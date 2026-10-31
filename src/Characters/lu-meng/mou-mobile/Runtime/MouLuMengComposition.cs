@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouLuMengComposition
 {
-    internal const string Keji = "mou-mobile:keji", Dujiang = "mou-mobile:dujiang", Duojing = "mou-mobile:duojing";
+    internal const string Keji = "mou-mobile:keji",Dujiang = "mou-mobile:dujiang",Duojing = "mou-mobile:duojing";
     private static bool Plain(SkillProgramEffect e, SkillProgramEffectOp op) => e.Op == op && e.Target == SkillProgramEffectTarget.Owner &&
         e.TargetReference is null && e.ActorReference is null && e.NumberExpression is null && e.SourceBind is null && e.ResultBind is null &&
         e.Condition.Kind == SkillProgramConditionKind.Always;

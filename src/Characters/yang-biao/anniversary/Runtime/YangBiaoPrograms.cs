@@ -76,7 +76,7 @@ public sealed record AnniversaryYangBiaoNativeIssuedEvent(long FrameId, int Ordi
 public sealed record AnniversaryYangBiaoNativeReturnedEvent(long FrameId, int Ordinal, long UseId, bool HadAttack) : IGameEvent;
 internal static class AnniversaryYangBiaoComposition
 {
-    internal const string Zhaohan = "anniversary:zhaohan", Jinjie = "anniversary:jinjie", Juee = "anniversary:juee";
+    internal const string Zhaohan = "anniversary:zhaohan",Jinjie = "anniversary:jinjie",Juee = "anniversary:juee";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ScheduleAnniversaryYangBiaoZhaohan or SkillProgramEffectOp.ResolveAnniversaryYangBiaoZhaohan or SkillProgramEffectOp.ResolveAnniversaryYangBiaoJinjie or SkillProgramEffectOp.ResolveAnniversaryYangBiaoJuee;
     [ProgramCatalogValidation(43700)] internal static void Validate(string path, SkillProgram p)
     {

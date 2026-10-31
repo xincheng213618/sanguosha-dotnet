@@ -19,7 +19,7 @@ internal sealed class AnniversaryZhangHuanHandler : ISkillProgramEffectHandler
 }
 internal static class AnniversaryZhangHuanComposition
 {
-    internal const string Yiju = "anniversary:yiju", Shuguo = "anniversary:shuguo";
+    internal const string Yiju = "anniversary:yiju",Shuguo = "anniversary:shuguo";
     [ProgramCatalogValidation(46300)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op == SkillProgramEffectOp.ResolveAnniversaryZhangHuanShuguo)) return;

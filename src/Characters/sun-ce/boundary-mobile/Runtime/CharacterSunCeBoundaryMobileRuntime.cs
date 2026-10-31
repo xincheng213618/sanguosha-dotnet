@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSunCeBoundaryMobileRuntime : global::CardGame.Core.IBoundarySunCeMobileHost
+{
+    private readonly ICharacterSunCeBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSunCeBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSunCeBoundaryMobileCoreEquipmentSlotGroupProgramsOperations _coreEquipmentSlotGroupProgramsOperations;
+    private readonly ICharacterSunCeBoundaryMobileCoreLordSkillProjectionsOperations _coreLordSkillProjectionsOperations;
+    private readonly ICharacterSunCeBoundaryMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterSunCeBoundaryMobileCorePindianOperations _corePindianOperations;
+    private readonly ICharacterSunCeBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSunCeBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterSunCeBoundaryMobileCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterSunCeBoundaryMobileCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICharacterSunCeBoundaryMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterSunCeBoundaryMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterSunCeBoundaryMobileCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterSunCeBoundaryMobileCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterSunCeBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramContributionUsesAccess _coreGameEngineSkillProgramsProgramContributionUsesAccess;
+    internal CharacterSunCeBoundaryMobileRuntime(ICharacterSunCeBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterSunCeBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterSunCeBoundaryMobileCoreEquipmentSlotGroupProgramsOperations coreEquipmentSlotGroupProgramsOperations, ICharacterSunCeBoundaryMobileCoreLordSkillProjectionsOperations coreLordSkillProjectionsOperations, ICharacterSunCeBoundaryMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterSunCeBoundaryMobileCorePindianOperations corePindianOperations, ICharacterSunCeBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSunCeBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterSunCeBoundaryMobileCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterSunCeBoundaryMobileCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICharacterSunCeBoundaryMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterSunCeBoundaryMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterSunCeBoundaryMobileCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterSunCeBoundaryMobileCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterSunCeBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramContributionUsesAccess coreGameEngineSkillProgramsProgramContributionUsesAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreEquipmentSlotGroupProgramsOperations = coreEquipmentSlotGroupProgramsOperations;
+        this._coreLordSkillProjectionsOperations = coreLordSkillProjectionsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePindianOperations = corePindianOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineSkillProgramsProgramContributionUsesAccess = coreGameEngineSkillProgramsProgramContributionUsesAccess;
+    }
+}

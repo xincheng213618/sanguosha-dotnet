@@ -1,0 +1,66 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterSunYuanOlEntries
+{
+    internal bool AdvanceSunYuanChildren() => _resolve().AdvanceSunYuanChildren();
+    internal void AnswerSunYuan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerSunYuan(choice);
+    internal void AssertSunYuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSunYuan(f);
+    internal void BeginSayingFactionRequest(global::CardGame.Core.ProgramSkillFrame f, int actor, int target) => _resolve().BeginSayingFactionRequest(f, actor, target);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginSunYuan(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginSunYuan(supplied, op);
+    internal void BindDongxinEntityUse(global::CardGame.Core.CardUseFrame supplied) => _resolve().BindDongxinEntityUse(supplied);
+    internal void BindSayingSlashUse(global::CardGame.Core.CardUseFrame supplied) => _resolve().BindSayingSlashUse(supplied);
+    internal bool CanOfferSunYuan(global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext c, int owner) => _resolve().CanOfferSunYuan(t, c, owner);
+    internal global::CardGame.Core.PromptChoice ChooseSunYuanAi(global::CardGame.Core.PendingDecision p) => _resolve().ChooseSunYuanAi(p);
+    internal bool ContinueIssuedSunYuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueIssuedSunYuan(f);
+    internal void ContinueSunYuan(long id) => _resolve().ContinueSunYuan(id);
+    internal bool DistanceSpecificSlashExemption10HasSayingRoundRange(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().DistanceSpecificSlashExemption10HasSayingRoundRange(q);
+    internal bool DongxinCanPay(int owner, int victim) => _resolve().DongxinCanPay(owner, victim);
+    internal bool DongxinContextLegal(int owner, string direction, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().DongxinContextLegal(owner, direction, c);
+    internal bool DongxinDirectionAvailable(int owner, string direction) => _resolve().DongxinDirectionAvailable(owner, direction);
+    internal bool DongxinSlashQuotaBeforeLimit(global::CardGame.Core.ProgramSlashQuotaQuery query) => _resolve().DongxinSlashQuotaBeforeLimit(query);
+    internal bool DrainSunYuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainSunYuan(f);
+    internal bool FinishSayingSuppliedSlashFailure(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().FinishSayingSuppliedSlashFailure(supplied);
+    internal void FinishSunYuan(global::CardGame.Core.ProgramSkillFrame f, bool applied) => _resolve().FinishSunYuan(f, applied);
+    internal bool HasDongxinEntitySlashQuota(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int> ids) => _resolve().HasDongxinEntitySlashQuota(actor, kind, ids);
+    internal bool HasIssuedDongxinEntitySlashQuota(long? useId, int actor) => _resolve().HasIssuedDongxinEntitySlashQuota(useId, actor);
+    internal bool HasIssuedDongxinSlashDebitExemption(long useId, int actorSeat) => _resolve().HasIssuedDongxinSlashDebitExemption(useId, actorSeat);
+    internal bool HasSayingRoundRange(int actor, int target) => _resolve().HasSayingRoundRange(actor, target);
+    internal bool HasSayingWeijiePayment(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardUseFrame? use = default) => _resolve().HasSayingWeijiePayment(f, use);
+    internal bool HasSunYuanBeforeDamageObserver(long id) => _resolve().HasSunYuanBeforeDamageObserver(id);
+    internal bool HasSunYuanDamageObserver(long id) => _resolve().HasSunYuanDamageObserver(id);
+    internal bool IsIssuedSayingUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedSayingUse(use);
+    internal bool IsSayingFactionOrigin(global::CardGame.Core.ProgramSkillFrame f, int actor, int target, string resultBind) => _resolve().IsSayingFactionOrigin(f, actor, target, resultBind);
+    internal bool IsSayingNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsSayingNativeSettlementBatch(f, batch);
+    internal bool IsSayingRemovedMaterial(long useId, int cardId) => _resolve().IsSayingRemovedMaterial(useId, cardId);
+    internal bool IsSayingSlashQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsSayingSlashQuery(actor);
+    internal bool IsSayingSlashRequest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsSayingSlashRequest(f);
+    internal bool IsSunYuanDying() => _resolve().IsSunYuanDying();
+    internal bool IsSunYuanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsSunYuanMovement(f, effect, pending);
+    internal bool IsSunYuanPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsSunYuanPaidMovement(f, m);
+    internal bool IsSunYuanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsSunYuanRecoveryParent(f, recovery);
+    internal void IssueSunYuanMove(global::CardGame.Core.ProgramSkillFrame supplied, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.CardLocation to, global::CardGame.Core.SunYuanStage stage, string reason, bool discard) => _resolve().IssueSunYuanMove(supplied, ids, to, stage, reason, discard);
+    internal void PayDongxin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayDongxin(f);
+    internal void PrepareSayingSuppliedSlash(global::CardGame.Core.ProgramSkillFrame supplied, int actorSeat, int providerSeat, int targetSeat, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> materials, global::CardGame.Core.CardConversionSource? conversionSource, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardConversionSource>? additionalConversionSources = default) => _resolve().PrepareSayingSuppliedSlash(supplied, actorSeat, providerSeat, targetSeat, kind, materials, conversionSource, additionalConversionSources);
+    internal void ProjectDongxinCardSkillMark(int cardId, ref global::CardGame.Core.CardSkillMarkProjection projection) => _resolve().ProjectDongxinCardSkillMark(cardId, ref projection);
+    internal void PublishSaying(global::CardGame.Core.ProgramSkillFrame supplied, bool keepCurrentRequest = false) => _resolve().PublishSaying(supplied, keepCurrentRequest);
+    internal void ReclaimDongxin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReclaimDongxin(f);
+    internal void RecordDongxinEntityDeparture(global::CardGame.Core.CardMovedEvent e) => _resolve().RecordDongxinEntityDeparture(e);
+    internal void RecordSayingSlashPayment(global::CardGame.Core.CardMovedEvent e) => _resolve().RecordSayingSlashPayment(e);
+    internal bool ResumeSayingSuppliedSlash(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ResumeSayingSuppliedSlash(supplied);
+    internal bool ResumeSunYuan(long id) => _resolve().ResumeSunYuan(id);
+    internal bool ReturnSayingAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnSayingAttack(completion);
+    internal void ReturnSayingNative(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnSayingNative(use);
+    internal bool ReturnSunYuanMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnSunYuanMovement(f);
+    internal bool SayingSlashQuotaBeforeLimit(global::CardGame.Core.ProgramSlashQuotaQuery query) => _resolve().SayingSlashQuotaBeforeLimit(query);
+    internal void SettleSayingNative(global::CardGame.Core.SayingNativeOrigin o) => _resolve().SettleSayingNative(o);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> SunYuanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SunYuanChoices(f);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> SunYuanEligibleCards(int chooser, int holder, bool obtain) => _resolve().SunYuanEligibleCards(chooser, holder, obtain);
+    internal bool SunYuanFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().SunYuanFirstChild(f, child);
+    internal global::CardGame.Core.ProgramSkillFrame? SunYuanObserverRoot() => _resolve().SunYuanObserverRoot();
+    internal bool SunYuanParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SunYuanParent(f);
+    internal bool TryGetSayingSlashRequest(global::CardGame.Core.ProgramSkillFrame f, scoped out int actorSeat, scoped out global::System.Collections.Generic.IReadOnlyList<int> targetSeats) => _resolve().TryGetSayingSlashRequest(f, out actorSeat, out targetSeats);
+    internal bool ValidateSayingFactionSlashParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidateSayingFactionSlashParent(pending, f);
+    internal void ValidateSayingNative(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateSayingNative(use);
+    internal bool WindowSettlement_IsSayingNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().WindowSettlement_IsSayingNativeSettlementBatch(frame, batch);
+    internal bool HasSunYuanCapability { get => _resolve().HasSunYuanCapability; }
+}

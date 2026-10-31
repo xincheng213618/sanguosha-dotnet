@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
+{
+    private readonly ICoreProgramCardPoliciesCharacterCaiWenJiLeOperations _characterCaiWenJiLeOperations;
+    private readonly ICoreProgramCardPoliciesCharacterCaoPiMouOperations _characterCaoPiMouOperations;
+    private readonly ICoreProgramCardPoliciesCharacterHanSongAnniversaryOperations _characterHanSongAnniversaryOperations;
+    private readonly ICoreProgramCardPoliciesCharacterHuangGaiMouMobileOperations _characterHuangGaiMouMobileOperations;
+    private readonly ICoreProgramCardPoliciesCharacterLuZhiMouOlOperations _characterLuZhiMouOlOperations;
+    private readonly ICoreProgramCardPoliciesCharacterLvYiMobileShiOperations _characterLvYiMobileShiOperations;
+    private readonly ICoreProgramCardPoliciesCharacterSunCeMobileGodOperations _characterSunCeMobileGodOperations;
+    private readonly ICoreProgramCardPoliciesCharacterSunShaoMobileShiOperations _characterSunShaoMobileShiOperations;
+    private readonly ICoreProgramCardPoliciesCharacterSunYuanOlOperations _characterSunYuanOlOperations;
+    private readonly ICoreProgramCardPoliciesCharacterXiahouBaMobileShiOperations _characterXiahouBaMobileShiOperations;
+    private readonly ICoreProgramCardPoliciesCharacterXiahouHuiAnniversaryOperations _characterXiahouHuiAnniversaryOperations;
+    private readonly ICoreProgramCardPoliciesCharacterXiaoQiaoBoundaryMobileOperations _characterXiaoQiaoBoundaryMobileOperations;
+    private readonly ICoreProgramCardPoliciesCharacterZhangFeiAnniversaryGodOperations _characterZhangFeiAnniversaryGodOperations;
+    private readonly ICoreProgramCardPoliciesCharacterZhongHuiMobileShiOperations _characterZhongHuiMobileShiOperations;
+    private readonly ICoreProgramCardPoliciesCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreProgramCardPoliciesCoreLordSkillProjectionsOperations _coreLordSkillProjectionsOperations;
+    private readonly ICoreProgramCardPoliciesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramCardPoliciesCoreProgramAlcoholQuotaOperations _coreProgramAlcoholQuotaOperations;
+    private readonly ICoreProgramCardPoliciesCoreShanheS5QuyiOperations _coreShanheS5QuyiOperations;
+    private readonly ICoreProgramCardPoliciesCoreShanheTrickResponseOperations _coreShanheTrickResponseOperations;
+    private readonly ICoreProgramCardPoliciesCoreWushuangSkillsBAuditOperations _coreWushuangSkillsBAuditOperations;
+    private readonly ICoreProgramCardPoliciesCoreLeastHandMarkerDrawProgramsOperations _coreLeastHandMarkerDrawProgramsOperations;
+    private readonly ICoreProgramCardPoliciesCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreProgramCardPoliciesCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreProgramCardPoliciesCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
+    private readonly ICoreProgramCardPoliciesCoreShanheBossProgramsOperations _coreShanheBossProgramsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramCardPoliciesRuntime(ICoreProgramCardPoliciesCharacterCaiWenJiLeOperations characterCaiWenJiLeOperations, ICoreProgramCardPoliciesCharacterCaoPiMouOperations characterCaoPiMouOperations, ICoreProgramCardPoliciesCharacterHanSongAnniversaryOperations characterHanSongAnniversaryOperations, ICoreProgramCardPoliciesCharacterHuangGaiMouMobileOperations characterHuangGaiMouMobileOperations, ICoreProgramCardPoliciesCharacterLuZhiMouOlOperations characterLuZhiMouOlOperations, ICoreProgramCardPoliciesCharacterLvYiMobileShiOperations characterLvYiMobileShiOperations, ICoreProgramCardPoliciesCharacterSunCeMobileGodOperations characterSunCeMobileGodOperations, ICoreProgramCardPoliciesCharacterSunShaoMobileShiOperations characterSunShaoMobileShiOperations, ICoreProgramCardPoliciesCharacterSunYuanOlOperations characterSunYuanOlOperations, ICoreProgramCardPoliciesCharacterXiahouBaMobileShiOperations characterXiahouBaMobileShiOperations, ICoreProgramCardPoliciesCharacterXiahouHuiAnniversaryOperations characterXiahouHuiAnniversaryOperations, ICoreProgramCardPoliciesCharacterXiaoQiaoBoundaryMobileOperations characterXiaoQiaoBoundaryMobileOperations, ICoreProgramCardPoliciesCharacterZhangFeiAnniversaryGodOperations characterZhangFeiAnniversaryGodOperations, ICoreProgramCardPoliciesCharacterZhongHuiMobileShiOperations characterZhongHuiMobileShiOperations, ICoreProgramCardPoliciesCoreActionQueriesOperations coreActionQueriesOperations, ICoreProgramCardPoliciesCoreLordSkillProjectionsOperations coreLordSkillProjectionsOperations, ICoreProgramCardPoliciesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramCardPoliciesCoreProgramAlcoholQuotaOperations coreProgramAlcoholQuotaOperations, ICoreProgramCardPoliciesCoreShanheS5QuyiOperations coreShanheS5QuyiOperations, ICoreProgramCardPoliciesCoreShanheTrickResponseOperations coreShanheTrickResponseOperations, ICoreProgramCardPoliciesCoreWushuangSkillsBAuditOperations coreWushuangSkillsBAuditOperations, ICoreProgramCardPoliciesCoreLeastHandMarkerDrawProgramsOperations coreLeastHandMarkerDrawProgramsOperations, ICoreProgramCardPoliciesCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreProgramCardPoliciesCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreProgramCardPoliciesCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICoreProgramCardPoliciesCoreShanheBossProgramsOperations coreShanheBossProgramsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCaiWenJiLeOperations = characterCaiWenJiLeOperations;
+        this._characterCaoPiMouOperations = characterCaoPiMouOperations;
+        this._characterHanSongAnniversaryOperations = characterHanSongAnniversaryOperations;
+        this._characterHuangGaiMouMobileOperations = characterHuangGaiMouMobileOperations;
+        this._characterLuZhiMouOlOperations = characterLuZhiMouOlOperations;
+        this._characterLvYiMobileShiOperations = characterLvYiMobileShiOperations;
+        this._characterSunCeMobileGodOperations = characterSunCeMobileGodOperations;
+        this._characterSunShaoMobileShiOperations = characterSunShaoMobileShiOperations;
+        this._characterSunYuanOlOperations = characterSunYuanOlOperations;
+        this._characterXiahouBaMobileShiOperations = characterXiahouBaMobileShiOperations;
+        this._characterXiahouHuiAnniversaryOperations = characterXiahouHuiAnniversaryOperations;
+        this._characterXiaoQiaoBoundaryMobileOperations = characterXiaoQiaoBoundaryMobileOperations;
+        this._characterZhangFeiAnniversaryGodOperations = characterZhangFeiAnniversaryGodOperations;
+        this._characterZhongHuiMobileShiOperations = characterZhongHuiMobileShiOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreLordSkillProjectionsOperations = coreLordSkillProjectionsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAlcoholQuotaOperations = coreProgramAlcoholQuotaOperations;
+        this._coreShanheS5QuyiOperations = coreShanheS5QuyiOperations;
+        this._coreShanheTrickResponseOperations = coreShanheTrickResponseOperations;
+        this._coreWushuangSkillsBAuditOperations = coreWushuangSkillsBAuditOperations;
+        this._coreLeastHandMarkerDrawProgramsOperations = coreLeastHandMarkerDrawProgramsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;
+        this._coreShanheBossProgramsOperations = coreShanheBossProgramsOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

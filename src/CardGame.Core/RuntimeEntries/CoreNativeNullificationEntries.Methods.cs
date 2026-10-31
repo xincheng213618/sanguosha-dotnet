@@ -1,0 +1,17 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CoreNativeNullificationEntries
+{
+    internal void BeginJizhiOrNullificationWindow(long resolutionId, global::CardGame.Core.Card effectCard, int sourceSeat, global::System.Collections.Generic.IReadOnlyList<int> targetSeats, global::CardGame.Core.LegalActionKind actionKind, int? targetCardId = default, global::CardGame.Core.CardKind? requiredCardKind = default, global::CardGame.Core.CardKind? playedCardKind = default) => _resolve().BeginJizhiOrNullificationWindow(resolutionId, effectCard, sourceSeat, targetSeats, actionKind, targetCardId, requiredCardKind, playedCardKind);
+    internal void BeginNullificationWindow(long resolutionId, global::CardGame.Core.Card effectCard, int sourceSeat, global::System.Collections.Generic.IReadOnlyList<int> targetSeats, global::CardGame.Core.LegalActionKind actionKind, int? targetCardId = default, global::CardGame.Core.CardKind? requiredCardKind = default, global::CardGame.Core.CardKind? playedCardKind = default) => _resolve().BeginNullificationWindow(resolutionId, effectCard, sourceSeat, targetSeats, actionKind, targetCardId, requiredCardKind, playedCardKind);
+    internal global::System.Collections.Generic.IReadOnlyList<int> BuildNullificationCandidateSeats(int startAfterSeat) => _resolve().BuildNullificationCandidateSeats(startAfterSeat);
+    internal void ContinueJizhiOrNullificationAfterTargetTriggers(global::CardGame.Core.NativeOwners.JizhiResolution pending) => _resolve().ContinueJizhiOrNullificationAfterTargetTriggers(pending);
+    internal void ContinueNullificationWindow(global::CardGame.Core.NullificationWindowFrame pending) => _resolve().ContinueNullificationWindow(pending);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> CreateNullificationChoices(global::CardGame.Core.NullificationWindowFrame pending, global::CardGame.Core.CharacterState responder, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards) => _resolve().CreateNullificationChoices(pending, responder, cards);
+    internal void FinishNullificationWindow(global::CardGame.Core.NullificationWindowFrame pending) => _resolve().FinishNullificationWindow(pending);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> GetNullificationCards(global::CardGame.Core.CharacterState responder) => _resolve().GetNullificationCards(responder);
+    internal void ResolveNullifiableEffect(global::CardGame.Core.NullificationWindowFrame pending) => _resolve().ResolveNullifiableEffect(pending);
+    internal void ResolveNullifiableEffectCore(global::CardGame.Core.NullificationWindowFrame pending) => _resolve().ResolveNullifiableEffectCore(pending);
+    internal void ResolveNullificationChoice(global::CardGame.Core.NullificationWindowFrame pending, global::CardGame.Core.CharacterState responder, global::CardGame.Core.Card? selectedCard, global::CardGame.Core.CardConversionSource? selectedConversionSource = default) => _resolve().ResolveNullificationChoice(pending, responder, selectedCard, selectedConversionSource);
+    internal void ValidateNullificationConversion(global::CardGame.Core.CharacterState responder, global::CardGame.Core.Card card, global::CardGame.Core.CardConversionSource? selectedSource) => _resolve().ValidateNullificationConversion(responder, card, selectedSource);
+}

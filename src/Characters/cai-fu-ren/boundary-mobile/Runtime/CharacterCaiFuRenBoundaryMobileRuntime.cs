@@ -1,0 +1,61 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterCaiFuRenBoundaryMobileRuntime : global::CardGame.Core.IBoundaryMobileQietingHost
+{
+    private readonly ICharacterCaiFuRenBoundaryMobileCharacterCaiFuRenOlOperations _characterCaiFuRenOlOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileRandomOperations _randomOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterCaiFuRenBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterCaiFuRenBoundaryMobileRuntime(ICharacterCaiFuRenBoundaryMobileCharacterCaiFuRenOlOperations characterCaiFuRenOlOperations, ICharacterCaiFuRenBoundaryMobileCardZonesOperations cardZonesOperations, ICharacterCaiFuRenBoundaryMobileRandomOperations randomOperations, ICharacterCaiFuRenBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterCaiFuRenBoundaryMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterCaiFuRenBoundaryMobileCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICharacterCaiFuRenBoundaryMobileCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterCaiFuRenBoundaryMobileCoreEquipmentContentOperations coreEquipmentContentOperations, ICharacterCaiFuRenBoundaryMobileCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICharacterCaiFuRenBoundaryMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterCaiFuRenBoundaryMobileCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterCaiFuRenBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterCaiFuRenBoundaryMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterCaiFuRenBoundaryMobileCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterCaiFuRenBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterCaiFuRenBoundaryMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterCaiFuRenBoundaryMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterCaiFuRenBoundaryMobileCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterCaiFuRenBoundaryMobileCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterCaiFuRenBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.RuntimeAccess.IClosedHandCardViewQueriesSource _closedHandCardViewQueriesSource)
+    {
+        this._characterCaiFuRenOlOperations = characterCaiFuRenOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._closedHandCardViewQueriesSource = _closedHandCardViewQueriesSource;
+    }
+
+    private readonly global::CardGame.Core.RuntimeAccess.IClosedHandCardViewQueriesSource _closedHandCardViewQueriesSource;
+}

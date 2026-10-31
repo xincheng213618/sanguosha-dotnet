@@ -14,7 +14,7 @@ public sealed record WushuangShopDecision(WushuangShopAction Action, string? Off
 public sealed partial class SimpleAiBrain
 {
     private long _wushuangShopWindow = -1;
-    private int _wushuangFreeRefreshes, _wushuangPaidRefreshes;
+    private int _wushuangFreeRefreshes,_wushuangPaidRefreshes;
     private string? _wushuangSavedOffer;
     private int _wushuangSavedTurn;
 

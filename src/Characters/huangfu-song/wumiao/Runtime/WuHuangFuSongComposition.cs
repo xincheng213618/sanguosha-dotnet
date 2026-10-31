@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class WuHuangFuSongComposition
 {
-    internal const string Chaozhen = "wumiao:chaozhen", Lianjie = "wumiao:lianjie", Jiangxian = "wumiao:jiangxian";
+    internal const string Chaozhen = "wumiao:chaozhen",Lianjie = "wumiao:lianjie",Jiangxian = "wumiao:jiangxian";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveWuHuangFuSongChaozhen or SkillProgramEffectOp.ResolveWuHuangFuSongLianjie or SkillProgramEffectOp.ArmWuHuangFuSongJiangxian or SkillProgramEffectOp.SettleWuHuangFuSongJiangxian;
     private static bool Effect(IReadOnlyList<SkillProgramEffect> e, SkillProgramEffectOp op) => e is [var a] && a.Op == op && a.Target == SkillProgramEffectTarget.Owner && a.Amount == 0 && a.Condition.Kind == SkillProgramConditionKind.Always && a.ActorReference is null && a.TargetReference is null && a.SourceBind is null && a.ResultBind is null && a.NumberExpression is null;
     private static bool Trigger(SkillProgramTrigger t, string id, SkillProgramTriggerWindow w, bool optional, SkillProgramEffectOp op) => t.Id == id && t.Window == w && t.Optional == optional && t.Condition.Kind == SkillProgramTriggerConditionKind.Always && t.UsageLimit is null && t.MarkerCost is null && t.CardKinds.Count == 0 && t.CardCategories.Count == 0 && t.SourceZones.Count == 0 && t.DestinationZones.Count == 0 && t.MovementReasons.Count == 0 && Effect(t.Effects, op);

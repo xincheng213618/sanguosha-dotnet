@@ -1,0 +1,60 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRecipientContestReceiptsRuntime
+{
+    private readonly ICoreRecipientContestReceiptsCharacterLiuPanOlOperations _characterLiuPanOlOperations;
+    private readonly ICoreRecipientContestReceiptsCharacterMaChengOlOperations _characterMaChengOlOperations;
+    private readonly ICoreRecipientContestReceiptsCharacterMaWanOlOperations _characterMaWanOlOperations;
+    private readonly ICoreRecipientContestReceiptsCharacterMaXiuMaTieOlOperations _characterMaXiuMaTieOlOperations;
+    private readonly ICoreRecipientContestReceiptsCharacterQianZhaoOlOperations _characterQianZhaoOlOperations;
+    private readonly ICoreRecipientContestReceiptsCharacterYangFuOlOperations _characterYangFuOlOperations;
+    private readonly ICoreRecipientContestReceiptsCharacterZhangYanOlOperations _characterZhangYanOlOperations;
+    private readonly ICoreRecipientContestReceiptsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRecipientContestReceiptsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRecipientContestReceiptsCoreActualTurnDamageClaimsOperations _coreActualTurnDamageClaimsOperations;
+    private readonly ICoreRecipientContestReceiptsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreRecipientContestReceiptsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRecipientContestReceiptsCoreCurrentSlashFireOffersOperations _coreCurrentSlashFireOffersOperations;
+    private readonly ICoreRecipientContestReceiptsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreRecipientContestReceiptsCoreOriginalTargetAdditionsOperations _coreOriginalTargetAdditionsOperations;
+    private readonly ICoreRecipientContestReceiptsCoreRecipientContestsOperations _coreRecipientContestsOperations;
+    private readonly ICoreRecipientContestReceiptsCoreSameTypeActualUseAidOperations _coreSameTypeActualUseAidOperations;
+    private readonly ICoreRecipientContestReceiptsCoreShortRangeSlashTargetsOperations _coreShortRangeSlashTargetsOperations;
+    private readonly ICoreRecipientContestReceiptsCoreUniqueHpPeerProgramsOperations _coreUniqueHpPeerProgramsOperations;
+    private readonly ICoreRecipientContestReceiptsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreRecipientContestReceiptsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineRecipientContestReceiptsRuntime(ICoreRecipientContestReceiptsCharacterLiuPanOlOperations characterLiuPanOlOperations, ICoreRecipientContestReceiptsCharacterMaChengOlOperations characterMaChengOlOperations, ICoreRecipientContestReceiptsCharacterMaWanOlOperations characterMaWanOlOperations, ICoreRecipientContestReceiptsCharacterMaXiuMaTieOlOperations characterMaXiuMaTieOlOperations, ICoreRecipientContestReceiptsCharacterQianZhaoOlOperations characterQianZhaoOlOperations, ICoreRecipientContestReceiptsCharacterYangFuOlOperations characterYangFuOlOperations, ICoreRecipientContestReceiptsCharacterZhangYanOlOperations characterZhangYanOlOperations, ICoreRecipientContestReceiptsContentRegistryOperations contentRegistryOperations, ICoreRecipientContestReceiptsResolutionStackOperations resolutionStackOperations, ICoreRecipientContestReceiptsCoreActualTurnDamageClaimsOperations coreActualTurnDamageClaimsOperations, ICoreRecipientContestReceiptsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreRecipientContestReceiptsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRecipientContestReceiptsCoreCurrentSlashFireOffersOperations coreCurrentSlashFireOffersOperations, ICoreRecipientContestReceiptsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreRecipientContestReceiptsCoreOriginalTargetAdditionsOperations coreOriginalTargetAdditionsOperations, ICoreRecipientContestReceiptsCoreRecipientContestsOperations coreRecipientContestsOperations, ICoreRecipientContestReceiptsCoreSameTypeActualUseAidOperations coreSameTypeActualUseAidOperations, ICoreRecipientContestReceiptsCoreShortRangeSlashTargetsOperations coreShortRangeSlashTargetsOperations, ICoreRecipientContestReceiptsCoreUniqueHpPeerProgramsOperations coreUniqueHpPeerProgramsOperations, ICoreRecipientContestReceiptsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreRecipientContestReceiptsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._characterLiuPanOlOperations = characterLiuPanOlOperations;
+        this._characterMaChengOlOperations = characterMaChengOlOperations;
+        this._characterMaWanOlOperations = characterMaWanOlOperations;
+        this._characterMaXiuMaTieOlOperations = characterMaXiuMaTieOlOperations;
+        this._characterQianZhaoOlOperations = characterQianZhaoOlOperations;
+        this._characterYangFuOlOperations = characterYangFuOlOperations;
+        this._characterZhangYanOlOperations = characterZhangYanOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnDamageClaimsOperations = coreActualTurnDamageClaimsOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCurrentSlashFireOffersOperations = coreCurrentSlashFireOffersOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreOriginalTargetAdditionsOperations = coreOriginalTargetAdditionsOperations;
+        this._coreRecipientContestsOperations = coreRecipientContestsOperations;
+        this._coreSameTypeActualUseAidOperations = coreSameTypeActualUseAidOperations;
+        this._coreShortRangeSlashTargetsOperations = coreShortRangeSlashTargetsOperations;
+        this._coreUniqueHpPeerProgramsOperations = coreUniqueHpPeerProgramsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

@@ -23,7 +23,7 @@ internal sealed class AnniversaryQiaoRuiHandler(SkillProgramEffectOp op) : ISkil
 { public SkillProgramEffectOp Op => op; public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int seat, ISkillProgramEffectHost h) => h.GetCapability<IAnniversaryQiaoRuiHost>().Begin(f, op); }
 internal static class AnniversaryQiaoRuiComposition
 {
- internal const string Aishou = "anniversary:aishou", Saowei = "anniversary:saowei";
+ internal const string Aishou = "anniversary:aishou",Saowei = "anniversary:saowei";
  [ProgramCatalogValidation(49400)] internal static void Validate(string path, SkillProgram p)
  {
   if (!p.Triggers.SelectMany(t => t.Effects).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouDraw or SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouPrepare or SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouLastLoss or SkillProgramEffectOp.ResolveAnniversaryQiaoRuiSaowei)) return;

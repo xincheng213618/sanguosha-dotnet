@@ -1,0 +1,26 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProvenanceClaimObserversRuntime
+{
+    private readonly ICoreProvenanceClaimObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProvenanceClaimObserversCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreProvenanceClaimObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreProvenanceClaimObserversCoreDiscardedProvenanceOperations _coreDiscardedProvenanceOperations;
+    private readonly ICoreProvenanceClaimObserversCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICoreProvenanceClaimObserversCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    internal CoreGameEngineProvenanceClaimObserversRuntime(ICoreProvenanceClaimObserversResolutionStackOperations resolutionStackOperations, ICoreProvenanceClaimObserversCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreProvenanceClaimObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreProvenanceClaimObserversCoreDiscardedProvenanceOperations coreDiscardedProvenanceOperations, ICoreProvenanceClaimObserversCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICoreProvenanceClaimObserversCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreDiscardedProvenanceOperations = coreDiscardedProvenanceOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+    }
+}

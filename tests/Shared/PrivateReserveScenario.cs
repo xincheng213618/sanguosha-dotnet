@@ -3,9 +3,9 @@ using CardGame.Core;
 
 internal static class PrivateReserveScenario
 {
-    public const string Qixing = "ol:qixing";
-    public const string Gale = "ol:kuangfeng";
-    public const string Mist = "ol:dawu";
+    public const string Qixing = "mobile-god:qixing";
+    public const string Gale = "mobile-god:kuangfeng";
+    public const string Mist = "mobile-god:dawu";
     public static ContentRegistry Registry() => ContentRegistry.Build(new StandardContentPackage(), new Fixture());
 
     public static GameEngine Start(ContentRegistry registry)

@@ -90,15 +90,15 @@ internal static class WoodenOxChecks
                     transferState.Players[targetSeat].WoodenOxGrain!.Single().Id == storedId,
                 "Moving Wooden Ox between equipment zones must carry all stored grain.");
 
-            var players = (IList)typeof(GameEngine)
+            var players = (IList)global::FixtureRuntimeAccess.Engine
                 .GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .GetValue(transferred)!;
             var targetRuntime = players[targetSeat]!;
-            var findCard = typeof(GameEngine).GetMethod(
+            var findCard = global::FixtureRuntimeAccess.Engine.GetMethod(
                 "FindOwnedPlayableCard", BindingFlags.Instance | BindingFlags.NonPublic)!;
             var woodenOx = findCard.Invoke(transferred, [targetRuntime, transferState.Players[targetSeat]
                 .Equipment.Single(card => card.Kind == CardKind.WoodenOx).Id])!;
-            typeof(GameEngine).GetMethod("MoveCard", BindingFlags.Instance | BindingFlags.NonPublic)!
+            global::FixtureRuntimeAccess.Engine.GetMethod("MoveCard", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .Invoke(transferred,
                 [woodenOx, CardLocation.Equipment(targetSeat), CardLocation.DiscardPile, CardMoveReasons.DismantlementFinished, null, true, CardMovementDisclosure.Unspecified]);
             Require(transferred.CardMovements.Any(move =>

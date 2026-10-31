@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouZhangXiuOlComposition
 {
-    internal const string Qiulie = "mou-ol:qiulie", Zhuijiao = "mou-ol:zhuijiao";
+    internal const string Qiulie = "mou-ol:qiulie",Zhuijiao = "mou-ol:zhuijiao";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouZhangXiuQiulie or SkillProgramEffectOp.UseMouZhangXiuQiulieSlash or SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash or SkillProgramEffectOp.ResolveMouZhangXiuZhuijiao or SkillProgramEffectOp.CompleteMouZhangXiuZhuijiao;
     internal static ActualDiscardRecoveryPhaseKind? Phase(SkillProgramTriggerWindow window) => window switch
     {

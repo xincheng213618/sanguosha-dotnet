@@ -1,0 +1,9 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CoreGameEngineProgramOrdinaryTrickUsesEntries
+{
+    internal void AddProgramOrdinaryTrickTargetCardOptions(global::System.Collections.Generic.ICollection<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> options, global::CardGame.Core.CharacterState source, global::CardGame.Core.CharacterState target, global::CardGame.Core.CardKind cardKind, global::CardGame.Core.LegalActionKind actionKind, string cardName) => _resolve().AddProgramOrdinaryTrickTargetCardOptions(options, source, target, cardKind, actionKind, cardName);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> BuildProgramOrdinaryTrickUseOptions(global::CardGame.Core.CharacterState source, global::CardGame.Core.CardKind? outputKind = default, global::CardGame.Core.Suit? physicalSuit = default, bool excludeOwner = false, bool enforceUsePermission = false, global::CardGame.Core.Suit? beneficiaryShieldSuit = default, bool? actualEffectiveColor = default, bool hasActualColor = false, global::System.Collections.Generic.IReadOnlyList<int>? physicalCardIds = default, bool includeNextActualUseAdjustment = false, global::CardGame.Core.CardConversionSource? conversionSource = default) => _resolve().BuildProgramOrdinaryTrickUseOptions(source, outputKind, physicalSuit, excludeOwner, enforceUsePermission, beneficiaryShieldSuit, actualEffectiveColor, hasActualColor, physicalCardIds, includeNextActualUseAdjustment, conversionSource);
+    internal void ResolveProgramOrdinaryTrickUseChoice(global::CardGame.Core.PromptChoice selected) => _resolve().ResolveProgramOrdinaryTrickUseChoice(selected);
+    internal global::CardGame.Core.SkillProgramStepOutcome UseProgramAllHandCardsAsOrdinaryTrick(global::CardGame.Core.ProgramSkillFrame frame, string viewAsId) => _resolve().UseProgramAllHandCardsAsOrdinaryTrick(frame, viewAsId);
+}

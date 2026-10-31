@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterChenZhiMobileShiRuntime : global::CardGame.Core.IMobileShiChenZhiHost
+{
+    private readonly ICharacterChenZhiMobileShiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterChenZhiMobileShiResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterChenZhiMobileShiSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICharacterChenZhiMobileShiCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterChenZhiMobileShiCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterChenZhiMobileShiCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterChenZhiMobileShiCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterChenZhiMobileShiCorePrepPoisonOutcomesOperations _corePrepPoisonOutcomesOperations;
+    private readonly ICharacterChenZhiMobileShiCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterChenZhiMobileShiCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterChenZhiMobileShiCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICharacterChenZhiMobileShiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterChenZhiMobileShiCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterChenZhiMobileShiCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterChenZhiMobileShiCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterChenZhiMobileShiCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterChenZhiMobileShiCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterChenZhiMobileShiCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterChenZhiMobileShiCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterChenZhiMobileShiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterChenZhiMobileShiRuntime(ICharacterChenZhiMobileShiContentRegistryOperations contentRegistryOperations, ICharacterChenZhiMobileShiResolutionStackOperations resolutionStackOperations, ICharacterChenZhiMobileShiSkillRuntimeStateOperations skillRuntimeStateOperations, ICharacterChenZhiMobileShiCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterChenZhiMobileShiCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterChenZhiMobileShiCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterChenZhiMobileShiCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterChenZhiMobileShiCorePrepPoisonOutcomesOperations corePrepPoisonOutcomesOperations, ICharacterChenZhiMobileShiCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterChenZhiMobileShiCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterChenZhiMobileShiCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICharacterChenZhiMobileShiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterChenZhiMobileShiCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterChenZhiMobileShiCoreRuntimeOperations coreRuntimeOperations, ICharacterChenZhiMobileShiCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterChenZhiMobileShiCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterChenZhiMobileShiCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterChenZhiMobileShiCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterChenZhiMobileShiCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterChenZhiMobileShiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePrepPoisonOutcomesOperations = corePrepPoisonOutcomesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

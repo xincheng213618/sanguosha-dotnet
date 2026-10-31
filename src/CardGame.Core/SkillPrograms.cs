@@ -4212,7 +4212,7 @@ public sealed class SkillProgramCatalog
         { DiscardCost = discardCost, ProviderDrawCount = providerDrawCount,
           UseIncomingResponseDistance = useIncomingResponseDistance, IncludeNonTargetResponders = includeNonTargetResponders,
           PeachRecoveryScope = peachRecoveryScope, BeforePhaseEntry = beforePhaseEntry };
-        GameEngine.ValidateComparedBlackSlashPolicy(path, policy);
+global::CardGame.Core.EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBlackSlashPolicy(path,policy);
         return policy;
     }
 

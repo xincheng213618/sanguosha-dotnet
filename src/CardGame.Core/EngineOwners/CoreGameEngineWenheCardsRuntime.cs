@@ -1,0 +1,88 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineWenheCardsRuntime
+{
+    private readonly ICoreWenheCardsCharacterZhugeGuoLeOperations _characterZhugeGuoLeOperations;
+    private readonly ICoreWenheCardsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreWenheCardsRandomOperations _randomOperations;
+    private readonly ICoreWenheCardsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreWenheCardsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreWenheCardsCoreActivityBattleRulesOperations _coreActivityBattleRulesOperations;
+    private readonly ICoreWenheCardsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreWenheCardsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreWenheCardsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreWenheCardsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreWenheCardsCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreWenheCardsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreWenheCardsCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreWenheCardsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreWenheCardsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreWenheCardsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreWenheCardsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreWenheCardsCoreShenwuEquipmentOperations _coreShenwuEquipmentOperations;
+    private readonly ICoreWenheCardsCoreWenheChaosOperations _coreWenheChaosOperations;
+    private readonly ICoreWenheCardsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreWenheCardsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreWenheCardsCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreWenheCardsCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreWenheCardsCoreNativeCoreInvariantsOperations _coreNativeCoreInvariantsOperations;
+    private readonly ICoreWenheCardsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreWenheCardsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreWenheCardsCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
+    private readonly ICoreWenheCardsCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreWenheCardsCoreNativeNullificationFramesOperations _coreNativeNullificationFramesOperations;
+    private readonly ICoreWenheCardsCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreWenheCardsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreWenheCardsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreWenheCardsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreWenheCardsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreWenheCardsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineWenheCardsRuntime(ICoreWenheCardsCharacterZhugeGuoLeOperations characterZhugeGuoLeOperations, ICoreWenheCardsCardZonesOperations cardZonesOperations, ICoreWenheCardsRandomOperations randomOperations, ICoreWenheCardsResolutionStackOperations resolutionStackOperations, ICoreWenheCardsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreWenheCardsCoreActivityBattleRulesOperations coreActivityBattleRulesOperations, ICoreWenheCardsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreWenheCardsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreWenheCardsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreWenheCardsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreWenheCardsCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreWenheCardsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreWenheCardsCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreWenheCardsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreWenheCardsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreWenheCardsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreWenheCardsCoreRuntimeOperations coreRuntimeOperations, ICoreWenheCardsCoreShenwuEquipmentOperations coreShenwuEquipmentOperations, ICoreWenheCardsCoreWenheChaosOperations coreWenheChaosOperations, ICoreWenheCardsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreWenheCardsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreWenheCardsCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreWenheCardsCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreWenheCardsCoreNativeCoreInvariantsOperations coreNativeCoreInvariantsOperations, ICoreWenheCardsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreWenheCardsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreWenheCardsCoreNativeLegalActionsOperations coreNativeLegalActionsOperations, ICoreWenheCardsCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreWenheCardsCoreNativeNullificationFramesOperations coreNativeNullificationFramesOperations, ICoreWenheCardsCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreWenheCardsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreWenheCardsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreWenheCardsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreWenheCardsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreWenheCardsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterZhugeGuoLeOperations = characterZhugeGuoLeOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreActivityBattleRulesOperations = coreActivityBattleRulesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShenwuEquipmentOperations = coreShenwuEquipmentOperations;
+        this._coreWenheChaosOperations = coreWenheChaosOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeCoreInvariantsOperations = coreNativeCoreInvariantsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativeNullificationFramesOperations = coreNativeNullificationFramesOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

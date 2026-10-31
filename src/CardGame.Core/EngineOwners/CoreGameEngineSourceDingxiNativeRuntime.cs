@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSourceDingxiNativeRuntime
+{
+    private readonly ICoreSourceDingxiNativeCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSourceDingxiNativeResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSourceDingxiNativeCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreSourceDingxiNativeCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreSourceDingxiNativeCoreAlcoholSlashSuppressionsOperations _coreAlcoholSlashSuppressionsOperations;
+    private readonly ICoreSourceDingxiNativeCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreSourceDingxiNativeCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreSourceDingxiNativeCoreCurrentCardEnhancementsOperations _coreCurrentCardEnhancementsOperations;
+    private readonly ICoreSourceDingxiNativeCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreSourceDingxiNativeCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreSourceDingxiNativeCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSourceDingxiNativeCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSourceDingxiNativeCoreSourceBeigongOperations _coreSourceBeigongOperations;
+    private readonly ICoreSourceDingxiNativeCoreNativeAiDecisionsOperations _coreNativeAiDecisionsOperations;
+    private readonly ICoreSourceDingxiNativeCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreSourceDingxiNativeCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreSourceDingxiNativeCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreSourceDingxiNativeCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreSourceDingxiNativeKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreSourceDingxiNativeKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSourceDingxiNativeRuntime(ICoreSourceDingxiNativeCardZonesOperations cardZonesOperations, ICoreSourceDingxiNativeResolutionStackOperations resolutionStackOperations, ICoreSourceDingxiNativeCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreSourceDingxiNativeCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreSourceDingxiNativeCoreAlcoholSlashSuppressionsOperations coreAlcoholSlashSuppressionsOperations, ICoreSourceDingxiNativeCoreCardActionsOperations coreCardActionsOperations, ICoreSourceDingxiNativeCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreSourceDingxiNativeCoreCurrentCardEnhancementsOperations coreCurrentCardEnhancementsOperations, ICoreSourceDingxiNativeCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreSourceDingxiNativeCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreSourceDingxiNativeCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSourceDingxiNativeCoreRuntimeOperations coreRuntimeOperations, ICoreSourceDingxiNativeCoreSourceBeigongOperations coreSourceBeigongOperations, ICoreSourceDingxiNativeCoreNativeAiDecisionsOperations coreNativeAiDecisionsOperations, ICoreSourceDingxiNativeCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreSourceDingxiNativeCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreSourceDingxiNativeCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreSourceDingxiNativeCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreSourceDingxiNativeKernelCoreMainOperations kernelCoreMainOperations, ICoreSourceDingxiNativeKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlcoholSlashSuppressionsOperations = coreAlcoholSlashSuppressionsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentCardEnhancementsOperations = coreCurrentCardEnhancementsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSourceBeigongOperations = coreSourceBeigongOperations;
+        this._coreNativeAiDecisionsOperations = coreNativeAiDecisionsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

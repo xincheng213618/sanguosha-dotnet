@@ -13,14 +13,4 @@ public sealed record ProgramYoudiBaitEvent(long FrameId, string SkillId, string 
 
 public sealed partial class GameEngine
 {
-
-
-    [ProgramCapability]
-    private sealed class ZhouFangProgramCapability(GameEngine engine) : IZhouFangProgramHost
-    {
-        public SkillProgramStepOutcome DuanfaDiscardAndDraw(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.DuanfaProgramDiscardAndDraw(frame, effect);
-        public SkillProgramStepOutcome YoudiBaitDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.YoudiProgramBaitDiscard(frame, effect);
-    }
 }

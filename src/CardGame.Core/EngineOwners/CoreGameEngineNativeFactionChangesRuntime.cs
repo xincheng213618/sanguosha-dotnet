@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineNativeFactionChangesRuntime
+{
+    private readonly ICoreNativeFactionChangesCharacterCaoTengOlOperations _characterCaoTengOlOperations;
+    private readonly ICoreNativeFactionChangesCharacterSunShangxiangMouMobileOperations _characterSunShangxiangMouMobileOperations;
+    private readonly ICoreNativeFactionChangesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNativeFactionChangesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNativeFactionChangesCoreModeAllegianceOperations _coreModeAllegianceOperations;
+    private readonly ICoreNativeFactionChangesCorePrivateGeneralLibrariesOperations _corePrivateGeneralLibrariesOperations;
+    private readonly ICoreNativeFactionChangesCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreNativeFactionChangesCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeFactionChangesCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICoreNativeFactionChangesCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreNativeFactionChangesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreNativeFactionChangesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess _coreGameEngineNativeFactionChangesFieldsAccess;
+    internal CoreGameEngineNativeFactionChangesRuntime(ICoreNativeFactionChangesCharacterCaoTengOlOperations characterCaoTengOlOperations, ICoreNativeFactionChangesCharacterSunShangxiangMouMobileOperations characterSunShangxiangMouMobileOperations, ICoreNativeFactionChangesContentRegistryOperations contentRegistryOperations, ICoreNativeFactionChangesResolutionStackOperations resolutionStackOperations, ICoreNativeFactionChangesCoreModeAllegianceOperations coreModeAllegianceOperations, ICoreNativeFactionChangesCorePrivateGeneralLibrariesOperations corePrivateGeneralLibrariesOperations, ICoreNativeFactionChangesCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreNativeFactionChangesCoreMatchLogOperations coreMatchLogOperations, ICoreNativeFactionChangesCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICoreNativeFactionChangesCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreNativeFactionChangesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreNativeFactionChangesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess coreGameEngineNativeFactionChangesFieldsAccess)
+    {
+        this._characterCaoTengOlOperations = characterCaoTengOlOperations;
+        this._characterSunShangxiangMouMobileOperations = characterSunShangxiangMouMobileOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreModeAllegianceOperations = coreModeAllegianceOperations;
+        this._corePrivateGeneralLibrariesOperations = corePrivateGeneralLibrariesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreMatchSetupSetupCompleteAccess = coreMatchSetupSetupCompleteAccess;
+        this._coreGameEngineNativeFactionChangesFieldsAccess = coreGameEngineNativeFactionChangesFieldsAccess;
+    }
+}

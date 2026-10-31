@@ -32,10 +32,10 @@ internal static class DamageCursorProjectionChecks
         var store = typeof(GameEngine).GetField("_resolutionStack", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(game)!;
         var push = store.GetType().GetMethod("Push")!;
         var replace = store.GetType().GetMethod("Replace")!;
-        var project = typeof(GameEngine).GetMethod("TypedDamageProgramObserver", BindingFlags.NonPublic | BindingFlags.Instance)!;
-        var resolve = typeof(GameEngine).GetMethod("ResolveDamageCursor", BindingFlags.NonPublic | BindingFlags.Instance)!;
-        var ownedSubtree = typeof(GameEngine).GetMethod("HasOwnedProgramChildSubtree", BindingFlags.NonPublic | BindingFlags.Instance)!;
-        ((ICollection<CardMovementRecord>)typeof(GameEngine).GetField("_cardMovements",
+        var project = global::FixtureRuntimeAccess.Engine.GetMethod("TypedDamageProgramObserver", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        var resolve = global::FixtureRuntimeAccess.Engine.GetMethod("ResolveDamageCursor", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        var ownedSubtree = global::FixtureRuntimeAccess.Engine.GetMethod("HasOwnedProgramChildSubtree", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        ((ICollection<CardMovementRecord>)global::FixtureRuntimeAccess.Engine.GetField("_cardMovements",
             BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(game)!).Add(move);
         foreach (var frame in frames) push.Invoke(store, [frame]);
         Require(Project()?.Id == root.Id, "The registered movement/HP chain projects to its exact owning damage candidate.");
@@ -209,10 +209,10 @@ internal static class DamageCursorProjectionChecks
         var push = store.GetType().GetMethod("Push")!;
         var replace = store.GetType().GetMethod("Replace")!;
         var complete = store.GetType().GetMethod("CompleteTop")!;
-        var project = typeof(GameEngine).GetMethod("ProjectTypedRecoveryDamageCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var resolve = typeof(GameEngine).GetMethod("ResolveDamageCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var events = (List<IGameEvent>)typeof(GameEngine).GetField("_pendingEvents", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
-        var pendingHp = (List<HpChangeContext>)typeof(GameEngine).GetField("_pendingHpChanges", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var project = global::FixtureRuntimeAccess.Engine.GetMethod("ProjectTypedRecoveryDamageCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var resolve = global::FixtureRuntimeAccess.Engine.GetMethod("ResolveDamageCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var events = (List<IGameEvent>)global::FixtureRuntimeAccess.Engine.GetField("_pendingEvents", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var pendingHp = (List<HpChangeContext>)global::FixtureRuntimeAccess.Engine.GetField("_pendingHpChanges", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         events.Add(new RecoveryReplacementChosenEvent(4, 0, 1, replacement.SkillId, replacement.SkillInstanceId, replacement.PolicyId, 1, replacement.RecoveryAmount));
         events.Add(new ProgramSkillHpLostEvent(6, skillId, 1, 1, 0));
         events.Add(new PlayerDyingEvent(8, 1, null));
@@ -268,7 +268,7 @@ internal static class DamageCursorProjectionChecks
         foreach (var frame in frames.Skip(4).Reverse()) complete.Invoke(store, [frame.Id, frame.Kind]);
         var rewarded = recovery with { Stage = RecoveryReplacementStage.RewardApplied };
         replace.Invoke(store, [rewarded]);
-        var ledger = (List<CardMovementRecord>)typeof(GameEngine).GetField("_cardMovements", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var ledger = (List<CardMovementRecord>)global::FixtureRuntimeAccess.Engine.GetField("_cardMovements", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         var historicalReward = new CardMovementRecord(ledger.Count + 1, 1, 2, CardKind.Slash, CardLocation.DrawPile, CardLocation.Hand(0), new("skill-program.recovery-replacement.reward"));
         ledger.Add(historicalReward);
         var move = new CardMovementRecord(ledger.Count + 1, 1, 1, CardKind.Slash, CardLocation.DrawPile, CardLocation.Hand(0), new("skill-program.recovery-replacement.reward"));
@@ -381,12 +381,12 @@ internal static class DamageCursorProjectionChecks
         {
             replace.Invoke(store, [root]);
             complete.Invoke(store, [response.Id, response.Kind]);
-            var roundField = typeof(GameEngine).GetField("_roundNumber", BindingFlags.Instance | BindingFlags.NonPublic)!;
-            var turnField = typeof(GameEngine).GetField("_turnNumber", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            var roundField = global::FixtureRuntimeAccess.Engine.GetField("_roundNumber", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            var turnField = global::FixtureRuntimeAccess.Engine.GetField("_turnNumber", BindingFlags.Instance | BindingFlags.NonPublic)!;
             var originalRound = roundField.GetValue(game); var originalTurn = turnField.GetValue(game);
             roundField.SetValue(game, 1); turnField.SetValue(game, 1);
             var eventsBefore = events.Count; var hpBefore = pendingHp.Count;
-            var moves = (List<CardMovementRecord>)typeof(GameEngine).GetField("_cardMovements", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+            var moves = (List<CardMovementRecord>)global::FixtureRuntimeAccess.Engine.GetField("_cardMovements", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
             var movesBefore = moves.Count;
             var entryCandidate = new ProgramTriggerCandidate(0, skillId, "entry-macro", "entry-macro-instance", hash, 0);
             var entry = new ProgramLifecycleTriggerWindowFrame(10, dying.VictimSeat, SkillProgramTriggerWindow.DyingEntering,
@@ -394,9 +394,9 @@ internal static class DamageCursorProjectionChecks
             var entryProgram = Frame(11, 0, "entry-macro", "entry-macro-instance",
                 new(SkillProgramTriggerWindow.DyingEntering, entry.Id, 0, TargetSeat: dying.VictimSeat));
             push.Invoke(store, [entry]); push.Invoke(store, [entryProgram]);
-            var capture = typeof(GameEngine).GetMethod("CaptureDyingSuitsOriginalCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            var capture = global::FixtureRuntimeAccess.Engine.GetMethod("CaptureDyingSuitsOriginalCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
             var originalCursor = (DyingSuitsOriginalCursor)capture.Invoke(game, [dying, entry])!;
-            var cursorHashMethod = typeof(GameEngine).GetMethod("DyingSuitsCursorHash", BindingFlags.Static | BindingFlags.NonPublic)!.MakeGenericMethod(typeof(DyingSuitsOriginalCursor));
+            var cursorHashMethod = global::FixtureRuntimeAccess.Engine.GetMethod("DyingSuitsCursorHash", BindingFlags.Static | BindingFlags.NonPublic)!.MakeGenericMethod(typeof(DyingSuitsOriginalCursor));
             var cursorHash = (string)cursorHashMethod.Invoke(null, [originalCursor])!;
             var source = new CardConversionSource(skillId, "entry-macro", 0, entryProgram.SkillInstanceId);
             var drawn = new CardMovementRecord(movesBefore + 1, 1, 1, CardKind.Slash, CardLocation.DrawPile,
@@ -421,7 +421,7 @@ internal static class DamageCursorProjectionChecks
             foreach (var frame in suffix) push.Invoke(store, [frame]);
             try
             {
-                var legacy = typeof(GameEngine).GetMethod("IsDyingSuitsProgramDying", BindingFlags.Instance | BindingFlags.NonPublic)!;
+                var legacy = global::FixtureRuntimeAccess.Engine.GetMethod("IsDyingSuitsProgramDying", BindingFlags.Instance | BindingFlags.NonPublic)!;
                 var unknown = Projection();
                 Require((bool)legacy.Invoke(game, [])! && unknown.GetType().GetProperty("Root")!.GetValue(unknown) is null &&
                     !(bool)unknown.GetType().GetProperty("IsMalformed")!.GetValue(unknown)!,

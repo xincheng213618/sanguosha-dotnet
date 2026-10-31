@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineQuotaTopProgramsRuntime : global::CardGame.Core.IQuotaTopProgramHost
+{
+    private readonly ICoreQuotaTopProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreQuotaTopProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreQuotaTopProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreQuotaTopProgramsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreQuotaTopProgramsCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreQuotaTopProgramsCoreNamedDefenseAndPublicDraftOperations _coreNamedDefenseAndPublicDraftOperations;
+    private readonly ICoreQuotaTopProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreQuotaTopProgramsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreQuotaTopProgramsCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreQuotaTopProgramsCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICoreQuotaTopProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreQuotaTopProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreQuotaTopProgramsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreQuotaTopProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreQuotaTopProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreQuotaTopProgramsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreQuotaTopProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreQuotaTopProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreQuotaTopProgramsCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreQuotaTopProgramsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreQuotaTopProgramsKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreQuotaTopProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineQuotaTopProgramsFirstTurnTargetActionsAccess _coreGameEngineQuotaTopProgramsFirstTurnTargetActionsAccess;
+    internal CoreGameEngineQuotaTopProgramsRuntime(ICoreQuotaTopProgramsCardZonesOperations cardZonesOperations, ICoreQuotaTopProgramsContentRegistryOperations contentRegistryOperations, ICoreQuotaTopProgramsResolutionStackOperations resolutionStackOperations, ICoreQuotaTopProgramsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreQuotaTopProgramsCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreQuotaTopProgramsCoreNamedDefenseAndPublicDraftOperations coreNamedDefenseAndPublicDraftOperations, ICoreQuotaTopProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreQuotaTopProgramsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreQuotaTopProgramsCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreQuotaTopProgramsCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICoreQuotaTopProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreQuotaTopProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreQuotaTopProgramsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreQuotaTopProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreQuotaTopProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreQuotaTopProgramsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreQuotaTopProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreQuotaTopProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreQuotaTopProgramsCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreQuotaTopProgramsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreQuotaTopProgramsKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreQuotaTopProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineQuotaTopProgramsFirstTurnTargetActionsAccess coreGameEngineQuotaTopProgramsFirstTurnTargetActionsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreNamedDefenseAndPublicDraftOperations = coreNamedDefenseAndPublicDraftOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineQuotaTopProgramsFirstTurnTargetActionsAccess = coreGameEngineQuotaTopProgramsFirstTurnTargetActionsAccess;
+    }
+}

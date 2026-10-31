@@ -61,7 +61,7 @@ internal static class RuntimeFrameStoreChecks
     {
         try
         {
-            typeof(GameEngine).GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic)!
+            global::FixtureRuntimeAccess.Engine.GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic)!
                 .Invoke(game, [value]);
         }
         catch (TargetInvocationException error) when (error.InnerException is not null)

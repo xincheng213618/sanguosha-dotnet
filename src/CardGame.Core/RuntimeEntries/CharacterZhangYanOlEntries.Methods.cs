@@ -1,0 +1,56 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterZhangYanOlEntries
+{
+    internal bool AdvanceZhangYanSubtree() => _resolve().AdvanceZhangYanSubtree();
+    internal global::CardGame.Core.PromptChoice AiZhangYan(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiZhangYan(p, f);
+    internal void AnswerZhangYan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerZhangYan(choice);
+    internal void AppendZhangYanSujiDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.DamageTriggerCandidate> candidates) => _resolve().AppendZhangYanSujiDamageCandidates(attack, window, candidates);
+    internal void AssertZhangYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhangYan(f);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginZhangYan(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginZhangYan(supplied, op);
+    internal void BindZhangYanSujiUse(long id) => _resolve().BindZhangYanSujiUse(id);
+    internal bool CanOfferZhangYan(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferZhangYan(candidate, trigger, c);
+    internal bool CanZhangYanSujiMaterial(int actor, global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from, int target) => _resolve().CanZhangYanSujiMaterial(actor, card, from, target);
+    internal void CompleteZhangYanLangdaoTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CompleteZhangYanLangdaoTargets(f);
+    internal void CompleteZhangYanSujiPayment(long id) => _resolve().CompleteZhangYanSujiPayment(id);
+    internal bool ContinuePaidZhangYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidZhangYan(f);
+    internal void ContinueZhangYan(long id) => _resolve().ContinueZhangYan(id);
+    internal bool DrainZhangYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainZhangYan(f);
+    internal void FinishZhangYan(global::CardGame.Core.ProgramSkillFrame f, bool applied) => _resolve().FinishZhangYan(f, applied);
+    internal bool HasIssuedZhangYanSujiRewardCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedZhangYanSujiRewardCandidate(c, context);
+    internal bool HasZhangYanDamageObserver(long id) => _resolve().HasZhangYanDamageObserver(id);
+    internal bool HasZhangYanLangdaoTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasZhangYanLangdaoTargetTail(use);
+    internal bool IsZhangYanDying() => _resolve().IsZhangYanDying();
+    internal bool IsZhangYanLangdaoIssued(global::CardGame.Core.CardUseFrame use) => _resolve().IsZhangYanLangdaoIssued(use);
+    internal bool IsZhangYanLangdaoUnrespondable(long id) => _resolve().IsZhangYanLangdaoUnrespondable(id);
+    internal bool IsZhangYanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhangYanMovement(f, e, p);
+    internal bool IsZhangYanNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsZhangYanNativeSettlementBatch(f, batch);
+    internal bool IsZhangYanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsZhangYanRecoveryParent(f, recovery);
+    internal bool IsZhangYanRewardMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsZhangYanRewardMovement(f, m);
+    internal bool IsZhangYanSujiRemovedMaterial(long useId, int cardId) => _resolve().IsZhangYanSujiRemovedMaterial(useId, cardId);
+    internal bool IsZhangYanSujiUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsZhangYanSujiUse(use);
+    internal void ObserveZhangYanLangdaoOutcome(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveZhangYanLangdaoOutcome(payload);
+    internal void PublishZhangYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishZhangYan(f);
+    internal void RecordZhangYanLangdaoRedirect(global::CardGame.Core.ProgramSkillFrame redirector, long useId, int originalSeat, int newSeat) => _resolve().RecordZhangYanLangdaoRedirect(redirector, useId, originalSeat, newSeat);
+    internal void ResolveZhangYanLangdao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ResolveZhangYanLangdao(f);
+    internal bool ResumeZhangYan(long id) => _resolve().ResumeZhangYan(id);
+    internal bool ReturnZhangYanMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnZhangYanMovement(f);
+    internal bool ReturnZhangYanSujiAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnZhangYanSujiAttack(completion);
+    internal void ReturnZhangYanSujiUse(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnZhangYanSujiUse(use);
+    internal bool TryGetZhangYanVirtualPrimaryReturn(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramSkillFrame parent, scoped out global::System.Collections.Generic.IReadOnlyList<int> primary) => _resolve().TryGetZhangYanVirtualPrimaryReturn(use, parent, out primary);
+    internal void ValidateZhangYanSujiUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateZhangYanSujiUse(use);
+    internal bool WindowSettlement_IsZhangYanNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().WindowSettlement_IsZhangYanNativeSettlementBatch(frame, batch);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LangdaoOption> ZhangYanAvailableOptions(global::CardGame.Core.CardConversionSource source) => _resolve().ZhangYanAvailableOptions(source);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ZhangYanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangYanChoices(f);
+    internal int ZhangYanChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangYanChooser(f);
+    internal int[] ZhangYanExtraTargets(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardUseFrame use) => _resolve().ZhangYanExtraTargets(f, use);
+    internal bool ZhangYanFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ZhangYanFirstChild(f, child);
+    internal int ZhangYanLangdaoDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().ZhangYanLangdaoDamageBonus(attack);
+    internal global::CardGame.Core.CardUseFrame? ZhangYanLangdaoParent(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().ZhangYanLangdaoParent(candidate, c);
+    internal global::CardGame.Core.ProgramSkillFrame? ZhangYanObserverRoot() => _resolve().ZhangYanObserverRoot();
+    internal bool ZhangYanPlayParent(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().ZhangYanPlayParent(candidate, c);
+    internal bool ZhangYanRewardChoicesAvailable(int owner, int target) => _resolve().ZhangYanRewardChoicesAvailable(owner, target);
+    internal global::CardGame.Core.CardUseFrame? ZhangYanRewardUse(global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().ZhangYanRewardUse(c);
+    internal global::CardGame.Core.CardConversionSource ZhangYanSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangYanSource(f);
+    internal int[] ZhangYanSujiTargets(int actor, global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from) => _resolve().ZhangYanSujiTargets(actor, card, from);
+}

@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramBindingRuntimePortsRuntime : global::CardGame.Core.IProgramBindingFacts, global::CardGame.Core.IProgramBindingProtocols
+{
+    private readonly ICoreProgramBindingRuntimePortsCharacterHeQiOlOperations _characterHeQiOlOperations;
+    private readonly ICoreProgramBindingRuntimePortsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramBindingRuntimePortsCoreActualPlayPhaseCardUsesOperations _coreActualPlayPhaseCardUsesOperations;
+    private readonly ICoreProgramBindingRuntimePortsCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICoreProgramBindingRuntimePortsCoreAlcoholIdentityPoliciesOperations _coreAlcoholIdentityPoliciesOperations;
+    private readonly ICoreProgramBindingRuntimePortsCoreEarnedActualEndingBenefitsOperations _coreEarnedActualEndingBenefitsOperations;
+    private readonly ICoreProgramBindingRuntimePortsCoreFixedDistanceOneDebtOperations _coreFixedDistanceOneDebtOperations;
+    private readonly ICoreProgramBindingRuntimePortsCoreHpConditionalSkillGrantsOperations _coreHpConditionalSkillGrantsOperations;
+    private readonly ICoreProgramBindingRuntimePortsCorePrepDiscardEndingPromisesOperations _corePrepDiscardEndingPromisesOperations;
+    private readonly ICoreProgramBindingRuntimePortsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramBindingRuntimePortsCoreProgramMarkerPaymentsOperations _coreProgramMarkerPaymentsOperations;
+    private readonly ICoreProgramBindingRuntimePortsCorePublicPileColorsOperations _corePublicPileColorsOperations;
+    private readonly ICoreProgramBindingRuntimePortsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreProgramBindingRuntimePortsRuntime(ICoreProgramBindingRuntimePortsCharacterHeQiOlOperations characterHeQiOlOperations, ICoreProgramBindingRuntimePortsContentRegistryOperations contentRegistryOperations, ICoreProgramBindingRuntimePortsCoreActualPlayPhaseCardUsesOperations coreActualPlayPhaseCardUsesOperations, ICoreProgramBindingRuntimePortsCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICoreProgramBindingRuntimePortsCoreAlcoholIdentityPoliciesOperations coreAlcoholIdentityPoliciesOperations, ICoreProgramBindingRuntimePortsCoreEarnedActualEndingBenefitsOperations coreEarnedActualEndingBenefitsOperations, ICoreProgramBindingRuntimePortsCoreFixedDistanceOneDebtOperations coreFixedDistanceOneDebtOperations, ICoreProgramBindingRuntimePortsCoreHpConditionalSkillGrantsOperations coreHpConditionalSkillGrantsOperations, ICoreProgramBindingRuntimePortsCorePrepDiscardEndingPromisesOperations corePrepDiscardEndingPromisesOperations, ICoreProgramBindingRuntimePortsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramBindingRuntimePortsCoreProgramMarkerPaymentsOperations coreProgramMarkerPaymentsOperations, ICoreProgramBindingRuntimePortsCorePublicPileColorsOperations corePublicPileColorsOperations, ICoreProgramBindingRuntimePortsCoreMatchLogOperations coreMatchLogOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHeQiOlOperations = characterHeQiOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreActualPlayPhaseCardUsesOperations = coreActualPlayPhaseCardUsesOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreAlcoholIdentityPoliciesOperations = coreAlcoholIdentityPoliciesOperations;
+        this._coreEarnedActualEndingBenefitsOperations = coreEarnedActualEndingBenefitsOperations;
+        this._coreFixedDistanceOneDebtOperations = coreFixedDistanceOneDebtOperations;
+        this._coreHpConditionalSkillGrantsOperations = coreHpConditionalSkillGrantsOperations;
+        this._corePrepDiscardEndingPromisesOperations = corePrepDiscardEndingPromisesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramMarkerPaymentsOperations = coreProgramMarkerPaymentsOperations;
+        this._corePublicPileColorsOperations = corePublicPileColorsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,55 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterZhangYanMobileShiEntries
+{
+    internal bool AdvanceShiZyChildren() => _resolve().AdvanceShiZyChildren();
+    internal void AdvanceShiZyCommit(global::CardGame.Core.ProgramSkillFrame input) => _resolve().AdvanceShiZyCommit(input);
+    internal void AfterShiZyReveal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AfterShiZyReveal(f);
+    internal bool AllowsShiZy(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().AllowsShiZy(c, t, w);
+    internal void AnswerShiZy(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiZy(choice);
+    internal void AssertShiZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiZy(f);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginShiZy(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShiZy(input, op);
+    internal global::CardGame.Core.PromptChoice ChooseShiZy(global::CardGame.Core.PendingDecision p) => _resolve().ChooseShiZy(p);
+    internal void CompleteShiZyDuelReturn(global::CardGame.Core.ProgramSkillFrame f, long useId, global::CardGame.Core.ProgramVirtualOrdinaryTrickOrigin origin) => _resolve().CompleteShiZyDuelReturn(f, useId, origin);
+    internal void CompleteShiZyTargets(global::CardGame.Core.ProgramSkillFrame f, string? color) => _resolve().CompleteShiZyTargets(f, color);
+    internal void ContinueShiZy(long id) => _resolve().ContinueShiZy(id);
+    internal bool DrainShiZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainShiZy(f);
+    internal void FinishShiZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShiZy(f);
+    internal global::CardGame.Core.CardUseFrame? FrozenShiZyCompletedSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FrozenShiZyCompletedSlash(f);
+    internal bool HasShiZySuspendedCompletedParent(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().HasShiZySuspendedCompletedParent(window);
+    internal void IssueShiZyVirtualDuel(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueShiZyVirtualDuel(f);
+    internal bool KeepShiZyPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepShiZyPaid(f);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiZhangYanPublicStates(global::CardGame.Core.CharacterState owner, string id) => _resolve().MobileShiZhangYanPublicStates(owner, id);
+    internal void PayShiZyNextHand(global::CardGame.Core.ProgramSkillFrame input) => _resolve().PayShiZyNextHand(input);
+    internal global::CardGame.Core.PendingDecision? ProjectShiZyCardSelection(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ProjectShiZyCardSelection(decision, f);
+    internal void PublishShiZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShiZy(f);
+    internal void RestoreShiZyCompletedSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RestoreShiZyCompletedSlash(f);
+    internal bool ResumeShiZy(long id) => _resolve().ResumeShiZy(id);
+    internal bool ResumeShiZyNativeDuel() => _resolve().ResumeShiZyNativeDuel();
+    internal bool ReturnShiZyMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiZyMovement(f);
+    internal void SealShiZy(long id) => _resolve().SealShiZy(id);
+    internal bool ShiZyAddedSlashDistance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().ShiZyAddedSlashDistance(q);
+    internal bool ShiZyAddedTargetDistance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().ShiZyAddedTargetDistance(q);
+    internal bool ShiZyBeforeDamageChild(long id) => _resolve().ShiZyBeforeDamageChild(id);
+    internal global::CardGame.Core.CardUseFrame? ShiZyCardWindow(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().ShiZyCardWindow(c, w, window);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiZyChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiZyChoices(f);
+    internal int ShiZyChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiZyChooser(f);
+    internal bool ShiZyDamageChild(long id) => _resolve().ShiZyDamageChild(id);
+    internal global::CardGame.Core.CardUseFrame? ShiZyDamageUse(int owner, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().ShiZyDamageUse(owner, w);
+    internal bool ShiZyDyingChild() => _resolve().ShiZyDyingChild();
+    internal bool ShiZyEdge(int i) => _resolve().ShiZyEdge(i);
+    internal bool ShiZyExtraLegal(global::CardGame.Core.CardUseFrame use, int seat) => _resolve().ShiZyExtraLegal(use, seat);
+    internal bool ShiZyFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiZyFirstChild(f, child);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiZyHandChoices(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ShiZyHandPlan plan) => _resolve().ShiZyHandChoices(f, plan);
+    internal bool ShiZyIssuedExtra(long id, int actor, int target) => _resolve().ShiZyIssuedExtra(id, actor, target);
+    internal bool ShiZyMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ShiZyMovementProof(f, e, p);
+    internal global::CardGame.Core.ProgramSkillFrame? ShiZyObserverRoot() => _resolve().ShiZyObserverRoot();
+    internal int[] ShiZyPath(int owner, int target, int direction) => _resolve().ShiZyPath(owner, target, direction);
+    internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.CardSnapshot> ShiZyPublicCommittedHands() => _resolve().ShiZyPublicCommittedHands();
+    internal bool ShiZyRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().ShiZyRecoveryParent(f, recovery);
+    internal bool ShiZySuffix(int n) => _resolve().ShiZySuffix(n);
+    internal void StartShiZyFact(global::CardGame.Core.ProgramSkillFrame f) => _resolve().StartShiZyFact(f);
+    internal bool TryReturnShiZyVirtualDuel(global::CardGame.Core.CardUseFrame use) => _resolve().TryReturnShiZyVirtualDuel(use);
+    internal bool ValidShiZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidShiZy(f);
+    internal bool ValidShiZyVirtualDuelUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidShiZyVirtualDuelUse(use);
+}

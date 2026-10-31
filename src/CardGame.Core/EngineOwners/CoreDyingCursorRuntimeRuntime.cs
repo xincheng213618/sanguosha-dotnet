@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreDyingCursorRuntimeRuntime
+{
+    private readonly ICoreDyingCursorRuntimeCharacterDianWeiHappyGodOperations _characterDianWeiHappyGodOperations;
+    private readonly ICoreDyingCursorRuntimeCharacterDiaoChanLeOperations _characterDiaoChanLeOperations;
+    private readonly ICoreDyingCursorRuntimeCharacterHeJinOlOperations _characterHeJinOlOperations;
+    private readonly ICoreDyingCursorRuntimeCharacterJiangWeiMobileGodOperations _characterJiangWeiMobileGodOperations;
+    private readonly ICoreDyingCursorRuntimeCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreDyingCursorRuntimeCharacterYangBiaoAnniversaryOperations _characterYangBiaoAnniversaryOperations;
+    private readonly ICoreDyingCursorRuntimeCharacterZhangFeiWumiaoOperations _characterZhangFeiWumiaoOperations;
+    private readonly ICoreDyingCursorRuntimeResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDyingCursorRuntimeCoreDeathGrowthSkillObserversOperations _coreDeathGrowthSkillObserversOperations;
+    private readonly ICoreDyingCursorRuntimeCoreDyingSuitsAndHistoricalUseObserversOperations _coreDyingSuitsAndHistoricalUseObserversOperations;
+    private readonly ICoreDyingCursorRuntimeCoreNativeDrawThresholdDyingOperations _coreNativeDrawThresholdDyingOperations;
+    private readonly ICoreDyingCursorRuntimeCoreNativeRecoveryDamageOperations _coreNativeRecoveryDamageOperations;
+    private readonly ICoreDyingCursorRuntimeCoreOwnedDeathBenefitReturnsOperations _coreOwnedDeathBenefitReturnsOperations;
+    private readonly ICoreDyingCursorRuntimeCoreProgramOwnerDeathDamageOperations _coreProgramOwnerDeathDamageOperations;
+    private readonly ICoreDyingCursorRuntimeCoreRecipientCategoryMarkContinuationsOperations _coreRecipientCategoryMarkContinuationsOperations;
+    private readonly ICoreDyingCursorRuntimeCoreWenhePoisonOperations _coreWenhePoisonOperations;
+    private readonly ICoreDyingCursorRuntimeCoreHellKingProgramsOperations _coreHellKingProgramsOperations;
+    private readonly ICoreDyingCursorRuntimeCoreProgramDamageInsertionRuntimeOperations _coreProgramDamageInsertionRuntimeOperations;
+    internal CoreDyingCursorRuntimeRuntime(ICoreDyingCursorRuntimeCharacterDianWeiHappyGodOperations characterDianWeiHappyGodOperations, ICoreDyingCursorRuntimeCharacterDiaoChanLeOperations characterDiaoChanLeOperations, ICoreDyingCursorRuntimeCharacterHeJinOlOperations characterHeJinOlOperations, ICoreDyingCursorRuntimeCharacterJiangWeiMobileGodOperations characterJiangWeiMobileGodOperations, ICoreDyingCursorRuntimeCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreDyingCursorRuntimeCharacterYangBiaoAnniversaryOperations characterYangBiaoAnniversaryOperations, ICoreDyingCursorRuntimeCharacterZhangFeiWumiaoOperations characterZhangFeiWumiaoOperations, ICoreDyingCursorRuntimeResolutionStackOperations resolutionStackOperations, ICoreDyingCursorRuntimeCoreDeathGrowthSkillObserversOperations coreDeathGrowthSkillObserversOperations, ICoreDyingCursorRuntimeCoreDyingSuitsAndHistoricalUseObserversOperations coreDyingSuitsAndHistoricalUseObserversOperations, ICoreDyingCursorRuntimeCoreNativeDrawThresholdDyingOperations coreNativeDrawThresholdDyingOperations, ICoreDyingCursorRuntimeCoreNativeRecoveryDamageOperations coreNativeRecoveryDamageOperations, ICoreDyingCursorRuntimeCoreOwnedDeathBenefitReturnsOperations coreOwnedDeathBenefitReturnsOperations, ICoreDyingCursorRuntimeCoreProgramOwnerDeathDamageOperations coreProgramOwnerDeathDamageOperations, ICoreDyingCursorRuntimeCoreRecipientCategoryMarkContinuationsOperations coreRecipientCategoryMarkContinuationsOperations, ICoreDyingCursorRuntimeCoreWenhePoisonOperations coreWenhePoisonOperations, ICoreDyingCursorRuntimeCoreHellKingProgramsOperations coreHellKingProgramsOperations, ICoreDyingCursorRuntimeCoreProgramDamageInsertionRuntimeOperations coreProgramDamageInsertionRuntimeOperations)
+    {
+        this._characterDianWeiHappyGodOperations = characterDianWeiHappyGodOperations;
+        this._characterDiaoChanLeOperations = characterDiaoChanLeOperations;
+        this._characterHeJinOlOperations = characterHeJinOlOperations;
+        this._characterJiangWeiMobileGodOperations = characterJiangWeiMobileGodOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._characterYangBiaoAnniversaryOperations = characterYangBiaoAnniversaryOperations;
+        this._characterZhangFeiWumiaoOperations = characterZhangFeiWumiaoOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDeathGrowthSkillObserversOperations = coreDeathGrowthSkillObserversOperations;
+        this._coreDyingSuitsAndHistoricalUseObserversOperations = coreDyingSuitsAndHistoricalUseObserversOperations;
+        this._coreNativeDrawThresholdDyingOperations = coreNativeDrawThresholdDyingOperations;
+        this._coreNativeRecoveryDamageOperations = coreNativeRecoveryDamageOperations;
+        this._coreOwnedDeathBenefitReturnsOperations = coreOwnedDeathBenefitReturnsOperations;
+        this._coreProgramOwnerDeathDamageOperations = coreProgramOwnerDeathDamageOperations;
+        this._coreRecipientCategoryMarkContinuationsOperations = coreRecipientCategoryMarkContinuationsOperations;
+        this._coreWenhePoisonOperations = coreWenhePoisonOperations;
+        this._coreHellKingProgramsOperations = coreHellKingProgramsOperations;
+        this._coreProgramDamageInsertionRuntimeOperations = coreProgramDamageInsertionRuntimeOperations;
+    }
+}

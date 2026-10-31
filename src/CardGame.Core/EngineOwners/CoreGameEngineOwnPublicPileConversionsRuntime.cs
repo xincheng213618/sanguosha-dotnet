@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineOwnPublicPileConversionsRuntime
+{
+    private readonly ICoreOwnPublicPileConversionsCharacterGongsunZanMouMobileOperations _characterGongsunZanMouMobileOperations;
+    private readonly ICoreOwnPublicPileConversionsCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
+    private readonly ICoreOwnPublicPileConversionsCharacterHuangZuMobileShiOperations _characterHuangZuMobileShiOperations;
+    private readonly ICoreOwnPublicPileConversionsCharacterLuBuOlMagicOperations _characterLuBuOlMagicOperations;
+    private readonly ICoreOwnPublicPileConversionsCharacterPangTongFriendOperations _characterPangTongFriendOperations;
+    private readonly ICoreOwnPublicPileConversionsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreOwnPublicPileConversionsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreOwnPublicPileConversionsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreOwnPublicPileConversionsCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreOwnPublicPileConversionsCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreOwnPublicPileConversionsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreOwnPublicPileConversionsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreOwnPublicPileConversionsCoreNativePublicPileOriginalCardsOperations _coreNativePublicPileOriginalCardsOperations;
+    private readonly ICoreOwnPublicPileConversionsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreOwnPublicPileConversionsCorePublicPileSourcesOperations _corePublicPileSourcesOperations;
+    private readonly ICoreOwnPublicPileConversionsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreOwnPublicPileConversionsCoreSourceDingxiNativeOperations _coreSourceDingxiNativeOperations;
+    private readonly ICoreOwnPublicPileConversionsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    internal CoreGameEngineOwnPublicPileConversionsRuntime(ICoreOwnPublicPileConversionsCharacterGongsunZanMouMobileOperations characterGongsunZanMouMobileOperations, ICoreOwnPublicPileConversionsCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICoreOwnPublicPileConversionsCharacterHuangZuMobileShiOperations characterHuangZuMobileShiOperations, ICoreOwnPublicPileConversionsCharacterLuBuOlMagicOperations characterLuBuOlMagicOperations, ICoreOwnPublicPileConversionsCharacterPangTongFriendOperations characterPangTongFriendOperations, ICoreOwnPublicPileConversionsCardZonesOperations cardZonesOperations, ICoreOwnPublicPileConversionsContentRegistryOperations contentRegistryOperations, ICoreOwnPublicPileConversionsResolutionStackOperations resolutionStackOperations, ICoreOwnPublicPileConversionsCoreActionQueriesOperations coreActionQueriesOperations, ICoreOwnPublicPileConversionsCoreCardActionsOperations coreCardActionsOperations, ICoreOwnPublicPileConversionsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreOwnPublicPileConversionsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreOwnPublicPileConversionsCoreNativePublicPileOriginalCardsOperations coreNativePublicPileOriginalCardsOperations, ICoreOwnPublicPileConversionsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreOwnPublicPileConversionsCorePublicPileSourcesOperations corePublicPileSourcesOperations, ICoreOwnPublicPileConversionsCoreRuntimeOperations coreRuntimeOperations, ICoreOwnPublicPileConversionsCoreSourceDingxiNativeOperations coreSourceDingxiNativeOperations, ICoreOwnPublicPileConversionsCoreTableOrderOperations coreTableOrderOperations, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess coreGameEnginePublicPileSourcesPublicPersistentPilesAccess)
+    {
+        this._characterGongsunZanMouMobileOperations = characterGongsunZanMouMobileOperations;
+        this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
+        this._characterHuangZuMobileShiOperations = characterHuangZuMobileShiOperations;
+        this._characterLuBuOlMagicOperations = characterLuBuOlMagicOperations;
+        this._characterPangTongFriendOperations = characterPangTongFriendOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativePublicPileOriginalCardsOperations = coreNativePublicPileOriginalCardsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._corePublicPileSourcesOperations = corePublicPileSourcesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSourceDingxiNativeOperations = coreSourceDingxiNativeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreGameEnginePublicPileSourcesPublicPersistentPilesAccess = coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    }
+}

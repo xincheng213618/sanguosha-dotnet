@@ -67,7 +67,7 @@ public sealed partial record ProgramSkillFrame
 }
 internal static class AnniversaryZhangWenComposition
 {
-    internal const string Songshu = "anniversary:songshu", Sibian = "anniversary:sibian", Contest = "hand-contest", Replacement = "replace-draw-four";
+    internal const string Songshu = "anniversary:songshu",Sibian = "anniversary:sibian",Contest = "hand-contest",Replacement = "replace-draw-four";
     [ProgramCatalogValidation(45100)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op is SkillProgramEffectOp.RefundAnniversaryZhangWenSongshu or SkillProgramEffectOp.ResolveAnniversaryZhangWenSibian)) return;

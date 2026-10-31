@@ -50,9 +50,9 @@ internal static class ShanheDifficultyPreviewUiChecks
             var expectedHp = enemy.Hp ?? general.InitialHp ?? expectedMaximum;
             var expectedOpening = (enemy.StartingHand?.Count ?? 4) + enemy.InitialHandBonus + (enemy.StartingCards?.Count ?? 0);
             var native = game.CreateSnapshot(0).Players.Single(player => player.Seat == 1);
-            var players = (IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players",
+            var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players",
                 BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
-            var draw = (RuleQueryEvaluation)typeof(GameEngine).GetMethod("EvaluateDrawCount",
+            var draw = (RuleQueryEvaluation)global::FixtureRuntimeAccess.Engine.GetMethod("EvaluateDrawCount",
                 BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(game, [players[1]])!;
             Program.Assert(vm.IsShanheBattleSession && setup.EnemyRoster.SequenceEqual(encounter.Enemies) &&
                 native.GeneralId == enemy.GeneralId && native.Hp == expectedHp && native.MaxHp == expectedMaximum &&

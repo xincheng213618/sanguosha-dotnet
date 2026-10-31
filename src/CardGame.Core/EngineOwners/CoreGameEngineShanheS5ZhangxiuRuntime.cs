@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheS5ZhangxiuRuntime : global::CardGame.Core.IShanheS5ZhangxiuHost
+{
+    private readonly ICoreShanheS5ZhangxiuRandomOperations _randomOperations;
+    private readonly ICoreShanheS5ZhangxiuResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreShanheLeizhenOperations _coreShanheLeizhenOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreProgramAbolishAreasOperationOperations _coreProgramAbolishAreasOperationOperations;
+    private readonly ICoreShanheS5ZhangxiuCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreShanheS5ZhangxiuKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineShanheS5ZhangxiuRuntime(ICoreShanheS5ZhangxiuRandomOperations randomOperations, ICoreShanheS5ZhangxiuResolutionStackOperations resolutionStackOperations, ICoreShanheS5ZhangxiuCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreShanheS5ZhangxiuCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheS5ZhangxiuCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreShanheS5ZhangxiuCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreShanheS5ZhangxiuCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheS5ZhangxiuCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheS5ZhangxiuCoreRuntimeOperations coreRuntimeOperations, ICoreShanheS5ZhangxiuCoreShanheLeizhenOperations coreShanheLeizhenOperations, ICoreShanheS5ZhangxiuCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreShanheS5ZhangxiuCoreProgramAbolishAreasOperationOperations coreProgramAbolishAreasOperationOperations, ICoreShanheS5ZhangxiuCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreShanheS5ZhangxiuKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheLeizhenOperations = coreShanheLeizhenOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreProgramAbolishAreasOperationOperations = coreProgramAbolishAreasOperationOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

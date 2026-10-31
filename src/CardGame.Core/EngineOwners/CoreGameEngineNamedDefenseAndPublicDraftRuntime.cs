@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineNamedDefenseAndPublicDraftRuntime : global::CardGame.Core.INamedDefenseAndPublicDraftHost
+{
+    private readonly ICoreNamedDefenseAndPublicDraftCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCardZonesOperations _cardZonesOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreNamedDefenseAndPublicDraftKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineNamedDefenseAndPublicDraftRuntime(ICoreNamedDefenseAndPublicDraftCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreNamedDefenseAndPublicDraftCardZonesOperations cardZonesOperations, ICoreNamedDefenseAndPublicDraftContentRegistryOperations contentRegistryOperations, ICoreNamedDefenseAndPublicDraftResolutionStackOperations resolutionStackOperations, ICoreNamedDefenseAndPublicDraftSkillRuntimeStateOperations skillRuntimeStateOperations, ICoreNamedDefenseAndPublicDraftCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreNamedDefenseAndPublicDraftCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreNamedDefenseAndPublicDraftCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreNamedDefenseAndPublicDraftCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreNamedDefenseAndPublicDraftCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreNamedDefenseAndPublicDraftCoreRuntimeOperations coreRuntimeOperations, ICoreNamedDefenseAndPublicDraftCoreTableOrderOperations coreTableOrderOperations, ICoreNamedDefenseAndPublicDraftCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreNamedDefenseAndPublicDraftCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNamedDefenseAndPublicDraftCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreNamedDefenseAndPublicDraftCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNamedDefenseAndPublicDraftCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreNamedDefenseAndPublicDraftKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

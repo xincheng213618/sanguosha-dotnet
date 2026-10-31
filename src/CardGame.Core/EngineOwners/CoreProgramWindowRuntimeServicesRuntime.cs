@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramWindowRuntimeServicesRuntime : global::CardGame.Core.IProgramWindowNativeReturns, global::CardGame.Core.IProgramWindowReturnQueries
+{
+    private readonly ICoreProgramWindowRuntimeServicesCharacterBeiMiHuOlOperations _characterBeiMiHuOlOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCharacterGuanYuHappyGodOperations _characterGuanYuHappyGodOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCharacterRuanHuiOlOperations _characterRuanHuiOlOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICoreProgramWindowRuntimeServicesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreActualUseTargetProgramsOperations _coreActualUseTargetProgramsOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreCardEffectProgramsOperations _coreCardEffectProgramsOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreCompletedUseChildReturnsOperations _coreCompletedUseChildReturnsOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreForeignTurnContestsOperations _coreForeignTurnContestsOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreJudgmentReplacementProgramsOperations _coreJudgmentReplacementProgramsOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCorePhaseHandSeizureOperations _corePhaseHandSeizureOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCorePindianRevealWindowsOperations _corePindianRevealWindowsOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreShanheYongzhanOperations _coreShanheYongzhanOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreSlashTargetBenefitWindowsOperations _coreSlashTargetBenefitWindowsOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreSlashTargetPenaltyWindowsOperations _coreSlashTargetPenaltyWindowsOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreWushuangDyingExitOperations _coreWushuangDyingExitOperations;
+    private readonly ICoreProgramWindowRuntimeServicesCoreNativeDamageWindowsOperations _coreNativeDamageWindowsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseAccess _coreActualTurnProgressPhaseAccess;
+    internal CoreProgramWindowRuntimeServicesRuntime(ICoreProgramWindowRuntimeServicesCharacterBeiMiHuOlOperations characterBeiMiHuOlOperations, ICoreProgramWindowRuntimeServicesCharacterGuanYuHappyGodOperations characterGuanYuHappyGodOperations, ICoreProgramWindowRuntimeServicesCharacterRuanHuiOlOperations characterRuanHuiOlOperations, ICoreProgramWindowRuntimeServicesCharacterYanPuOlOperations characterYanPuOlOperations, ICoreProgramWindowRuntimeServicesResolutionStackOperations resolutionStackOperations, ICoreProgramWindowRuntimeServicesCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreProgramWindowRuntimeServicesCoreActualUseTargetProgramsOperations coreActualUseTargetProgramsOperations, ICoreProgramWindowRuntimeServicesCoreCardEffectProgramsOperations coreCardEffectProgramsOperations, ICoreProgramWindowRuntimeServicesCoreCompletedUseChildReturnsOperations coreCompletedUseChildReturnsOperations, ICoreProgramWindowRuntimeServicesCoreForeignTurnContestsOperations coreForeignTurnContestsOperations, ICoreProgramWindowRuntimeServicesCoreJudgmentReplacementProgramsOperations coreJudgmentReplacementProgramsOperations, ICoreProgramWindowRuntimeServicesCorePhaseHandSeizureOperations corePhaseHandSeizureOperations, ICoreProgramWindowRuntimeServicesCorePindianRevealWindowsOperations corePindianRevealWindowsOperations, ICoreProgramWindowRuntimeServicesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramWindowRuntimeServicesCoreShanheYongzhanOperations coreShanheYongzhanOperations, ICoreProgramWindowRuntimeServicesCoreSlashTargetBenefitWindowsOperations coreSlashTargetBenefitWindowsOperations, ICoreProgramWindowRuntimeServicesCoreSlashTargetPenaltyWindowsOperations coreSlashTargetPenaltyWindowsOperations, ICoreProgramWindowRuntimeServicesCoreWushuangDyingExitOperations coreWushuangDyingExitOperations, ICoreProgramWindowRuntimeServicesCoreNativeDamageWindowsOperations coreNativeDamageWindowsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseAccess coreActualTurnProgressPhaseAccess)
+    {
+        this._characterBeiMiHuOlOperations = characterBeiMiHuOlOperations;
+        this._characterGuanYuHappyGodOperations = characterGuanYuHappyGodOperations;
+        this._characterRuanHuiOlOperations = characterRuanHuiOlOperations;
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreActualUseTargetProgramsOperations = coreActualUseTargetProgramsOperations;
+        this._coreCardEffectProgramsOperations = coreCardEffectProgramsOperations;
+        this._coreCompletedUseChildReturnsOperations = coreCompletedUseChildReturnsOperations;
+        this._coreForeignTurnContestsOperations = coreForeignTurnContestsOperations;
+        this._coreJudgmentReplacementProgramsOperations = coreJudgmentReplacementProgramsOperations;
+        this._corePhaseHandSeizureOperations = corePhaseHandSeizureOperations;
+        this._corePindianRevealWindowsOperations = corePindianRevealWindowsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreShanheYongzhanOperations = coreShanheYongzhanOperations;
+        this._coreSlashTargetBenefitWindowsOperations = coreSlashTargetBenefitWindowsOperations;
+        this._coreSlashTargetPenaltyWindowsOperations = coreSlashTargetPenaltyWindowsOperations;
+        this._coreWushuangDyingExitOperations = coreWushuangDyingExitOperations;
+        this._coreNativeDamageWindowsOperations = coreNativeDamageWindowsOperations;
+        this._coreActualTurnProgressPhaseAccess = coreActualTurnProgressPhaseAccess;
+    }
+}

@@ -14,7 +14,7 @@ public sealed record MouLuXunReceipt(CardConversionSource Source, string Gamepla
     long UseId = 0, long ActionId = 0, int Cursor = 0, long Before = 0, long After = 0, bool Paid = false)
 {
     public string GrantSourceId { get; init; } = "";
-    private readonly IReadOnlyList<int> _selected = Array.AsReadOnly(Array.Empty<int>()), _viewed = Array.AsReadOnly(Array.Empty<int>());
+    private readonly IReadOnlyList<int> _selected = Array.AsReadOnly(Array.Empty<int>()),_viewed = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Selected { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Viewed { get => _viewed; init => _viewed = Array.AsReadOnly(value.ToArray()); }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public CardLocation? HoldLocation { get; init; }

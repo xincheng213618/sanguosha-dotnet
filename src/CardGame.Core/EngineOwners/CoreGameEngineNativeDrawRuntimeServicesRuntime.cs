@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineNativeDrawRuntimeServicesRuntime : global::CardGame.Core.INativeDrawAttemptOperations, global::CardGame.Core.INativeDrawAttemptQueries, global::CardGame.Core.INativeDrawProducerOperations, global::CardGame.Core.INativeDrawProducerQueries
+{
+    private readonly ICoreNativeDrawRuntimeServicesCharacterZhangFeiOlMagicOperations _characterZhangFeiOlMagicOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCharacterZhouFeiLeOperations _characterZhouFeiLeOperations;
+    private readonly ICoreNativeDrawRuntimeServicesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNativeDrawRuntimeServicesProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreLiushiEffectsOperations _coreLiushiEffectsOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreNativeDrawAttemptsOperations _coreNativeDrawAttemptsOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreOutsidePhaseDrawDiscardOperations _coreOutsidePhaseDrawDiscardOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCorePairObtainShownGiftsOperations _corePairObtainShownGiftsOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCorePrepDiscardImmediateDrawOperations _corePrepDiscardImmediateDrawOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreProgramCategoryTargetLedgerOperations _coreProgramCategoryTargetLedgerOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreNativeDrawRuntimeServicesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreNativeDrawRuntimeServicesNativeDrawReturnsOperations _nativeDrawReturnsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
+    internal CoreGameEngineNativeDrawRuntimeServicesRuntime(ICoreNativeDrawRuntimeServicesCharacterZhangFeiOlMagicOperations characterZhangFeiOlMagicOperations, ICoreNativeDrawRuntimeServicesCharacterZhouFeiLeOperations characterZhouFeiLeOperations, ICoreNativeDrawRuntimeServicesContentRegistryOperations contentRegistryOperations, ICoreNativeDrawRuntimeServicesProgramPipelineHooksOperations programPipelineHooksOperations, ICoreNativeDrawRuntimeServicesCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICoreNativeDrawRuntimeServicesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreNativeDrawRuntimeServicesCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreNativeDrawRuntimeServicesCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreNativeDrawRuntimeServicesCoreLiushiEffectsOperations coreLiushiEffectsOperations, ICoreNativeDrawRuntimeServicesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreNativeDrawRuntimeServicesCoreNativeDrawAttemptsOperations coreNativeDrawAttemptsOperations, ICoreNativeDrawRuntimeServicesCoreOutsidePhaseDrawDiscardOperations coreOutsidePhaseDrawDiscardOperations, ICoreNativeDrawRuntimeServicesCorePairObtainShownGiftsOperations corePairObtainShownGiftsOperations, ICoreNativeDrawRuntimeServicesCorePrepDiscardImmediateDrawOperations corePrepDiscardImmediateDrawOperations, ICoreNativeDrawRuntimeServicesCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreNativeDrawRuntimeServicesCoreProgramCategoryTargetLedgerOperations coreProgramCategoryTargetLedgerOperations, ICoreNativeDrawRuntimeServicesCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreNativeDrawRuntimeServicesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreNativeDrawRuntimeServicesCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreNativeDrawRuntimeServicesCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreNativeDrawRuntimeServicesCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreNativeDrawRuntimeServicesCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreNativeDrawRuntimeServicesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreNativeDrawRuntimeServicesNativeDrawReturnsOperations nativeDrawReturnsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess)
+    {
+        this._characterZhangFeiOlMagicOperations = characterZhangFeiOlMagicOperations;
+        this._characterZhouFeiLeOperations = characterZhouFeiLeOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreLiushiEffectsOperations = coreLiushiEffectsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeDrawAttemptsOperations = coreNativeDrawAttemptsOperations;
+        this._coreOutsidePhaseDrawDiscardOperations = coreOutsidePhaseDrawDiscardOperations;
+        this._corePairObtainShownGiftsOperations = corePairObtainShownGiftsOperations;
+        this._corePrepDiscardImmediateDrawOperations = corePrepDiscardImmediateDrawOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramCategoryTargetLedgerOperations = coreProgramCategoryTargetLedgerOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._nativeDrawReturnsOperations = nativeDrawReturnsOperations;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreMatchSetupSetupCompleteAccess = coreMatchSetupSetupCompleteAccess;
+    }
+}

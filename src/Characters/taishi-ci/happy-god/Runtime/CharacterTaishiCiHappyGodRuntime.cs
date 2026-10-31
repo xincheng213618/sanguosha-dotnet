@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterTaishiCiHappyGodRuntime : global::CardGame.Core.IHappyTaishiCiHost
+{
+    private readonly ICharacterTaishiCiHappyGodCharacterTaishiCiMobileGodOperations _characterTaishiCiMobileGodOperations;
+    private readonly ICharacterTaishiCiHappyGodCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterTaishiCiHappyGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
+    private readonly ICharacterTaishiCiHappyGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterTaishiCiHappyGodCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterTaishiCiHappyGodKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterTaishiCiHappyGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterTaishiCiHappyGodRuntime(ICharacterTaishiCiHappyGodCharacterTaishiCiMobileGodOperations characterTaishiCiMobileGodOperations, ICharacterTaishiCiHappyGodCardZonesOperations cardZonesOperations, ICharacterTaishiCiHappyGodResolutionStackOperations resolutionStackOperations, ICharacterTaishiCiHappyGodCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterTaishiCiHappyGodCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICharacterTaishiCiHappyGodCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterTaishiCiHappyGodCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterTaishiCiHappyGodCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterTaishiCiHappyGodCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterTaishiCiHappyGodCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterTaishiCiHappyGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterTaishiCiHappyGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterTaishiCiHappyGodCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterTaishiCiHappyGodCoreRuntimeOperations coreRuntimeOperations, ICharacterTaishiCiHappyGodCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterTaishiCiHappyGodCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterTaishiCiHappyGodCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICharacterTaishiCiHappyGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterTaishiCiHappyGodCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterTaishiCiHappyGodKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterTaishiCiHappyGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterTaishiCiMobileGodOperations = characterTaishiCiMobileGodOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

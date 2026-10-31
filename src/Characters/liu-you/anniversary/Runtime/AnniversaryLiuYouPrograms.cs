@@ -24,7 +24,7 @@ internal sealed class AnniversaryLiuYouHandler(SkillProgramEffectOp operation) :
 }
 internal static class AnniversaryLiuYouComposition
 {
-    internal const string Skill = "anniversary:kannan", Activation = "phase-contest", Result = "kannan-contest";
+    internal const string Skill = "anniversary:kannan",Activation = "phase-contest",Result = "kannan-contest";
     [ProgramCatalogValidation(50000)] internal static void Validate(string path, SkillProgram p)
     {
         var owns = p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects))

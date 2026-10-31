@@ -54,7 +54,7 @@ public sealed record AnniversaryLiuLiNameChosenEvent(long FrameId, CardConversio
 public sealed record AnniversaryLiuLiDehuaCompletedEvent(long FrameId, int OwnerSeat, int Names) : IGameEvent;
 internal static class AnniversaryLiuLiComposition
 {
-    internal const string Fuli = "anniversary:fuli", Dehua = "anniversary:dehua";
+    internal const string Fuli = "anniversary:fuli",Dehua = "anniversary:dehua";
     [ProgramCatalogValidation(43300)] internal static void Validate(string path, SkillProgram p)
     {
         var effects = p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).ToArray();

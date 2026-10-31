@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramPhaseBoundaryRuntimePortsRuntime : global::CardGame.Core.IProgramPhaseBoundaryFacts, global::CardGame.Core.IProgramPhaseBoundaryProtocols
+{
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCharacterGuoTuOlOperations _characterGuoTuOlOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCharacterLiWanOlOperations _characterLiWanOlOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCharacterLiuBaOlOperations _characterLiuBaOlOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCharacterLuZhiWeiOlOperations _characterLuZhiWeiOlOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCharacterLvQianOlOperations _characterLvQianOlOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCharacterRuanYuOlOperations _characterRuanYuOlOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCharacterWenYangOlOperations _characterWenYangOlOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCharacterZhangJiaoAnniversaryGodOperations _characterZhangJiaoAnniversaryGodOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCoreConvertingGiftsOperations _coreConvertingGiftsOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCoreEarnedActualEndingBenefitsOperations _coreEarnedActualEndingBenefitsOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCoreFixedDistanceOneDebtOperations _coreFixedDistanceOneDebtOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCoreNeighborDiscardOpportunitiesOperations _coreNeighborDiscardOpportunitiesOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCorePrepDiscardEndingPromisesOperations _corePrepDiscardEndingPromisesOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsCoreWenheActivityProgramsOperations _coreWenheActivityProgramsOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreProgramPhaseBoundaryRuntimePortsKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    internal CoreProgramPhaseBoundaryRuntimePortsRuntime(ICoreProgramPhaseBoundaryRuntimePortsCharacterGuoTuOlOperations characterGuoTuOlOperations, ICoreProgramPhaseBoundaryRuntimePortsCharacterLiWanOlOperations characterLiWanOlOperations, ICoreProgramPhaseBoundaryRuntimePortsCharacterLiuBaOlOperations characterLiuBaOlOperations, ICoreProgramPhaseBoundaryRuntimePortsCharacterLuZhiWeiOlOperations characterLuZhiWeiOlOperations, ICoreProgramPhaseBoundaryRuntimePortsCharacterLvQianOlOperations characterLvQianOlOperations, ICoreProgramPhaseBoundaryRuntimePortsCharacterRuanYuOlOperations characterRuanYuOlOperations, ICoreProgramPhaseBoundaryRuntimePortsCharacterWenYangOlOperations characterWenYangOlOperations, ICoreProgramPhaseBoundaryRuntimePortsCharacterYanPuOlOperations characterYanPuOlOperations, ICoreProgramPhaseBoundaryRuntimePortsCharacterZhangJiaoAnniversaryGodOperations characterZhangJiaoAnniversaryGodOperations, ICoreProgramPhaseBoundaryRuntimePortsProgramPipelineHooksOperations programPipelineHooksOperations, ICoreProgramPhaseBoundaryRuntimePortsCoreActualTurnsOperations coreActualTurnsOperations, ICoreProgramPhaseBoundaryRuntimePortsCoreConvertingGiftsOperations coreConvertingGiftsOperations, ICoreProgramPhaseBoundaryRuntimePortsCoreEarnedActualEndingBenefitsOperations coreEarnedActualEndingBenefitsOperations, ICoreProgramPhaseBoundaryRuntimePortsCoreFixedDistanceOneDebtOperations coreFixedDistanceOneDebtOperations, ICoreProgramPhaseBoundaryRuntimePortsCoreNeighborDiscardOpportunitiesOperations coreNeighborDiscardOpportunitiesOperations, ICoreProgramPhaseBoundaryRuntimePortsCorePrepDiscardEndingPromisesOperations corePrepDiscardEndingPromisesOperations, ICoreProgramPhaseBoundaryRuntimePortsCoreTableOrderOperations coreTableOrderOperations, ICoreProgramPhaseBoundaryRuntimePortsCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICoreProgramPhaseBoundaryRuntimePortsCoreWenheActivityProgramsOperations coreWenheActivityProgramsOperations, ICoreProgramPhaseBoundaryRuntimePortsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreProgramPhaseBoundaryRuntimePortsKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess)
+    {
+        this._characterGuoTuOlOperations = characterGuoTuOlOperations;
+        this._characterLiWanOlOperations = characterLiWanOlOperations;
+        this._characterLiuBaOlOperations = characterLiuBaOlOperations;
+        this._characterLuZhiWeiOlOperations = characterLuZhiWeiOlOperations;
+        this._characterLvQianOlOperations = characterLvQianOlOperations;
+        this._characterRuanYuOlOperations = characterRuanYuOlOperations;
+        this._characterWenYangOlOperations = characterWenYangOlOperations;
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._characterZhangJiaoAnniversaryGodOperations = characterZhangJiaoAnniversaryGodOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreConvertingGiftsOperations = coreConvertingGiftsOperations;
+        this._coreEarnedActualEndingBenefitsOperations = coreEarnedActualEndingBenefitsOperations;
+        this._coreFixedDistanceOneDebtOperations = coreFixedDistanceOneDebtOperations;
+        this._coreNeighborDiscardOpportunitiesOperations = coreNeighborDiscardOpportunitiesOperations;
+        this._corePrepDiscardEndingPromisesOperations = corePrepDiscardEndingPromisesOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreWenheActivityProgramsOperations = coreWenheActivityProgramsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+    }
+}

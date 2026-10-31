@@ -165,7 +165,7 @@ internal sealed partial class ProgramPaidCardRuntime
                 };
                 result.Add(new PromptChoice(
                     new ChoiceId($"program-owned-card.frame-{frameId}.zone-{zone}.slot-{slot}"),
-                    hidden ? $"选择第 {slot + 1} 张手牌" : $"选择【{_facts.Snapshot(cards[slot]).DisplayName}】",
+                    hidden ? $"选择第 {slot + 1} 张手牌" : $"选择【{_snapshots.Snapshot(cards[slot]).DisplayName}】",
                     hidden ? [] : [cards[slot].Id], [], parameters));
             }
         }
@@ -343,14 +343,14 @@ internal sealed partial class ProgramPaidCardRuntime
         }
         var reason = new CardMoveReason($"skill-program.{frame.SkillId}.{effect.Op}");
         var discardInvocation = destination == CardLocation.DiscardPile
-            ? _operations.CaptureLogicalDiscard(frame.OwnerSeat, chooserSeat, [card.Id], reason, frame.Id) : null;
+            ? _logicalDiscards.Capture(frame.OwnerSeat, chooserSeat, [card.Id], reason, frame.Id) : null;
         if (effect.RevealBeforeMove)
         {
             _frames.ReplaceTop(_frames.ActiveProgram(frame.Id) with { PendingMovementContinuation = null, PublicHandRevealSelection = new("selected-card-pre-move",frame.InstructionIndex,0,
                 card.Id,card.Kind,source,destination,ownerSeat,chooserSeat,effect.ResultBind,frozenMovedSuit,beforeCoverage,discardInvocation) });
             _events.AdvanceFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId,
                 RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame), frame.OwnerSeat, effect.ResultBind!,
-                Array.AsReadOnly(new[] { _facts.Snapshot(card) })));
+                Array.AsReadOnly(new[] { _snapshots.Snapshot(card) })));
             if(_operations.BeginPublicHandReveal(frame.Id,"selected-card-pre-move"))return;
             ContinueSelectedCardAfterPublicReveal(_frames.ActiveProgram(frame.Id));return;
         }
@@ -366,7 +366,7 @@ internal sealed partial class ProgramPaidCardRuntime
                 _operations.Move(card, CardLocation.Processing, destination, reason, disclosure: disclosure);
         }
         else _operations.Move(card, source, destination, reason, disclosure: disclosure);
-        _operations.CompleteLogicalDiscard(discardInvocation);
+        _logicalDiscards.Complete(discardInvocation);
         if (effect.Destination == SkillProgramCardDestination.SelectedTargetEquipment)
         {
             // Mirror CompleteEquipmentUse's public entry trio (move + event + log);
@@ -504,7 +504,7 @@ internal sealed partial class ProgramPaidCardRuntime
                 _operations.Move(card, CardLocation.Processing, destination, reason, disclosure: disclosure);
         }
         else _operations.Move(card, source, destination, reason, disclosure: disclosure);
-        _operations.CompleteLogicalDiscard(discardInvocation);
+        _logicalDiscards.Complete(discardInvocation);
         if (effect.Destination == SkillProgramCardDestination.SelectedTargetEquipment)
         {
             // Mirror CompleteEquipmentUse's public entry trio (move + event + log);

@@ -1,0 +1,82 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSimaYiMobileGodRuntime : global::CardGame.Core.IMobileSimaCommonFacts, global::CardGame.Core.IMobileSimaRenjieFacts, global::CardGame.Core.IMobileSimaRenjieOperations, global::CardGame.Core.IMobileSimaYiFacts, global::CardGame.Core.IMobileSimaYiOperations
+{
+    private readonly ICharacterSimaYiMobileGodCharacterFeiYiOlOperations _characterFeiYiOlOperations;
+    private readonly ICharacterSimaYiMobileGodCharacterHuaTuoAnniversaryGodOperations _characterHuaTuoAnniversaryGodOperations;
+    private readonly ICharacterSimaYiMobileGodCharacterLiuQiOlOperations _characterLiuQiOlOperations;
+    private readonly ICharacterSimaYiMobileGodCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICharacterSimaYiMobileGodCharacterXunYuMobileGodOperations _characterXunYuMobileGodOperations;
+    private readonly ICharacterSimaYiMobileGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSimaYiMobileGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSimaYiMobileGodCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterSimaYiMobileGodCoreDelayedNullificationOperations _coreDelayedNullificationOperations;
+    private readonly ICharacterSimaYiMobileGodCoreIssuedPlayUsePoliciesOperations _coreIssuedPlayUsePoliciesOperations;
+    private readonly ICharacterSimaYiMobileGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterSimaYiMobileGodCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterSimaYiMobileGodCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICharacterSimaYiMobileGodCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterSimaYiMobileGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSimaYiMobileGodCoreProgramMarkerPaymentsOperations _coreProgramMarkerPaymentsOperations;
+    private readonly ICharacterSimaYiMobileGodCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICharacterSimaYiMobileGodCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterSimaYiMobileGodCoreWushuangSkillsBAuditOperations _coreWushuangSkillsBAuditOperations;
+    private readonly ICharacterSimaYiMobileGodCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICharacterSimaYiMobileGodCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICharacterSimaYiMobileGodCoreNativeBorrowedSwordOperations _coreNativeBorrowedSwordOperations;
+    private readonly ICharacterSimaYiMobileGodCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICharacterSimaYiMobileGodCoreNativeDamageApplicationOperations _coreNativeDamageApplicationOperations;
+    private readonly ICharacterSimaYiMobileGodCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICharacterSimaYiMobileGodCoreNativeNullificationFramesOperations _coreNativeNullificationFramesOperations;
+    private readonly ICharacterSimaYiMobileGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterSimaYiMobileGodKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICharacterSimaYiMobileGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterSimaYiMobileGodMobileSimaRenjieOperations _mobileSimaRenjieOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterSimaYiMobileGodRuntime(ICharacterSimaYiMobileGodCharacterFeiYiOlOperations characterFeiYiOlOperations, ICharacterSimaYiMobileGodCharacterHuaTuoAnniversaryGodOperations characterHuaTuoAnniversaryGodOperations, ICharacterSimaYiMobileGodCharacterLiuQiOlOperations characterLiuQiOlOperations, ICharacterSimaYiMobileGodCharacterLuMengMouOperations characterLuMengMouOperations, ICharacterSimaYiMobileGodCharacterXunYuMobileGodOperations characterXunYuMobileGodOperations, ICharacterSimaYiMobileGodContentRegistryOperations contentRegistryOperations, ICharacterSimaYiMobileGodResolutionStackOperations resolutionStackOperations, ICharacterSimaYiMobileGodCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterSimaYiMobileGodCoreDelayedNullificationOperations coreDelayedNullificationOperations, ICharacterSimaYiMobileGodCoreIssuedPlayUsePoliciesOperations coreIssuedPlayUsePoliciesOperations, ICharacterSimaYiMobileGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterSimaYiMobileGodCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterSimaYiMobileGodCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICharacterSimaYiMobileGodCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterSimaYiMobileGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSimaYiMobileGodCoreProgramMarkerPaymentsOperations coreProgramMarkerPaymentsOperations, ICharacterSimaYiMobileGodCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICharacterSimaYiMobileGodCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterSimaYiMobileGodCoreWushuangSkillsBAuditOperations coreWushuangSkillsBAuditOperations, ICharacterSimaYiMobileGodCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICharacterSimaYiMobileGodCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICharacterSimaYiMobileGodCoreNativeBorrowedSwordOperations coreNativeBorrowedSwordOperations, ICharacterSimaYiMobileGodCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICharacterSimaYiMobileGodCoreNativeDamageApplicationOperations coreNativeDamageApplicationOperations, ICharacterSimaYiMobileGodCoreNativeNullificationOperations coreNativeNullificationOperations, ICharacterSimaYiMobileGodCoreNativeNullificationFramesOperations coreNativeNullificationFramesOperations, ICharacterSimaYiMobileGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterSimaYiMobileGodKernelCoreMainOperations kernelCoreMainOperations, ICharacterSimaYiMobileGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterSimaYiMobileGodMobileSimaRenjieOperations mobileSimaRenjieOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterFeiYiOlOperations = characterFeiYiOlOperations;
+        this._characterHuaTuoAnniversaryGodOperations = characterHuaTuoAnniversaryGodOperations;
+        this._characterLiuQiOlOperations = characterLiuQiOlOperations;
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._characterXunYuMobileGodOperations = characterXunYuMobileGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDelayedNullificationOperations = coreDelayedNullificationOperations;
+        this._coreIssuedPlayUsePoliciesOperations = coreIssuedPlayUsePoliciesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramMarkerPaymentsOperations = coreProgramMarkerPaymentsOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreWushuangSkillsBAuditOperations = coreWushuangSkillsBAuditOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeBorrowedSwordOperations = coreNativeBorrowedSwordOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamageApplicationOperations = coreNativeDamageApplicationOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativeNullificationFramesOperations = coreNativeNullificationFramesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._mobileSimaRenjieOperations = mobileSimaRenjieOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

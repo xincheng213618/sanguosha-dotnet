@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineGuanduGeneralQualificationRuntime
+{
+    private readonly ICoreGuanduGeneralQualificationCardZonesOperations _cardZonesOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreGuanduActivitiesOperations _coreGuanduActivitiesOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreGuanduEquipmentOperations _coreGuanduEquipmentOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreGuanduGeneralBenefitsOperations _coreGuanduGeneralBenefitsOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreGuanduGeneralNativeCardsOperations _coreGuanduGeneralNativeCardsOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreGuanduGeneralsOperations _coreGuanduGeneralsOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreGuanduGeneralQualificationCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreGuanduGeneralQualificationCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreGuanduGeneralQualificationKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineGuanduGeneralQualificationRuntime(ICoreGuanduGeneralQualificationCardZonesOperations cardZonesOperations, ICoreGuanduGeneralQualificationCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreGuanduGeneralQualificationCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreGuanduGeneralQualificationCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreGuanduGeneralQualificationCoreGuanduActivitiesOperations coreGuanduActivitiesOperations, ICoreGuanduGeneralQualificationCoreGuanduEquipmentOperations coreGuanduEquipmentOperations, ICoreGuanduGeneralQualificationCoreGuanduGeneralBenefitsOperations coreGuanduGeneralBenefitsOperations, ICoreGuanduGeneralQualificationCoreGuanduGeneralNativeCardsOperations coreGuanduGeneralNativeCardsOperations, ICoreGuanduGeneralQualificationCoreGuanduGeneralsOperations coreGuanduGeneralsOperations, ICoreGuanduGeneralQualificationCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreGuanduGeneralQualificationCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreGuanduGeneralQualificationCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreGuanduGeneralQualificationCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICoreGuanduGeneralQualificationCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICoreGuanduGeneralQualificationCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreGuanduGeneralQualificationCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreGuanduGeneralQualificationCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreGuanduGeneralQualificationKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreGuanduActivitiesOperations = coreGuanduActivitiesOperations;
+        this._coreGuanduEquipmentOperations = coreGuanduEquipmentOperations;
+        this._coreGuanduGeneralBenefitsOperations = coreGuanduGeneralBenefitsOperations;
+        this._coreGuanduGeneralNativeCardsOperations = coreGuanduGeneralNativeCardsOperations;
+        this._coreGuanduGeneralsOperations = coreGuanduGeneralsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

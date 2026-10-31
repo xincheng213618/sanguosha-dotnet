@@ -42,7 +42,7 @@ public sealed record GaoXiangChiyingMovedEvent(long FrameId, bool Gain, int Ordi
     CardLocation From, CardLocation To, int Sequence, long BatchId) : IGameEvent;
 internal static class GaoXiangComposition
 {
-    internal const string Skill = "anniversary:chiying", Activation = "assist-range-discards";
+    internal const string Skill = "anniversary:chiying",Activation = "assist-range-discards";
     [ProgramCatalogValidation(44900)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op == SkillProgramEffectOp.ResolveAnniversaryGaoXiangChiying)) return;

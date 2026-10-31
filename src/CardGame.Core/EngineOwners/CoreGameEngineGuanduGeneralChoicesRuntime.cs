@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineGuanduGeneralChoicesRuntime
+{
+    private readonly ICoreGuanduGeneralChoicesCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreGuanduGeneralChoicesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreGuanduGeneralChoicesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreGuanduGeneralChoicesRandomOperations _randomOperations;
+    private readonly ICoreGuanduGeneralChoicesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreGuanduGeneralChoicesCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreGuanduGeneralChoicesCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreGuanduGeneralChoicesCoreGuanduActivitiesOperations _coreGuanduActivitiesOperations;
+    private readonly ICoreGuanduGeneralChoicesCoreGuanduGeneralBenefitsOperations _coreGuanduGeneralBenefitsOperations;
+    private readonly ICoreGuanduGeneralChoicesCoreGuanduGeneralQualificationOperations _coreGuanduGeneralQualificationOperations;
+    private readonly ICoreGuanduGeneralChoicesCoreGuanduGeneralsOperations _coreGuanduGeneralsOperations;
+    private readonly ICoreGuanduGeneralChoicesCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreGuanduGeneralChoicesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreGuanduGeneralChoicesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreGuanduGeneralChoicesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreGuanduGeneralChoicesCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreGuanduGeneralChoicesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineGuanduGeneralChoicesRuntime(ICoreGuanduGeneralChoicesCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreGuanduGeneralChoicesCardZonesOperations cardZonesOperations, ICoreGuanduGeneralChoicesContentRegistryOperations contentRegistryOperations, ICoreGuanduGeneralChoicesRandomOperations randomOperations, ICoreGuanduGeneralChoicesResolutionStackOperations resolutionStackOperations, ICoreGuanduGeneralChoicesCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreGuanduGeneralChoicesCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreGuanduGeneralChoicesCoreGuanduActivitiesOperations coreGuanduActivitiesOperations, ICoreGuanduGeneralChoicesCoreGuanduGeneralBenefitsOperations coreGuanduGeneralBenefitsOperations, ICoreGuanduGeneralChoicesCoreGuanduGeneralQualificationOperations coreGuanduGeneralQualificationOperations, ICoreGuanduGeneralChoicesCoreGuanduGeneralsOperations coreGuanduGeneralsOperations, ICoreGuanduGeneralChoicesCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreGuanduGeneralChoicesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreGuanduGeneralChoicesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreGuanduGeneralChoicesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreGuanduGeneralChoicesCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreGuanduGeneralChoicesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreGuanduActivitiesOperations = coreGuanduActivitiesOperations;
+        this._coreGuanduGeneralBenefitsOperations = coreGuanduGeneralBenefitsOperations;
+        this._coreGuanduGeneralQualificationOperations = coreGuanduGeneralQualificationOperations;
+        this._coreGuanduGeneralsOperations = coreGuanduGeneralsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

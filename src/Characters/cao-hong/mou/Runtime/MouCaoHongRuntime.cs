@@ -3,7 +3,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class MouCaoHongRuntime(IMouCaoHongFacts facts, IMouCaoHongNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMouCaoHongRuntime
 {
-    internal const string Action = "mou-cao-hong-anniversary", TakeReason = "skill-program.mou-cao-hong.obtain", GiveReason = "skill-program.mou:yingjia.return", DiscardReason = "skill-program.mou:xianju.ending-discard";
+    internal const string Action = "mou-cao-hong-anniversary",TakeReason = "skill-program.mou-cao-hong.obtain",GiveReason = "skill-program.mou:yingjia.return",DiscardReason = "skill-program.mou:xianju.ending-discard";
     internal static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 35900, SkillProgramEffectOp.ResolveMouCaoHongYingjia, SkillProgramEffectOp.SettleMouCaoHongXianju)]
     private bool Qualifies(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => t.Effects.Single().Op == SkillProgramEffectOp.ResolveMouCaoHongYingjia ? facts.Use(c, w) is { Targets.Count: > 0 } : facts.Debt(c, w) is not null;

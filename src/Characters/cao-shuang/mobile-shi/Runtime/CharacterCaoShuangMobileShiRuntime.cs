@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterCaoShuangMobileShiRuntime : global::CardGame.Core.IShiCaoShuangHost
+{
+    private readonly ICharacterCaoShuangMobileShiCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterCaoShuangMobileShiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterCaoShuangMobileShiObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICharacterCaoShuangMobileShiRandomOperations _randomOperations;
+    private readonly ICharacterCaoShuangMobileShiResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterCaoShuangMobileShiCorePrepPoisonOutcomesOperations _corePrepPoisonOutcomesOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterCaoShuangMobileShiCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterCaoShuangMobileShiCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterCaoShuangMobileShiCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterCaoShuangMobileShiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterCaoShuangMobileShiRuntime(ICharacterCaoShuangMobileShiCardZonesOperations cardZonesOperations, ICharacterCaoShuangMobileShiContentRegistryOperations contentRegistryOperations, ICharacterCaoShuangMobileShiObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICharacterCaoShuangMobileShiRandomOperations randomOperations, ICharacterCaoShuangMobileShiResolutionStackOperations resolutionStackOperations, ICharacterCaoShuangMobileShiCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterCaoShuangMobileShiCorePrepPoisonOutcomesOperations corePrepPoisonOutcomesOperations, ICharacterCaoShuangMobileShiCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterCaoShuangMobileShiCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterCaoShuangMobileShiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterCaoShuangMobileShiCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterCaoShuangMobileShiCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICharacterCaoShuangMobileShiCoreRuntimeOperations coreRuntimeOperations, ICharacterCaoShuangMobileShiCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterCaoShuangMobileShiCoreMatchLogOperations coreMatchLogOperations, ICharacterCaoShuangMobileShiCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterCaoShuangMobileShiCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterCaoShuangMobileShiCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterCaoShuangMobileShiCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterCaoShuangMobileShiCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterCaoShuangMobileShiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePrepPoisonOutcomesOperations = corePrepPoisonOutcomesOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

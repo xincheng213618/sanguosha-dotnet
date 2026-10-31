@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineTargetHandVisibilityRuntime
+{
+    private readonly ICoreTargetHandVisibilityCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreTargetHandVisibilityCoreWushuangCombatTacticsOperations _coreWushuangCombatTacticsOperations;
+    private readonly ICoreTargetHandVisibilityCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreTargetHandVisibilityCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreTargetHandVisibilityCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreTargetHandVisibilityCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreTargetHandVisibilityCoreProgramShanheSourceZhaoranOperations _coreProgramShanheSourceZhaoranOperations;
+    private readonly ICoreTargetHandVisibilityCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineTargetHandVisibilityRuntime(ICoreTargetHandVisibilityCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreTargetHandVisibilityCoreWushuangCombatTacticsOperations coreWushuangCombatTacticsOperations, ICoreTargetHandVisibilityCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreTargetHandVisibilityCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreTargetHandVisibilityCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreTargetHandVisibilityCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreTargetHandVisibilityCoreProgramShanheSourceZhaoranOperations coreProgramShanheSourceZhaoranOperations, ICoreTargetHandVisibilityCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreWushuangCombatTacticsOperations = coreWushuangCombatTacticsOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramShanheSourceZhaoranOperations = coreProgramShanheSourceZhaoranOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

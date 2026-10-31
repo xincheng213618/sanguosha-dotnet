@@ -163,7 +163,7 @@ internal static class ShanheSourceShenNuStageChecks
     private static (CardKind Kind, Suit Suit, int Rank) Face(ShanheStartingCard card) => (card.Kind, card.Suit, card.Rank);
     private sealed class Scene(ShanheBattleSetup setup, ContentRegistry registry)
     {
-        private static readonly FieldInfo PlayersField = typeof(GameEngine).GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        private static readonly FieldInfo PlayersField = global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!;
         public GameEngine Game { get; } = GameEngine.CreateStandard(new()
         {
             Seed = setup.BattleSeed, PlayerCount = 2, HumanSeat = 0, HumanRole = null,

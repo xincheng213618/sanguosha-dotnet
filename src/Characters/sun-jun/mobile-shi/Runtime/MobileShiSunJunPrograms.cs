@@ -4,7 +4,7 @@ namespace CardGame.Core;
 public enum ShiSunJunStage { Hand, RevealChildren, Branch, Payment, DiscardChildren = 9, CostChildren, DamageIssued, Drawing, DrawChildren, Finished }
 public sealed record ShiSunJunReceipt(CardConversionSource Source, string Hash, int Turn, ActualDiscardRecoveryPhaseKey? Phase, int Target, ShiSunJunStage Stage)
 {
-    private IReadOnlyList<int> _hand = [], _payment = [];
+    private IReadOnlyList<int> _hand = [],_payment = [];
     public IReadOnlyList<int> Hand { get => _hand; init => _hand = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Payment { get => _payment; init => _payment = Array.AsReadOnly(value.ToArray()); }
     public int Revealed { get; init; }

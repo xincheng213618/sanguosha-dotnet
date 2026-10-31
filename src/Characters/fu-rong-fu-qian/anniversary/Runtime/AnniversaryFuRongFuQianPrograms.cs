@@ -27,8 +27,7 @@ internal sealed class AnniversaryFuRongFuQianHandler(SkillProgramEffectOp operat
 }
 internal static class AnniversaryFuRongFuQianComposition
 {
-    internal const string Xuewei = "anniversary:xuewei", Yuguan = "anniversary:yuguan", Arm = "arm-until-next-actual-turn",
-        Protect = "prevent-and-pay-once-per-damage", Refill = "maximum-lost-hp-actual-turn-end";
+    internal const string Xuewei = "anniversary:xuewei",Yuguan = "anniversary:yuguan",Arm = "arm-until-next-actual-turn",        Protect = "prevent-and-pay-once-per-damage",Refill = "maximum-lost-hp-actual-turn-end";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ArmAnniversaryFuRongFuQianXuewei or
         SkillProgramEffectOp.ResolveAnniversaryFuRongFuQianXuewei or SkillProgramEffectOp.ResolveAnniversaryFuRongFuQianYuguan;
     [ProgramCatalogValidation(44700)] internal static void Validate(string path, SkillProgram p)

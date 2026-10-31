@@ -57,7 +57,7 @@ public sealed record XiahouHuiCommittedEvent(long FrameId, int Recipient, int Do
 
 internal static class XiahouHuiComposition
 {
-    internal const string Dujun = "anniversary:dujun", Jikun = "anniversary:jikun", Drawn = "dujun-drawn";
+    internal const string Dujun = "anniversary:dujun",Jikun = "anniversary:jikun",Drawn = "dujun-drawn";
     internal static readonly string[] DamageBindings = ["self-first-caused", "self-first-received", "partner-first-caused", "partner-first-received"];
     [ProgramCatalogValidation(46200)] internal static void Validate(string path, SkillProgram p)
     {

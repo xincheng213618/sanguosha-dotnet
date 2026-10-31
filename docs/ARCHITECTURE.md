@@ -11,13 +11,15 @@
 
 Core 不依赖 WPF。人物运行模块链接编译到 Core，内容 JSON 嵌入内容程序集，可选 WPF 模块编译到界面程序集。目录、注册顺序、内容 ID 和逻辑资源名共同遵守 [人物模块约定](CHARACTER_MODULES.md)。
 
+`GameEngine` 保留公开入口与核心装配；独立规则、原生宿主和状态所有者通过本局窄接口协作。职责目录、按需创建和注册约束见 [GameEngine 职责与装配](GAME_ENGINE_DECOMPOSITION.md)。
+
 二进制素材与代码分别交付：WPF 程序集包含界面和小型目录数据，图片与音频放在程序旁的 `Assets/`。运行时通过统一的本地路径解析和图片加载入口使用素材，不依赖源码目录，也不把大型立绘重新嵌入界面程序集。目录、缓存、缺图和离线校验约定见[资源交付边界](RESOURCE_CATALOG_DESIGN.md#代码目录与素材的交付)。
 
 ## 命令与提交
 
 WPF 的开局、选将、出牌、技能、响应、弃牌和推进通过 `Submit(GameCommand)` 进入同一会话。命令是可序列化数据，携带行动者和预期 Revision；回答询问时还需匹配 PromptId 与当前公布的精确候选。无效输入返回 `CommandError`，不推进牌局。
 
-一次已接受操作的边界由 [GameEngine.CommandSession.cs](../src/CardGame.Core/GameEngine.CommandSession.cs) 管理：
+一次已接受操作的边界由 [CommandSession](../src/CardGame.Core/Session/CommandSession.cs) 管理，规则状态通过 [CommandSessionRuntime](../src/CardGame.Core/NativeOwners/CommandSessionRuntime.cs) 接入：
 
 1. 执行规则，累计待提交的事实与通知。
 2. 同步技能投影，检查状态和牌区不变量。
@@ -39,7 +41,7 @@ WPF 的开局、选将、出牌、技能、响应、弃牌和推进通过 `Submi
 
 ## 规则事件与技能执行
 
-规则事实通过 `AdvanceEventRulesAndQueueFact` 进入注册观察链：先执行 `BeforeEvent`，再入输出队列，最后执行 `AfterEvent`。状态推进通过 `AdvanceRulesAndPublishState` 先处理状态规则，再打开人物状态、体力和牌区移动窗口。`QueueGameEvent` 与 `PublishState` 负责输出。
+规则事实通过 `AdvanceEventRulesAndQueueFact` 进入注册观察链：先执行 `BeforeEvent`，再入输出队列，最后执行 `AfterEvent`。状态推进通过 `AdvanceRulesAndPublishState` 先处理状态规则，再打开人物状态、体力和牌区移动窗口。`QueueGameEvent` 接到独立的 [PendingGameEventOutput](../src/CardGame.Core/Session/PendingGameEventOutput.cs)，与 `PublishState` 一样只负责输出。
 
 技能规则与中文展示分别存储。加载器校验格式、节点参数和引用；Registry 校验内容依赖并编译执行计划。人物优先复用现有配置能力，需要共享机制时才增加运行模块。主要扩展点为：
 

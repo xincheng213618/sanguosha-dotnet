@@ -1,0 +1,11 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CorePendingDecisionPolicyPipelineRuntime
+{
+    internal PendingDecision? _pendingDecision { get => _corePlayerDecisionPendingDecisionBackingAccess._pendingDecisionBacking; set => _corePlayerDecisionPendingDecisionBackingAccess._pendingDecisionBacking = _characterLiuFengBoundaryOperations.AppendBoundaryLiuFengQinlingChoices(_characterXiaoQiaoMouOlOperations.AddMouXqJueyanRequestChoices(_characterHuanShuJunOlOperations.AddHuanpeiRequestChoices(_characterLiuZhangOlOperations.AddZonghuRequestChoices(_characterGuoTuOlOperations.AddWeijieRequestChoices(_coreChainedStateBasicConversionsOperations.AddChainedStateBasicChoices(_coreRequestedDeckBasicsOperations.AddRequestedDeckBasicChoices(_coreDrawFundedDistinctBasicOffersOperations.AddDrawFundedDistinctBasicChoices(value)))))))); }
+}

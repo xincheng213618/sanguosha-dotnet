@@ -1,0 +1,60 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineRedDiscardRecoveryRuntime : global::CardGame.Core.IRedDiscardRecoveryHost
+{
+    private readonly ICoreRedDiscardRecoveryCharacterMengHuoBoundaryMobileOperations _characterMengHuoBoundaryMobileOperations;
+    private readonly ICoreRedDiscardRecoveryCardZonesOperations _cardZonesOperations;
+    private readonly ICoreRedDiscardRecoveryContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRedDiscardRecoveryResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRedDiscardRecoveryCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRedDiscardRecoveryCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreRedDiscardRecoveryCoreDiscardBudgetAndFactionGiftsOperations _coreDiscardBudgetAndFactionGiftsOperations;
+    private readonly ICoreRedDiscardRecoveryCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreRedDiscardRecoveryCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreRedDiscardRecoveryCoreRecoveryAmountBonusesOperations _coreRecoveryAmountBonusesOperations;
+    private readonly ICoreRedDiscardRecoveryCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreRedDiscardRecoveryCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreRedDiscardRecoveryCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreRedDiscardRecoveryCoreNativeRecoveryFramesOperations _coreNativeRecoveryFramesOperations;
+    private readonly ICoreRedDiscardRecoveryCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreRedDiscardRecoveryCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreRedDiscardRecoveryCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreRedDiscardRecoveryCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreRedDiscardRecoveryKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineRedDiscardRecoveryTurnRedDiscardCountTurnRedDiscardTurnAccess _coreGameEngineRedDiscardRecoveryTurnRedDiscardCountTurnRedDiscardTurnAccess;
+    internal CoreGameEngineRedDiscardRecoveryRuntime(ICoreRedDiscardRecoveryCharacterMengHuoBoundaryMobileOperations characterMengHuoBoundaryMobileOperations, ICoreRedDiscardRecoveryCardZonesOperations cardZonesOperations, ICoreRedDiscardRecoveryContentRegistryOperations contentRegistryOperations, ICoreRedDiscardRecoveryResolutionStackOperations resolutionStackOperations, ICoreRedDiscardRecoveryCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRedDiscardRecoveryCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreRedDiscardRecoveryCoreDiscardBudgetAndFactionGiftsOperations coreDiscardBudgetAndFactionGiftsOperations, ICoreRedDiscardRecoveryCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreRedDiscardRecoveryCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreRedDiscardRecoveryCoreRecoveryAmountBonusesOperations coreRecoveryAmountBonusesOperations, ICoreRedDiscardRecoveryCoreRuntimeOperations coreRuntimeOperations, ICoreRedDiscardRecoveryCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreRedDiscardRecoveryCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreRedDiscardRecoveryCoreNativeRecoveryFramesOperations coreNativeRecoveryFramesOperations, ICoreRedDiscardRecoveryCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreRedDiscardRecoveryCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreRedDiscardRecoveryCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreRedDiscardRecoveryCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreRedDiscardRecoveryKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineRedDiscardRecoveryTurnRedDiscardCountTurnRedDiscardTurnAccess coreGameEngineRedDiscardRecoveryTurnRedDiscardCountTurnRedDiscardTurnAccess)
+    {
+        this._characterMengHuoBoundaryMobileOperations = characterMengHuoBoundaryMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreDiscardBudgetAndFactionGiftsOperations = coreDiscardBudgetAndFactionGiftsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecoveryAmountBonusesOperations = coreRecoveryAmountBonusesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRecoveryFramesOperations = coreNativeRecoveryFramesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineRedDiscardRecoveryTurnRedDiscardCountTurnRedDiscardTurnAccess = coreGameEngineRedDiscardRecoveryTurnRedDiscardCountTurnRedDiscardTurnAccess;
+    }
+}

@@ -28,7 +28,7 @@ internal static class PublicPileProjectionChecks
         var single = Method("SinglePublicPileSource").CreateDelegate<Func<int, PublicPersistentPileSource?>>(game);
         var piles = Method("CreatePublicPersistentPileSnapshots").CreateDelegate<Func<int, IReadOnlyList<PublicPersistentPileSnapshot>?>>(game);
         var count = Method("PublicPileProgramCount").CreateDelegate<Func<int, string, string, int>>(game);
-        var scalar = typeof(GameEngine).GetMethod("PublicPileCards", Flags, null, [typeof(int)], null)!
+        var scalar = global::FixtureRuntimeAccess.Engine.GetMethod("PublicPileCards", Flags, null, [typeof(int)], null)!
             .CreateDelegate<Func<int, IReadOnlyList<Card>>>(game);
         var project = Method("ToSnapshot").CreateDelegate<Func<Card, CardSnapshot>>(game);
         var referenced = Method("ReferencedPublicPileSources")
@@ -152,7 +152,7 @@ internal static class PublicPileProjectionChecks
         void VerifyPlayerFreeze(IReadOnlyList<PublicPersistentPileSnapshot> values)
         {
             var player = game.CreateSnapshot(0).Players[0] with { PublicPersistentPiles = values };
-            var frozen = (PlayerSnapshot)typeof(GameEngine).GetMethod("FreezePlayer", BindingFlags.Static | BindingFlags.NonPublic)!
+            var frozen = (PlayerSnapshot)typeof(PlayerViewFreezer).GetMethod("FreezePlayer", BindingFlags.Static | BindingFlags.NonPublic)!
                 .Invoke(null, [player])!;
             var json = JsonSerializer.Serialize(frozen);
             RejectReadOnly(frozen.PublicPersistentPiles!, values[0]);
@@ -169,8 +169,8 @@ internal static class PublicPileProjectionChecks
     }
     private static void Equal<T>(T expected, T actual) => Require(JsonSerializer.Serialize(expected) == JsonSerializer.Serialize(actual),
         "The full query JSON or exception type must match the original expression.");
-    private static MethodInfo Method(string name) => typeof(GameEngine).GetMethod(name, Flags)!;
-    private static T Field<T>(GameEngine game, string name) => (T)typeof(GameEngine).GetField(name, Flags)!.GetValue(game)!;
+    private static MethodInfo Method(string name) => global::FixtureRuntimeAccess.Engine.GetMethod(name, Flags)!;
+    private static T Field<T>(GameEngine game, string name) => (T)global::FixtureRuntimeAccess.Engine.GetField(name, Flags)!.GetValue(game)!;
     private static void RejectReadOnly<T>(IReadOnlyList<T> values, T replacement)
     {
         Require(values is ReadOnlyCollection<T> && values is IList<T> { IsReadOnly: true }, "The original read-only wrapper remains present.");

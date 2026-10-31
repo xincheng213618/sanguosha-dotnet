@@ -51,7 +51,7 @@ internal sealed class MouDaQiaoHandler(SkillProgramEffectOp op) : ISkillProgramE
 }
 internal static class MouDaQiaoComposition
 {
-    internal const string Guose = "mou-mobile:guose", Liuli = "mou-mobile:liuli";
+    internal const string Guose = "mou-mobile:guose",Liuli = "mou-mobile:liuli";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouDaQiaoGuose or SkillProgramEffectOp.ResolveMouDaQiaoGuoseRemove or SkillProgramEffectOp.ResolveMouDaQiaoLiuliHeart or SkillProgramEffectOp.InsertMouDaQiaoLiuliPlay;
     [ProgramCatalogValidation(1350)]
     internal static void ValidateProgram(string path, SkillProgram p)

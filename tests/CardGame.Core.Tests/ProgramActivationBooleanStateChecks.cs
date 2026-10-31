@@ -40,7 +40,7 @@ internal static class ProgramActivationBooleanStateChecks
 
         // Direct grant audit follows existing host fixtures. This segment is not a command-replay claim.
         var flags = BindingFlags.Instance | BindingFlags.NonPublic;
-        var players = (IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", flags)!.GetValue(game)!;
+        var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", flags)!.GetValue(game)!;
         var owner = players[0];
         var original = owner.SkillGrants.Grants.Single(g => g.SkillId == SkillA);
         var laterInstance = original.SkillInstanceId + ":later";
@@ -63,7 +63,7 @@ internal static class ProgramActivationBooleanStateChecks
                 !Has(game, SkillA) && !Has(game, SkillB),
             "Each skill's real SetBooleanState cost closes only its own activation gate.");
 
-        var evaluate = typeof(GameEngine).GetMethod("EvaluateProgramActivationCondition", flags)!;
+        var evaluate = global::FixtureRuntimeAccess.Engine.GetMethod("EvaluateProgramActivationCondition", flags)!;
         var context = new PlayerSkillContext(0, 4, 4, 4, TurnPhase.Play, IsOwnTurn: true);
         var frameOnly = new SkillProgramCondition(SkillProgramConditionKind.PindianWon, 0, [], sourceBind: "missing-result");
         try

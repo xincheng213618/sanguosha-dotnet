@@ -1,0 +1,63 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterHuangZuMobileShiEntries
+{
+    internal bool AdvanceShiHzChildren() => _resolve().AdvanceShiHzChildren();
+    internal void AnswerShiHz(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiHz(choice);
+    internal void AssertShiHzFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiHzFrame(f);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginShiHz(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShiHz(input, op);
+    internal bool CanOfferShiHz(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShiHz(c, t, context);
+    internal void CleanupShiHzStored(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CleanupShiHzStored(f);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ActualPhaseEndItem> CollectShiHzPhaseEndCandidates(global::CardGame.Core.ActualDiscardRecoveryPhaseKey phase) => _resolve().CollectShiHzPhaseEndCandidates(phase);
+    internal void ContinueShiHz(long id) => _resolve().ContinueShiHz(id);
+    internal bool DrainShiHz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainShiHz(f);
+    internal void FinishShiHz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShiHz(f);
+    internal bool IsIssuedShiHz(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedShiHz(c, context);
+    internal bool IsIssuedShiHzPile(global::CardGame.Core.PublicPersistentPileSource source) => _resolve().IsIssuedShiHzPile(source);
+    internal bool IsShiHzOriginalActionCost(global::CardGame.Core.CardActionContext action, global::CardGame.Core.CardActionCost cost) => _resolve().IsShiHzOriginalActionCost(action, cost);
+    internal bool IsShiHzOriginalUseChoice(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind) => _resolve().IsShiHzOriginalUseChoice(owner, card, kind);
+    internal bool IsShiHzOriginalUseParent(global::CardGame.Core.CardUseFrame use) => _resolve().IsShiHzOriginalUseParent(use);
+    internal void IssueShiHzNativeUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueShiHzNativeUse(f);
+    internal void IssueShiHzReward(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueShiHzReward(f);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiHuangZuPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().MobileShiHuangZuPublicStates(owner, skillId);
+    internal bool PaidShiHzContinues(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PaidShiHzContinues(f);
+    internal void PublishShiHz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShiHz(f);
+    internal bool ResumeShiHz(long id) => _resolve().ResumeShiHz(id);
+    internal bool ResumeShiHzAttack() => _resolve().ResumeShiHzAttack();
+    internal void ReturnShiHzDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiHzDraw(f, outcome);
+    internal bool ReturnShiHzMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiHzMovement(f);
+    internal bool ReturnShiHzNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnShiHzNativeUse(use);
+    internal void SealShiHz(long id) => _resolve().SealShiHz(id);
+    internal global::CardGame.Core.PromptChoice ShiHzAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiHzAi(p, f);
+    internal bool ShiHzBeforeDamageChild(long id) => _resolve().ShiHzBeforeDamageChild(id);
+    internal bool ShiHzChildEdge(int i) => _resolve().ShiHzChildEdge(i);
+    internal bool ShiHzChildSuffix(int n) => _resolve().ShiHzChildSuffix(n);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiHzChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiHzChoices(f);
+    internal bool ShiHzDamageChild(long id) => _resolve().ShiHzDamageChild(id);
+    internal global::CardGame.Core.CardUseFrame? ShiHzDamageUse(global::CardGame.Core.ProgramSkillWindowContext context, int owner) => _resolve().ShiHzDamageUse(context, owner);
+    internal int[]? ShiHzDiscardIndexes(global::CardGame.Core.CardMovementBatchContext batch, global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramInstructionFeatures features) => _resolve().ShiHzDiscardIndexes(batch, c, features);
+    internal bool ShiHzDyingChild() => _resolve().ShiHzDyingChild();
+    internal bool ShiHzExemptDebit(long useId, int actor) => _resolve().ShiHzExemptDebit(useId, actor);
+    internal bool ShiHzFinalizedTrickWindow(global::CardGame.Core.ProgramTargetCardWindowQuery q) => _resolve().ShiHzFinalizedTrickWindow(q);
+    internal bool ShiHzFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiHzFirstChild(f, child);
+    internal global::CardGame.Core.ShiHzStoredEvent? ShiHzGrant(long id) => _resolve().ShiHzGrant(id);
+    internal global::CardGame.Core.CardUseFrame? ShiHzHandDamage(global::CardGame.Core.ProgramSkillWindowContext c, int owner) => _resolve().ShiHzHandDamage(c, owner);
+    internal bool ShiHzIssued(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ShiHzIssued(c, context);
+    internal bool ShiHzMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().ShiHzMovementProof(f, effect, movement);
+    internal bool ShiHzNativeMaterialBatch(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().ShiHzNativeMaterialBatch(use, batch);
+    internal bool ShiHzNativeResponseBan(global::CardGame.Core.ProgramNativeResponseQuery q) => _resolve().ShiHzNativeResponseBan(q);
+    internal global::CardGame.Core.CardMovementRecord[] ShiHzNonUseHandSlashes(global::CardGame.Core.CardMovementBatchContext batch, int owner) => _resolve().ShiHzNonUseHandSlashes(batch, owner);
+    internal global::CardGame.Core.CardMovementRecord[] ShiHzNonUseHandSlashes2(global::CardGame.Core.ProgramSkillWindowContext? c, int owner) => _resolve().ShiHzNonUseHandSlashes(c, owner);
+    internal global::CardGame.Core.ProgramSkillFrame? ShiHzObserverRoot() => _resolve().ShiHzObserverRoot();
+    internal bool ShiHzRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().ShiHzRecoveryParent(f, recovery);
+    internal bool? ShiHzResponseColor(global::CardGame.Core.CharacterState owner, global::System.Collections.Generic.IReadOnlyList<int> cards, global::CardGame.Core.CardConversionSource? source) => _resolve().ShiHzResponseColor(owner, cards, source);
+    internal bool ShiHzResponseColorAllowed(int responder, bool? effectiveIsRed) => _resolve().ShiHzResponseColorAllowed(responder, effectiveIsRed);
+    internal bool ShiHzSlashDistance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().ShiHzSlashDistance(q);
+    internal bool ShiHzStoredAvailable(global::CardGame.Core.ShiHzStoredEvent g) => _resolve().ShiHzStoredAvailable(g);
+    internal void ShiHzSubmittedResponse(global::CardGame.Core.ProgramSubmittedUseQuery q) => _resolve().ShiHzSubmittedResponse(q);
+    internal global::System.Collections.Generic.IReadOnlyList<int> ShiHzTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiHzTargets(f);
+    internal bool ShiHzUseRidesOn(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiHzUseRidesOn(use, f);
+    internal bool ShiHzViewAsResponseBan(global::CardGame.Core.ProgramViewAsLegalityQuery q) => _resolve().ShiHzViewAsResponseBan(q);
+    internal void ValidateShiHzNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateShiHzNativeUse(use);
+    internal bool HasShiHz { get => _resolve().HasShiHz; }
+}

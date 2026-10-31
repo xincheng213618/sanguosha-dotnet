@@ -55,7 +55,7 @@ internal static class SkillProgramSelectedJudgmentChecks
             .Single(item => item.SkillId == ProgramId && item.TriggerId == SpadeTriggerId);
         var finalBinding = restored.Events.Select(item => item.Payload).OfType<ProgramBindingStartedEvent>()
             .Single(item => item.SkillId == ProgramId && item.BindingId == SpadeTriggerId);
-        var players = (IReadOnlyList<CharacterState>)typeof(GameEngine)
+        var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine
             .GetField("_players", System.Reflection.BindingFlags.Instance |
                 System.Reflection.BindingFlags.NonPublic)!.GetValue(restored)!;
         Require(requested.TargetSeat == targetSeat &&

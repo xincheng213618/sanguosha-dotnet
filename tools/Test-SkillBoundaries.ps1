@@ -35,7 +35,7 @@ $checks = @(
     @{ Name = 'retired engine mutation entry'; Pattern = 'public\s+(?:void|bool|CommandResult)\s+(?:Start|Advance|AdvanceOneStep|Human\w+)\s*\('; Scope = 'engine' },
     @{ Name = 'retired preferences import'; Pattern = '\bImportLegacyPreferences\s*\('; Scope = 'all' },
     @{ Name = 'historical engine constructor'; Pattern = '\bCreateForReplay\s*\(|\bValidateRulesVersion\s*\('; Scope = 'core' },
-    @{ Name = 'historical engine version branch'; Pattern = '\b_rulesVersion\b|\brulesVersion\s*(?:[<>]=?|==|!=)\s*\d|\brulesVersion\s+is\s+[<>]'; Scope = 'engine' },
+    @{ Name = 'historical engine version branch'; Pattern = '\b_rulesVersion\b|\brulesVersion\s*(?:[<>]=?|==|!=)\s*\d|\brulesVersion\s+is\s+[<>]'; Scope = 'core' },
     @{ Name = 'conversion tier mutation outside shared skill change'; Pattern = '\b_configuredConversionTiers\s*(?:\[[^\]]+\]\s*(?:=(?!=)|\+\+|--|\+=|-=)|\.\s*(?:Add|TryAdd|Remove|Clear)\s*\()'; Scope = 'skill-tier-write' },
     @{ Name = 'temporal gate in shared skill change'; Pattern = '\b(?:_roundNumber|_turnNumber|_phase|_currentSeat)\b'; Scope = 'skill-change' },
     @{ Name = 'character-specific turn state'; Pattern = '\bTianyi(?:Won|Lost)ThisTurn\b'; Scope = 'core' },
@@ -51,6 +51,11 @@ foreach ($directory in @('src', 'tests')) {
         # paths live beside each character's content and skill definitions.
         $isCharacterRuntime = $relative -match '^src/Characters/(?:[^/]+/)*Runtime/'
         $isCoreSource = $relative.StartsWith('src/CardGame.Core/') -or $isCharacterRuntime
+        $isSharedSkillChangeSource = $relative -eq 'src/CardGame.Core/GameEngine.ProgramSkillChanges.cs' -or
+            $relative -eq 'src/CardGame.Core/Runtime/Rules/ProgramSkillChangeRuntime.cs' -or
+            $relative -cmatch '^src/CardGame.Core/EngineOwners/CoreGameEngineProgramSkillChangesRuntime(?:\.[^/]+)?\.cs$'
+        $isPindianSource = $relative -eq 'src/CardGame.Core/GameEngine.Pindian.cs' -or
+            $relative -cmatch '^src/CardGame.Core/EngineOwners/CoreGameEnginePindianRuntime(?:\.[^/]+)?\.cs$'
         $isEngineSource = $file.Name -like 'GameEngine*.cs' -or
             ($isCharacterRuntime -and [IO.File]::ReadAllText($file.FullName) -cmatch '\bclass\s+GameEngine\b')
         $lineNumber = 0
@@ -62,9 +67,9 @@ foreach ($directory in @('src', 'tests')) {
                 if ($check.Scope -eq 'core' -and !$isCoreSource) { continue }
                 if ($check.Scope -eq 'engine' -and !$isEngineSource) { continue }
                 if ($check.Scope -eq 'skill-tier-write' -and
-                    (!$isCoreSource -or $relative -eq 'src/CardGame.Core/GameEngine.ProgramSkillChanges.cs')) { continue }
-                if ($check.Scope -eq 'skill-change' -and $relative -ne 'src/CardGame.Core/GameEngine.ProgramSkillChanges.cs') { continue }
-                if ($check.Scope -eq 'pindian' -and $relative -ne 'src/CardGame.Core/GameEngine.Pindian.cs') { continue }
+                    (!$isCoreSource -or $isSharedSkillChangeSource)) { continue }
+                if ($check.Scope -eq 'skill-change' -and !$isSharedSkillChangeSource) { continue }
+                if ($check.Scope -eq 'pindian' -and !$isPindianSource) { continue }
                 if ($line -cmatch $check.Pattern) {
                     $violations.Add([pscustomobject]@{
                         Boundary = $check.Name; File = $relative; Line = $lineNumber

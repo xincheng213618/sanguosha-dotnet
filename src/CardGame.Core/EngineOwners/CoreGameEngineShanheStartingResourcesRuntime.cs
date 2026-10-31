@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
+{
+    private readonly ICoreShanheStartingResourcesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheStartingResourcesCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreShanheStartingResourcesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreShanheStartingResourcesCoreDelayedNullificationOperations _coreDelayedNullificationOperations;
+    private readonly ICoreShanheStartingResourcesCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheStartingResourcesCoreResponseCompletionOperations _coreResponseCompletionOperations;
+    private readonly ICoreShanheStartingResourcesCoreShanheBossCancelledMaterialsOperations _coreShanheBossCancelledMaterialsOperations;
+    private readonly ICoreShanheStartingResourcesCoreShanheMarketApplicationOperations _coreShanheMarketApplicationOperations;
+    private readonly ICoreShanheStartingResourcesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    internal CoreGameEngineShanheStartingResourcesRuntime(ICoreShanheStartingResourcesResolutionStackOperations resolutionStackOperations, ICoreShanheStartingResourcesCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreShanheStartingResourcesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreShanheStartingResourcesCoreDelayedNullificationOperations coreDelayedNullificationOperations, ICoreShanheStartingResourcesCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheStartingResourcesCoreResponseCompletionOperations coreResponseCompletionOperations, ICoreShanheStartingResourcesCoreShanheBossCancelledMaterialsOperations coreShanheBossCancelledMaterialsOperations, ICoreShanheStartingResourcesCoreShanheMarketApplicationOperations coreShanheMarketApplicationOperations, ICoreShanheStartingResourcesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDelayedNullificationOperations = coreDelayedNullificationOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreResponseCompletionOperations = coreResponseCompletionOperations;
+        this._coreShanheBossCancelledMaterialsOperations = coreShanheBossCancelledMaterialsOperations;
+        this._coreShanheMarketApplicationOperations = coreShanheMarketApplicationOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess = coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    }
+}

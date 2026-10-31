@@ -1,0 +1,26 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CharacterHuangZhongBoundaryMobileRuntime
+{
+    private readonly ICharacterHuangZhongBoundaryMobileCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterHuangZhongBoundaryMobileCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICharacterHuangZhongBoundaryMobileCoreFinalTargetSlashOperations _coreFinalTargetSlashOperations;
+    private readonly ICharacterHuangZhongBoundaryMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterHuangZhongBoundaryMobileCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICharacterHuangZhongBoundaryMobileCoreProgramPersistentCombatPoliciesOperations _coreProgramPersistentCombatPoliciesOperations;
+    internal CharacterHuangZhongBoundaryMobileRuntime(ICharacterHuangZhongBoundaryMobileCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterHuangZhongBoundaryMobileCoreActionQueriesOperations coreActionQueriesOperations, ICharacterHuangZhongBoundaryMobileCoreFinalTargetSlashOperations coreFinalTargetSlashOperations, ICharacterHuangZhongBoundaryMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterHuangZhongBoundaryMobileCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICharacterHuangZhongBoundaryMobileCoreProgramPersistentCombatPoliciesOperations coreProgramPersistentCombatPoliciesOperations)
+    {
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreFinalTargetSlashOperations = coreFinalTargetSlashOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramPersistentCombatPoliciesOperations = coreProgramPersistentCombatPoliciesOperations;
+    }
+}

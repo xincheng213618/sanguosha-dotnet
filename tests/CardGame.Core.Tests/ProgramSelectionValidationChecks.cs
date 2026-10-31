@@ -105,7 +105,14 @@ internal static class ProgramSelectionValidationChecks
                 registry.EmptySelectionLabel(SkillProgramTargetKind.OtherLivingWithoutEndingSupport) == "不授予此技能。" &&
                 registry.MinimumTargets(SkillProgramTargetKind.OtherLivingWithHand) == 0 &&
                 registry.EmptySelectionLabel(SkillProgramTargetKind.OtherLivingWithHand) == "不获得手牌。" &&
-                registry.MinimumTargets(SkillProgramTargetKind.AnyLiving) == 1,
+                registry.MinimumTargets(SkillProgramTargetKind.AnyLiving) == 0 &&
+                registry.EmptySelectionLabel(SkillProgramTargetKind.AnyLiving) == "不选择角色。" &&
+                registry.MinimumTargets(SkillProgramTargetKind.OtherLiving) == 0 &&
+                registry.EmptySelectionLabel(SkillProgramTargetKind.OtherLiving) == "不选择角色。" &&
+                registry.MinimumTargets(SkillProgramTargetKind.AnyLivingChained) == 0 &&
+                registry.EmptySelectionLabel(SkillProgramTargetKind.AnyLivingChained) == "不选择角色。" &&
+                registry.MinimumTargets(SkillProgramTargetKind.AnyWounded) == 1 &&
+                registry.EmptySelectionLabel(SkillProgramTargetKind.AnyWounded) == "不获得手牌。",
             "Registered and generic target domains must preserve their original minimum counts and empty-choice labels.");
         Require(registry.TryResolve(new(0, SkillProgramTargetKind.OtherLivingNotLastRoundFocus), out var previous) && previous.SequenceEqual([3]),
             "Previous-round focus must exclude only the same source owner's preceding round target.");

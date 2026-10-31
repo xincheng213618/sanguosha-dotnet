@@ -1,0 +1,24 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreNativeFrameRoutingRuntimeRuntime : global::CardGame.Core.INativeFrameRoutes, global::CardGame.Core.INativeProgramExecution
+{
+    private readonly ICoreNativeFrameRoutingRuntimeCharacterHuaTuoAnniversaryGodOperations _characterHuaTuoAnniversaryGodOperations;
+    private readonly ICoreNativeFrameRoutingRuntimeCoreModeNativeFrameRuntimeOperations _coreModeNativeFrameRuntimeOperations;
+    private readonly ICoreNativeFrameRoutingRuntimeKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreNativeFrameRoutingRuntimeKernelCoreGameEngineProgramContinuationsOperations _kernelCoreGameEngineProgramContinuationsOperations;
+    private readonly ICoreNativeFrameRoutingRuntimeNativeCardGameCoreModeNativeFrameRuntimeOperations _nativeCardGameCoreModeNativeFrameRuntimeOperations;
+    internal CoreNativeFrameRoutingRuntimeRuntime(ICoreNativeFrameRoutingRuntimeCharacterHuaTuoAnniversaryGodOperations characterHuaTuoAnniversaryGodOperations, ICoreNativeFrameRoutingRuntimeCoreModeNativeFrameRuntimeOperations coreModeNativeFrameRuntimeOperations, ICoreNativeFrameRoutingRuntimeKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreNativeFrameRoutingRuntimeKernelCoreGameEngineProgramContinuationsOperations kernelCoreGameEngineProgramContinuationsOperations, ICoreNativeFrameRoutingRuntimeNativeCardGameCoreModeNativeFrameRuntimeOperations nativeCardGameCoreModeNativeFrameRuntimeOperations)
+    {
+        this._characterHuaTuoAnniversaryGodOperations = characterHuaTuoAnniversaryGodOperations;
+        this._coreModeNativeFrameRuntimeOperations = coreModeNativeFrameRuntimeOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineProgramContinuationsOperations = kernelCoreGameEngineProgramContinuationsOperations;
+        this._nativeCardGameCoreModeNativeFrameRuntimeOperations = nativeCardGameCoreModeNativeFrameRuntimeOperations;
+    }
+}

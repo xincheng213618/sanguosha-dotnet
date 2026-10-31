@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineJianjiDeclarationsRuntime
+{
+    private readonly ICoreJianjiDeclarationsCharacterHuangQuanOlOperations _characterHuangQuanOlOperations;
+    private readonly ICoreJianjiDeclarationsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreJianjiDeclarationsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreJianjiDeclarationsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreJianjiDeclarationsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreJianjiDeclarationsCoreCardDeclarationsOperations _coreCardDeclarationsOperations;
+    private readonly ICoreJianjiDeclarationsCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICoreJianjiDeclarationsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreJianjiDeclarationsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreJianjiDeclarationsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreJianjiDeclarationsCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICoreJianjiDeclarationsCoreDrawFundedDistinctBasicReturnsOperations _coreDrawFundedDistinctBasicReturnsOperations;
+    private readonly ICoreJianjiDeclarationsCoreJianjiDeclarationsOperations _coreJianjiDeclarationsOperations;
+    private readonly ICoreJianjiDeclarationsCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICoreJianjiDeclarationsCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICoreJianjiDeclarationsCoreTieredRoundZeroReturnsOperations _coreTieredRoundZeroReturnsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineJianjiDeclarationsRuntime(ICoreJianjiDeclarationsCharacterHuangQuanOlOperations characterHuangQuanOlOperations, ICoreJianjiDeclarationsCardZonesOperations cardZonesOperations, ICoreJianjiDeclarationsContentRegistryOperations contentRegistryOperations, ICoreJianjiDeclarationsResolutionStackOperations resolutionStackOperations, ICoreJianjiDeclarationsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreJianjiDeclarationsCoreCardDeclarationsOperations coreCardDeclarationsOperations, ICoreJianjiDeclarationsCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICoreJianjiDeclarationsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreJianjiDeclarationsCoreRuntimeOperations coreRuntimeOperations, ICoreJianjiDeclarationsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreJianjiDeclarationsCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICoreJianjiDeclarationsCoreDrawFundedDistinctBasicReturnsOperations coreDrawFundedDistinctBasicReturnsOperations, ICoreJianjiDeclarationsCoreJianjiDeclarationsOperations coreJianjiDeclarationsOperations, ICoreJianjiDeclarationsCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICoreJianjiDeclarationsCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICoreJianjiDeclarationsCoreTieredRoundZeroReturnsOperations coreTieredRoundZeroReturnsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._characterHuangQuanOlOperations = characterHuangQuanOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._coreDrawFundedDistinctBasicReturnsOperations = coreDrawFundedDistinctBasicReturnsOperations;
+        this._coreJianjiDeclarationsOperations = coreJianjiDeclarationsOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreTieredRoundZeroReturnsOperations = coreTieredRoundZeroReturnsOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

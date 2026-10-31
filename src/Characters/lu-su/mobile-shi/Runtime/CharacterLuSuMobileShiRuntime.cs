@@ -1,0 +1,88 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLuSuMobileShiRuntime : global::CardGame.Core.IShiLuSuHost
+{
+    private readonly ICharacterLuSuMobileShiCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterLuSuMobileShiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLuSuMobileShiResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLuSuMobileShiCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterLuSuMobileShiCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterLuSuMobileShiCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICharacterLuSuMobileShiCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterLuSuMobileShiCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICharacterLuSuMobileShiCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterLuSuMobileShiCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterLuSuMobileShiCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterLuSuMobileShiCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterLuSuMobileShiCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterLuSuMobileShiCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterLuSuMobileShiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterLuSuMobileShiCoreProgramHandExchangesOperations _coreProgramHandExchangesOperations;
+    private readonly ICharacterLuSuMobileShiCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLuSuMobileShiCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterLuSuMobileShiCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLuSuMobileShiCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterLuSuMobileShiCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterLuSuMobileShiCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterLuSuMobileShiCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLuSuMobileShiCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterLuSuMobileShiCorePlayerViewNativeCardSelectionsOperations _corePlayerViewNativeCardSelectionsOperations;
+    private readonly ICharacterLuSuMobileShiCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterLuSuMobileShiCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICharacterLuSuMobileShiCharacterLuSuMobileShiOperations _characterLuSuMobileShiOperations;
+    private readonly ICharacterLuSuMobileShiCoreDrawFundedDistinctBasicReturnsOperations _coreDrawFundedDistinctBasicReturnsOperations;
+    private readonly ICharacterLuSuMobileShiCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICharacterLuSuMobileShiCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterLuSuMobileShiCoreTieredRoundZeroReturnsOperations _coreTieredRoundZeroReturnsOperations;
+    private readonly ICharacterLuSuMobileShiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterLuSuMobileShiRuntime(ICharacterLuSuMobileShiCardZonesOperations cardZonesOperations, ICharacterLuSuMobileShiContentRegistryOperations contentRegistryOperations, ICharacterLuSuMobileShiResolutionStackOperations resolutionStackOperations, ICharacterLuSuMobileShiCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterLuSuMobileShiCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterLuSuMobileShiCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICharacterLuSuMobileShiCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterLuSuMobileShiCoreEquipmentContentOperations coreEquipmentContentOperations, ICharacterLuSuMobileShiCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterLuSuMobileShiCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterLuSuMobileShiCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterLuSuMobileShiCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterLuSuMobileShiCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterLuSuMobileShiCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterLuSuMobileShiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLuSuMobileShiCoreProgramHandExchangesOperations coreProgramHandExchangesOperations, ICharacterLuSuMobileShiCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLuSuMobileShiCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterLuSuMobileShiCoreRuntimeOperations coreRuntimeOperations, ICharacterLuSuMobileShiCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterLuSuMobileShiCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterLuSuMobileShiCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterLuSuMobileShiCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLuSuMobileShiCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterLuSuMobileShiCorePlayerViewNativeCardSelectionsOperations corePlayerViewNativeCardSelectionsOperations, ICharacterLuSuMobileShiCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterLuSuMobileShiCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICharacterLuSuMobileShiCharacterLuSuMobileShiOperations characterLuSuMobileShiOperations, ICharacterLuSuMobileShiCoreDrawFundedDistinctBasicReturnsOperations coreDrawFundedDistinctBasicReturnsOperations, ICharacterLuSuMobileShiCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICharacterLuSuMobileShiCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterLuSuMobileShiCoreTieredRoundZeroReturnsOperations coreTieredRoundZeroReturnsOperations, ICharacterLuSuMobileShiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramHandExchangesOperations = coreProgramHandExchangesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewNativeCardSelectionsOperations = corePlayerViewNativeCardSelectionsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._characterLuSuMobileShiOperations = characterLuSuMobileShiOperations;
+        this._coreDrawFundedDistinctBasicReturnsOperations = coreDrawFundedDistinctBasicReturnsOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreTieredRoundZeroReturnsOperations = coreTieredRoundZeroReturnsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

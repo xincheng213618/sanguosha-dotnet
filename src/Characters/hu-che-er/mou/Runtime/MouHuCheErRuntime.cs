@@ -3,7 +3,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouHuCheErHost
 {
-    internal const string MouHuCheErAction = "mou-hu-che-er-kongwu", MouHuCheErDiscardReason = "skill-program.mou:kongwu.discard", MouHuCheErDrawReason = "skill-program.mou:kongwu.draw";
+    internal const string MouHuCheErAction = "mou-hu-che-er-kongwu",MouHuCheErDiscardReason = "skill-program.mou:kongwu.discard",MouHuCheErDrawReason = "skill-program.mou:kongwu.draw";
     private static CardConversionSource MouHuCheErSource(ProgramSkillFrame f) => new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     internal bool CanStart(int owner) => facts.Phase() is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == owner && facts.Recorded(p) && facts.Targets(owner).Count > 0;
     public SkillProgramStepOutcome Resolve(ProgramSkillFrame supplied) => BeginMouHuCheEr(supplied);

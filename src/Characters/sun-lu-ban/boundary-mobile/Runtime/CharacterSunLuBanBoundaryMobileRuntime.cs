@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSunLuBanBoundaryMobileRuntime : global::CardGame.Core.IBoundarySunLuBanHost
+{
+    private readonly ICharacterSunLuBanBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterSunLuBanBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterSunLuBanBoundaryMobileRuntime(ICharacterSunLuBanBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterSunLuBanBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterSunLuBanBoundaryMobileCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterSunLuBanBoundaryMobileCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICharacterSunLuBanBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSunLuBanBoundaryMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterSunLuBanBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterSunLuBanBoundaryMobileCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterSunLuBanBoundaryMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterSunLuBanBoundaryMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterSunLuBanBoundaryMobileCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterSunLuBanBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

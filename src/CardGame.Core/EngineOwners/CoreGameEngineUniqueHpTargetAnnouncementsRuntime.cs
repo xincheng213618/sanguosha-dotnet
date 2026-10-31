@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineUniqueHpTargetAnnouncementsRuntime
+{
+    private readonly ICoreUniqueHpTargetAnnouncementsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsCoreActualUseTargetProgramsOperations _coreActualUseTargetProgramsOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsCoreSameTypeActualUseAidOperations _coreSameTypeActualUseAidOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreUniqueHpTargetAnnouncementsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineUniqueHpTargetAnnouncementsRuntime(ICoreUniqueHpTargetAnnouncementsContentRegistryOperations contentRegistryOperations, ICoreUniqueHpTargetAnnouncementsResolutionStackOperations resolutionStackOperations, ICoreUniqueHpTargetAnnouncementsCoreActualUseTargetProgramsOperations coreActualUseTargetProgramsOperations, ICoreUniqueHpTargetAnnouncementsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreUniqueHpTargetAnnouncementsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreUniqueHpTargetAnnouncementsCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreUniqueHpTargetAnnouncementsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreUniqueHpTargetAnnouncementsCoreRuntimeOperations coreRuntimeOperations, ICoreUniqueHpTargetAnnouncementsCoreSameTypeActualUseAidOperations coreSameTypeActualUseAidOperations, ICoreUniqueHpTargetAnnouncementsCoreTableOrderOperations coreTableOrderOperations, ICoreUniqueHpTargetAnnouncementsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreUniqueHpTargetAnnouncementsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualUseTargetProgramsOperations = coreActualUseTargetProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSameTypeActualUseAidOperations = coreSameTypeActualUseAidOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

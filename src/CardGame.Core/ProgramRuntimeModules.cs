@@ -28,6 +28,7 @@ internal sealed class ProgramRuntimeModuleCatalog
         ArgumentNullException.ThrowIfNull(types);
         var registrations = new List<Registration>();
         var methods = new List<MethodInfo>(legacyMethods ?? []);
+        var engineContracts = new Dictionary<Type, bool>();
         foreach (var type in types.Select(type => type ??
                      throw new InvalidOperationException("A runtime module type cannot be null."))
                      .OrderBy(type => type.FullName, StringComparer.Ordinal))
@@ -39,6 +40,11 @@ internal sealed class ProgramRuntimeModuleCatalog
             if (type.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
                     BindingFlags.DeclaredOnly).Any(field => !field.IsLiteral))
                 throw Invalid(type, "must not retain nonconstant static fields");
+            var declaredMethods = type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
+                BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+            if (declaredMethods.Any(ExposesEngine) || type.GetFields(BindingFlags.Instance | BindingFlags.Public |
+                    BindingFlags.NonPublic | BindingFlags.DeclaredOnly).Any(field => ContainsEngine(field.FieldType)))
+                throw Invalid(type, "must not expose GameEngine through rule fields, methods or callbacks");
             ConstructorInfo? constructor = null;
             Type[] dependencies = [];
             if (type.IsAbstract)
@@ -60,14 +66,41 @@ internal sealed class ProgramRuntimeModuleCatalog
                         !typeof(IProgramRuntimeOperations).IsAssignableFrom(dependency)) ||
                     only.GetParameters().Any(parameter => parameter.IsOptional || parameter.IsOut))
                     throw Invalid(type, "constructor dependencies must be dedicated query or runtime-operation interfaces");
+                if (dependencies.Any(ContractExposesEngine))
+                    throw Invalid(type, "dedicated dependency contracts must not expose GameEngine or engine callbacks");
             }
             registrations.Add(new(type, constructor, Array.AsReadOnly(dependencies)));
-            methods.AddRange(type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
-                BindingFlags.NonPublic | BindingFlags.DeclaredOnly));
+            methods.AddRange(declaredMethods);
         }
         Registrations = Array.AsReadOnly(registrations.ToArray());
         _registrations = new ReadOnlyDictionary<Type, Registration>(registrations.ToDictionary(item => item.Type));
         Methods = Array.AsReadOnly(methods.ToArray());
+
+        bool ContractExposesEngine(Type contract)
+        {
+            if (engineContracts.TryGetValue(contract, out var result)) return result;
+            result = ContainsEngine(contract) || contract.GetInterfaces().Append(contract).Any(current => current.GetMethods(
+                BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
+                BindingFlags.DeclaredOnly).Any(ExposesEngine));
+            engineContracts.Add(contract, result);
+            return result;
+        }
+    }
+
+    private static bool ExposesEngine(MethodInfo method) => ContainsEngine(method.ReturnType) ||
+        method.GetParameters().Any(parameter => ContainsEngine(parameter.ParameterType));
+
+    private static bool ContainsEngine(Type type) => ContainsEngine(type, new HashSet<Type>());
+
+    private static bool ContainsEngine(Type type, HashSet<Type> visited)
+    {
+        if (type == typeof(GameEngine)) return true;
+        if (!visited.Add(type)) return false;
+        if (type.HasElementType && ContainsEngine(type.GetElementType()!, visited)) return true;
+        if (type.IsGenericType && type.GetGenericArguments().Any(argument => ContainsEngine(argument, visited))) return true;
+        return typeof(Delegate).IsAssignableFrom(type) && type.GetMethod("Invoke") is { } invoke &&
+            (ContainsEngine(invoke.ReturnType, visited) ||
+             invoke.GetParameters().Any(parameter => ContainsEngine(parameter.ParameterType, visited)));
     }
 
     internal static bool IsDeclared(Type? type) => type?.IsDefined(typeof(ProgramRuntimeModuleAttribute), false) == true;
@@ -110,29 +143,44 @@ internal sealed class ProgramRuntimeModuleRegistry(ProgramRuntimeModuleCatalog c
         finally { _constructing.Remove(type); }
     }
 
-    internal Delegate Bind(MethodInfo method, Type delegateType, object legacyHost)
+    internal Delegate Bind(MethodInfo method, Type delegateType, Func<MethodInfo, Type, Delegate> bindCore)
     {
         var key = (method, delegateType);
         if (_handlers.TryGetValue(key, out var handler)) return handler;
-        handler = method.IsStatic ? method.CreateDelegate(delegateType) :
-            method.CreateDelegate(delegateType, Target(method, legacyHost));
+        if (method.IsStatic) handler = method.CreateDelegate(delegateType);
+        else if (method.DeclaringType == typeof(GameEngine)) handler = bindCore(method, delegateType);
+        else
+        {
+            _ = catalog.Get(method.DeclaringType!);
+            handler = DeferredRuntimeHandler.Create(method, delegateType,
+                () => method.CreateDelegate(delegateType, Get(method.DeclaringType!)));
+        }
         _handlers.Add(key, handler);
         return handler;
     }
 
-    internal object? Target(MethodInfo method, object legacyHost) => method.IsStatic ? null :
-        method.DeclaringType == typeof(GameEngine) ? legacyHost : Get(method.DeclaringType!);
+    internal Delegate Bind(MethodInfo method, Type delegateType, object legacyHost) =>
+        Bind(method, delegateType, (coreMethod, type) => coreMethod.CreateDelegate(type, legacyHost));
 }
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramRuntimeModuleCatalog> RuntimeModuleMetadata = new(() => ProgramRuntimeModuleCatalog.Default, true);
-    private static IReadOnlyList<MethodInfo> RuntimeModuleMethods => RuntimeModuleMetadata.Value.Methods;
-    private ProgramRuntimeModuleRegistry? _runtimeModules;
-    private ProgramRuntimeModuleRegistry RuntimeModules => _runtimeModules ??= new(RuntimeModuleMetadata.Value,
-        contract => ProgramCapabilities.Get(contract));
-    internal object GetRuntimeModuleInstance(Type type) => RuntimeModules.Get(type);
+internal static IReadOnlyList<MethodInfo> RuntimeModuleMethods => ProgramRuntimeModuleCatalog.Default.Methods;
+    private MatchRuntime? _matchRuntime;
+    private MatchRuntime MatchRuntime => _matchRuntime ??= new(ProgramRuntimeModuleCatalog.Default,
+        ProgramCapabilityCatalog.Default, new global::CardGame.Core.GameEngine.MatchRuntimeAdapterFactory(this),
+        global::System.Linq.Enumerable.ToArray(global::System.Linq.Enumerable.Concat(new MatchCoreCapabilityProvider(_cardZones, ProgramHistory, _cardMovementBatches, _contentRegistry,
+            _players, _cardMovements, _cardSnapshotCache, turnEffects: _turnCardUseEffects, random: _random,
+            skillObservations: _skillGrantRevisions).Bindings, __GeneratedActualStateOwnerBindings())),
+        resolutionScheduler: _resolutionScheduler);
+    internal object GetRuntimeModuleInstance(Type type) => MatchRuntime.GetModule(type);
     internal T GetRuntimeModule<T>() where T : class => (T)GetRuntimeModuleInstance(typeof(T));
-    internal Delegate BindRuntimeHandler(MethodInfo method, Type delegateType) => RuntimeModules.Bind(method, delegateType, this);
-    private object? ResolveRuntimeHandlerTarget(MethodInfo method) => RuntimeModules.Target(method, this);
+    internal Delegate BindRuntimeHandler(MethodInfo method, Type delegateType) => MatchRuntime.BindHandler(method, delegateType);
+    private object? ResolveRuntimeHandlerTarget(MethodInfo method) => MatchRuntime.HandlerTarget(method);
+internal sealed class MatchRuntimeAdapterFactory(GameEngine engine) : IMatchRuntimeAdapterFactory
+    {
+        public object CreateAdapter(ProgramCapabilityCatalog.Registration registration) => registration.CreateAdapter(engine);
+        public Delegate BindCoreHandler(MethodInfo method, Type delegateType) => method.CreateDelegate(delegateType, engine);
+        public object CoreHandlerTarget(MethodInfo method) => engine;
+    }
 }

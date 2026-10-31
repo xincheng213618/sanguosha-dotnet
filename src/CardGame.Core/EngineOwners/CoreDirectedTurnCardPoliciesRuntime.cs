@@ -1,0 +1,30 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreDirectedTurnCardPoliciesRuntime
+{
+    private readonly ICoreDirectedTurnCardPoliciesCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreDirectedTurnCardPoliciesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreDirectedTurnCardPoliciesCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreDirectedTurnCardPoliciesCoreProgramTargetRulesOperations _coreProgramTargetRulesOperations;
+    private readonly ICoreDirectedTurnCardPoliciesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesDirectedTurnCardPolicySequenceAccess _coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesDirectedTurnCardPolicySequenceAccess;
+    internal CoreDirectedTurnCardPoliciesRuntime(ICoreDirectedTurnCardPoliciesCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreDirectedTurnCardPoliciesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDirectedTurnCardPoliciesCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreDirectedTurnCardPoliciesCoreProgramTargetRulesOperations coreProgramTargetRulesOperations, ICoreDirectedTurnCardPoliciesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesDirectedTurnCardPolicySequenceAccess coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesDirectedTurnCardPolicySequenceAccess)
+    {
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramTargetRulesOperations = coreProgramTargetRulesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesDirectedTurnCardPolicySequenceAccess = coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesDirectedTurnCardPolicySequenceAccess;
+    }
+}

@@ -5,7 +5,7 @@ public enum RicePileStage { DrawChildren, StoreSelection, MovementChildren, Reco
 /// <summary>One actual ending, damage point, pile exhaustion or judgment payment.</summary>
 public sealed record RicePileReceipt
 {
-    private IReadOnlyList<int> _selected = [], _cards = [];
+    private IReadOnlyList<int> _selected = [],_cards = [];
     private IReadOnlyList<CardLocation> _from = [];
     private IReadOnlyList<PromptChoice> _choices = [];
     public SkillProgramEffectOp Operation { get; init; }

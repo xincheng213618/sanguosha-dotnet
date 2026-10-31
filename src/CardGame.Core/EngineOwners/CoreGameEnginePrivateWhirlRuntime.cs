@@ -1,0 +1,70 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEnginePrivateWhirlRuntime : global::CardGame.Core.IPrivateWhirlHost
+{
+    private readonly ICorePrivateWhirlCardZonesOperations _cardZonesOperations;
+    private readonly ICorePrivateWhirlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePrivateWhirlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePrivateWhirlCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePrivateWhirlCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICorePrivateWhirlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICorePrivateWhirlCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICorePrivateWhirlCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICorePrivateWhirlCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICorePrivateWhirlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICorePrivateWhirlCorePersistentPrivateWhirlOperations _corePersistentPrivateWhirlOperations;
+    private readonly ICorePrivateWhirlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePrivateWhirlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePrivateWhirlCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICorePrivateWhirlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICorePrivateWhirlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICorePrivateWhirlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePrivateWhirlCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICorePrivateWhirlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICorePrivateWhirlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICorePrivateWhirlCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICorePrivateWhirlCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICorePrivateWhirlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePrivateWhirlHasIssuedPrivateWhirlAccess _coreGameEnginePrivateWhirlHasIssuedPrivateWhirlAccess;
+    internal CoreGameEnginePrivateWhirlRuntime(ICorePrivateWhirlCardZonesOperations cardZonesOperations, ICorePrivateWhirlContentRegistryOperations contentRegistryOperations, ICorePrivateWhirlResolutionStackOperations resolutionStackOperations, ICorePrivateWhirlCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePrivateWhirlCoreCardAttackStateOperations coreCardAttackStateOperations, ICorePrivateWhirlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICorePrivateWhirlCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICorePrivateWhirlCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICorePrivateWhirlCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICorePrivateWhirlCoreNationalSkillsOperations coreNationalSkillsOperations, ICorePrivateWhirlCorePersistentPrivateWhirlOperations corePersistentPrivateWhirlOperations, ICorePrivateWhirlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePrivateWhirlCoreRuntimeOperations coreRuntimeOperations, ICorePrivateWhirlCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICorePrivateWhirlCoreSkillProgramsOperations coreSkillProgramsOperations, ICorePrivateWhirlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICorePrivateWhirlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePrivateWhirlCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICorePrivateWhirlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICorePrivateWhirlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICorePrivateWhirlCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICorePrivateWhirlCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICorePrivateWhirlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePrivateWhirlHasIssuedPrivateWhirlAccess coreGameEnginePrivateWhirlHasIssuedPrivateWhirlAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePersistentPrivateWhirlOperations = corePersistentPrivateWhirlOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+        this._coreGameEnginePrivateWhirlHasIssuedPrivateWhirlAccess = coreGameEnginePrivateWhirlHasIssuedPrivateWhirlAccess;
+    }
+}

@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouHuaXiongComposition
 {
-    internal const string Yaowu = "mou-mobile:yaowu", Yangwei = "mou-mobile:yangwei";
+    internal const string Yaowu = "mou-mobile:yaowu",Yangwei = "mou-mobile:yangwei";
     private static bool Plain(SkillProgramEffect e, SkillProgramEffectOp op) => e.Op == op && e.Target == SkillProgramEffectTarget.Owner &&
         e.TargetReference is null && e.ActorReference is null && e.NumberExpression is null && e.SourceBind is null && e.ResultBind is null && e.Condition.Kind == SkillProgramConditionKind.Always;
     internal static bool IsYangwei(SkillProgram p) => p.Id == Yangwei && p.Triggers.Count == 0 && p.ViewAs.Count == 0 &&

@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramAttackEffectsRuntime
+{
+    private readonly ICoreProgramAttackEffectsCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICoreProgramAttackEffectsCharacterDaQiaoMobileOperations _characterDaQiaoMobileOperations;
+    private readonly ICoreProgramAttackEffectsCharacterLiuPanOlOperations _characterLiuPanOlOperations;
+    private readonly ICoreProgramAttackEffectsCharacterMaChengOlOperations _characterMaChengOlOperations;
+    private readonly ICoreProgramAttackEffectsCharacterMaWanOlOperations _characterMaWanOlOperations;
+    private readonly ICoreProgramAttackEffectsCharacterMaXiuMaTieOlOperations _characterMaXiuMaTieOlOperations;
+    private readonly ICoreProgramAttackEffectsCharacterQianZhaoOlOperations _characterQianZhaoOlOperations;
+    private readonly ICoreProgramAttackEffectsCharacterYangFuOlOperations _characterYangFuOlOperations;
+    private readonly ICoreProgramAttackEffectsCharacterZhangYanOlOperations _characterZhangYanOlOperations;
+    private readonly ICoreProgramAttackEffectsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramAttackEffectsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramAttackEffectsCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreProgramAttackEffectsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreProgramAttackEffectsCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreProgramAttackEffectsCoreCurrentEnhancementSlashRedirectsOperations _coreCurrentEnhancementSlashRedirectsOperations;
+    private readonly ICoreProgramAttackEffectsCoreCurrentSlashFireOffersOperations _coreCurrentSlashFireOffersOperations;
+    private readonly ICoreProgramAttackEffectsCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICoreProgramAttackEffectsCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreProgramAttackEffectsCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICoreProgramAttackEffectsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramAttackEffectsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramAttackEffectsCoreShortRangeSlashTargetsOperations _coreShortRangeSlashTargetsOperations;
+    private readonly ICoreProgramAttackEffectsCoreSoleTargetRedirectOperations _coreSoleTargetRedirectOperations;
+    private readonly ICoreProgramAttackEffectsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreProgramAttackEffectsCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreProgramAttackEffectsCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreProgramAttackEffectsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreProgramAttackEffectsCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICoreProgramAttackEffectsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramAttackEffectsRuntime(ICoreProgramAttackEffectsCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICoreProgramAttackEffectsCharacterDaQiaoMobileOperations characterDaQiaoMobileOperations, ICoreProgramAttackEffectsCharacterLiuPanOlOperations characterLiuPanOlOperations, ICoreProgramAttackEffectsCharacterMaChengOlOperations characterMaChengOlOperations, ICoreProgramAttackEffectsCharacterMaWanOlOperations characterMaWanOlOperations, ICoreProgramAttackEffectsCharacterMaXiuMaTieOlOperations characterMaXiuMaTieOlOperations, ICoreProgramAttackEffectsCharacterQianZhaoOlOperations characterQianZhaoOlOperations, ICoreProgramAttackEffectsCharacterYangFuOlOperations characterYangFuOlOperations, ICoreProgramAttackEffectsCharacterZhangYanOlOperations characterZhangYanOlOperations, ICoreProgramAttackEffectsContentRegistryOperations contentRegistryOperations, ICoreProgramAttackEffectsResolutionStackOperations resolutionStackOperations, ICoreProgramAttackEffectsCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreProgramAttackEffectsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreProgramAttackEffectsCoreCardActionsOperations coreCardActionsOperations, ICoreProgramAttackEffectsCoreCurrentEnhancementSlashRedirectsOperations coreCurrentEnhancementSlashRedirectsOperations, ICoreProgramAttackEffectsCoreCurrentSlashFireOffersOperations coreCurrentSlashFireOffersOperations, ICoreProgramAttackEffectsCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICoreProgramAttackEffectsCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreProgramAttackEffectsCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICoreProgramAttackEffectsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramAttackEffectsCoreRuntimeOperations coreRuntimeOperations, ICoreProgramAttackEffectsCoreShortRangeSlashTargetsOperations coreShortRangeSlashTargetsOperations, ICoreProgramAttackEffectsCoreSoleTargetRedirectOperations coreSoleTargetRedirectOperations, ICoreProgramAttackEffectsCoreMatchLogOperations coreMatchLogOperations, ICoreProgramAttackEffectsCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreProgramAttackEffectsCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreProgramAttackEffectsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreProgramAttackEffectsCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICoreProgramAttackEffectsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._characterDaQiaoMobileOperations = characterDaQiaoMobileOperations;
+        this._characterLiuPanOlOperations = characterLiuPanOlOperations;
+        this._characterMaChengOlOperations = characterMaChengOlOperations;
+        this._characterMaWanOlOperations = characterMaWanOlOperations;
+        this._characterMaXiuMaTieOlOperations = characterMaXiuMaTieOlOperations;
+        this._characterQianZhaoOlOperations = characterQianZhaoOlOperations;
+        this._characterYangFuOlOperations = characterYangFuOlOperations;
+        this._characterZhangYanOlOperations = characterZhangYanOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCurrentEnhancementSlashRedirectsOperations = coreCurrentEnhancementSlashRedirectsOperations;
+        this._coreCurrentSlashFireOffersOperations = coreCurrentSlashFireOffersOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShortRangeSlashTargetsOperations = coreShortRangeSlashTargetsOperations;
+        this._coreSoleTargetRedirectOperations = coreSoleTargetRedirectOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

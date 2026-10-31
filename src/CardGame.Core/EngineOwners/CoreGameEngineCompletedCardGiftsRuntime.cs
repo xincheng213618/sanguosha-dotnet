@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime : global::CardGame.Core.ICompletedCardGiftProgramHost
+{
+    private readonly ICoreCompletedCardGiftsCharacterKongShuOlOperations _characterKongShuOlOperations;
+    private readonly ICoreCompletedCardGiftsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreCompletedCardGiftsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCompletedCardGiftsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCompletedCardGiftsCoreCompletedGiftQinglongRidesOperations _coreCompletedGiftQinglongRidesOperations;
+    private readonly ICoreCompletedCardGiftsCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreCompletedCardGiftsCoreAssistedFactionSlashOperations _coreAssistedFactionSlashOperations;
+    private readonly ICoreCompletedCardGiftsCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreCompletedCardGiftsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreCompletedCardGiftsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreCompletedCardGiftsCoreOwnPublicPileConversionsOperations _coreOwnPublicPileConversionsOperations;
+    private readonly ICoreCompletedCardGiftsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreCompletedCardGiftsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreCompletedCardGiftsCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICoreCompletedCardGiftsCoreProgramFactionPoliciesOperations _coreProgramFactionPoliciesOperations;
+    private readonly ICoreCompletedCardGiftsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCompletedCardGiftsCoreWuJingQueriesOperations _coreWuJingQueriesOperations;
+    private readonly ICoreCompletedCardGiftsCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreCompletedCardGiftsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreCompletedCardGiftsCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreCompletedCardGiftsCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreCompletedCardGiftsCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreCompletedCardGiftsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreCompletedCardGiftsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreCompletedCardGiftsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreCompletedCardGiftsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess _coreCommandJournalStorageEventsPendingEventsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineCompletedCardGiftsRuntime(ICoreCompletedCardGiftsCharacterKongShuOlOperations characterKongShuOlOperations, ICoreCompletedCardGiftsCardZonesOperations cardZonesOperations, ICoreCompletedCardGiftsContentRegistryOperations contentRegistryOperations, ICoreCompletedCardGiftsResolutionStackOperations resolutionStackOperations, ICoreCompletedCardGiftsCoreCompletedGiftQinglongRidesOperations coreCompletedGiftQinglongRidesOperations, ICoreCompletedCardGiftsCoreActionQueriesOperations coreActionQueriesOperations, ICoreCompletedCardGiftsCoreAssistedFactionSlashOperations coreAssistedFactionSlashOperations, ICoreCompletedCardGiftsCoreCardConversionsOperations coreCardConversionsOperations, ICoreCompletedCardGiftsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreCompletedCardGiftsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreCompletedCardGiftsCoreOwnPublicPileConversionsOperations coreOwnPublicPileConversionsOperations, ICoreCompletedCardGiftsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreCompletedCardGiftsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreCompletedCardGiftsCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICoreCompletedCardGiftsCoreProgramFactionPoliciesOperations coreProgramFactionPoliciesOperations, ICoreCompletedCardGiftsCoreRuntimeOperations coreRuntimeOperations, ICoreCompletedCardGiftsCoreWuJingQueriesOperations coreWuJingQueriesOperations, ICoreCompletedCardGiftsCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreCompletedCardGiftsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreCompletedCardGiftsCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreCompletedCardGiftsCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreCompletedCardGiftsCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreCompletedCardGiftsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreCompletedCardGiftsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreCompletedCardGiftsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreCompletedCardGiftsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess coreCommandJournalStorageEventsPendingEventsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterKongShuOlOperations = characterKongShuOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCompletedGiftQinglongRidesOperations = coreCompletedGiftQinglongRidesOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreAssistedFactionSlashOperations = coreAssistedFactionSlashOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOwnPublicPileConversionsOperations = coreOwnPublicPileConversionsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramFactionPoliciesOperations = coreProgramFactionPoliciesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreWuJingQueriesOperations = coreWuJingQueriesOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCommandJournalStorageEventsPendingEventsAccess = coreCommandJournalStorageEventsPendingEventsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

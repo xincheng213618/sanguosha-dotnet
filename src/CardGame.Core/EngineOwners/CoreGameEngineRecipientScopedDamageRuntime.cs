@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRecipientScopedDamageRuntime
+{
+    private readonly ICoreRecipientScopedDamageCharacterCheZhouAnniversaryOperations _characterCheZhouAnniversaryOperations;
+    private readonly ICoreRecipientScopedDamageContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRecipientScopedDamageModeRulesOperations _modeRulesOperations;
+    private readonly ICoreRecipientScopedDamageResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRecipientScopedDamageCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRecipientScopedDamageCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreRecipientScopedDamageCoreLateFixedTargetDamageCapScopesOperations _coreLateFixedTargetDamageCapScopesOperations;
+    private readonly ICoreRecipientScopedDamageCorePassiveDamageCapsOperations _corePassiveDamageCapsOperations;
+    private readonly ICoreRecipientScopedDamageCorePassiveRulePoliciesOperations _corePassiveRulePoliciesOperations;
+    private readonly ICoreRecipientScopedDamageCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreRecipientScopedDamageCoreProgramVirtualDuelOperations _coreProgramVirtualDuelOperations;
+    private readonly ICoreRecipientScopedDamageCoreSignedDamagePaymentsOperations _coreSignedDamagePaymentsOperations;
+    private readonly ICoreRecipientScopedDamageCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICoreRecipientScopedDamageCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreRecipientScopedDamageKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRecipientScopedDamageRuntime(ICoreRecipientScopedDamageCharacterCheZhouAnniversaryOperations characterCheZhouAnniversaryOperations, ICoreRecipientScopedDamageContentRegistryOperations contentRegistryOperations, ICoreRecipientScopedDamageModeRulesOperations modeRulesOperations, ICoreRecipientScopedDamageResolutionStackOperations resolutionStackOperations, ICoreRecipientScopedDamageCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRecipientScopedDamageCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreRecipientScopedDamageCoreLateFixedTargetDamageCapScopesOperations coreLateFixedTargetDamageCapScopesOperations, ICoreRecipientScopedDamageCorePassiveDamageCapsOperations corePassiveDamageCapsOperations, ICoreRecipientScopedDamageCorePassiveRulePoliciesOperations corePassiveRulePoliciesOperations, ICoreRecipientScopedDamageCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreRecipientScopedDamageCoreProgramVirtualDuelOperations coreProgramVirtualDuelOperations, ICoreRecipientScopedDamageCoreSignedDamagePaymentsOperations coreSignedDamagePaymentsOperations, ICoreRecipientScopedDamageCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICoreRecipientScopedDamageCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreRecipientScopedDamageKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCheZhouAnniversaryOperations = characterCheZhouAnniversaryOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._modeRulesOperations = modeRulesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreLateFixedTargetDamageCapScopesOperations = coreLateFixedTargetDamageCapScopesOperations;
+        this._corePassiveDamageCapsOperations = corePassiveDamageCapsOperations;
+        this._corePassiveRulePoliciesOperations = corePassiveRulePoliciesOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramVirtualDuelOperations = coreProgramVirtualDuelOperations;
+        this._coreSignedDamagePaymentsOperations = coreSignedDamagePaymentsOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

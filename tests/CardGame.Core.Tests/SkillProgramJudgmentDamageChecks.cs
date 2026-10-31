@@ -68,7 +68,7 @@ internal static class SkillProgramJudgmentDamageChecks
         var rejectedParent = false;
         try
         {
-            typeof(GameEngine).GetMethod("AssertCoreInvariants",
+            global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants",
                 BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(invalidParent, null);
         }
         catch (TargetInvocationException exception) when (exception.InnerException is

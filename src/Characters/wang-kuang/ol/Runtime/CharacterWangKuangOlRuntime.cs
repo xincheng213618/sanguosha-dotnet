@@ -1,0 +1,78 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterWangKuangOlRuntime : global::CardGame.Core.IWangKuangProgramHost
+{
+    private readonly ICharacterWangKuangOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterWangKuangOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterWangKuangOlResolutionStackOperations2 _resolutionStackOperations;
+    private readonly ICharacterWangKuangOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterWangKuangOlCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterWangKuangOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterWangKuangOlCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICharacterWangKuangOlCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterWangKuangOlCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICharacterWangKuangOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterWangKuangOlCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterWangKuangOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterWangKuangOlCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterWangKuangOlCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterWangKuangOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterWangKuangOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterWangKuangOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterWangKuangOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterWangKuangOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterWangKuangOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterWangKuangOlCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICharacterWangKuangOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterWangKuangOlCharacterWangKuangOlOperations _characterWangKuangOlOperations;
+    private readonly ICharacterWangKuangOlResolutionStackOperations _resolutionStackOperations2;
+    private readonly ICharacterWangKuangOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICharacterWangKuangOlCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterWangKuangOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CharacterWangKuangOlRuntime(ICharacterWangKuangOlCardZonesOperations cardZonesOperations, ICharacterWangKuangOlContentRegistryOperations contentRegistryOperations, ICharacterWangKuangOlResolutionStackOperations2 resolutionStackOperations, ICharacterWangKuangOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterWangKuangOlCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterWangKuangOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterWangKuangOlCoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterWangKuangOlCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterWangKuangOlCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICharacterWangKuangOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterWangKuangOlCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterWangKuangOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterWangKuangOlCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterWangKuangOlCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterWangKuangOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterWangKuangOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterWangKuangOlCoreRuntimeOperations coreRuntimeOperations, ICharacterWangKuangOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterWangKuangOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterWangKuangOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterWangKuangOlCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICharacterWangKuangOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterWangKuangOlCharacterWangKuangOlOperations characterWangKuangOlOperations, ICharacterWangKuangOlResolutionStackOperations resolutionStackOperations2, ICharacterWangKuangOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICharacterWangKuangOlCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterWangKuangOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._characterWangKuangOlOperations = characterWangKuangOlOperations;
+        this._resolutionStackOperations2 = resolutionStackOperations2;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

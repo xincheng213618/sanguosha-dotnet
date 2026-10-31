@@ -7,63 +7,6 @@ public sealed partial record CardUseFrame
 
 public sealed partial class GameEngine
 {
-    private bool HasTurnRedSlashCapability=>_contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GrantTurnRedSlashBenefits)==true;
-    private bool CapturesActionColor=>_contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.NativeActionAppearance)||HasMouWenChouOl||HasMouLuZhiCapability||HasMouHanDangCapability||HasWuLuKangDixianCapability||_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuaXiongYaowu)||_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouGongsunZanJiaodi)||_contentRegistry.ProgramDependencies.UsesOwnPublicPileConversions||HasLiuYanCapability||HasQuHuangCapability||HasRuanYuCapability||HasLiuPanCapability||HasWuJingLiubing||HasWuJingHeji||_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveKenshangTargetRewrite)||HasMaMiDiCapability||TracksAlternateActualUseColor||TracksDamageTargetBudgetTargets||HasAdjacentRedTargetCapability||HasSoleTargetProtectionCapability||HasTargetedOrdinaryTrickAdjustment||_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RecordOpeningTurnUse)||_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RewriteWeilinTargetHand)||HasSourceCurseActionColors||TracksActionDiscardColor||HasTurnRedSlashCapability||HasBlackTrickTargetPolicy||HasComparedBlackSlashPolicies||HasYuanchouCardPolicy||_contentRegistry.ProgramDependencies.UsesRoundDistinctBasicUse||_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferPairedColorCardDisposition);
-    private void GrantTurnRedSlashBenefits(ProgramSkillFrame frame)
-    {
-        ValidateProgramTurnEffectGrant(frame);
-        var change=frame.WindowContext?.HpChange;
-        if(change?.Kind!=HpChangeKind.Loss || change.TargetSeat!=frame.OwnerSeat) throw new InvalidOperationException("Red Slash benefits require the owner's actual Loss.");
-        if(change.LossOccurrence is not {ActualTurnNumber:>0,Phase:TurnPhase.Play} occurrence || occurrence.TurnOwnerSeat!=frame.OwnerSeat) return;
-        if(occurrence.ActualTurnNumber!=_turnNumber || occurrence.TurnOwnerSeat!=_currentSeat) throw new InvalidOperationException("A Loss benefit crossed its actual turn.");
-        var source=CreateProgramTurnEffectSource(frame);
-        var modifier=_turnCardUseEffects.GrantRuleModifier(_turnNumber,_currentSeat,frame.Id,frame.InstructionIndex-1,source,SkillRuleQuery.SlashLimit,SkillRuleOperation.Add,1);
-        AdvanceEventRulesAndQueueFact(new TurnRuleModifierGrantedEvent(modifier));
-        var policy=_turnCardUseEffects.GrantRedSlashPolicy(_turnNumber,_currentSeat,frame.Id,frame.InstructionIndex-1,source);
-        AdvanceEventRulesAndQueueFact(new TurnRedSlashPolicyGrantedEvent(policy));
-    }
-    private bool HasTurnRedSlashPolicy(int actor,CardKind kind,Suit? suit)=>HasTurnRedSlashPolicyForColor(actor,kind,SuitColor(suit));
-    private bool HasTurnRedSlashPolicyForColor(int actor,CardKind kind,bool? color)=>IsSlashCard(kind)&&color==true&&_turnCardUseEffects.HasRedSlashPolicy(_turnNumber,_currentSeat,actor);
-    private bool? PhysicalGroupColor(CharacterState owner,IReadOnlyList<Card> cards)
-    { var colors=cards.Select(c=>SuitColor(EffectiveSuit(owner,c))).Distinct().ToArray();return colors.Length==1?colors[0]:null; }
-    private bool IsRedSlashProviderPaymentLegal(FactionCardRequestHandle pending,CardKind kind,IReadOnlyList<Card> cards,bool isTrueZhangba = false)
-    {
-        if (!IsWuyouFactionPaymentLegal(pending, kind, cards, isTrueZhangba)) return false;
-        if (IsFactionSlashUse(pending) && HasRankSlashRange(_players[pending.OwnerSeat],kind)) return IsSpecificRankProviderPaymentLegal(pending,kind,cards,isTrueZhangba);
-        if(!IsFactionSlashUse(pending) || pending.IsAssistedProgramUse || pending.TargetSeat is not {} target || (!_turnCardUseEffects.HasRedSlashPolicy(_turnNumber,_currentSeat,pending.OwnerSeat) && !HasSlashUseDistanceBySuit(_players[pending.OwnerSeat],kind,Suit.Diamond)))return true;
-        var actor=_players[pending.OwnerSeat];var color=PhysicalGroupColor(actor,cards);var suit=HasSlashUseDistanceBySuit(actor,kind,Suit.Diamond) ? PhysicalGroupSuit(actor,cards) : null;
-        if(pending.IsBorrowedSwordUse)return IsLegalBorrowedSwordSlashTarget(actor,_players[target],kind,physicalSuit:suit,allowAnyPhysicalSuit:false,effectiveColor:color);
-        if(pending.IsQinglongCrescentBladeUse)return CanUseQinglongCrescentBladeTarget(actor,_players[target],kind,color,allowAnyColor:false,physicalSuit:suit);
-        return CanUseProvidedSlashTarget(actor,_players[target],kind,physicalSuit:suit,allowAnyPhysicalSuit:false,effectiveColor:color);
-    }
-    [ProgramCapability]
-    private sealed class TurnRedSlashProgramCapability(GameEngine engine) : ITurnRedSlashProgramHost
-    { public void GrantTurnRedSlashBenefits(ProgramSkillFrame frame)=>engine.GrantTurnRedSlashBenefits(frame); }
-
-    [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 180)]
-    [ProgramDistanceRule(ProgramDistanceStage.BorrowedPhysicalSlash, 70)]
-    private bool DistancePhysicalSlash180HasTurnRedSlashPolicy(ProgramSlashDistanceQuery q) =>
-        HasTurnRedSlashPolicy(q.Actor.Seat, q.Kind, EffectiveSuit(q.Actor,q.PhysicalCard!));
-
-
-    [ProgramDistanceRule(ProgramDistanceStage.VirtualSlash, 80)]
-    [ProgramDistanceRule(ProgramDistanceStage.ProvidedSlash, 60)]
-    [ProgramDistanceRule(ProgramDistanceStage.BorrowedSlash, 120)]
-    private bool DistanceVirtualSlash80HasTurnRedSlashPolicyForColor(ProgramSlashDistanceQuery q) =>
-        HasTurnRedSlashPolicyForColor(q.Actor.Seat, q.Kind, q.EffectiveColor ?? SuitColor(q.PhysicalSuit));
-
-
-
-
-
-
-    [ProgramDistanceRule(ProgramDistanceStage.BorrowedSlash, 130)]
-    private bool DistanceBorrowedSlash130HasTurnRedSlashPolicy(ProgramSlashDistanceQuery q) =>
-        (q.AllowAnyPhysicalSuit && GetSlashUseCards(q.Actor).Any(c=>HasTurnRedSlashPolicy(q.Actor.Seat,q.Kind,EffectiveSuit(q.Actor,c))));
-
-    [ProgramDistanceRule(ProgramDistanceStage.ProvidedSlash, 70)]
-    private bool DistanceProvidedSlash70HasRedSlashPolicy(ProgramSlashDistanceQuery q) =>
-        q.AllowAnyPhysicalSuit && _turnCardUseEffects.HasRedSlashPolicy(_turnNumber,_currentSeat,q.Actor.Seat);
 
 
 

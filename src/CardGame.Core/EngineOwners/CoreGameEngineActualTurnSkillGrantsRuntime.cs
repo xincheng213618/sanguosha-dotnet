@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineActualTurnSkillGrantsRuntime
+{
+    private readonly ICoreActualTurnSkillGrantsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreActualTurnSkillGrantsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreActualTurnSkillGrantsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreActualTurnSkillGrantsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreActualTurnSkillGrantsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreActualTurnSkillGrantsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreActualTurnSkillGrantsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreActualTurnSkillGrantsCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICoreActualTurnSkillGrantsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreActualTurnSkillGrantsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineActualTurnSkillGrantsRuntime(ICoreActualTurnSkillGrantsContentRegistryOperations contentRegistryOperations, ICoreActualTurnSkillGrantsResolutionStackOperations resolutionStackOperations, ICoreActualTurnSkillGrantsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreActualTurnSkillGrantsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreActualTurnSkillGrantsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreActualTurnSkillGrantsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreActualTurnSkillGrantsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreActualTurnSkillGrantsCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICoreActualTurnSkillGrantsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreActualTurnSkillGrantsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

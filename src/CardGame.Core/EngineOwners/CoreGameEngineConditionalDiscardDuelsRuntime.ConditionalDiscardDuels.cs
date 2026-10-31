@@ -1,0 +1,224 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+using System.Globalization;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime
+{
+    internal const string ConditionalDuelOwnerReason = "skill-program.conditional-discard-duel.owner-cost";
+    internal const string ConditionalDuelTargetReason = "skill-program.conditional-discard-duel.target-cost";
+    internal bool ConditionalDuelSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 60, SkillProgramEffectOp.DiscardSlashThenOtherCardAndUseDuel)]
+    internal bool CanStartConditionalDiscardDuel(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Any(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) && !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner.Seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard));
+    internal bool ConditionalDuelParentMatches(ProgramSkillFrame f)
+    {
+        if (f.ConditionalDiscardDuel is not { } d || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != d.InstructionIndex || d.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var target] || target != d.TargetSeat || target == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || d.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || d.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || d.TurnOwnerSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || d.Source != new CardConversionSource(f.SkillId, f.ActivationId!, f.OwnerSeat, f.SkillInstanceId) || d.GameplayHash != f.GameplayHash || string.IsNullOrWhiteSpace(f.SkillInstanceId) || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash)
+            return false;
+        var plan = ProgramInstructionResolver.Default.Resolve(f, p);
+        return plan.Instructions is [{ Op: SkillProgramEffectOp.DiscardSlashThenOtherCardAndUseDuel }] && plan.Activation is { MinCards: 0, MaxCards: 0, MinTargets: 1, MaxTargets: 1, TargetKind: SkillProgramTargetKind.OtherLivingInAttackRange, UsesPerTurn: null, UsesPerPhase: null, UsesPerGame: null } && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ConditionalDiscardDuelStartedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == d.Source && e.GameplayHash == d.GameplayHash && e.TurnNumber == d.TurnNumber && e.TurnOwnerSeat == d.TurnOwnerSeat && e.TargetSeat == d.TargetSeat) == 1;
+    }
+
+    internal SkillProgramStepOutcome BeginConditionalDiscardDuel(ProgramSkillFrame supplied)
+    {
+        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        if (f.ConditionalDiscardDuel is not null || f.SelectedTargetSeats is not [var target] || !ConditionalDuelSourceCurrent(f) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, target))
+            return SkillProgramStepOutcome.Continue;
+        var source = new CardConversionSource(f.SkillId, f.ActivationId!, f.OwnerSeat, f.SkillInstanceId);
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ConditionalDiscardDuel = new(f.InstructionIndex, source, f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, target, ConditionalDiscardDuelStage.OwnerChoice) });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ConditionalDiscardDuelStartedEvent(f.Id, source, f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, target));
+        if (!ConditionalDuelParentMatches(f))
+            throw new InvalidOperationException("Conditional Duel lost its exact activation.");
+        PublishConditionalDuelPayment(f);
+        return SkillProgramStepOutcome.AwaitChoice;
+    }
+
+    internal IReadOnlyList<PromptChoice> ConditionalDuelChoices(ProgramSkillFrame f)
+    {
+        var d = f.ConditionalDiscardDuel!;
+        var ownerCost = d.Stage == ConditionalDiscardDuelStage.OwnerChoice;
+        var payer = ownerCost ? f.OwnerSeat : d.TargetSeat;
+        var choices = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, payer, payer, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard, canSelect: (_, c) => !ownerCost || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) && !c.IsGeneralWeapon).Select(c =>
+        {
+            var args = c.Parameters.ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
+            args["program-action"] = "conditional-discard-duel";
+            args["cost-side"] = ownerCost ? "owner" : "target";
+            return new PromptChoice(c.Id, c.Description, c.Cards, c.Targets, args);
+        }).ToList();
+        if (ownerCost)
+            choices.Add(new(new($"conditional-discard-duel.{(f.Id)}.cancel"), "不支付，取消发动。", [], [], new Dictionary<string, string> { ["program-action"] = "conditional-discard-duel", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["cost-side"] = "cancel" }));
+        return Array.AsReadOnly(choices.ToArray());
+    }
+
+    internal void PublishConditionalDuelPayment(ProgramSkillFrame f)
+    {
+        var d = f.ConditionalDiscardDuel!;
+        if (!ConditionalDuelSourceCurrent(f) || !_coreMatchParticipantsPlayersAccess._players[d.TargetSeat].IsAlive)
+        {
+            FinishConditionalDiscardDuel(f, false);
+            return;
+        }
+
+        var payer = d.Stage == ConditionalDiscardDuelStage.OwnerChoice ? f.OwnerSeat : d.TargetSeat;
+        var choices = ConditionalDuelChoices(f);
+        if (choices.Count == 0)
+        {
+            FinishConditionalDiscardDuel(f, false);
+            return;
+        }
+
+        var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, payer, payer == f.OwnerSeat ? "请选择实际手牌或装备中的一张杀弃置。" : "请选择自己的一张手牌或装备弃置。", choices.SelectMany(c => c.Cards).Distinct().ToArray(), [], f.OwnerSeat)
+        {
+            PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
+            IsPrivate = true,
+            TargetSeat = payer,
+            Choices = choices,
+            SkillPrompt = new(f.SkillId, skill.Name, skill.Name + " · 实际弃牌", skill.Description)
+        };
+        _coreMatchOutcomeStatusWinnerAccess._status = _coreMatchParticipantsPlayersAccess._players[payer].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
+    }
+
+    [ProgramAnswer("conditional-discard-duel")]
+    internal void ResolveConditionalDuelPayment(PromptChoice selected)
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !ConditionalDuelParentMatches(f) || f.ConditionalDiscardDuel is not { Stage: ConditionalDiscardDuelStage.OwnerChoice or ConditionalDiscardDuelStage.TargetChoice } d || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != (d.Stage == ConditionalDiscardDuelStage.OwnerChoice ? f.OwnerSeat : d.TargetSeat) || !ConditionalDuelChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets)) || selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture))
+            throw new InvalidOperationException("Conditional Duel payment must be its exact published private choice.");
+        if (!ConditionalDuelSourceCurrent(f) || !_coreMatchParticipantsPlayersAccess._players[d.TargetSeat].IsAlive)
+        {
+            _coreNativePromptBoundaryOperations.ClearPendingDecision();
+            FinishConditionalDiscardDuel(f, false);
+            return;
+        }
+
+        if (selected.Parameters.GetValueOrDefault("cost-side") == "cancel")
+        {
+            _coreNativePromptBoundaryOperations.ClearPendingDecision();
+            FinishConditionalDiscardDuel(f, false);
+            return;
+        }
+
+        var payer = prompt.PlayerSeat;
+        var ownerCost = d.Stage == ConditionalDiscardDuelStage.OwnerChoice;
+        if (!Enum.TryParse<CardZoneKind>(selected.Parameters.GetValueOrDefault("source-zone"), out var zone) || zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !int.TryParse(selected.Parameters.GetValueOrDefault("slot-index"), out var slot))
+            throw new InvalidOperationException("Conditional Duel lost its own payment zone and slot.");
+        var from = new CardLocation(zone, payer);
+        var cards = _cardZonesOperations._cardZones.CardsAt(from);
+        if (slot < 0 || slot >= cards.Count || selected.Cards is not [var id] || cards[slot].Id != id || ownerCost && (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(cards[slot].Kind) || cards[slot].IsGeneralWeapon) || _coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(payer, cards[slot], from, OwnedCardMoveIntent.Discard))
+            throw new InvalidOperationException("Conditional Duel cannot pay an invalid or substituted entity.");
+        var card = cards[slot];
+        var before = _coreCardMovementJournalMovementSequenceAccess._movementSequence;
+        var paid = new ConditionalDiscardDuelPayment(payer, card.Id, card.Kind, from, before, before);
+        _coreNativePromptBoundaryOperations.ClearPendingDecision();
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { ConditionalDiscardDuel = d with { Stage = ownerCost ? ConditionalDiscardDuelStage.OwnerChildren : ConditionalDiscardDuelStage.TargetChildren, OwnerPayment = ownerCost ? paid : d.OwnerPayment, TargetPayment = ownerCost ? null : paid }, PendingMovementContinuation = new(payer, 0, null) });
+        _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(f.OwnerSeat, payer, card, from, new(ownerCost ? ConditionalDuelOwnerReason : ConditionalDuelTargetReason));
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id); // Preserve queued SilverLion recovery/replacement fields on this actual owner.
+        paid = paid with
+        {
+            SequenceAfter = _coreCardMovementJournalMovementSequenceAccess._movementSequence
+        };
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ConditionalDiscardDuel = f.ConditionalDiscardDuel!with { OwnerPayment = ownerCost ? paid : f.ConditionalDiscardDuel.OwnerPayment, TargetPayment = ownerCost ? null : paid } });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ConditionalDiscardDuelPaidEvent(f.Id, payer, ownerCost, paid.SequenceBefore, paid.SequenceAfter));
+        ContinueConditionalDuelPaymentChildren(f);
+    }
+
+    internal void ContinueConditionalDuelPaymentChildren(ProgramSkillFrame f)
+    {
+        if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id))
+            return;
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { PendingMovementContinuation = null });
+        _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
+    }
+
+    [ProgramContinuation(ProgramContinuationKind.Movement, 370)]
+    internal bool ReturnConditionalDuelMovement(ProgramSkillFrame f)
+    {
+        if (f.ConditionalDiscardDuel is not { Stage: ConditionalDiscardDuelStage.OwnerChildren or ConditionalDiscardDuelStage.TargetChildren })
+            return false;
+        if (f.PendingMovementContinuation is null || !_coreConditionalDiscardDuelReturnsOperations.ValidConditionalDuelPayments(f))
+            throw new InvalidOperationException("Conditional Duel movement lost its real cost.");
+        ContinueConditionalDuelPaymentChildren(f);
+        return true;
+    }
+
+    [ProgramContinuation(ProgramContinuationKind.Resume, 670)]
+    internal bool ResumeConditionalDiscardDuel(long id)
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.ConditionalDiscardDuel is not { } d)
+            return false;
+        if (!ConditionalDuelParentMatches(f) || !_coreConditionalDiscardDuelReturnsOperations.ValidConditionalDuelPayments(f))
+            throw new InvalidOperationException("Conditional Duel lost its frozen owner, costs or instruction.");
+        if (d.Stage is ConditionalDiscardDuelStage.OwnerChoice or ConditionalDiscardDuelStage.TargetChoice)
+        {
+            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
+                PublishConditionalDuelPayment(f);
+            return true;
+        }
+
+        if (d.Stage == ConditionalDiscardDuelStage.DuelIssued)
+            throw new InvalidOperationException("Issued Conditional Duel requires its exact typed use return.");
+        if (f.PendingMovementContinuation is not null)
+        {
+            ContinueConditionalDuelPaymentChildren(f);
+            return true;
+        }
+
+        if (!ConditionalDuelSourceCurrent(f) || !_coreMatchParticipantsPlayersAccess._players[d.TargetSeat].IsAlive)
+        {
+            FinishConditionalDiscardDuel(f, false);
+            return true;
+        }
+
+        if (d.Stage == ConditionalDiscardDuelStage.OwnerChildren)
+        {
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ConditionalDiscardDuel = d with { Stage = ConditionalDiscardDuelStage.TargetChoice } });
+            PublishConditionalDuelPayment(f);
+            return true;
+        }
+
+        // This comparison happens only after every real child of the target's actual discard has returned.
+        if (d.TargetPayment is not { } paid || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(paid.PrintedKind) || _coreMatchParticipantsPlayersAccess._players[d.TargetSeat].Hp < _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp || !_coreDamageColorDuelProgramsOperations.CanIssueSelectedActorDuel(d.TargetSeat, f.OwnerSeat))
+        {
+            FinishConditionalDiscardDuel(f, false);
+            return true;
+        }
+
+        var useId = _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1;
+        var origin = new ConditionalDiscardDuelOrigin(f.Id, d.InstructionIndex, useId, d.Source, d.GameplayHash, d.TurnNumber, d.TurnOwnerSeat, f.OwnerSeat, d.TargetSeat, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp, _coreMatchParticipantsPlayersAccess._players[d.TargetSeat].Hp);
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { ConditionalDiscardDuel = d with { Stage = ConditionalDiscardDuelStage.DuelIssued, CardUseFrameId = useId, OwnerHpAtIssue = origin.OwnerHpAtIssue, TargetHpAtIssue = origin.TargetHpAtIssue } });
+        var card = new Card(0, CardKind.Duel, Suit.None, 0);
+        var issued = _coreNativeCardUseOperations.BeginCardUse(card, f.OwnerSeat, [d.TargetSeat], CardKind.Duel, physicalCardIds: [], conditionalDiscardDuelOrigin: origin);
+        if (issued != useId)
+            throw new InvalidOperationException("Conditional Duel must retain its reserved owning Use.");
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ConditionalDiscardDuelIssuedEvent(origin));
+        _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(useId, card, f.OwnerSeat, [d.TargetSeat], LegalActionKind.Duel, playedCardKind: CardKind.Duel);
+        return true;
+    }
+
+    internal void FinishConditionalDiscardDuel(ProgramSkillFrame f, bool issued)
+    {
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ConditionalDiscardDuelFinishedEvent(f.Id, issued));
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { ConditionalDiscardDuel = null, PendingMovementContinuation = null });
+        if (issued)
+            _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+        else if (ConditionalDuelSourceCurrent(f))
+            _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
+        else
+            _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "已付弃牌保留，未发行决斗取消。");
+    }
+
+    [ProgramAiChoice(SkillProgramEffectOp.DiscardSlashThenOtherCardAndUseDuel)]
+    internal PromptChoice SelectAiConditionalDuel(PendingDecision decision, ProgramSkillFrame f)
+    {
+        var choices = decision.Choices.Where(c => c.Parameters.GetValueOrDefault("cost-side") != "cancel").ToArray();
+        if (choices.Length == 0)
+            return decision.Choices[0];
+        // Every named card belongs to this exact chooser. No opponent's hidden identity is inspected.
+        var d = f.ConditionalDiscardDuel!;
+        return choices.OrderBy(c => d.Stage == ConditionalDiscardDuelStage.TargetChoice && _coreMatchParticipantsPlayersAccess._players[d.TargetSeat].Hp >= _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp && c.Cards is [var id] && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardAttackStateOperations.GetAttackCard(id).Kind) ? -100 : 0).ThenBy(c => c.Parameters.GetValueOrDefault("source-zone") == "Equipment" ? 1 : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    }
+
+    SkillProgramStepOutcome global::CardGame.Core.IConditionalDiscardDuelProgramHost.DiscardSlashThenOtherCardAndUseDuel(ProgramSkillFrame frame) => BeginConditionalDiscardDuel(frame);
+}

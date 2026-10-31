@@ -2,6 +2,28 @@ using CardGame.Core;
 
 internal static class CharacterSkillSetChecks
 {
+    public static void ObservationsPreservePaidBaselineAndConsumeChangesOnce()
+    {
+        var owner = Character(new GeneralDefinition("fixture:owner", "Owner", "", []));
+        var observations = new SkillGrantRevisionStore();
+        var otherMatch = new SkillGrantRevisionStore();
+        Require(!observations.Observe(owner), "The first observation establishes a baseline without inventing a change.");
+        observations.Capture([owner]);
+        owner.SkillGrants.Grant(new SkillGrant("paid", "fixture:skill", "instance", "source"));
+        observations.Capture([owner]);
+        Require(observations.Observe(owner) && !observations.Observe(owner),
+            "Repeated capture during a paid child retains the pre-change revision; its change is consumed exactly once.");
+        Require(!otherMatch.Observe(owner), "A different match has its own first-observation baseline.");
+        owner.SkillGrants.RemoveGrant("paid");
+        Require(observations.Observe(owner) && otherMatch.Observe(owner),
+            "Each match consumes a genuine later grant revision independently.");
+        owner.IsAlive = false;
+        observations.Capture([owner]);
+        owner.SkillGrants.Grant(new SkillGrant("dead", "fixture:skill", "instance:dead", "source"));
+        observations.Capture([owner]);
+        Require(observations.Observe(owner), "Capture includes the original dead participants without replacing an existing revision.");
+    }
+
     public static void GrantsRetainSourcesAndStableOwnership()
     {
         var skills = new CharacterSkillSet();

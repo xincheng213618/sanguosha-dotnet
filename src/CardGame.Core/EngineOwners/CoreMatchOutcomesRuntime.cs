@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreMatchOutcomesRuntime
+{
+    private readonly ICoreMatchOutcomesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreMatchOutcomesPendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICoreMatchOutcomesCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreMatchOutcomesCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreMatchOutcomesCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICoreMatchOutcomesCoreNationalGeneralRevealOperations _coreNationalGeneralRevealOperations;
+    private readonly ICoreMatchOutcomesCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreMatchOutcomesCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreMatchOutcomesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreMatchOutcomesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseAccess _coreActualTurnProgressPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionAccess _coreMatchDefinitionModeDefinitionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess _coreGameEngineHpChangeProgramsPendingHpChangesAccess;
+    internal CoreMatchOutcomesRuntime(ICoreMatchOutcomesCardZonesOperations cardZonesOperations, ICoreMatchOutcomesPendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICoreMatchOutcomesCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreMatchOutcomesCoreMatchLogOperations coreMatchLogOperations, ICoreMatchOutcomesCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICoreMatchOutcomesCoreNationalGeneralRevealOperations coreNationalGeneralRevealOperations, ICoreMatchOutcomesCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreMatchOutcomesCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreMatchOutcomesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreMatchOutcomesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseAccess coreActualTurnProgressPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionAccess coreMatchDefinitionModeDefinitionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess coreGameEngineHpChangeProgramsPendingHpChangesAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNationalGeneralRevealOperations = coreNationalGeneralRevealOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressPhaseAccess = coreActualTurnProgressPhaseAccess;
+        this._coreMatchDefinitionModeDefinitionAccess = coreMatchDefinitionModeDefinitionAccess;
+        this._coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess = coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineHpChangeProgramsPendingHpChangesAccess = coreGameEngineHpChangeProgramsPendingHpChangesAccess;
+    }
+}

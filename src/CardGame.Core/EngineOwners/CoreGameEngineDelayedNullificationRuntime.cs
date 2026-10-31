@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineDelayedNullificationRuntime
+{
+    private readonly ICoreDelayedNullificationCardZonesOperations _cardZonesOperations;
+    private readonly ICoreDelayedNullificationResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDelayedNullificationCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreDelayedNullificationCoreCardEffectProgramsOperations _coreCardEffectProgramsOperations;
+    private readonly ICoreDelayedNullificationCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreDelayedNullificationCoreGroupTargetNullificationOperations _coreGroupTargetNullificationOperations;
+    private readonly ICoreDelayedNullificationCoreOriginalUseLightningOperations _coreOriginalUseLightningOperations;
+    private readonly ICoreDelayedNullificationCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDelayedNullificationCoreShanheDelayedNullifiedTrickClaimsOperations _coreShanheDelayedNullifiedTrickClaimsOperations;
+    private readonly ICoreDelayedNullificationCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreDelayedNullificationCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreDelayedNullificationCoreNativeJudgmentOperations _coreNativeJudgmentOperations;
+    private readonly ICoreDelayedNullificationCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreDelayedNullificationCoreNativeNullificationFramesOperations _coreNativeNullificationFramesOperations;
+    private readonly ICoreDelayedNullificationCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreDelayedNullificationCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreDelayedNullificationCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineDelayedNullificationRuntime(ICoreDelayedNullificationCardZonesOperations cardZonesOperations, ICoreDelayedNullificationResolutionStackOperations resolutionStackOperations, ICoreDelayedNullificationCoreActualTurnsOperations coreActualTurnsOperations, ICoreDelayedNullificationCoreCardEffectProgramsOperations coreCardEffectProgramsOperations, ICoreDelayedNullificationCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreDelayedNullificationCoreGroupTargetNullificationOperations coreGroupTargetNullificationOperations, ICoreDelayedNullificationCoreOriginalUseLightningOperations coreOriginalUseLightningOperations, ICoreDelayedNullificationCoreRuntimeOperations coreRuntimeOperations, ICoreDelayedNullificationCoreShanheDelayedNullifiedTrickClaimsOperations coreShanheDelayedNullifiedTrickClaimsOperations, ICoreDelayedNullificationCoreMatchLogOperations coreMatchLogOperations, ICoreDelayedNullificationCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreDelayedNullificationCoreNativeJudgmentOperations coreNativeJudgmentOperations, ICoreDelayedNullificationCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreDelayedNullificationCoreNativeNullificationFramesOperations coreNativeNullificationFramesOperations, ICoreDelayedNullificationCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreDelayedNullificationCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreDelayedNullificationCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreCardEffectProgramsOperations = coreCardEffectProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreGroupTargetNullificationOperations = coreGroupTargetNullificationOperations;
+        this._coreOriginalUseLightningOperations = coreOriginalUseLightningOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheDelayedNullifiedTrickClaimsOperations = coreShanheDelayedNullifiedTrickClaimsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeJudgmentOperations = coreNativeJudgmentOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativeNullificationFramesOperations = coreNativeNullificationFramesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

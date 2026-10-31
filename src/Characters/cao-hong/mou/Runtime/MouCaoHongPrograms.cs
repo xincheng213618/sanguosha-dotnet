@@ -12,7 +12,7 @@ public sealed record MouCaoHongReceipt(CardConversionSource Source, string Gamep
     public int Actual { get; init; }
     public long Before { get; init; }
     public long After { get; init; }
-    private IReadOnlyList<int> _targets = [], _selected = [];
+    private IReadOnlyList<int> _targets = [],_selected = [];
     private IReadOnlyList<MouCaoHongCard> _cards = [];
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Selected { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }

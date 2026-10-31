@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineFixedDistanceOneDebtObserversRuntime
+{
+    private readonly ICoreFixedDistanceOneDebtObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFixedDistanceOneDebtObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreFixedDistanceOneDebtObserversCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreFixedDistanceOneDebtObserversCoreFixedDistanceOneDebtOperations _coreFixedDistanceOneDebtOperations;
+    private readonly ICoreFixedDistanceOneDebtObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreFixedDistanceOneDebtObserversCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreFixedDistanceOneDebtObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreFixedDistanceOneDebtObserversCoreFixedDistanceOneDebtObserversOperations _coreFixedDistanceOneDebtObserversOperations;
+    private readonly ICoreFixedDistanceOneDebtObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineFixedDistanceOneDebtObserversRuntime(ICoreFixedDistanceOneDebtObserversResolutionStackOperations resolutionStackOperations, ICoreFixedDistanceOneDebtObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreFixedDistanceOneDebtObserversCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreFixedDistanceOneDebtObserversCoreFixedDistanceOneDebtOperations coreFixedDistanceOneDebtOperations, ICoreFixedDistanceOneDebtObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreFixedDistanceOneDebtObserversCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreFixedDistanceOneDebtObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreFixedDistanceOneDebtObserversCoreFixedDistanceOneDebtObserversOperations coreFixedDistanceOneDebtObserversOperations, ICoreFixedDistanceOneDebtObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreFixedDistanceOneDebtOperations = coreFixedDistanceOneDebtOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreFixedDistanceOneDebtObserversOperations = coreFixedDistanceOneDebtObserversOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

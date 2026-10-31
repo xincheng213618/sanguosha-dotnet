@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouChenGongComposition
 {
-    internal const string Mingce = "mou-mobile:mingce", Zhichi = "mou-mobile:zhichi";
+    internal const string Mingce = "mou-mobile:mingce",Zhichi = "mou-mobile:zhichi";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouChenGongMingceGift or SkillProgramEffectOp.ResolveMouChenGongMingceRelease;
     private static bool Plain(SkillProgramEffect e, SkillProgramEffectOp op) => e.Op == op && e.Target == SkillProgramEffectTarget.Owner &&
         e.Condition.Kind == SkillProgramConditionKind.Always && e.Amount == 0 && e.ActorReference is null && e.TargetReference is null &&

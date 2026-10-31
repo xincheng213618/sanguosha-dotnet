@@ -80,8 +80,8 @@ internal static class MobileShenMaChaoChecks
         public PlayerSnapshot V(int seat) => G.CreateSnapshot(seat).Players[seat];
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
         public int Ting(int seat) => V(seat).Markers?.SingleOrDefault(m => m.Kind == PlayerMarkerKind.MobileShenMaChaoTing)?.Count ?? 0;
-        public int Limit(int seat) => (int)typeof(GameEngine).GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G,
-            [((System.Collections.IList)typeof(GameEngine).GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!)[seat]])!;
+        public int Limit(int seat) => (int)global::FixtureRuntimeAccess.Engine.GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G,
+            [((System.Collections.IList)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!)[seat]])!;
         public void End() => Accept(new EndPlayPhaseCommand(0, G.Revision, P!.PromptId));
         public void Play() => Reach(() => P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         public void Activate() => Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");

@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineProgramTargetCommitRuntime : global::CardGame.Core.IProgramTargetCommitHost
+{
+    private readonly ICoreProgramTargetCommitContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramTargetCommitResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramTargetCommitCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreProgramTargetCommitCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreProgramTargetCommitCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramTargetCommitCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramTargetCommitCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramTargetCommitCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreProgramTargetCommitCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreProgramTargetCommitCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreProgramTargetCommitCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramTargetCommitCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreProgramTargetCommitCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreProgramTargetCommitKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramTargetCommitRuntime(ICoreProgramTargetCommitContentRegistryOperations contentRegistryOperations, ICoreProgramTargetCommitResolutionStackOperations resolutionStackOperations, ICoreProgramTargetCommitCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreProgramTargetCommitCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreProgramTargetCommitCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramTargetCommitCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramTargetCommitCoreRuntimeOperations coreRuntimeOperations, ICoreProgramTargetCommitCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreProgramTargetCommitCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreProgramTargetCommitCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreProgramTargetCommitCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramTargetCommitCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreProgramTargetCommitCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreProgramTargetCommitKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

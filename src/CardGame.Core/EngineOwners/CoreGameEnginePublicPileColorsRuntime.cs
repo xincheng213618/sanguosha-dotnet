@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEnginePublicPileColorsRuntime : global::CardGame.Core.IPublicPileColorHost
+{
+    private readonly ICorePublicPileColorsCharacterLuZhiMobileOperations _characterLuZhiMobileOperations;
+    private readonly ICorePublicPileColorsCardZonesOperations _cardZonesOperations;
+    private readonly ICorePublicPileColorsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePublicPileColorsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePublicPileColorsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICorePublicPileColorsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePublicPileColorsCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICorePublicPileColorsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICorePublicPileColorsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICorePublicPileColorsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICorePublicPileColorsCoreProgramConversionPolarityOperations _coreProgramConversionPolarityOperations;
+    private readonly ICorePublicPileColorsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePublicPileColorsCorePublicPileSourcesOperations _corePublicPileSourcesOperations;
+    private readonly ICorePublicPileColorsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePublicPileColorsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICorePublicPileColorsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICorePublicPileColorsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICorePublicPileColorsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePublicPileColorsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICorePublicPileColorsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICorePublicPileColorsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEnginePublicPileColorsRuntime(ICorePublicPileColorsCharacterLuZhiMobileOperations characterLuZhiMobileOperations, ICorePublicPileColorsCardZonesOperations cardZonesOperations, ICorePublicPileColorsContentRegistryOperations contentRegistryOperations, ICorePublicPileColorsResolutionStackOperations resolutionStackOperations, ICorePublicPileColorsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICorePublicPileColorsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePublicPileColorsCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICorePublicPileColorsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICorePublicPileColorsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICorePublicPileColorsCoreNationalSkillsOperations coreNationalSkillsOperations, ICorePublicPileColorsCoreProgramConversionPolarityOperations coreProgramConversionPolarityOperations, ICorePublicPileColorsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePublicPileColorsCorePublicPileSourcesOperations corePublicPileSourcesOperations, ICorePublicPileColorsCoreRuntimeOperations coreRuntimeOperations, ICorePublicPileColorsCoreSkillProgramsOperations coreSkillProgramsOperations, ICorePublicPileColorsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICorePublicPileColorsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICorePublicPileColorsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePublicPileColorsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICorePublicPileColorsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICorePublicPileColorsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLuZhiMobileOperations = characterLuZhiMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramConversionPolarityOperations = coreProgramConversionPolarityOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPileSourcesOperations = corePublicPileSourcesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

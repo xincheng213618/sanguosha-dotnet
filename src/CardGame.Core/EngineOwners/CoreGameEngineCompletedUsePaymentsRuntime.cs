@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineCompletedUsePaymentsRuntime
+{
+    private readonly ICoreCompletedUsePaymentsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreCompletedUsePaymentsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCompletedUsePaymentsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCompletedUsePaymentsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreCompletedUsePaymentsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreCompletedUsePaymentsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreCompletedUsePaymentsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreCompletedUsePaymentsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreCompletedUsePaymentsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreCompletedUsePaymentsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreCompletedUsePaymentsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreCompletedUsePaymentsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreCompletedUsePaymentsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCompletedUsePaymentsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreCompletedUsePaymentsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreCompletedUsePaymentsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreCompletedUsePaymentsKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreCompletedUsePaymentsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineCompletedUsePaymentsRuntime(ICoreCompletedUsePaymentsCardZonesOperations cardZonesOperations, ICoreCompletedUsePaymentsContentRegistryOperations contentRegistryOperations, ICoreCompletedUsePaymentsResolutionStackOperations resolutionStackOperations, ICoreCompletedUsePaymentsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreCompletedUsePaymentsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreCompletedUsePaymentsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreCompletedUsePaymentsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreCompletedUsePaymentsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreCompletedUsePaymentsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreCompletedUsePaymentsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreCompletedUsePaymentsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreCompletedUsePaymentsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreCompletedUsePaymentsCoreRuntimeOperations coreRuntimeOperations, ICoreCompletedUsePaymentsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreCompletedUsePaymentsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreCompletedUsePaymentsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreCompletedUsePaymentsKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreCompletedUsePaymentsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

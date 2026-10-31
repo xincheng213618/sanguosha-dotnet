@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterHuaTuoBoundaryMobileRuntime : global::CardGame.Core.IBoundaryHuaTuoSelection
+{
+    private readonly ICharacterHuaTuoBoundaryMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterHuaTuoBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterHuaTuoBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterHuaTuoBoundaryMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterHuaTuoBoundaryMobileCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterHuaTuoBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterHuaTuoBoundaryMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterHuaTuoBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterHuaTuoBoundaryMobileCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterHuaTuoBoundaryMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterHuaTuoBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CharacterHuaTuoBoundaryMobileRuntime(ICharacterHuaTuoBoundaryMobileCardZonesOperations cardZonesOperations, ICharacterHuaTuoBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterHuaTuoBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterHuaTuoBoundaryMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterHuaTuoBoundaryMobileCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterHuaTuoBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterHuaTuoBoundaryMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterHuaTuoBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterHuaTuoBoundaryMobileCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterHuaTuoBoundaryMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterHuaTuoBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

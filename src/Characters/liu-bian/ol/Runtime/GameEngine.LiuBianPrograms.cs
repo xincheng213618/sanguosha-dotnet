@@ -14,15 +14,4 @@ public sealed record ProgramDuShiGrantEvent(long FrameId, string SkillId, string
 
 public sealed partial class GameEngine
 {
-
-    [ProgramCapability]
-    private sealed class LiuBianProgramCapability(GameEngine engine) : ILiuBianProgramHost
-    {
-        public SkillProgramStepOutcome ShiYuanTargetDraw(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.ShiYuanProgramTargetDraw(frame, effect);
-        public SkillProgramStepOutcome DuShiGrantSkill(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.DuShiProgramGrantSkill(frame, effect);
-        public SkillProgramStepOutcome YuWeiMarkActiveTurn(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.YuWeiProgramMarkActiveTurn(frame, effect);
-    }
 }

@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouDengAiOlComposition
 {
-    internal const string Jigu = "mou-ol:jigu", Jiewan = "mou-ol:jiewan";
+    internal const string Jigu = "mou-ol:jigu",Jiewan = "mou-ol:jiewan";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.CollectMouDengAiJigu or SkillProgramEffectOp.ExchangeMouDengAiJigu or SkillProgramEffectOp.UseMouDengAiJiewan or SkillProgramEffectOp.GrowMouDengAiJiewan;
     [ProgramCatalogValidation(1560)]
     internal static void Validate(string path, SkillProgram p)

@@ -1,0 +1,80 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineBlackGiftContestsRuntime : global::CardGame.Core.IRecipientContestConsequencesHost
+{
+    private readonly ICoreBlackGiftContestsCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
+    private readonly ICoreBlackGiftContestsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreBlackGiftContestsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreBlackGiftContestsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreBlackGiftContestsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreBlackGiftContestsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreBlackGiftContestsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreBlackGiftContestsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreBlackGiftContestsCoreEquipmentSlotGroupProgramsOperations _coreEquipmentSlotGroupProgramsOperations;
+    private readonly ICoreBlackGiftContestsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreBlackGiftContestsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreBlackGiftContestsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreBlackGiftContestsCorePindianOperations _corePindianOperations;
+    private readonly ICoreBlackGiftContestsCorePrintedLordBenefitsOperations _corePrintedLordBenefitsOperations;
+    private readonly ICoreBlackGiftContestsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreBlackGiftContestsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreBlackGiftContestsCoreRecipientConsequencesReceiptsOperations _coreRecipientConsequencesReceiptsOperations;
+    private readonly ICoreBlackGiftContestsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreBlackGiftContestsCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreBlackGiftContestsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreBlackGiftContestsCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreBlackGiftContestsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreBlackGiftContestsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreBlackGiftContestsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreBlackGiftContestsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreBlackGiftContestsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreBlackGiftContestsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreBlackGiftContestsKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreBlackGiftContestsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineBlackGiftContestsRuntime(ICoreBlackGiftContestsCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICoreBlackGiftContestsCardZonesOperations cardZonesOperations, ICoreBlackGiftContestsContentRegistryOperations contentRegistryOperations, ICoreBlackGiftContestsResolutionStackOperations resolutionStackOperations, ICoreBlackGiftContestsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreBlackGiftContestsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreBlackGiftContestsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreBlackGiftContestsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreBlackGiftContestsCoreEquipmentSlotGroupProgramsOperations coreEquipmentSlotGroupProgramsOperations, ICoreBlackGiftContestsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreBlackGiftContestsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreBlackGiftContestsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreBlackGiftContestsCorePindianOperations corePindianOperations, ICoreBlackGiftContestsCorePrintedLordBenefitsOperations corePrintedLordBenefitsOperations, ICoreBlackGiftContestsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreBlackGiftContestsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreBlackGiftContestsCoreRecipientConsequencesReceiptsOperations coreRecipientConsequencesReceiptsOperations, ICoreBlackGiftContestsCoreRuntimeOperations coreRuntimeOperations, ICoreBlackGiftContestsCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreBlackGiftContestsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreBlackGiftContestsCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreBlackGiftContestsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreBlackGiftContestsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreBlackGiftContestsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreBlackGiftContestsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreBlackGiftContestsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreBlackGiftContestsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreBlackGiftContestsKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreBlackGiftContestsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEquipmentSlotGroupProgramsOperations = coreEquipmentSlotGroupProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePindianOperations = corePindianOperations;
+        this._corePrintedLordBenefitsOperations = corePrintedLordBenefitsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecipientConsequencesReceiptsOperations = coreRecipientConsequencesReceiptsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

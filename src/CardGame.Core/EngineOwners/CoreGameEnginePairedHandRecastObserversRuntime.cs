@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePairedHandRecastObserversRuntime
+{
+    private readonly ICorePairedHandRecastObserversContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePairedHandRecastObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePairedHandRecastObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICorePairedHandRecastObserversCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePairedHandRecastObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICorePairedHandRecastObserversCorePairedHandRecastOperations _corePairedHandRecastOperations;
+    private readonly ICorePairedHandRecastObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePairedHandRecastObserversCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICorePairedHandRecastObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICorePairedHandRecastObserversCorePairedHandRecastObserversOperations _corePairedHandRecastObserversOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess _coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    internal CoreGameEnginePairedHandRecastObserversRuntime(ICorePairedHandRecastObserversContentRegistryOperations contentRegistryOperations, ICorePairedHandRecastObserversResolutionStackOperations resolutionStackOperations, ICorePairedHandRecastObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICorePairedHandRecastObserversCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePairedHandRecastObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICorePairedHandRecastObserversCorePairedHandRecastOperations corePairedHandRecastOperations, ICorePairedHandRecastObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePairedHandRecastObserversCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICorePairedHandRecastObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICorePairedHandRecastObserversCorePairedHandRecastObserversOperations corePairedHandRecastObserversOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess coreGameEngineSkillProgramsProgramPhaseUsesAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePairedHandRecastOperations = corePairedHandRecastOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._corePairedHandRecastObserversOperations = corePairedHandRecastObserversOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+        this._coreGameEngineSkillProgramsProgramPhaseUsesAccess = coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    }
+}

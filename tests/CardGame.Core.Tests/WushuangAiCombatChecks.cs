@@ -195,10 +195,10 @@ internal static class WushuangAiCombatChecks
         public PublicDamagePrediction Incoming()
         {
             const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
-            var attack = typeof(GameEngine).GetProperty("ActiveCardAttack", flags)!.GetValue(G);
+            var attack = global::FixtureRuntimeAccess.Engine.GetProperty("ActiveCardAttack", flags)!.GetValue(G);
             Need(attack is not null && G.CreateSnapshot(1).PendingDecision?.Kind == DecisionKind.RespondDodge,
                 "Incoming prediction is read only at a genuine native Dodge response boundary.");
-            return (PublicDamagePrediction)typeof(GameEngine).GetMethod("PredictPublicIncomingDamage", flags)!
+            return (PublicDamagePrediction)global::FixtureRuntimeAccess.Engine.GetMethod("PredictPublicIncomingDamage", flags)!
                 .Invoke(G, [attack, 1, null, null, null])!;
         }
         private void Use(string activation, int[]? cards = null, int[]? targets = null) => Accept(new UseProgramSkillCommand(0,

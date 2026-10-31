@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineFinalTargetTurnCountsRuntime : global::CardGame.Core.IFinalTargetTurnCountHost
+{
+    private readonly ICoreFinalTargetTurnCountsCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICoreFinalTargetTurnCountsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreFinalTargetTurnCountsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreFinalTargetTurnCountsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreFinalTargetTurnCountsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreFinalTargetTurnCountsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreFinalTargetTurnCountsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreFinalTargetTurnCountsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineFinalTargetTurnCountsRuntime(ICoreFinalTargetTurnCountsCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICoreFinalTargetTurnCountsCardZonesOperations cardZonesOperations, ICoreFinalTargetTurnCountsContentRegistryOperations contentRegistryOperations, ICoreFinalTargetTurnCountsResolutionStackOperations resolutionStackOperations, ICoreFinalTargetTurnCountsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreFinalTargetTurnCountsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreFinalTargetTurnCountsCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreFinalTargetTurnCountsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreFinalTargetTurnCountsCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreFinalTargetTurnCountsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreFinalTargetTurnCountsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreFinalTargetTurnCountsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreFinalTargetTurnCountsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreFinalTargetTurnCountsCoreRuntimeOperations coreRuntimeOperations, ICoreFinalTargetTurnCountsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreFinalTargetTurnCountsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreFinalTargetTurnCountsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreFinalTargetTurnCountsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreFinalTargetTurnCountsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

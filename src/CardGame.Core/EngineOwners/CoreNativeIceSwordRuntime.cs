@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeIceSwordRuntime
+{
+    private readonly ICoreNativeIceSwordCardZonesOperations _cardZonesOperations;
+    private readonly ICoreNativeIceSwordCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreNativeIceSwordCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreNativeIceSwordCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreNativeIceSwordCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreNativeIceSwordCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreNativeIceSwordCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreNativeIceSwordCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreNativeIceSwordCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeIceSwordCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreNativeIceSwordCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeIceSwordCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreNativeIceSwordCoreNativeDamageApplicationOperations _coreNativeDamageApplicationOperations;
+    private readonly ICoreNativeIceSwordCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreNativeIceSwordCoreNativeEquipmentInvocationsOperations _coreNativeEquipmentInvocationsOperations;
+    private readonly ICoreNativeIceSwordCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreNativeIceSwordCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreNativeIceSwordCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeIceSwordCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNativeIceSwordCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreNativeIceSwordCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreNativeIceSwordKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreNativeIceSwordKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeIceSwordRuntime(ICoreNativeIceSwordCardZonesOperations cardZonesOperations, ICoreNativeIceSwordCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativeIceSwordCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreNativeIceSwordCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreNativeIceSwordCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreNativeIceSwordCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreNativeIceSwordCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreNativeIceSwordCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreNativeIceSwordCoreMatchLogOperations coreMatchLogOperations, ICoreNativeIceSwordCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreNativeIceSwordCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeIceSwordCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreNativeIceSwordCoreNativeDamageApplicationOperations coreNativeDamageApplicationOperations, ICoreNativeIceSwordCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreNativeIceSwordCoreNativeEquipmentInvocationsOperations coreNativeEquipmentInvocationsOperations, ICoreNativeIceSwordCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreNativeIceSwordCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreNativeIceSwordCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeIceSwordCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeIceSwordCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreNativeIceSwordCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreNativeIceSwordKernelCoreMainOperations kernelCoreMainOperations, ICoreNativeIceSwordKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeDamageApplicationOperations = coreNativeDamageApplicationOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeEquipmentInvocationsOperations = coreNativeEquipmentInvocationsOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

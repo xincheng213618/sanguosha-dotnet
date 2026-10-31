@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CharacterSharedGameEngineOlMoRumoProofsRuntime
+{
+    private readonly ICharacterSharedGameEngineOlMoRumoProofsCharacterDiaoChanOlMagicOperations _characterDiaoChanOlMagicOperations;
+    private readonly ICharacterSharedGameEngineOlMoRumoProofsCharacterLuBuOlMagicOperations _characterLuBuOlMagicOperations;
+    private readonly ICharacterSharedGameEngineOlMoRumoProofsCharacterSunQuanOlMagicOperations _characterSunQuanOlMagicOperations;
+    private readonly ICharacterSharedGameEngineOlMoRumoProofsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSharedGameEngineOlMoRumoProofsProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICharacterSharedGameEngineOlMoRumoProofsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSharedGameEngineOlMoRumoProofsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSharedGameEngineOlMoRumoProofsCoreRoundEndingOperations _coreRoundEndingOperations;
+    private readonly ICharacterSharedGameEngineOlMoRumoProofsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess _coreCommandJournalStorageEventsPendingEventsAccess;
+    internal CharacterSharedGameEngineOlMoRumoProofsRuntime(ICharacterSharedGameEngineOlMoRumoProofsCharacterDiaoChanOlMagicOperations characterDiaoChanOlMagicOperations, ICharacterSharedGameEngineOlMoRumoProofsCharacterLuBuOlMagicOperations characterLuBuOlMagicOperations, ICharacterSharedGameEngineOlMoRumoProofsCharacterSunQuanOlMagicOperations characterSunQuanOlMagicOperations, ICharacterSharedGameEngineOlMoRumoProofsContentRegistryOperations contentRegistryOperations, ICharacterSharedGameEngineOlMoRumoProofsProgramPipelineHooksOperations programPipelineHooksOperations, ICharacterSharedGameEngineOlMoRumoProofsResolutionStackOperations resolutionStackOperations, ICharacterSharedGameEngineOlMoRumoProofsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSharedGameEngineOlMoRumoProofsCoreRoundEndingOperations coreRoundEndingOperations, ICharacterSharedGameEngineOlMoRumoProofsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess coreCommandJournalStorageEventsPendingEventsAccess)
+    {
+        this._characterDiaoChanOlMagicOperations = characterDiaoChanOlMagicOperations;
+        this._characterLuBuOlMagicOperations = characterLuBuOlMagicOperations;
+        this._characterSunQuanOlMagicOperations = characterSunQuanOlMagicOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRoundEndingOperations = coreRoundEndingOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCommandJournalStorageEventsPendingEventsAccess = coreCommandJournalStorageEventsPendingEventsAccess;
+    }
+}

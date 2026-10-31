@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineForcedPhaseAlcoholRuntime : global::CardGame.Core.IForcedPhaseAlcoholHost
+{
+    private readonly ICoreForcedPhaseAlcoholCharacterHuangGaiMouMobileOperations _characterHuangGaiMouMobileOperations;
+    private readonly ICoreForcedPhaseAlcoholCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreForcedPhaseAlcoholCardZonesOperations _cardZonesOperations;
+    private readonly ICoreForcedPhaseAlcoholContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreForcedPhaseAlcoholResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreActualPlayPhaseCardUsesOperations _coreActualPlayPhaseCardUsesOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreIssuedPlayUsePoliciesOperations _coreIssuedPlayUsePoliciesOperations;
+    private readonly ICoreForcedPhaseAlcoholCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreVirtualBasicOffersOperations _coreVirtualBasicOffersOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreNativeDamageCompletionOperations _coreNativeDamageCompletionOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreForcedPhaseAlcoholCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreForcedPhaseAlcoholKernelCoreGameEngineProgramAttackAttemptOperations _kernelCoreGameEngineProgramAttackAttemptOperations;
+    private readonly ICoreForcedPhaseAlcoholKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CoreGameEngineForcedPhaseAlcoholRuntime(ICoreForcedPhaseAlcoholCharacterHuangGaiMouMobileOperations characterHuangGaiMouMobileOperations, ICoreForcedPhaseAlcoholCharacterLuMengMouOperations characterLuMengMouOperations, ICoreForcedPhaseAlcoholCardZonesOperations cardZonesOperations, ICoreForcedPhaseAlcoholContentRegistryOperations contentRegistryOperations, ICoreForcedPhaseAlcoholResolutionStackOperations resolutionStackOperations, ICoreForcedPhaseAlcoholCoreActualPlayPhaseCardUsesOperations coreActualPlayPhaseCardUsesOperations, ICoreForcedPhaseAlcoholCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICoreForcedPhaseAlcoholCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreForcedPhaseAlcoholCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreForcedPhaseAlcoholCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreForcedPhaseAlcoholCoreIssuedPlayUsePoliciesOperations coreIssuedPlayUsePoliciesOperations, ICoreForcedPhaseAlcoholCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreForcedPhaseAlcoholCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreForcedPhaseAlcoholCoreRuntimeOperations coreRuntimeOperations, ICoreForcedPhaseAlcoholCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreForcedPhaseAlcoholCoreVirtualBasicOffersOperations coreVirtualBasicOffersOperations, ICoreForcedPhaseAlcoholCoreNativeDamageCompletionOperations coreNativeDamageCompletionOperations, ICoreForcedPhaseAlcoholCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreForcedPhaseAlcoholCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreForcedPhaseAlcoholCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreForcedPhaseAlcoholKernelCoreGameEngineProgramAttackAttemptOperations kernelCoreGameEngineProgramAttackAttemptOperations, ICoreForcedPhaseAlcoholKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess)
+    {
+        this._characterHuangGaiMouMobileOperations = characterHuangGaiMouMobileOperations;
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualPlayPhaseCardUsesOperations = coreActualPlayPhaseCardUsesOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreIssuedPlayUsePoliciesOperations = coreIssuedPlayUsePoliciesOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreVirtualBasicOffersOperations = coreVirtualBasicOffersOperations;
+        this._coreNativeDamageCompletionOperations = coreNativeDamageCompletionOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineProgramAttackAttemptOperations = kernelCoreGameEngineProgramAttackAttemptOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+    }
+}

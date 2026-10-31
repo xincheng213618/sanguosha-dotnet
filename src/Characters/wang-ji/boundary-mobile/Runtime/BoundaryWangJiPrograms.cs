@@ -12,7 +12,7 @@ public sealed record BoundaryWangJiReceipt(CardConversionSource Source, string G
     public long After { get; init; }
     public NativeDrawOutcome? Draw { get; init; }
     public BoundaryWangJiDiscardedEvent? Payment { get; init; }
-    private IReadOnlyList<int> _targets = [], _viewed = [];
+    private IReadOnlyList<int> _targets = [],_viewed = [];
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Viewed { get => _viewed; init => _viewed = Array.AsReadOnly(value.ToArray()); }
 }

@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineGroupTargetNullificationRuntime
+{
+    private readonly ICoreGroupTargetNullificationCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreGroupTargetNullificationCharacterZhugeGuoLeOperations _characterZhugeGuoLeOperations;
+    private readonly ICoreGroupTargetNullificationResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreGroupTargetNullificationCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreGroupTargetNullificationCoreCurrentCardEnhancementsOperations _coreCurrentCardEnhancementsOperations;
+    private readonly ICoreGroupTargetNullificationCoreIssuedPlayUsePoliciesOperations _coreIssuedPlayUsePoliciesOperations;
+    private readonly ICoreGroupTargetNullificationCoreOrderedSelectedActorDuelsOperations _coreOrderedSelectedActorDuelsOperations;
+    private readonly ICoreGroupTargetNullificationCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreGroupTargetNullificationCoreUnnullifiableOrdinaryTricksOperations _coreUnnullifiableOrdinaryTricksOperations;
+    private readonly ICoreGroupTargetNullificationCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreGroupTargetNullificationCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreGroupTargetNullificationCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreGroupTargetNullificationCoreNativeGroupAttackOperations _coreNativeGroupAttackOperations;
+    private readonly ICoreGroupTargetNullificationCoreNativeGroupCompletionOperations _coreNativeGroupCompletionOperations;
+    private readonly ICoreGroupTargetNullificationCoreNativeHarvestOperations _coreNativeHarvestOperations;
+    private readonly ICoreGroupTargetNullificationCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreGroupTargetNullificationCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineGroupTargetNullificationRuntime(ICoreGroupTargetNullificationCharacterLuMengMouOperations characterLuMengMouOperations, ICoreGroupTargetNullificationCharacterZhugeGuoLeOperations characterZhugeGuoLeOperations, ICoreGroupTargetNullificationResolutionStackOperations resolutionStackOperations, ICoreGroupTargetNullificationCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreGroupTargetNullificationCoreCurrentCardEnhancementsOperations coreCurrentCardEnhancementsOperations, ICoreGroupTargetNullificationCoreIssuedPlayUsePoliciesOperations coreIssuedPlayUsePoliciesOperations, ICoreGroupTargetNullificationCoreOrderedSelectedActorDuelsOperations coreOrderedSelectedActorDuelsOperations, ICoreGroupTargetNullificationCoreRuntimeOperations coreRuntimeOperations, ICoreGroupTargetNullificationCoreUnnullifiableOrdinaryTricksOperations coreUnnullifiableOrdinaryTricksOperations, ICoreGroupTargetNullificationCoreMatchLogOperations coreMatchLogOperations, ICoreGroupTargetNullificationCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreGroupTargetNullificationCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreGroupTargetNullificationCoreNativeGroupAttackOperations coreNativeGroupAttackOperations, ICoreGroupTargetNullificationCoreNativeGroupCompletionOperations coreNativeGroupCompletionOperations, ICoreGroupTargetNullificationCoreNativeHarvestOperations coreNativeHarvestOperations, ICoreGroupTargetNullificationCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreGroupTargetNullificationCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._characterZhugeGuoLeOperations = characterZhugeGuoLeOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentCardEnhancementsOperations = coreCurrentCardEnhancementsOperations;
+        this._coreIssuedPlayUsePoliciesOperations = coreIssuedPlayUsePoliciesOperations;
+        this._coreOrderedSelectedActorDuelsOperations = coreOrderedSelectedActorDuelsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreUnnullifiableOrdinaryTricksOperations = coreUnnullifiableOrdinaryTricksOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeGroupAttackOperations = coreNativeGroupAttackOperations;
+        this._coreNativeGroupCompletionOperations = coreNativeGroupCompletionOperations;
+        this._coreNativeHarvestOperations = coreNativeHarvestOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

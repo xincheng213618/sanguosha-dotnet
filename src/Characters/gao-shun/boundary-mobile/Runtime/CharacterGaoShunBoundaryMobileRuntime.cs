@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterGaoShunBoundaryMobileRuntime : global::CardGame.Core.IBoundaryGaoShunHost
+{
+    private readonly ICharacterGaoShunBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterGaoShunBoundaryMobileCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICharacterGaoShunBoundaryMobileCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICharacterGaoShunBoundaryMobileCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterGaoShunBoundaryMobileCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterGaoShunBoundaryMobileCoreProgramDamageReductionOperations _coreProgramDamageReductionOperations;
+    private readonly ICharacterGaoShunBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterGaoShunBoundaryMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterGaoShunBoundaryMobileCoreTurnHandLimitKindExemptionsOperations _coreTurnHandLimitKindExemptionsOperations;
+    private readonly ICharacterGaoShunBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CharacterGaoShunBoundaryMobileRuntime(ICharacterGaoShunBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterGaoShunBoundaryMobileCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICharacterGaoShunBoundaryMobileCoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterGaoShunBoundaryMobileCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterGaoShunBoundaryMobileCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterGaoShunBoundaryMobileCoreProgramDamageReductionOperations coreProgramDamageReductionOperations, ICharacterGaoShunBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterGaoShunBoundaryMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterGaoShunBoundaryMobileCoreTurnHandLimitKindExemptionsOperations coreTurnHandLimitKindExemptionsOperations, ICharacterGaoShunBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramDamageReductionOperations = coreProgramDamageReductionOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreTurnHandLimitKindExemptionsOperations = coreTurnHandLimitKindExemptionsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

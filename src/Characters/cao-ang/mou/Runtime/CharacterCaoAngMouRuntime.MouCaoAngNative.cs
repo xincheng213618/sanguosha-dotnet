@@ -1,0 +1,118 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterCaoAngMouRuntime
+{
+    internal static bool MouCaDamageKind(CardKind kind) => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(kind) || global::CardGame.Core.EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(kind) || kind == CardKind.Lightning;
+    internal bool IsMouCaExactCardQuery(CharacterState actor, int? selected)
+    {
+        if (selected is not { } id || !actor.IsAlive || !_cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, id))
+            return false;
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MouCaoAng: { } r } f && MouCaoAng.Valid(f) && f.SkillId == MouCaoAngRuntime.Zhiwang && actor.Seat != f.OwnerSeat && MouCaDamageKind(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind))
+            return r.Stage == MouCaoAngStage.Material || r.Stage is MouCaoAngStage.UseChoice or MouCaoAngStage.IssuingUse && r.Actor == actor.Seat && r.CardId == id;
+        return _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { MouCaoAngZhiwang: { } n } u && n.Actor == actor.Seat && n.CardId == id && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(x => x.Id == n.FrameId)is { } parent && MouCaUseRidesOn(u, parent);
+    }
+
+    internal Card? MouCaQueryOriginalCard(CharacterState actor, int? id) => IsMouCaExactCardQuery(actor, id) ? _coreAdvancedLifecycleOperations.GetAdvancedCard(id!.Value) : null;
+    internal IReadOnlyList<LegalAction> MouCaPlans(ProgramSkillFrame f, int actor, int id)
+    {
+        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) || !IsMouCaExactCardQuery(_coreMatchParticipantsPlayersAccess._players[actor], id) || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
+            return[];
+        var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
+        return Array.AsReadOnly(_coreNativeLegalActionsOperations.BuildLegalActions(_coreMatchParticipantsPlayersAccess._players[actor], false, id).Where(a => a.CardId == id && a.ConversionSource is null && (a.AdditionalConversionSources?.Count ?? 0) == 0 && a.MinCardCount <= 1 && a.MaxCardCount <= 1 && a.Kind is not (LegalActionKind.Recast or LegalActionKind.EndPlay or LegalActionKind.UseProgramSkill or LegalActionKind.UseEquipmentEffect or LegalActionKind.RevealGeneral) && ((a.PlayedCardKind ?? card.Kind) == card.Kind || card.Kind == CardKind.Slash && a.PlayedCardKind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[actor]))).Select(a => a with { TargetSeats = Array.AsReadOnly(a.TargetSeats.ToArray()), AdditionalConversionSources = Array.AsReadOnly((a.AdditionalConversionSources ?? []).ToArray()), SelectableCardIds = Array.AsReadOnly(a.SelectableCardIds.ToArray()), SelectableTargetSeats = Array.AsReadOnly(a.SelectableTargetSeats.ToArray()), SelectableCardTargets = a.SelectableCardTargets is null ? null : Array.AsReadOnly(a.SelectableCardTargets.ToArray()), SelectableTargetSequences = a.SelectableTargetSequences is null ? null : Array.AsReadOnly(a.SelectableTargetSequences.Select(t => (IReadOnlyList<int>)Array.AsReadOnly(t.ToArray())).ToArray()) }).ToArray());
+    }
+
+    internal IReadOnlyList<MouCaPair> MouCaPairs(ProgramSkillFrame f)
+    {
+        if (f.MouCaoAng is not { Stage: MouCaoAngStage.Material } || !MouCaoAng.Valid(f) || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
+            return[];
+        var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => MouCaDamageKind(c.Kind)).ToArray();
+        return Array.AsReadOnly(cards.SelectMany(c => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && MouCaPlans(f, p.Seat, c.Id).Count > 0).Select(p => new MouCaPair(c.Id, p.Seat, c.Kind, c.DisplayName))).ToArray());
+    }
+
+    internal IReadOnlyList<int> MouCaExpectedTargets(MouCaNativeUse n)
+    {
+        var a = n.Action;
+        var actor = _coreMatchParticipantsPlayersAccess._players[n.Actor];
+        var card = _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, _coreAdvancedLifecycleOperations.GetAdvancedCard(n.CardId), null);
+        if (_coreGuanduCardsOperations.GuanduExpectedNativeTargets(actor, card, a)is { } guandu)
+            return guandu;
+        if (_coreDragonBoatCardsOperations.DragonBoatExpectedNativeTargets(actor, card, a)is { } dragon)
+            return dragon;
+        if (a.Kind is not (LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage))
+            return _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(n.Kind, n.Actor, a.TargetSeats);
+        return Array.AsReadOnly(Enumerable.Range(1, _coreMatchDefinitionPlayerCountAccess._playerCount - 1).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(n.Actor, offset)]).Where(p => p.IsAlive && !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, n.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, n.Kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(n.Actor, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(n.Actor, p.Seat, n.Kind))).Select(p => p.Seat).ToArray());
+    }
+
+    internal void IssueMouCaUse(ProgramSkillFrame f)
+    {
+        if (!MouCaoAng.Valid(f) || f.MouCaoAng is not { Stage: MouCaoAngStage.IssuingUse, Native: { UseId: 0, ActionId: 0 } n })
+            throw new InvalidOperationException("Zhiwang requires its issued real discard entity and actual other actor.");
+        var action = MouCaPlans(f, n.Actor, n.CardId).SingleOrDefault(a => MouCaoAngRuntime.SameAction(a, n.Action));
+        if (action is null)
+            throw new InvalidOperationException("Zhiwang's material, actor or native legal target plan expired.");
+        _coreNativeActionDispatchOperations.ExecuteAction(_coreMatchParticipantsPlayersAccess._players[n.Actor], action);
+    }
+
+    internal void BindMouCaNativeUse(CardUseFrame use)
+    {
+        if (_resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramSkillFrame { MouCaoAng: { Stage: MouCaoAngStage.IssuingUse, Native: { UseId: 0, ActionId: 0 } n } r } f)
+            return;
+        var targets = MouCaExpectedTargets(n);
+        if (!MouCaoAng.Valid(f) || use.Action is not { Type: CardActionType.Use } a || a.ActorSeat != n.Actor || a.ProviderSeat != n.Actor || a.RequesterSeat is not null || a.ConversionChain.Count != 0 || use.SourceSeat != n.Actor || use.CardId != n.CardId || use.CardKind != n.Kind || a.PhysicalCards is not [{ CardId: var id, From: var from }] || id != n.CardId || from != CardLocation.DiscardPile || use.PhysicalCardIds is not [var material] || material != id || !use.TargetSeats.SequenceEqual(targets) || _cardZonesOperations._cardZones.GetLocation(id) != from)
+            throw new InvalidOperationException("Zhiwang changed the exact discard entity, actual actor/provider or canonical original targets.");
+        var bound = n with
+        {
+            UseId = use.Id,
+            ActionId = a.ActionId,
+            Targets = targets
+        };
+        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MouCaoAng = r with { Stage = MouCaoAngStage.NativeUse, Native = bound } });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouCaoAngZhiwang = bound });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouCaUseIssuedEvent(f.Id, use.Id, a.ActionId, id, n.Actor));
+    }
+
+    internal bool MouCaUseRidesOn(CardUseFrame u, ProgramSkillFrame f) => MouCaoAng.Valid(f) && u.MouCaoAngZhiwang is { } n && f.MouCaoAng is { Stage: MouCaoAngStage.NativeUse or MouCaoAngStage.ReturnedUse, Native: { } p } && MouCaoAngRuntime.SameUse(n, p) && n.FrameId == f.Id && n.Instruction == f.InstructionIndex && n.Source == f.MouCaoAng.Source && n.GameplayHash == f.GameplayHash && n.Turn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && u.Id == n.UseId && u.CardId == n.CardId && u.CardKind == n.Kind && u.Action is { Type: CardActionType.Use } a && a.ActionId == n.ActionId && a.ProviderSeat == n.Actor && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, n.Actor, n.Actor) && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == n.CardId && from == CardLocation.DiscardPile && u.PhysicalCardIds is [var material] && material == id && _coreProgramEventHistoryOperations.ProgramEventHistory<MouCaUseIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == u.Id && e.ActionId == a.ActionId && e.CardId == id && e.Actor == n.Actor) == 1;
+    [NativeUseValidation(36700)]
+    internal void ValidateMouCaUse(CardUseFrame u)
+    {
+        if (u.MouCaoAngZhiwang is { } n && (u.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.FrameId)is not { } parent || !MouCaUseRidesOn(u, parent)))
+            throw new InvalidOperationException("Zhiwang cannot retire another or incomplete native Use.");
+    }
+
+    [NativeUseReturn(36700)]
+    internal bool ReturnMouCaUse(CardUseFrame u)
+    {
+        if (u.MouCaoAngZhiwang is not { } n)
+            return false;
+        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(n.FrameId);
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(u.Id)is not null || u.Step != ResolutionFrameStep.Completed || !MouCaUseRidesOn(u, f) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) != 1)
+            throw new InvalidOperationException("Zhiwang requires its one completed original native child.");
+        MouCaoAng.Returned(n, u.CardAttack is { Active: true });
+        return true;
+    }
+
+    [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 36700)]
+    internal bool ResumeMouCaUse()
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouCaoAng: { Stage: MouCaoAngStage.ReturnedUse } } f)
+            return false;
+        _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
+        return true;
+    }
+
+    internal void PrepareMouCaDamageSource(global::CardGame.Core.GameEngine.IDamageAttempt attempt)
+    {
+        if (attempt is not global::CardGame.Core.NativeOwners.CardAttackHandle attack || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouCaoAngZhiwang: { } n } use || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.FrameId)is not { } parent || !MouCaUseRidesOn(use, parent))
+            return;
+        // A chain target may reuse the preceding target's owned attack state.
+        // Recompute for this actual victim, preserving native Lightning semantics.
+        _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, s => s!with { IsSourceLess = attack.TargetSeat == parent.OwnerSeat || s.IsDelayedJudgmentDamage && s.EffectiveCardKind == CardKind.Lightning });
+        if (attack.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouCaSourceLessEvent>().Any(e => e.UseId == use.Id && e.ActionId == n.ActionId && e.Target == parent.OwnerSeat))
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouCaSourceLessEvent(use.Id, n.ActionId, parent.OwnerSeat, n.CardId));
+    }
+}

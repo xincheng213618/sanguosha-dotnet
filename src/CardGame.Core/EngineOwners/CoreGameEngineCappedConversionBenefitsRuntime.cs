@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineCappedConversionBenefitsRuntime : global::CardGame.Core.ICappedConversionBenefitHost
+{
+    private readonly ICoreCappedConversionBenefitsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCappedConversionBenefitsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCappedConversionBenefitsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreCappedConversionBenefitsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreCappedConversionBenefitsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreCappedConversionBenefitsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreCappedConversionBenefitsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreCappedConversionBenefitsCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICoreCappedConversionBenefitsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCappedConversionBenefitsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreCappedConversionBenefitsCoreTieredRoundZeroReturnsOperations _coreTieredRoundZeroReturnsOperations;
+    private readonly ICoreCappedConversionBenefitsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreCappedConversionBenefitsCoreProgramTieredRoundConversionOperations _coreProgramTieredRoundConversionOperations;
+    private readonly ICoreCappedConversionBenefitsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreCappedConversionBenefitsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineCappedConversionBenefitsRuntime(ICoreCappedConversionBenefitsContentRegistryOperations contentRegistryOperations, ICoreCappedConversionBenefitsResolutionStackOperations resolutionStackOperations, ICoreCappedConversionBenefitsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreCappedConversionBenefitsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreCappedConversionBenefitsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreCappedConversionBenefitsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreCappedConversionBenefitsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreCappedConversionBenefitsCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICoreCappedConversionBenefitsCoreRuntimeOperations coreRuntimeOperations, ICoreCappedConversionBenefitsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreCappedConversionBenefitsCoreTieredRoundZeroReturnsOperations coreTieredRoundZeroReturnsOperations, ICoreCappedConversionBenefitsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreCappedConversionBenefitsCoreProgramTieredRoundConversionOperations coreProgramTieredRoundConversionOperations, ICoreCappedConversionBenefitsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreCappedConversionBenefitsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTieredRoundZeroReturnsOperations = coreTieredRoundZeroReturnsOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreProgramTieredRoundConversionOperations = coreProgramTieredRoundConversionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

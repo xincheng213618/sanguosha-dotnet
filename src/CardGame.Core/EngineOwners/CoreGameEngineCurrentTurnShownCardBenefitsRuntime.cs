@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineCurrentTurnShownCardBenefitsRuntime : global::CardGame.Core.ICurrentTurnShownCardProgramHost
+{
+    private readonly ICoreCurrentTurnShownCardBenefitsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsCoreCurrentTurnSkillSuppressionsOperations _coreCurrentTurnSkillSuppressionsOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreCurrentTurnShownCardBenefitsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess _coreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess;
+    internal CoreGameEngineCurrentTurnShownCardBenefitsRuntime(ICoreCurrentTurnShownCardBenefitsCardZonesOperations cardZonesOperations, ICoreCurrentTurnShownCardBenefitsContentRegistryOperations contentRegistryOperations, ICoreCurrentTurnShownCardBenefitsResolutionStackOperations resolutionStackOperations, ICoreCurrentTurnShownCardBenefitsCoreActionQueriesOperations coreActionQueriesOperations, ICoreCurrentTurnShownCardBenefitsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreCurrentTurnShownCardBenefitsCoreCurrentTurnSkillSuppressionsOperations coreCurrentTurnSkillSuppressionsOperations, ICoreCurrentTurnShownCardBenefitsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreCurrentTurnShownCardBenefitsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreCurrentTurnShownCardBenefitsCoreRuntimeOperations coreRuntimeOperations, ICoreCurrentTurnShownCardBenefitsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreCurrentTurnShownCardBenefitsCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICoreCurrentTurnShownCardBenefitsCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreCurrentTurnShownCardBenefitsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreCurrentTurnShownCardBenefitsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess coreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCurrentTurnSkillSuppressionsOperations = coreCurrentTurnSkillSuppressionsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess = coreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess;
+    }
+}

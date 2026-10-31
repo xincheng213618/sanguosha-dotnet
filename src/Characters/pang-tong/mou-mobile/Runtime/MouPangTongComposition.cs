@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouPangTongComposition
 {
-    internal const string Lianhuan = "mou-mobile:lianhuan", Niepan = "mou-mobile:niepan";
+    internal const string Lianhuan = "mou-mobile:lianhuan",Niepan = "mou-mobile:niepan";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ArmMouPangTongLianhuan or SkillProgramEffectOp.ResolveMouPangTongLianhuanTargets or SkillProgramEffectOp.UpgradeMouPangTongLianhuan;
     private static bool Own(SkillProgramEffect e, SkillProgramEffectOp op) => e.Op == op && e.Target == SkillProgramEffectTarget.Owner && e.ActorReference is null && e.TargetReference is null && e.Condition.Kind == SkillProgramConditionKind.Always;
     [ProgramCatalogValidation(1030)]

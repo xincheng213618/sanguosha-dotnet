@@ -21,9 +21,8 @@ internal static class CardMovementProgramChecks
         var knownHandId = hand[0].Id;
         var invalidZone = (CardZoneKind)int.MaxValue;
         var invalidLocation = new CardLocation(invalidZone);
-        var hostType = typeof(GameEngine).GetNestedType("ProgramSkillHost", BindingFlags.NonPublic)!;
-        var host = (ISkillProgramExecutionHost)hostType.GetConstructors(
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Single().Invoke([game]);
+        var hostType = global::FixtureRuntimeAccess.Engine.GetNestedType("ProgramSkillHost", BindingFlags.NonPublic)!;
+        var host = (ISkillProgramExecutionHost)game.ComposeNativeProgramSkillHost();
         Require(hand.All(card => store.Contains(handLocation, card.Id)) &&
                 !store.Contains(CardLocation.Hand(1), knownHandId) &&
                 !store.Contains(CardLocation.Equipment(HumanSeat), knownHandId) &&
@@ -298,7 +297,7 @@ internal static class CardMovementProgramChecks
         var complete = store.GetType().GetMethod("CompleteTop")!;
         var push = store.GetType().GetMethod("Push")!;
         var replace = store.GetType().GetMethod("Replace")!;
-        var assert = typeof(GameEngine).GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var assert = global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
         assert.Invoke(game, null);
         Require(game.ResolutionStack.Last().Id == movement.Id, "The issuance negative check needs the actual unpaid observer chooser.");
         var receipt = use.PaymentMovementReceipt ?? throw new InvalidOperationException("A real paid Slash lost its frame-owned batch issuance receipt.");
@@ -330,7 +329,7 @@ internal static class CardMovementProgramChecks
         {
             var borrowed = historical with { ParentFrameId = use.Id };
             Require(historical.Id != movement.Id && historical.Movements.All(old => game.CardMovements[old.Sequence - 1] == old) &&
-                    (bool)typeof(GameEngine).GetMethod("CardUsePaymentMaterialsMatch", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    (bool)global::FixtureRuntimeAccess.Engine.GetMethod("CardUsePaymentMaterialsMatch", BindingFlags.Instance | BindingFlags.NonPublic)!
                         .Invoke(game, [use, borrowed])!,
                 "The historical negative uses genuine earlier payment records of the same recycled physical material that still pass the original material/ledger checks.");
             Reject(use, Rebatch(borrowed));
@@ -550,7 +549,7 @@ internal static class CardMovementProgramChecks
         _ = store.Move(ox.Id, oxDiagnostic.Location, CardLocation.Equipment(HumanSeat));
         _ = store.Move(grainDiagnostic.CardId, grainDiagnostic.Location, CardLocation.WoodenOxGrain(HumanSeat));
 
-        var moveCard = typeof(GameEngine).GetMethod(
+        var moveCard = global::FixtureRuntimeAccess.Engine.GetMethod(
             "MoveCard", BindingFlags.NonPublic | BindingFlags.Instance) ??
             throw new InvalidOperationException("The movement fixture could not find MoveCard.");
         _ = moveCard.Invoke(game,
@@ -646,7 +645,7 @@ internal static class CardMovementProgramChecks
     }
 
     private static IReadOnlyList<CharacterState> Players(GameEngine game) =>
-        (IReadOnlyList<CharacterState>)(typeof(GameEngine)
+        (IReadOnlyList<CharacterState>)(global::FixtureRuntimeAccess.Engine
             .GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!
             .GetValue(game) ?? throw new InvalidOperationException("The movement fixture players are unavailable."));
 

@@ -15,7 +15,7 @@ public sealed partial record NativeDrawInvocationProof
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]
  public IReadOnlyList<ZhanjiDrawEntitlement>? ZhanjiEntitlements {get=>_zhanjiEntitlements;init=>_zhanjiEntitlements=value is null?null:Array.AsReadOnly(value.ToArray());}
 }
-internal interface ISpPangTongProgramHost{SkillProgramStepOutcome ExecuteSpPangTong(ProgramSkillFrame frame,SkillProgramEffectOp op);}
+internal interface ISpPangTongProgramHost : IProgramRuntimeOperations{SkillProgramStepOutcome ExecuteSpPangTong(ProgramSkillFrame frame,SkillProgramEffectOp op);}
 internal sealed class SpPangTongHandler(SkillProgramEffectOp op):ISkillProgramEffectHandler
 {public SkillProgramEffectOp Op=>op;public SkillProgramStepOutcome Execute(SkillProgramEffect e,ProgramSkillFrame f,int seat,ISkillProgramEffectHost host)=>host.GetCapability<ISpPangTongProgramHost>().ExecuteSpPangTong(f,op);}
 internal abstract class SpPangTongDescriptor(SkillProgramEffectOp op):ProgramOperationDescriptorBase

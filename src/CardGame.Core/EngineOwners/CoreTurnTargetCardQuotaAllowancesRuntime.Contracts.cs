@@ -1,0 +1,16 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal interface ICoreTurnTargetCardQuotaAllowancesCoreProgramTargetRulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+{
+    global::CardGame.Core.ProgramTargetRules TargetRules { get; }
+}
+
+internal interface ICoreTurnTargetCardQuotaAllowancesTurnCardUseEffectsOperations : global::CardGame.Core.IProgramRuntimeOperations
+{
+    ref readonly global::CardGame.Core.TurnCardUseEffectStore _turnCardUseEffects { get; }
+}

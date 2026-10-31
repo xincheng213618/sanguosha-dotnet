@@ -1,0 +1,92 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSimaShiMouRuntime : global::CardGame.Core.IMouSimaShiFacts, global::CardGame.Core.IMouSimaShiNative
+{
+    private readonly ICharacterSimaShiMouCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICharacterSimaShiMouCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterSimaShiMouContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSimaShiMouRandomOperations _randomOperations;
+    private readonly ICharacterSimaShiMouResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSimaShiMouCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICharacterSimaShiMouCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterSimaShiMouCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICharacterSimaShiMouCoreActualPhaseEndsOperations _coreActualPhaseEndsOperations;
+    private readonly ICharacterSimaShiMouCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterSimaShiMouCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICharacterSimaShiMouCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterSimaShiMouCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterSimaShiMouCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterSimaShiMouCoreDyingSuitsAndHistoricalUseObserversOperations _coreDyingSuitsAndHistoricalUseObserversOperations;
+    private readonly ICharacterSimaShiMouCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterSimaShiMouCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterSimaShiMouCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterSimaShiMouCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterSimaShiMouCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterSimaShiMouCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSimaShiMouCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterSimaShiMouCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterSimaShiMouCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterSimaShiMouCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterSimaShiMouCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterSimaShiMouCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterSimaShiMouCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICharacterSimaShiMouCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterSimaShiMouCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterSimaShiMouCharacterSimaShiMouOperations _characterSimaShiMouOperations;
+    private readonly ICharacterSimaShiMouCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICharacterSimaShiMouKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterSimaShiMouMouSimaShiOperations _mouSimaShiOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CharacterSimaShiMouRuntime(ICharacterSimaShiMouCharacterYanPuOlOperations characterYanPuOlOperations, ICharacterSimaShiMouCardZonesOperations cardZonesOperations, ICharacterSimaShiMouContentRegistryOperations contentRegistryOperations, ICharacterSimaShiMouRandomOperations randomOperations, ICharacterSimaShiMouResolutionStackOperations resolutionStackOperations, ICharacterSimaShiMouCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICharacterSimaShiMouCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterSimaShiMouCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICharacterSimaShiMouCoreActualPhaseEndsOperations coreActualPhaseEndsOperations, ICharacterSimaShiMouCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterSimaShiMouCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICharacterSimaShiMouCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterSimaShiMouCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterSimaShiMouCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterSimaShiMouCoreDyingSuitsAndHistoricalUseObserversOperations coreDyingSuitsAndHistoricalUseObserversOperations, ICharacterSimaShiMouCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterSimaShiMouCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterSimaShiMouCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterSimaShiMouCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterSimaShiMouCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterSimaShiMouCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSimaShiMouCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterSimaShiMouCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterSimaShiMouCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterSimaShiMouCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterSimaShiMouCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterSimaShiMouCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterSimaShiMouCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICharacterSimaShiMouCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterSimaShiMouCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterSimaShiMouCharacterSimaShiMouOperations characterSimaShiMouOperations, ICharacterSimaShiMouCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICharacterSimaShiMouKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterSimaShiMouMouSimaShiOperations mouSimaShiOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreActualPhaseEndsOperations = coreActualPhaseEndsOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDyingSuitsAndHistoricalUseObserversOperations = coreDyingSuitsAndHistoricalUseObserversOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterSimaShiMouOperations = characterSimaShiMouOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._mouSimaShiOperations = mouSimaShiOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

@@ -36,7 +36,7 @@ internal sealed class AnniversaryRuanJiHandler(SkillProgramEffectOp operation) :
 
 internal static class AnniversaryRuanJiComposition
 {
-    internal const string Zhaowen = "anniversary:zhaowen", Jiudun = "anniversary:jiudun";
+    internal const string Zhaowen = "anniversary:zhaowen",Jiudun = "anniversary:jiudun";
     internal static bool Own(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveAnniversaryRuanJiZhaowen or
         SkillProgramEffectOp.DrawAnniversaryRuanJiShownRedUse or SkillProgramEffectOp.ResolveAnniversaryRuanJiJiudun;
     internal static void ValidateRedTrigger(SkillProgramTrigger t)

@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterHuZhaoAnniversaryRuntime : global::CardGame.Core.IAnniversaryHuZhaoHost
+{
+    private readonly ICharacterHuZhaoAnniversaryContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterHuZhaoAnniversaryResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterHuZhaoAnniversaryCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreParticipantHandProgramsOperations _coreParticipantHandProgramsOperations;
+    private readonly ICharacterHuZhaoAnniversaryCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterHuZhaoAnniversaryCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterHuZhaoAnniversaryCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterHuZhaoAnniversaryCharacterHuZhaoAnniversaryOperations _characterHuZhaoAnniversaryOperations;
+    private readonly ICharacterHuZhaoAnniversaryCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterHuZhaoAnniversaryKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterHuZhaoAnniversaryRuntime(ICharacterHuZhaoAnniversaryContentRegistryOperations contentRegistryOperations, ICharacterHuZhaoAnniversaryResolutionStackOperations resolutionStackOperations, ICharacterHuZhaoAnniversaryCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterHuZhaoAnniversaryCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterHuZhaoAnniversaryCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterHuZhaoAnniversaryCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterHuZhaoAnniversaryCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterHuZhaoAnniversaryCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterHuZhaoAnniversaryCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterHuZhaoAnniversaryCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterHuZhaoAnniversaryCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterHuZhaoAnniversaryCoreRuntimeOperations coreRuntimeOperations, ICharacterHuZhaoAnniversaryCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterHuZhaoAnniversaryCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterHuZhaoAnniversaryCoreParticipantHandProgramsOperations coreParticipantHandProgramsOperations, ICharacterHuZhaoAnniversaryCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterHuZhaoAnniversaryCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterHuZhaoAnniversaryCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterHuZhaoAnniversaryCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterHuZhaoAnniversaryCharacterHuZhaoAnniversaryOperations characterHuZhaoAnniversaryOperations, ICharacterHuZhaoAnniversaryCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterHuZhaoAnniversaryKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreParticipantHandProgramsOperations = coreParticipantHandProgramsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterHuZhaoAnniversaryOperations = characterHuZhaoAnniversaryOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

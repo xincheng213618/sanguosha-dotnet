@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineCapturedEquipmentDrawsRuntime
+{
+    private readonly ICoreCapturedEquipmentDrawsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreCapturedEquipmentDrawsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCapturedEquipmentDrawsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreActualDiscardRecoveriesOperations _coreActualDiscardRecoveriesOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreEquipmentPlacementAndHpPairOperations _coreEquipmentPlacementAndHpPairOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCapturedEquipmentDrawsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreCapturedEquipmentDrawsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreCapturedEquipmentDrawsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreCapturedEquipmentDrawsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreCapturedEquipmentDrawsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineCapturedEquipmentDrawsRuntime(ICoreCapturedEquipmentDrawsCardZonesOperations cardZonesOperations, ICoreCapturedEquipmentDrawsContentRegistryOperations contentRegistryOperations, ICoreCapturedEquipmentDrawsResolutionStackOperations resolutionStackOperations, ICoreCapturedEquipmentDrawsCoreActualDiscardRecoveriesOperations coreActualDiscardRecoveriesOperations, ICoreCapturedEquipmentDrawsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreCapturedEquipmentDrawsCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreCapturedEquipmentDrawsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreCapturedEquipmentDrawsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreCapturedEquipmentDrawsCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreCapturedEquipmentDrawsCoreEquipmentPlacementAndHpPairOperations coreEquipmentPlacementAndHpPairOperations, ICoreCapturedEquipmentDrawsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreCapturedEquipmentDrawsCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreCapturedEquipmentDrawsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreCapturedEquipmentDrawsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreCapturedEquipmentDrawsCoreRuntimeOperations coreRuntimeOperations, ICoreCapturedEquipmentDrawsCoreMatchLogOperations coreMatchLogOperations, ICoreCapturedEquipmentDrawsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreCapturedEquipmentDrawsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreCapturedEquipmentDrawsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreCapturedEquipmentDrawsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualDiscardRecoveriesOperations = coreActualDiscardRecoveriesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreEquipmentPlacementAndHpPairOperations = coreEquipmentPlacementAndHpPairOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

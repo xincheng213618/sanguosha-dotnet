@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineAfterTurnEndedProgramsRuntime
+{
+    private readonly ICoreAfterTurnEndedProgramsCharacterAHuiNanOlOperations _characterAHuiNanOlOperations;
+    private readonly ICoreAfterTurnEndedProgramsCharacterCaiFuRenOlOperations _characterCaiFuRenOlOperations;
+    private readonly ICoreAfterTurnEndedProgramsCharacterCaoYuOlOperations _characterCaoYuOlOperations;
+    private readonly ICoreAfterTurnEndedProgramsCharacterCaoZhenMobileShiOperations _characterCaoZhenMobileShiOperations;
+    private readonly ICoreAfterTurnEndedProgramsCharacterChengJiChengCuiOlOperations _characterChengJiChengCuiOlOperations;
+    private readonly ICoreAfterTurnEndedProgramsCharacterHeQiMobileShiOperations _characterHeQiMobileShiOperations;
+    private readonly ICoreAfterTurnEndedProgramsCharacterHuangfuSongWumiaoOperations _characterHuangfuSongWumiaoOperations;
+    private readonly ICoreAfterTurnEndedProgramsCharacterQinLangOlOperations _characterQinLangOlOperations;
+    private readonly ICoreAfterTurnEndedProgramsCharacterWenYangOlOperations _characterWenYangOlOperations;
+    private readonly ICoreAfterTurnEndedProgramsCharacterXunYuMouOperations _characterXunYuMouOperations;
+    private readonly ICoreAfterTurnEndedProgramsCharacterZhangFeiAnniversaryGodOperations _characterZhangFeiAnniversaryGodOperations;
+    private readonly ICoreAfterTurnEndedProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreAfterTurnEndedProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreAfterTurnEndedProgramsCoreActualEndedTurnEquipmentOperations _coreActualEndedTurnEquipmentOperations;
+    private readonly ICoreAfterTurnEndedProgramsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreAfterTurnEndedProgramsCoreDeferredHandAlignmentsOperations _coreDeferredHandAlignmentsOperations;
+    private readonly ICoreAfterTurnEndedProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreAfterTurnEndedProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreAfterTurnEndedProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreAfterTurnEndedProgramsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreAfterTurnEndedProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreAfterTurnEndedProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreAfterTurnEndedProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineAfterTurnEndedProgramsRuntime(ICoreAfterTurnEndedProgramsCharacterAHuiNanOlOperations characterAHuiNanOlOperations, ICoreAfterTurnEndedProgramsCharacterCaiFuRenOlOperations characterCaiFuRenOlOperations, ICoreAfterTurnEndedProgramsCharacterCaoYuOlOperations characterCaoYuOlOperations, ICoreAfterTurnEndedProgramsCharacterCaoZhenMobileShiOperations characterCaoZhenMobileShiOperations, ICoreAfterTurnEndedProgramsCharacterChengJiChengCuiOlOperations characterChengJiChengCuiOlOperations, ICoreAfterTurnEndedProgramsCharacterHeQiMobileShiOperations characterHeQiMobileShiOperations, ICoreAfterTurnEndedProgramsCharacterHuangfuSongWumiaoOperations characterHuangfuSongWumiaoOperations, ICoreAfterTurnEndedProgramsCharacterQinLangOlOperations characterQinLangOlOperations, ICoreAfterTurnEndedProgramsCharacterWenYangOlOperations characterWenYangOlOperations, ICoreAfterTurnEndedProgramsCharacterXunYuMouOperations characterXunYuMouOperations, ICoreAfterTurnEndedProgramsCharacterZhangFeiAnniversaryGodOperations characterZhangFeiAnniversaryGodOperations, ICoreAfterTurnEndedProgramsContentRegistryOperations contentRegistryOperations, ICoreAfterTurnEndedProgramsResolutionStackOperations resolutionStackOperations, ICoreAfterTurnEndedProgramsCoreActualEndedTurnEquipmentOperations coreActualEndedTurnEquipmentOperations, ICoreAfterTurnEndedProgramsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreAfterTurnEndedProgramsCoreDeferredHandAlignmentsOperations coreDeferredHandAlignmentsOperations, ICoreAfterTurnEndedProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreAfterTurnEndedProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreAfterTurnEndedProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreAfterTurnEndedProgramsCoreTableOrderOperations coreTableOrderOperations, ICoreAfterTurnEndedProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreAfterTurnEndedProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreAfterTurnEndedProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterAHuiNanOlOperations = characterAHuiNanOlOperations;
+        this._characterCaiFuRenOlOperations = characterCaiFuRenOlOperations;
+        this._characterCaoYuOlOperations = characterCaoYuOlOperations;
+        this._characterCaoZhenMobileShiOperations = characterCaoZhenMobileShiOperations;
+        this._characterChengJiChengCuiOlOperations = characterChengJiChengCuiOlOperations;
+        this._characterHeQiMobileShiOperations = characterHeQiMobileShiOperations;
+        this._characterHuangfuSongWumiaoOperations = characterHuangfuSongWumiaoOperations;
+        this._characterQinLangOlOperations = characterQinLangOlOperations;
+        this._characterWenYangOlOperations = characterWenYangOlOperations;
+        this._characterXunYuMouOperations = characterXunYuMouOperations;
+        this._characterZhangFeiAnniversaryGodOperations = characterZhangFeiAnniversaryGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualEndedTurnEquipmentOperations = coreActualEndedTurnEquipmentOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreDeferredHandAlignmentsOperations = coreDeferredHandAlignmentsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -34,7 +34,7 @@ internal static class EngineFaultChecks
         var trustedZones = game.CreateCardZoneDiagnostics().ToArray();
 
         // Force the public-operation invariant to throw after command execution.
-        var field = typeof(GameEngine).GetField("_initialCardCount",
+        var field = global::FixtureRuntimeAccess.Engine.GetField("_initialCardCount",
             BindingFlags.Instance | BindingFlags.NonPublic)
             ?? throw new InvalidOperationException("The card-inventory invariant field was not found.");
         field.SetValue(game, (int)field.GetValue(game)! + 1);

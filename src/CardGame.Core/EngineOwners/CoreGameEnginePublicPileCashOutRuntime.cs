@@ -1,0 +1,84 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEnginePublicPileCashOutRuntime : global::CardGame.Core.IPublicPileCashOutHost
+{
+    private readonly ICorePublicPileCashOutCardZonesOperations _cardZonesOperations;
+    private readonly ICorePublicPileCashOutContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePublicPileCashOutObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICorePublicPileCashOutResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePublicPileCashOutCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICorePublicPileCashOutCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICorePublicPileCashOutCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePublicPileCashOutCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICorePublicPileCashOutCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICorePublicPileCashOutCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICorePublicPileCashOutCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICorePublicPileCashOutCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICorePublicPileCashOutCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICorePublicPileCashOutCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICorePublicPileCashOutCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICorePublicPileCashOutCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICorePublicPileCashOutCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePublicPileCashOutCorePublicPilePreparationOperations _corePublicPilePreparationOperations;
+    private readonly ICorePublicPileCashOutCorePublicPileSourcesOperations _corePublicPileSourcesOperations;
+    private readonly ICorePublicPileCashOutCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICorePublicPileCashOutCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePublicPileCashOutCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICorePublicPileCashOutCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICorePublicPileCashOutCoreWushuangShopCardsOperations _coreWushuangShopCardsOperations;
+    private readonly ICorePublicPileCashOutCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICorePublicPileCashOutCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICorePublicPileCashOutCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICorePublicPileCashOutCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICorePublicPileCashOutCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICorePublicPileCashOutCorePublicPileCashOutOperations _corePublicPileCashOutOperations;
+    private readonly ICorePublicPileCashOutKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    internal CoreGameEnginePublicPileCashOutRuntime(ICorePublicPileCashOutCardZonesOperations cardZonesOperations, ICorePublicPileCashOutContentRegistryOperations contentRegistryOperations, ICorePublicPileCashOutObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICorePublicPileCashOutResolutionStackOperations resolutionStackOperations, ICorePublicPileCashOutCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICorePublicPileCashOutCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICorePublicPileCashOutCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePublicPileCashOutCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICorePublicPileCashOutCoreCardUseModulesOperations coreCardUseModulesOperations, ICorePublicPileCashOutCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICorePublicPileCashOutCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICorePublicPileCashOutCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICorePublicPileCashOutCoreNationalSkillsOperations coreNationalSkillsOperations, ICorePublicPileCashOutCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICorePublicPileCashOutCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICorePublicPileCashOutCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICorePublicPileCashOutCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePublicPileCashOutCorePublicPilePreparationOperations corePublicPilePreparationOperations, ICorePublicPileCashOutCorePublicPileSourcesOperations corePublicPileSourcesOperations, ICorePublicPileCashOutCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICorePublicPileCashOutCoreRuntimeOperations coreRuntimeOperations, ICorePublicPileCashOutCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICorePublicPileCashOutCoreSkillProgramsOperations coreSkillProgramsOperations, ICorePublicPileCashOutCoreWushuangShopCardsOperations coreWushuangShopCardsOperations, ICorePublicPileCashOutCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICorePublicPileCashOutCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICorePublicPileCashOutCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICorePublicPileCashOutCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICorePublicPileCashOutCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICorePublicPileCashOutCorePublicPileCashOutOperations corePublicPileCashOutOperations, ICorePublicPileCashOutKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess coreGameEnginePublicPileSourcesPublicPersistentPilesAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPilePreparationOperations = corePublicPilePreparationOperations;
+        this._corePublicPileSourcesOperations = corePublicPileSourcesOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreWushuangShopCardsOperations = coreWushuangShopCardsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._corePublicPileCashOutOperations = corePublicPileCashOutOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEnginePublicPileSourcesPublicPersistentPilesAccess = coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    }
+}

@@ -1,0 +1,53 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterGuoJiaMobileGodEntries
+{
+    internal bool AdvanceShenGuoJiaSubtree() => _resolve().AdvanceShenGuoJiaSubtree();
+    internal void AnswerShenGuoJia(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShenGuoJia(choice);
+    internal void AssertShenGuoJia(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertShenGuoJia(frame);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginShenGuoJia(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginShenGuoJia(supplied, operation);
+    internal void BeginShenGuoJiaJudgment(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginShenGuoJiaJudgment(frame);
+    internal bool CanActivateShenGuoJiaHuishi(global::CardGame.Core.CharacterState owner) => _resolve().CanActivateShenGuoJiaHuishi(owner);
+    internal bool CanActivateShenGuoJiaZuoxing(global::CardGame.Core.CharacterState owner) => _resolve().CanActivateShenGuoJiaZuoxing(owner);
+    internal bool CanAwakenShenGuoJia(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanAwakenShenGuoJia(gate);
+    internal bool CanBeginShenGuoJiaJudgment(global::CardGame.Core.ProgramSkillFrame frame, int targetSeat, string reason, string resultBind, global::CardGame.Core.SkillProgramCardSetVisibility visibility) => _resolve().CanBeginShenGuoJiaJudgment(frame, targetSeat, reason, resultBind, visibility);
+    internal global::CardGame.Core.PromptChoice ChooseShenGuoJiaAi(global::CardGame.Core.PendingDecision prompt, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ChooseShenGuoJiaAi(prompt, frame);
+    internal void ChooseShenGuoJiaRecipient(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ChooseShenGuoJiaRecipient(frame);
+    internal bool ContinuePaidShenGuoJia(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ContinuePaidShenGuoJia(frame);
+    internal void ContinueShenGuoJia(long id) => _resolve().ContinueShenGuoJia(id);
+    internal bool DrainShenGuoJia(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().DrainShenGuoJia(frame);
+    internal void FinishShenGuoJia(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().FinishShenGuoJia(frame);
+    internal void FinishShenGuoJiaIssue(long id) => _resolve().FinishShenGuoJiaIssue(id);
+    internal bool HasShenGuoJiaAwakeningCondition(int seat, string skill, string? binding = default) => _resolve().HasShenGuoJiaAwakeningCondition(seat, skill, binding);
+    internal bool HasShenGuoJiaAwakeningReceipt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HasShenGuoJiaAwakeningReceipt(frame);
+    internal bool HasShenGuoJiaBeforeDamageObserver(long id) => _resolve().HasShenGuoJiaBeforeDamageObserver(id);
+    internal bool HasShenGuoJiaDamageObserver(long id) => _resolve().HasShenGuoJiaDamageObserver(id);
+    internal bool IsShenGuoJiaDying() => _resolve().IsShenGuoJiaDying();
+    internal bool IsShenGuoJiaJudgment(global::CardGame.Core.JudgmentFrame judgment, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsShenGuoJiaJudgment(judgment, frame);
+    internal bool IsShenGuoJiaMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsShenGuoJiaMovement(frame, effect, pending);
+    internal bool IsShenGuoJiaVirtualUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsShenGuoJiaVirtualUse(use);
+    internal void IssueShenGuoJiaVirtualUse(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IssueShenGuoJiaVirtualUse(frame);
+    internal void MoveShenGuoJiaJudgments(global::CardGame.Core.ProgramSkillFrame frame, int target) => _resolve().MoveShenGuoJiaJudgments(frame, target);
+    internal void PayShenGuoJiaFinalCost(global::CardGame.Core.ProgramSkillFrame frame, int amount, string purpose) => _resolve().PayShenGuoJiaFinalCost(frame, amount, purpose);
+    internal void PayShenGuoJiaMaximum(global::CardGame.Core.ProgramSkillFrame frame, int seat, int amount, string purpose) => _resolve().PayShenGuoJiaMaximum(frame, seat, amount, purpose);
+    internal void PublishShenGuoJiaChoice(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishShenGuoJiaChoice(frame);
+    internal bool ResumeShenGuoJia(long id) => _resolve().ResumeShenGuoJia(id);
+    internal bool ReturnShenGuoJiaAttack() => _resolve().ReturnShenGuoJiaAttack();
+    internal void ReturnShenGuoJiaFourDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShenGuoJiaFourDraw(supplied, outcome);
+    internal bool ReturnShenGuoJiaMovement(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ReturnShenGuoJiaMovement(frame);
+    internal global::CardGame.Core.ProgramSkillFrame SetShenGuoJiaChildren(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ShenGuoJiaStage stage) => _resolve().SetShenGuoJiaChildren(frame, stage);
+    internal bool ShenGuoJiaAlreadyAwakened(int seat, string skill) => _resolve().ShenGuoJiaAlreadyAwakened(seat, skill);
+    internal global::System.Collections.Generic.IEnumerable<string> ShenGuoJiaAwakeningBindings(string skill) => _resolve().ShenGuoJiaAwakeningBindings(skill);
+    internal bool ShenGuoJiaAwakeningOverride(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().ShenGuoJiaAwakeningOverride(gate);
+    internal global::System.Collections.Generic.IReadOnlyList<(int Seat, string Instance)> ShenGuoJiaBenefactors(global::CardGame.Core.CharacterState owner, string instance) => _resolve().ShenGuoJiaBenefactors(owner, instance);
+    internal global::CardGame.Core.PromptChoice ShenGuoJiaChoice(global::CardGame.Core.ProgramSkillFrame frame, string branch, string label, global::System.Collections.Generic.IReadOnlyList<int>? targets = default, string? value = default) => _resolve().ShenGuoJiaChoice(frame, branch, label, targets, value);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShenGuoJiaChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ShenGuoJiaChoices(frame);
+    internal bool ShenGuoJiaFirstChild(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ResolutionFrame child) => _resolve().ShenGuoJiaFirstChild(frame, child);
+    internal global::CardGame.Core.ProgramSkillFrame? ShenGuoJiaObserverRoot() => _resolve().ShenGuoJiaObserverRoot();
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ShenGuoJiaPlan> ShenGuoJiaPlans(int owner) => _resolve().ShenGuoJiaPlans(owner);
+    internal global::CardGame.Core.CardConversionSource ShenGuoJiaSource(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ShenGuoJiaSource(frame);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.IndexedSkillProgramInstance> ShenGuoJiaUnawakened(int seat) => _resolve().ShenGuoJiaUnawakened(seat);
+    internal bool TryReturnShenGuoJiaJudgment(global::CardGame.Core.JudgmentFrame judgment) => _resolve().TryReturnShenGuoJiaJudgment(judgment);
+    internal bool TryReturnShenGuoJiaVirtualUse(global::CardGame.Core.CardUseFrame use) => _resolve().TryReturnShenGuoJiaVirtualUse(use);
+    internal bool ValidShenGuoJia(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ValidShenGuoJia(frame);
+}

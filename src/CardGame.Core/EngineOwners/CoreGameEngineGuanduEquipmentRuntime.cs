@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineGuanduEquipmentRuntime
+{
+    private readonly ICoreGuanduEquipmentCardZonesOperations _cardZonesOperations;
+    private readonly ICoreGuanduEquipmentCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreGuanduEquipmentCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreGuanduEquipmentCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreGuanduEquipmentCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreGuanduEquipmentCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreGuanduEquipmentCoreGuanduGeneralsOperations _coreGuanduGeneralsOperations;
+    private readonly ICoreGuanduEquipmentCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreGuanduEquipmentCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreGuanduEquipmentCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreGuanduEquipmentCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreGuanduEquipmentKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    internal CoreGameEngineGuanduEquipmentRuntime(ICoreGuanduEquipmentCardZonesOperations cardZonesOperations, ICoreGuanduEquipmentCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreGuanduEquipmentCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreGuanduEquipmentCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreGuanduEquipmentCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreGuanduEquipmentCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreGuanduEquipmentCoreGuanduGeneralsOperations coreGuanduGeneralsOperations, ICoreGuanduEquipmentCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreGuanduEquipmentCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreGuanduEquipmentCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreGuanduEquipmentCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreGuanduEquipmentKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreGuanduGeneralsOperations = coreGuanduGeneralsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess = coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    }
+}

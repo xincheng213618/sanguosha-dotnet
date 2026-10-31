@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouLiuXieComposition
 {
-    internal const string Zhanban = "mou:zhanban", Chensheng = "mou:chensheng", Tiancheng = "mou:tiancheng";
+    internal const string Zhanban = "mou:zhanban",Chensheng = "mou:chensheng",Tiancheng = "mou:tiancheng";
     [ProgramCatalogValidation(1700)]
     internal static void Validate(string path, SkillProgram program)
     {

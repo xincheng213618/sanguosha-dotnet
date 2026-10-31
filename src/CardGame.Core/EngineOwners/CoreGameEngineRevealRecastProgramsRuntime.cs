@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineRevealRecastProgramsRuntime : global::CardGame.Core.IRevealRecastProgramHost
+{
+    private readonly ICoreRevealRecastProgramsCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreRevealRecastProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreRevealRecastProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRevealRecastProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRevealRecastProgramsCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreRevealRecastProgramsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreRevealRecastProgramsCoreNativeRecastInvocationsOperations _coreNativeRecastInvocationsOperations;
+    private readonly ICoreRevealRecastProgramsCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICoreRevealRecastProgramsCoreProgramSlashRequestOperations _coreProgramSlashRequestOperations;
+    private readonly ICoreRevealRecastProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreRevealRecastProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreRevealRecastProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreRevealRecastProgramsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreRevealRecastProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreRevealRecastProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreRevealRecastProgramsCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreRevealRecastProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess _coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    internal CoreGameEngineRevealRecastProgramsRuntime(ICoreRevealRecastProgramsCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreRevealRecastProgramsCardZonesOperations cardZonesOperations, ICoreRevealRecastProgramsContentRegistryOperations contentRegistryOperations, ICoreRevealRecastProgramsResolutionStackOperations resolutionStackOperations, ICoreRevealRecastProgramsCoreActionQueriesOperations coreActionQueriesOperations, ICoreRevealRecastProgramsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreRevealRecastProgramsCoreNativeRecastInvocationsOperations coreNativeRecastInvocationsOperations, ICoreRevealRecastProgramsCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICoreRevealRecastProgramsCoreProgramSlashRequestOperations coreProgramSlashRequestOperations, ICoreRevealRecastProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreRevealRecastProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreRevealRecastProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreRevealRecastProgramsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreRevealRecastProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreRevealRecastProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreRevealRecastProgramsCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreRevealRecastProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess coreGameEngineSkillProgramsProgramPhaseUsesAccess)
+    {
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreNativeRecastInvocationsOperations = coreNativeRecastInvocationsOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreProgramSlashRequestOperations = coreProgramSlashRequestOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineSkillProgramsProgramPhaseUsesAccess = coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    }
+}

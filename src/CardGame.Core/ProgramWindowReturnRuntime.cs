@@ -196,57 +196,6 @@ internal sealed class ProgramWindowReturnRuntime(
         frames.AdvanceTop<ProgramLifecycleTriggerWindowFrame>();
     }
 
-    [ProgramWindowReturn(SkillProgramTriggerWindow.TurnEnding)]
-    internal void ReturnTurnEndingProgramWindow(ProgramSkillFrame frame, bool completed)
-    {
-        var context = frame.WindowContext!;
-        if (frames.Top is not TurnEndingBoundaryFrame turnEnding ||
-            turnEnding.Id != context.ParentFrameId ||
-            turnEnding.Items[turnEnding.ItemIndex].Candidate is not { } expected ||
-            expected != new ProgramTriggerCandidate(
-                frame.OwnerSeat,
-                frame.SkillId,
-                frame.TriggerId!,
-                frame.SkillInstanceId,
-                frame.GameplayHash,
-                turnEnding.Items[turnEnding.ItemIndex].Priority,
-                context.OccurrenceIndex))
-            throw new InvalidOperationException("The turn-ending program lost its parent item.");
-        cursors.AdvanceTurnEndingBoundaryCursor(turnEnding);
-        frames.AdvanceTop<TurnEndingBoundaryFrame>();
-    }
-
-    [ProgramWindowReturn(SkillProgramTriggerWindow.PlayPhaseStarting)]
-    internal void ReturnPlayPhaseStartingProgramWindow(ProgramSkillFrame frame, bool completed)
-    {
-        var context = frame.WindowContext!;
-        if (frames.Top is not PlayPhaseStartingBoundaryFrame playStarting ||
-            playStarting.Id != context.ParentFrameId)
-            throw new InvalidOperationException("The play-phase-starting program lost its parent item.");
-        if (context.ResumeCandidateIndex is { } resumeItemIndex)
-        {
-            if (resumeItemIndex > playStarting.Items.Count)
-                throw new InvalidOperationException("The play-phase-starting resume cursor left the boundary.");
-            frames.ReplaceTop(playStarting with { ItemIndex = resumeItemIndex });
-        }
-        else
-        {
-            if (playStarting.ItemIndex >= playStarting.Items.Count ||
-                playStarting.Items[playStarting.ItemIndex].Candidate is not { } startingExpected ||
-                startingExpected != new ProgramTriggerCandidate(
-                    frame.OwnerSeat,
-                    frame.SkillId,
-                    frame.TriggerId!,
-                    frame.SkillInstanceId,
-                    frame.GameplayHash,
-                    playStarting.Items[playStarting.ItemIndex].Priority,
-                    context.OccurrenceIndex))
-                throw new InvalidOperationException("The play-phase-starting program lost its parent item.");
-            cursors.AdvancePlayPhaseStartingCursor(playStarting);
-        }
-        frames.AdvanceTop<PlayPhaseStartingBoundaryFrame>();
-    }
-
     [ProgramWindowReturn(SkillProgramTriggerWindow.GameStarting)]
     internal void ReturnGameStartingProgramWindow(ProgramSkillFrame frame, bool completed)
     {

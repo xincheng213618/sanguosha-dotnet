@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineShanheSourceChunlaoJudgment3161Runtime
+{
+    private readonly ICoreShanheSourceChunlaoJudgment3161ResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceChunlaoJudgment3161CoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreShanheSourceChunlaoJudgment3161CoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICoreShanheSourceChunlaoJudgment3161CoreActualPhaseEndsOperations _coreActualPhaseEndsOperations;
+    private readonly ICoreShanheSourceChunlaoJudgment3161CoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheSourceChunlaoJudgment3161CoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheSourceChunlaoJudgment3161CoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreShanheSourceChunlaoJudgment3161CorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheSourceChunlaoJudgment3161CoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreShanheSourceChunlaoJudgment3161KernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreDelayedTurnEffectsPendingTurnDelayedEffectsAccess _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheSourceChunlaoJudgment3161Runtime(ICoreShanheSourceChunlaoJudgment3161ResolutionStackOperations resolutionStackOperations, ICoreShanheSourceChunlaoJudgment3161CoreActualTurnsOperations coreActualTurnsOperations, ICoreShanheSourceChunlaoJudgment3161CoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICoreShanheSourceChunlaoJudgment3161CoreActualPhaseEndsOperations coreActualPhaseEndsOperations, ICoreShanheSourceChunlaoJudgment3161CoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheSourceChunlaoJudgment3161CoreRuntimeOperations coreRuntimeOperations, ICoreShanheSourceChunlaoJudgment3161CoreMatchLogOperations coreMatchLogOperations, ICoreShanheSourceChunlaoJudgment3161CorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheSourceChunlaoJudgment3161CoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreShanheSourceChunlaoJudgment3161KernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreDelayedTurnEffectsPendingTurnDelayedEffectsAccess coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreActualPhaseEndsOperations = coreActualPhaseEndsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess = coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

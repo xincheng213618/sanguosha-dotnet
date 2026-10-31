@@ -1,0 +1,113 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterHuangQuanMouRuntime : global::CardGame.Core.IMouHuangQuanFacts, global::CardGame.Core.IMouHuangQuanNative
+{
+    private readonly ICharacterHuangQuanMouCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICharacterHuangQuanMouCharacterFeiYiOlOperations _characterFeiYiOlOperations;
+    private readonly ICharacterHuangQuanMouCharacterHuangYueyingOlMouOperations _characterHuangYueyingOlMouOperations;
+    private readonly ICharacterHuangQuanMouCharacterSunQuanOlMagicOperations _characterSunQuanOlMagicOperations;
+    private readonly ICharacterHuangQuanMouCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterHuangQuanMouContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterHuangQuanMouResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterHuangQuanMouCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterHuangQuanMouCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterHuangQuanMouCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICharacterHuangQuanMouCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterHuangQuanMouCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterHuangQuanMouCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterHuangQuanMouCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICharacterHuangQuanMouCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterHuangQuanMouCoreNamedAmbushInvalidationOperations _coreNamedAmbushInvalidationOperations;
+    private readonly ICharacterHuangQuanMouCoreNextCardTargetAdjustmentsOperations _coreNextCardTargetAdjustmentsOperations;
+    private readonly ICharacterHuangQuanMouCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterHuangQuanMouCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterHuangQuanMouCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICharacterHuangQuanMouCoreProgramCardUseNullificationOperations _coreProgramCardUseNullificationOperations;
+    private readonly ICharacterHuangQuanMouCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterHuangQuanMouCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterHuangQuanMouCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterHuangQuanMouCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterHuangQuanMouCoreSequentialTrickTargetsOperations _coreSequentialTrickTargetsOperations;
+    private readonly ICharacterHuangQuanMouCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterHuangQuanMouCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterHuangQuanMouCoreSoleIncomingEffectRepeatOperations _coreSoleIncomingEffectRepeatOperations;
+    private readonly ICharacterHuangQuanMouCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICharacterHuangQuanMouCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICharacterHuangQuanMouCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICharacterHuangQuanMouCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICharacterHuangQuanMouCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterHuangQuanMouCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICharacterHuangQuanMouCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICharacterHuangQuanMouCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterHuangQuanMouCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterHuangQuanMouCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterHuangQuanMouKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICharacterHuangQuanMouKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterHuangQuanMouBoundaryYiJiOperations _boundaryYiJiOperations;
+    private readonly ICharacterHuangQuanMouMouHuangQuanOperations _mouHuangQuanOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterHuangQuanMouRuntime(ICharacterHuangQuanMouCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICharacterHuangQuanMouCharacterFeiYiOlOperations characterFeiYiOlOperations, ICharacterHuangQuanMouCharacterHuangYueyingOlMouOperations characterHuangYueyingOlMouOperations, ICharacterHuangQuanMouCharacterSunQuanOlMagicOperations characterSunQuanOlMagicOperations, ICharacterHuangQuanMouCardZonesOperations cardZonesOperations, ICharacterHuangQuanMouContentRegistryOperations contentRegistryOperations, ICharacterHuangQuanMouResolutionStackOperations resolutionStackOperations, ICharacterHuangQuanMouCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterHuangQuanMouCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterHuangQuanMouCoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterHuangQuanMouCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterHuangQuanMouCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterHuangQuanMouCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterHuangQuanMouCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICharacterHuangQuanMouCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterHuangQuanMouCoreNamedAmbushInvalidationOperations coreNamedAmbushInvalidationOperations, ICharacterHuangQuanMouCoreNextCardTargetAdjustmentsOperations coreNextCardTargetAdjustmentsOperations, ICharacterHuangQuanMouCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterHuangQuanMouCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterHuangQuanMouCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICharacterHuangQuanMouCoreProgramCardUseNullificationOperations coreProgramCardUseNullificationOperations, ICharacterHuangQuanMouCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterHuangQuanMouCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterHuangQuanMouCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterHuangQuanMouCoreRuntimeOperations coreRuntimeOperations, ICharacterHuangQuanMouCoreSequentialTrickTargetsOperations coreSequentialTrickTargetsOperations, ICharacterHuangQuanMouCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterHuangQuanMouCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterHuangQuanMouCoreSoleIncomingEffectRepeatOperations coreSoleIncomingEffectRepeatOperations, ICharacterHuangQuanMouCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICharacterHuangQuanMouCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICharacterHuangQuanMouCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICharacterHuangQuanMouCoreNativeNullificationOperations coreNativeNullificationOperations, ICharacterHuangQuanMouCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterHuangQuanMouCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICharacterHuangQuanMouCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICharacterHuangQuanMouCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterHuangQuanMouCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterHuangQuanMouCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterHuangQuanMouKernelCoreMainOperations kernelCoreMainOperations, ICharacterHuangQuanMouKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterHuangQuanMouBoundaryYiJiOperations boundaryYiJiOperations, ICharacterHuangQuanMouMouHuangQuanOperations mouHuangQuanOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.RuntimeAccess.IClosedNativeGivenCardQueriesSource _closedNativeGivenCardQueriesSource)
+    {
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._characterFeiYiOlOperations = characterFeiYiOlOperations;
+        this._characterHuangYueyingOlMouOperations = characterHuangYueyingOlMouOperations;
+        this._characterSunQuanOlMagicOperations = characterSunQuanOlMagicOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNamedAmbushInvalidationOperations = coreNamedAmbushInvalidationOperations;
+        this._coreNextCardTargetAdjustmentsOperations = coreNextCardTargetAdjustmentsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreProgramCardUseNullificationOperations = coreProgramCardUseNullificationOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialTrickTargetsOperations = coreSequentialTrickTargetsOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreSoleIncomingEffectRepeatOperations = coreSoleIncomingEffectRepeatOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._boundaryYiJiOperations = boundaryYiJiOperations;
+        this._mouHuangQuanOperations = mouHuangQuanOperations;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._closedNativeGivenCardQueriesSource = _closedNativeGivenCardQueriesSource;
+    }
+
+    private readonly global::CardGame.Core.RuntimeAccess.IClosedNativeGivenCardQueriesSource _closedNativeGivenCardQueriesSource;
+}

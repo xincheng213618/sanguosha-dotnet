@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineSlashSuitDiscardRuntime : global::CardGame.Core.ISlashSuitDiscardProgramHost
+{
+    private readonly ICoreSlashSuitDiscardCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSlashSuitDiscardContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSlashSuitDiscardResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSlashSuitDiscardCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreSlashSuitDiscardCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreSlashSuitDiscardCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreSlashSuitDiscardCoreCurrentCardEnhancementsOperations _coreCurrentCardEnhancementsOperations;
+    private readonly ICoreSlashSuitDiscardCoreCurrentTurnSkillSuppressionsOperations _coreCurrentTurnSkillSuppressionsOperations;
+    private readonly ICoreSlashSuitDiscardCoreFinalTargetSlashOperations _coreFinalTargetSlashOperations;
+    private readonly ICoreSlashSuitDiscardCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreSlashSuitDiscardCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSlashSuitDiscardCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSlashSuitDiscardCoreShanheS5MaSiblingsOperations _coreShanheS5MaSiblingsOperations;
+    private readonly ICoreSlashSuitDiscardCoreWushuangCombatTacticsOperations _coreWushuangCombatTacticsOperations;
+    private readonly ICoreSlashSuitDiscardCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreSlashSuitDiscardCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreSlashSuitDiscardCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreSlashSuitDiscardCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSlashSuitDiscardCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreSlashSuitDiscardCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreSlashSuitDiscardCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreSlashSuitDiscardKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreSlashSuitDiscardKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSlashSuitDiscardRuntime(ICoreSlashSuitDiscardCardZonesOperations cardZonesOperations, ICoreSlashSuitDiscardContentRegistryOperations contentRegistryOperations, ICoreSlashSuitDiscardResolutionStackOperations resolutionStackOperations, ICoreSlashSuitDiscardCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreSlashSuitDiscardCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreSlashSuitDiscardCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreSlashSuitDiscardCoreCurrentCardEnhancementsOperations coreCurrentCardEnhancementsOperations, ICoreSlashSuitDiscardCoreCurrentTurnSkillSuppressionsOperations coreCurrentTurnSkillSuppressionsOperations, ICoreSlashSuitDiscardCoreFinalTargetSlashOperations coreFinalTargetSlashOperations, ICoreSlashSuitDiscardCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreSlashSuitDiscardCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSlashSuitDiscardCoreRuntimeOperations coreRuntimeOperations, ICoreSlashSuitDiscardCoreShanheS5MaSiblingsOperations coreShanheS5MaSiblingsOperations, ICoreSlashSuitDiscardCoreWushuangCombatTacticsOperations coreWushuangCombatTacticsOperations, ICoreSlashSuitDiscardCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreSlashSuitDiscardCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreSlashSuitDiscardCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreSlashSuitDiscardCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSlashSuitDiscardCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreSlashSuitDiscardCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreSlashSuitDiscardCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreSlashSuitDiscardKernelCoreMainOperations kernelCoreMainOperations, ICoreSlashSuitDiscardKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCurrentCardEnhancementsOperations = coreCurrentCardEnhancementsOperations;
+        this._coreCurrentTurnSkillSuppressionsOperations = coreCurrentTurnSkillSuppressionsOperations;
+        this._coreFinalTargetSlashOperations = coreFinalTargetSlashOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheS5MaSiblingsOperations = coreShanheS5MaSiblingsOperations;
+        this._coreWushuangCombatTacticsOperations = coreWushuangCombatTacticsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

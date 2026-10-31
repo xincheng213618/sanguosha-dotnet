@@ -1,0 +1,106 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineFriendTrioRuntime : global::CardGame.Core.IFriendTrioProgramHost
+{
+    private readonly ICoreFriendTrioCharacterLuSuMobileShiOperations _characterLuSuMobileShiOperations;
+    private readonly ICoreFriendTrioCharacterPangTongFriendOperations _characterPangTongFriendOperations;
+    private readonly ICoreFriendTrioCardZonesOperations _cardZonesOperations;
+    private readonly ICoreFriendTrioContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreFriendTrioRandomOperations _randomOperations;
+    private readonly ICoreFriendTrioResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFriendTrioCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreFriendTrioCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreFriendTrioCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreFriendTrioCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreFriendTrioCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreFriendTrioCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreFriendTrioCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreFriendTrioCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreFriendTrioCoreFinalizedCardTargetsOperations _coreFinalizedCardTargetsOperations;
+    private readonly ICoreFriendTrioCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreFriendTrioCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreFriendTrioCoreModeAllegianceOperations _coreModeAllegianceOperations;
+    private readonly ICoreFriendTrioCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreFriendTrioCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreFriendTrioCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreFriendTrioCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreFriendTrioCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreFriendTrioCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreFriendTrioCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreFriendTrioCoreStrategicProgramsOperations _coreStrategicProgramsOperations;
+    private readonly ICoreFriendTrioCoreTeamActivitiesOperations _coreTeamActivitiesOperations;
+    private readonly ICoreFriendTrioCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreFriendTrioCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreFriendTrioCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreFriendTrioCoreNativeEquipmentUseOperations _coreNativeEquipmentUseOperations;
+    private readonly ICoreFriendTrioCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreFriendTrioCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreFriendTrioCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreFriendTrioCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreFriendTrioCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreFriendTrioCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreFriendTrioCoreTrustedCardZoneDiagnosticsOperations _coreTrustedCardZoneDiagnosticsOperations;
+    private readonly ICoreFriendTrioKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreFriendTrioKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineFriendTrioFriendFangqiuSpentFriendPredictionCountsFriendPredictionsFriendQihuiUnlimitedAccess _coreGameEngineFriendTrioFriendFangqiuSpentFriendPredictionCountsFriendPredictionsFriendQihuiUnlimitedAccess;
+    internal CoreGameEngineFriendTrioRuntime(ICoreFriendTrioCharacterLuSuMobileShiOperations characterLuSuMobileShiOperations, ICoreFriendTrioCharacterPangTongFriendOperations characterPangTongFriendOperations, ICoreFriendTrioCardZonesOperations cardZonesOperations, ICoreFriendTrioContentRegistryOperations contentRegistryOperations, ICoreFriendTrioRandomOperations randomOperations, ICoreFriendTrioResolutionStackOperations resolutionStackOperations, ICoreFriendTrioCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreFriendTrioCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreFriendTrioCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreFriendTrioCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreFriendTrioCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreFriendTrioCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreFriendTrioCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreFriendTrioCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreFriendTrioCoreFinalizedCardTargetsOperations coreFinalizedCardTargetsOperations, ICoreFriendTrioCoreHandComparisonOperations coreHandComparisonOperations, ICoreFriendTrioCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreFriendTrioCoreModeAllegianceOperations coreModeAllegianceOperations, ICoreFriendTrioCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreFriendTrioCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreFriendTrioCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreFriendTrioCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreFriendTrioCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreFriendTrioCoreRuntimeOperations coreRuntimeOperations, ICoreFriendTrioCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreFriendTrioCoreStrategicProgramsOperations coreStrategicProgramsOperations, ICoreFriendTrioCoreTeamActivitiesOperations coreTeamActivitiesOperations, ICoreFriendTrioCoreMatchLogOperations coreMatchLogOperations, ICoreFriendTrioCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreFriendTrioCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreFriendTrioCoreNativeEquipmentUseOperations coreNativeEquipmentUseOperations, ICoreFriendTrioCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreFriendTrioCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreFriendTrioCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreFriendTrioCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreFriendTrioCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreFriendTrioCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreFriendTrioCoreTrustedCardZoneDiagnosticsOperations coreTrustedCardZoneDiagnosticsOperations, ICoreFriendTrioKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreFriendTrioKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineFriendTrioFriendFangqiuSpentFriendPredictionCountsFriendPredictionsFriendQihuiUnlimitedAccess coreGameEngineFriendTrioFriendFangqiuSpentFriendPredictionCountsFriendPredictionsFriendQihuiUnlimitedAccess)
+    {
+        this._characterLuSuMobileShiOperations = characterLuSuMobileShiOperations;
+        this._characterPangTongFriendOperations = characterPangTongFriendOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFinalizedCardTargetsOperations = coreFinalizedCardTargetsOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreModeAllegianceOperations = coreModeAllegianceOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreStrategicProgramsOperations = coreStrategicProgramsOperations;
+        this._coreTeamActivitiesOperations = coreTeamActivitiesOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeEquipmentUseOperations = coreNativeEquipmentUseOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTrustedCardZoneDiagnosticsOperations = coreTrustedCardZoneDiagnosticsOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess = coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+        this._coreGameEngineFriendTrioFriendFangqiuSpentFriendPredictionCountsFriendPredictionsFriendQihuiUnlimitedAccess = coreGameEngineFriendTrioFriendFangqiuSpentFriendPredictionCountsFriendPredictionsFriendQihuiUnlimitedAccess;
+    }
+}

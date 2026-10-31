@@ -27,8 +27,7 @@ internal sealed class BoundarySunXiuYanzhuTarget : IProgramSelectionTargetFilter
 }
 internal static class BoundarySunXiuComposition
 {
-    internal const string Yanzhu="boundary:yanzhu-mobile", Xingxue="boundary:xingxue-mobile",
-        Upgraded="boundary:xingxue-mobile-upgraded", Zhaofu="boundary:zhaofu-mobile";
+    internal const string Yanzhu="boundary:yanzhu-mobile",Xingxue="boundary:xingxue-mobile",        Upgraded="boundary:xingxue-mobile-upgraded",Zhaofu="boundary:zhaofu-mobile";
     [ProgramCatalogValidation(53500)]
     internal static void Validate(string path,SkillProgram program)
     {

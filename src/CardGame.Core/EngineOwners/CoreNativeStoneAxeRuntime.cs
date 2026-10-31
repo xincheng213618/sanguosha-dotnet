@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeStoneAxeRuntime
+{
+    private readonly ICoreNativeStoneAxeCardZonesOperations _cardZonesOperations;
+    private readonly ICoreNativeStoneAxeCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreNativeStoneAxeCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreNativeStoneAxeCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreNativeStoneAxeCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreNativeStoneAxeCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreNativeStoneAxeCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeStoneAxeCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreNativeStoneAxeCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeStoneAxeCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreNativeStoneAxeCoreNativeDamageApplicationOperations _coreNativeDamageApplicationOperations;
+    private readonly ICoreNativeStoneAxeCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreNativeStoneAxeCoreNativeEquipmentInvocationsOperations _coreNativeEquipmentInvocationsOperations;
+    private readonly ICoreNativeStoneAxeCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreNativeStoneAxeCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeStoneAxeCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNativeStoneAxeCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreNativeStoneAxeKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreNativeStoneAxeKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeStoneAxeRuntime(ICoreNativeStoneAxeCardZonesOperations cardZonesOperations, ICoreNativeStoneAxeCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativeStoneAxeCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreNativeStoneAxeCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreNativeStoneAxeCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreNativeStoneAxeCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreNativeStoneAxeCoreMatchLogOperations coreMatchLogOperations, ICoreNativeStoneAxeCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreNativeStoneAxeCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeStoneAxeCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreNativeStoneAxeCoreNativeDamageApplicationOperations coreNativeDamageApplicationOperations, ICoreNativeStoneAxeCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreNativeStoneAxeCoreNativeEquipmentInvocationsOperations coreNativeEquipmentInvocationsOperations, ICoreNativeStoneAxeCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreNativeStoneAxeCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeStoneAxeCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeStoneAxeCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreNativeStoneAxeKernelCoreMainOperations kernelCoreMainOperations, ICoreNativeStoneAxeKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeDamageApplicationOperations = coreNativeDamageApplicationOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeEquipmentInvocationsOperations = coreNativeEquipmentInvocationsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

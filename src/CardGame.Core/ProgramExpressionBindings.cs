@@ -35,18 +35,4 @@ internal sealed class CaptureExpressionNumberDescriptor : ProgramOperationDescri
 
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class ExpressionNumberCaptureHost(GameEngine engine) : IProgramExpressionCaptureHost
-    {
-        public void Capture(ProgramSkillFrame frame, string name, ProgramExpression expression)
-        {
-            var active = engine.GetActiveProgramFrame(frame.Id);
-            if (ProgramExpressions.EvaluateInt(expression, new ProgramExpressionWorld(engine, active)) is not { } value)
-            {
-                engine.CancelProgramBindingAndCleanup(active, "冻结表达式无法计算，技能剩余步骤取消。");
-                return;
-            }
-            engine.CaptureProgramExpressionNumber(active.Id, name, value);
-        }
-    }
 }

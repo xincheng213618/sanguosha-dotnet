@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineHalfHandPhaseDebtProgramsRuntime : global::CardGame.Core.IHalfHandPhaseDebtProgramHost
+{
+    private readonly ICoreHalfHandPhaseDebtProgramsCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreHalfHandTargetSupportOperations _coreHalfHandTargetSupportOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreProgramHandExchangesOperations _coreProgramHandExchangesOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreProgramOwnedCardsOperations _coreProgramOwnedCardsOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreHalfHandPhaseDebtProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineHalfHandPhaseDebtProgramsRuntime(ICoreHalfHandPhaseDebtProgramsCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreHalfHandPhaseDebtProgramsCardZonesOperations cardZonesOperations, ICoreHalfHandPhaseDebtProgramsResolutionStackOperations resolutionStackOperations, ICoreHalfHandPhaseDebtProgramsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreHalfHandPhaseDebtProgramsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreHalfHandPhaseDebtProgramsCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreHalfHandPhaseDebtProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreHalfHandPhaseDebtProgramsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreHalfHandPhaseDebtProgramsCoreHalfHandTargetSupportOperations coreHalfHandTargetSupportOperations, ICoreHalfHandPhaseDebtProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreHalfHandPhaseDebtProgramsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreHalfHandPhaseDebtProgramsCoreProgramHandExchangesOperations coreProgramHandExchangesOperations, ICoreHalfHandPhaseDebtProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreHalfHandPhaseDebtProgramsCoreProgramOwnedCardsOperations coreProgramOwnedCardsOperations, ICoreHalfHandPhaseDebtProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreHalfHandPhaseDebtProgramsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreHalfHandPhaseDebtProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreHalfHandPhaseDebtProgramsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreHalfHandPhaseDebtProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreHalfHandTargetSupportOperations = coreHalfHandTargetSupportOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramHandExchangesOperations = coreProgramHandExchangesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramOwnedCardsOperations = coreProgramOwnedCardsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

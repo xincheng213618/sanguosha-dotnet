@@ -1,0 +1,78 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterGuYongOlRuntime : global::CardGame.Core.IOrdinaryGuYongHost
+{
+    private readonly ICharacterGuYongOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterGuYongOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterGuYongOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterGuYongOlCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICharacterGuYongOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICharacterGuYongOlCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterGuYongOlCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICharacterGuYongOlCoreProgramCategoryChallengesOperations _coreProgramCategoryChallengesOperations;
+    private readonly ICharacterGuYongOlCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterGuYongOlCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICharacterGuYongOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterGuYongOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterGuYongOlCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterGuYongOlCoreRecoveryReplacementDamageRidesOperations2 _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterGuYongOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterGuYongOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterGuYongOlCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterGuYongOlCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICharacterGuYongOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterGuYongOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterGuYongOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterGuYongOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterGuYongOlCharacterGuYongOlOperations _characterGuYongOlOperations;
+    private readonly ICharacterGuYongOlCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICharacterGuYongOlResolutionStackOperations2 _resolutionStackOperations2;
+    private readonly ICharacterGuYongOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICharacterGuYongOlCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations2;
+    private readonly ICharacterGuYongOlCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterGuYongOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterGuYongOlRuntime(ICharacterGuYongOlContentRegistryOperations contentRegistryOperations, ICharacterGuYongOlResolutionStackOperations resolutionStackOperations, ICharacterGuYongOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterGuYongOlCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICharacterGuYongOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICharacterGuYongOlCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterGuYongOlCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICharacterGuYongOlCoreProgramCategoryChallengesOperations coreProgramCategoryChallengesOperations, ICharacterGuYongOlCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterGuYongOlCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICharacterGuYongOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterGuYongOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterGuYongOlCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterGuYongOlCoreRecoveryReplacementDamageRidesOperations2 coreRecoveryReplacementDamageRidesOperations, ICharacterGuYongOlCoreRuntimeOperations coreRuntimeOperations, ICharacterGuYongOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterGuYongOlCoreTableOrderOperations coreTableOrderOperations, ICharacterGuYongOlCoreMatchLogOperations coreMatchLogOperations, ICharacterGuYongOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterGuYongOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterGuYongOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterGuYongOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterGuYongOlCharacterGuYongOlOperations characterGuYongOlOperations, ICharacterGuYongOlCharacterYanPuOlOperations characterYanPuOlOperations, ICharacterGuYongOlResolutionStackOperations2 resolutionStackOperations2, ICharacterGuYongOlCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICharacterGuYongOlCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations2, ICharacterGuYongOlCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterGuYongOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCategoryChallengesOperations = coreProgramCategoryChallengesOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterGuYongOlOperations = characterGuYongOlOperations;
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._resolutionStackOperations2 = resolutionStackOperations2;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreRecoveryReplacementDamageRidesOperations2 = coreRecoveryReplacementDamageRidesOperations2;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

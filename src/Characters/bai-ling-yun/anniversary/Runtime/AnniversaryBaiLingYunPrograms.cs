@@ -52,7 +52,7 @@ public sealed record AnniversaryBlyGainCompletedEvent(long FrameId, int Requeste
 
 internal static class AnniversaryBaiLingYunComposition
 {
-    internal const string Linghui = "anniversary:linghui", Xiace = "anniversary:xiace", Yuxin = "anniversary:yuxin";
+    internal const string Linghui = "anniversary:linghui",Xiace = "anniversary:xiace",Yuxin = "anniversary:yuxin";
     [ProgramCatalogValidation(43600)] internal static void Validate(string path, SkillProgram program)
     {
         if (!program.Triggers.SelectMany(t => t.Effects).Any(e => e.Op == SkillProgramEffectOp.ResolveAnniversaryBaiLingYunLinghui)) return;

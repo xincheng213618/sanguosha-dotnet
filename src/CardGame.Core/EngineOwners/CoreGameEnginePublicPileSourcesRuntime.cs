@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePublicPileSourcesRuntime
+{
+    private readonly ICorePublicPileSourcesCharacterCaoXianOlOperations _characterCaoXianOlOperations;
+    private readonly ICorePublicPileSourcesCharacterDengAiMouOlOperations _characterDengAiMouOlOperations;
+    private readonly ICorePublicPileSourcesCharacterGanNingMouMobileOperations _characterGanNingMouMobileOperations;
+    private readonly ICorePublicPileSourcesCharacterGongsunZanMouMobileOperations _characterGongsunZanMouMobileOperations;
+    private readonly ICorePublicPileSourcesCharacterGuanHaiOlOperations _characterGuanHaiOlOperations;
+    private readonly ICorePublicPileSourcesCharacterGuoHuaiMouMobileOperations _characterGuoHuaiMouMobileOperations;
+    private readonly ICorePublicPileSourcesCharacterLiFengOlOperations _characterLiFengOlOperations;
+    private readonly ICorePublicPileSourcesCharacterSunShangxiangMouMobileOperations _characterSunShangxiangMouMobileOperations;
+    private readonly ICorePublicPileSourcesCharacterXiahouDunMouMobileOperations _characterXiahouDunMouMobileOperations;
+    private readonly ICorePublicPileSourcesCharacterZhenJiHappyGodOperations _characterZhenJiHappyGodOperations;
+    private readonly ICorePublicPileSourcesCardZonesOperations _cardZonesOperations;
+    private readonly ICorePublicPileSourcesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePublicPileSourcesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICorePublicPileSourcesCoreRicePileOperations _coreRicePileOperations;
+    private readonly ICorePublicPileSourcesCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    internal CoreGameEnginePublicPileSourcesRuntime(ICorePublicPileSourcesCharacterCaoXianOlOperations characterCaoXianOlOperations, ICorePublicPileSourcesCharacterDengAiMouOlOperations characterDengAiMouOlOperations, ICorePublicPileSourcesCharacterGanNingMouMobileOperations characterGanNingMouMobileOperations, ICorePublicPileSourcesCharacterGongsunZanMouMobileOperations characterGongsunZanMouMobileOperations, ICorePublicPileSourcesCharacterGuanHaiOlOperations characterGuanHaiOlOperations, ICorePublicPileSourcesCharacterGuoHuaiMouMobileOperations characterGuoHuaiMouMobileOperations, ICorePublicPileSourcesCharacterLiFengOlOperations characterLiFengOlOperations, ICorePublicPileSourcesCharacterSunShangxiangMouMobileOperations characterSunShangxiangMouMobileOperations, ICorePublicPileSourcesCharacterXiahouDunMouMobileOperations characterXiahouDunMouMobileOperations, ICorePublicPileSourcesCharacterZhenJiHappyGodOperations characterZhenJiHappyGodOperations, ICorePublicPileSourcesCardZonesOperations cardZonesOperations, ICorePublicPileSourcesContentRegistryOperations contentRegistryOperations, ICorePublicPileSourcesCoreNationalSkillsOperations coreNationalSkillsOperations, ICorePublicPileSourcesCoreRicePileOperations coreRicePileOperations, ICorePublicPileSourcesCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess coreGameEnginePublicPileSourcesPublicPersistentPilesAccess)
+    {
+        this._characterCaoXianOlOperations = characterCaoXianOlOperations;
+        this._characterDengAiMouOlOperations = characterDengAiMouOlOperations;
+        this._characterGanNingMouMobileOperations = characterGanNingMouMobileOperations;
+        this._characterGongsunZanMouMobileOperations = characterGongsunZanMouMobileOperations;
+        this._characterGuanHaiOlOperations = characterGuanHaiOlOperations;
+        this._characterGuoHuaiMouMobileOperations = characterGuoHuaiMouMobileOperations;
+        this._characterLiFengOlOperations = characterLiFengOlOperations;
+        this._characterSunShangxiangMouMobileOperations = characterSunShangxiangMouMobileOperations;
+        this._characterXiahouDunMouMobileOperations = characterXiahouDunMouMobileOperations;
+        this._characterZhenJiHappyGodOperations = characterZhenJiHappyGodOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreRicePileOperations = coreRicePileOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEnginePublicPileSourcesPublicPersistentPilesAccess = coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    }
+}

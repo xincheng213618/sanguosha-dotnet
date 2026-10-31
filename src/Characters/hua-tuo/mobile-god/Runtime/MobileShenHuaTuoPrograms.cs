@@ -8,7 +8,7 @@ public sealed record MobileHuaTuoReceipt(CardConversionSource Source, string Gam
     int Cursor = 0, long Before = 0, long After = 0)
 {
     private IReadOnlyList<MobileWulingAnimal> _order = Array.AsReadOnly(Array.Empty<MobileWulingAnimal>());
-    private IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>()), _recipients = Array.AsReadOnly(Array.Empty<int>());
+    private IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>()),_recipients = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<MobileWulingAnimal> Order { get => _order; init => _order = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Recipients { get => _recipients; init => _recipients = Array.AsReadOnly(value.ToArray()); }

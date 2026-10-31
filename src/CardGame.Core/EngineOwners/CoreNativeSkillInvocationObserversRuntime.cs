@@ -1,0 +1,30 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeSkillInvocationObserversRuntime
+{
+    private readonly ICoreNativeSkillInvocationObserversCharacterHuaTuoAnniversaryGodOperations _characterHuaTuoAnniversaryGodOperations;
+    private readonly ICoreNativeSkillInvocationObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNativeSkillInvocationObserversCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreNativeSkillInvocationObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreNativeSkillInvocationObserversCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreNativeSkillInvocationObserversCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeSkillInvocationObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICoreNativeSkillInvocationObserversCoreNativeEquipmentInvocationsOperations _coreNativeEquipmentInvocationsOperations;
+    internal CoreNativeSkillInvocationObserversRuntime(ICoreNativeSkillInvocationObserversCharacterHuaTuoAnniversaryGodOperations characterHuaTuoAnniversaryGodOperations, ICoreNativeSkillInvocationObserversResolutionStackOperations resolutionStackOperations, ICoreNativeSkillInvocationObserversCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativeSkillInvocationObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreNativeSkillInvocationObserversCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreNativeSkillInvocationObserversCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeSkillInvocationObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICoreNativeSkillInvocationObserversCoreNativeEquipmentInvocationsOperations coreNativeEquipmentInvocationsOperations)
+    {
+        this._characterHuaTuoAnniversaryGodOperations = characterHuaTuoAnniversaryGodOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreNativeEquipmentInvocationsOperations = coreNativeEquipmentInvocationsOperations;
+    }
+}

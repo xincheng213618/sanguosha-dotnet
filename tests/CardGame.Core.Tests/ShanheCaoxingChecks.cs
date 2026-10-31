@@ -83,9 +83,9 @@ internal static class ShanheCaoxingChecks
         Need(action.SelectableCardIds.Contains(scene.V().Equipment.Single(card => card.Kind == CardKind.SilverLion).Id) &&
             action.SelectableTargetSeats.Contains(2) && action.ProgramAiHint is { TargetDamage: > 0, TargetHealthEffects.Count: > 0 },
             "Actual legal-action publication exposes the Heart equipment and distant target with a nonzero real-damage AI prior, without claiming a selected target yet.");
-        var players = (IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(scene.G)!;
-        var publicFactory = typeof(GameEngine).GetMethod("CreateProgramAiPublicContext", BindingFlags.Instance | BindingFlags.NonPublic, null, [typeof(CharacterState)], null)!;
-        var actorFactory = typeof(GameEngine).GetMethod("CreateAiSkillContext", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(scene.G)!;
+        var publicFactory = global::FixtureRuntimeAccess.Engine.GetMethod("CreateProgramAiPublicContext", BindingFlags.Instance | BindingFlags.NonPublic, null, [typeof(CharacterState)], null)!;
+        var actorFactory = global::FixtureRuntimeAccess.Engine.GetMethod("CreateAiSkillContext", BindingFlags.Instance | BindingFlags.NonPublic)!;
         var context = (ProgramAiPublicContext)publicFactory.Invoke(scene.G, [players[0]])!;
         var owner = (PlayerSkillContext)actorFactory.Invoke(scene.G, [players[0], 0, view])!;
         var target = (PlayerSkillContext)actorFactory.Invoke(scene.G, [players[2], 0, view])!;

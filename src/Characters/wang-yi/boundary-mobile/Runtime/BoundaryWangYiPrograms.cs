@@ -19,7 +19,7 @@ internal sealed class BoundaryWangYiMijiCountHandler : ISkillProgramEffectHandle
 }
 internal static class BoundaryWangYiMobile
 {
-    internal const string Zhenlie = "boundary:zhenlie-mobile", Miji = "boundary:miji-mobile";
+    internal const string Zhenlie = "boundary:zhenlie-mobile",Miji = "boundary:miji-mobile";
     [ProgramCatalogValidation(57400)]
     internal static void Validate(string path, SkillProgram p)
     {

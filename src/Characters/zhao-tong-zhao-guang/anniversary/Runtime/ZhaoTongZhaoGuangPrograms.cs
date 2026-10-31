@@ -42,7 +42,7 @@ public sealed record AnniversaryQingrenDrawReturnedEvent(long FrameId, int Reque
 
 internal static class AnniversaryZhaoTongZhaoGuangComposition
 {
-    internal const string Yizan = "anniversary:yizan", Longyuan = "anniversary:longyuan", Qingren = "anniversary:qingren";
+    internal const string Yizan = "anniversary:yizan",Longyuan = "anniversary:longyuan",Qingren = "anniversary:qingren";
     internal static readonly CardKind[] BasicKinds = [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.Dodge, CardKind.Peach, CardKind.Alcohol];
     [ProgramCatalogValidation(44600)] internal static void Validate(string path, SkillProgram p)
     {

@@ -57,9 +57,7 @@ internal sealed class ProgramPhaseUsedProjections
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramPhaseUsedProjectionCatalog> PhaseUsedProjectionMetadata = new(() =>
-        ProgramPhaseUsedProjectionCatalog.Discover(RuntimeModuleMethods), true);
     private ProgramPhaseUsedProjections? _phaseUsedProjections;
-    private ProgramPhaseUsedProjections PhaseUsedProjections => _phaseUsedProjections ??= new(PhaseUsedProjectionMetadata.Value,
+    private ProgramPhaseUsedProjections PhaseUsedProjections => _phaseUsedProjections ??= new(global::CardGame.Core.EngineOwners.CoreProgramPhaseUsedProjectionsDefinitions.PhaseUsedProjectionMetadata.Value,
         method => (Func<int, string, int, int>)BindRuntimeHandler(method, typeof(Func<int, string, int, int>)));
 }

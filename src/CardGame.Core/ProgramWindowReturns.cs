@@ -60,9 +60,3 @@ internal sealed class ProgramWindowReturnCatalog
         registration.Return(engine, frame, completed);
     }
 }
-
-public sealed partial class GameEngine
-{
-    private static readonly Lazy<ProgramWindowReturnCatalog> ProgramWindowReturns = new(() =>
-        ProgramWindowReturnCatalog.Discover(RuntimeModuleMethods), true);
-}

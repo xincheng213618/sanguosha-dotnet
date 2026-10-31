@@ -1,0 +1,105 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterDuanJiongOlRuntime
+{
+    internal ProgramSkillFrame? SaoguDiscardQueryOwner(int actor) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { DuanJiongSaogu: { Stage: DuanJiongSaoguStage.UseChoice or DuanJiongSaoguStage.NativeUse, ActorSeat: var seat } } f && seat == actor ? f : null;
+    internal bool SaoguUnspentDiscard(ProgramSkillFrame f, int id) => f.DuanJiongSaogu is { } r && !r.UsedCardIds.Contains(id) && r.Payments.Any(c => c.CardId == id && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)) && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DuanJiongSaoguEntityPaidEvent>().SingleOrDefault(e => e.FrameId == f.Id && !e.DelegateFee && e.CardId == id)is { } paid && !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.Sequence > paid.Sequence && m.From == CardLocation.DiscardPile);
+    internal IReadOnlyList<Card> AppendDuanJiongSaoguDiscardCards(CharacterState actor, IReadOnlyList<Card> held)
+    {
+        if (SaoguDiscardQueryOwner(actor.Seat)is not { } f)
+            return held;
+        var r = f.DuanJiongSaogu!;
+        return Array.AsReadOnly(held.Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => r.Stage == DuanJiongSaoguStage.UseChoice ? SaoguUnspentDiscard(f, c.Id) : r.SelectedUseCardId == c.Id)).DistinctBy(c => c.Id).ToArray());
+    }
+
+    internal Card? FindDuanJiongSaoguDiscardCard(CharacterState actor, int id) => IsDuanJiongSaoguSelectedDiscard(actor.Seat, id) ? _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(c => c.Id == id) : null;
+    internal bool IsDuanJiongSaoguSelectedDiscard(int actor, int id)
+    {
+        if (id <= 0 || !_cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, id))
+            return false;
+        if (SaoguDiscardQueryOwner(actor)is { } f)
+            return f.DuanJiongSaogu!.Stage == DuanJiongSaoguStage.UseChoice ? SaoguUnspentDiscard(f, id) : f.DuanJiongSaogu.SelectedUseCardId == id;
+        return _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { DuanJiongSaoguUse: { } origin } use && origin.CardId == id && HasIssuedDuanJiongSaoguUnlimitedUse(use.Id, actor);
+    }
+
+    internal bool IsDuanJiongSaoguDiscardQuery(CharacterState actor, int? id) => id is> 0 && SaoguDiscardQueryOwner(actor.Seat)is not null && IsDuanJiongSaoguSelectedDiscard(actor.Seat, id.Value);
+    internal IReadOnlyList<LegalAction> SaoguNativeActions(ProgramSkillFrame f) => Array.AsReadOnly(f.DuanJiongSaogu!.Payments.Where(c => SaoguUnspentDiscard(f, c.CardId)).SelectMany(c => _coreNativeLegalActionsOperations.BuildLegalActions(_coreMatchParticipantsPlayersAccess._players[f.DuanJiongSaogu.ActorSeat], false, c.CardId)).Where(a => a.Kind == LegalActionKind.Slash && a.CardId is> 0 && a.ConversionSource is null && (a.AdditionalConversionSources?.Count ?? 0) == 0).ToArray());
+    internal void IssueSaoguUse(ProgramSkillFrame f, PromptChoice choice)
+    {
+        var r = f.DuanJiongSaogu!;
+        var index = int.Parse(choice.Parameters["index"], System.Globalization.CultureInfo.InvariantCulture);
+        var actions = SaoguNativeActions(f);
+        if (index < 0 || index >= actions.Count || choice.Cards is not [var id] || actions[index].CardId != id || !SaoguUnspentDiscard(f, id))
+            throw new InvalidOperationException("Saogu requires its still-available original paid Slash and current native target legality.");
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { DuanJiongSaogu = r with { Stage = DuanJiongSaoguStage.NativeUse, SelectedUseCardId = id, ReservedUseId = _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1, UsedCardIds = r.UsedCardIds.Append(id).ToArray(), NativeUse = null, NativeCompleted = false } });
+        _coreNativeActionDispatchOperations.ExecuteAction(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat], actions[index]);
+    }
+
+    internal void BindDuanJiongSaoguNativeUse(CardUseFrame use)
+    {
+        var at = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
+        if (at < 1 || _resolutionStackOperations._resolutionStack[at - 1] is not ProgramSkillFrame { DuanJiongSaogu: { Stage: DuanJiongSaoguStage.NativeUse } r } f || r.ReservedUseId != use.Id)
+            return;
+        if (!ValidSaogu(f) || r.NativeUse is not null || r.SelectedUseCardId != use.CardId || use.SourceSeat != r.ActorSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.Action is not { Type: CardActionType.Use } action || action.ActorSeat != r.ActorSeat || action.ProviderSeat != r.ActorSeat || action.EffectiveKind != use.CardKind || action.ConversionChain.Count != 0 || use.PhysicalCardIds is not [var material] || material != use.CardId || action.PhysicalCards is not [{ From: var from, CardId: var paid }] || paid != material || from != CardLocation.DiscardPile || _cardZonesOperations._cardZones.GetLocation(material) != CardLocation.DiscardPile || !r.Payments.Any(c => c.CardId == material && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)))
+            throw new InvalidOperationException("Saogu must issue its exact original discarded Slash through a real native card use.");
+        var origin = new DuanJiongSaoguUseOrigin(f.Id, use.Id, action.ActionId, material, use.CardKind, r.ActorSeat);
+        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { DuanJiongSaogu = r with { NativeUse = origin } });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { DuanJiongSaoguUse = origin, UnlimitedUse = true });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuanJiongSaoguNativeIssuedEvent(origin));
+    }
+
+    [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 60)]
+    internal bool HasIssuedDuanJiongSaoguUnlimitedUse(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { DuanJiongSaoguUse: { } o, Action: { } action } use && o.CardUseFrameId == id && (o.ActorSeat == actor || use.SourceSeat == actor) && o.ActionId == action.ActionId && o.CardId == use.CardId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) && action.PhysicalCards is [{ From: var from, CardId: var material }] && from == CardLocation.DiscardPile && material == o.CardId && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is ProgramSkillFrame { DuanJiongSaogu: { Stage: DuanJiongSaoguStage.NativeUse, NativeCompleted: false, NativeUse: { } stored } } parent && stored == o && ValidSaogu(parent) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DuanJiongSaoguNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
+    [NativeUseValidation(27060)]
+    internal void AssertSaoguNativeUse(CardUseFrame use)
+    {
+        if (use.DuanJiongSaoguUse is { } o && (use.Step != ResolutionFrameStep.Completed || !HasIssuedDuanJiongSaoguUnlimitedUse(use.Id, o.ActorSeat)))
+            throw new InvalidOperationException("Saogu lost its exact whole native Slash completion.");
+    }
+
+    [NativeUseReturn(27060)]
+    internal void ReturnSaoguNativeUse(CardUseFrame use)
+    {
+        if (use.DuanJiongSaoguUse is not { } o)
+            return;
+        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
+        var r = f.DuanJiongSaogu!;
+        if (r.NativeUse != o || r.Stage != DuanJiongSaoguStage.NativeUse || r.NativeCompleted || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || _resolutionStackOperations._resolutionStack.Any(x => x.Id == use.Id))
+            throw new InvalidOperationException("Saogu native return cannot escape its original paid instruction or return twice.");
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { DuanJiongSaogu = r with { NativeCompleted = true } });
+        if (use.CardAttack is not { Active: true })
+            SettleSaoguNativeUse(o);
+    }
+
+    [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 27060)]
+    internal bool ReturnSaoguNativeAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuanJiongSaogu: { Stage: DuanJiongSaoguStage.NativeUse, NativeCompleted: true, NativeUse: { } o } } || o.CardUseFrameId != completion.ResolutionId)
+            return false;
+        SettleSaoguNativeUse(o);
+        return true;
+    }
+
+    internal void SettleSaoguNativeUse(DuanJiongSaoguUseOrigin o)
+    {
+        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
+        var r = f.DuanJiongSaogu!;
+        if (r.NativeUse != o || !r.NativeCompleted || _coreCardUseLifecycleOperations.LifecycleCardUse(o.CardUseFrameId)is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == o.CardUseFrameId) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DuanJiongSaoguNativeReturnedEvent>().Any(e => e.Origin == o))
+            throw new InvalidOperationException("Saogu must return after one complete native use.");
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { DuanJiongSaogu = r with { Stage = DuanJiongSaoguStage.NativeChildren } });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuanJiongSaoguNativeReturnedEvent(o));
+        // A lethal native Slash has already finished its physical use. Its
+        // exact paid ancestor still needs the ordinary typed continuation,
+        // because a decided game will not run another engine step for it.
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+            _coreRuntimeOperations.AdvanceRuntimeProgram(o.ProgramFrameId);
+    }
+
+    [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaBeforeLimit, 90)]
+    internal bool DuanJiongSaoguSlashQuotaBeforeLimit(ProgramSlashQuotaQuery query) => IsDuanJiongSaoguDiscardQuery(query.Actor, query.PhysicalCardIds is [var saoguCardId] ? saoguCardId : query.PhysicalCard?.Id);
+}

@@ -1,0 +1,27 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core;
+public sealed partial class GameEngine
+{
+    [ProgramCapability]
+    private sealed class CoreHuxinMirrorKernelCoreGameEngineRuleProgressionAdapter(GameEngine engine) : global::CardGame.Core.EngineOwners.ICoreHuxinMirrorKernelCoreGameEngineRuleProgressionOperations
+    {
+        public void AdvanceEventRulesAndQueueFact(global::CardGame.Core.IGameEvent payload) => engine.AdvanceEventRulesAndQueueFact(payload);
+    }
+
+    [ProgramCapability]
+    private sealed class CoreHuxinMirrorCardZonesAdapter(GameEngine engine) : global::CardGame.Core.EngineOwners.ICoreHuxinMirrorCardZonesOperations
+    {
+        public ref readonly global::CardGame.Core.CardZoneStore _cardZones => ref engine._cardZones;
+    }
+
+    [ProgramCapability]
+    private sealed class CoreHuxinMirrorResolutionStackAdapter(GameEngine engine) : global::CardGame.Core.EngineOwners.ICoreHuxinMirrorResolutionStackOperations
+    {
+        public ref readonly global::CardGame.Core.FrameStore _resolutionStack => ref engine._resolutionStack;
+    }
+}

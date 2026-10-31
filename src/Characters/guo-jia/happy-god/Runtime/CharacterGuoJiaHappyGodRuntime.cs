@@ -1,0 +1,86 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterGuoJiaHappyGodRuntime : global::CardGame.Core.IHappyGuoJiaHost
+{
+    private readonly ICharacterGuoJiaHappyGodCharacterGuoJiaMobileGodOperations _characterGuoJiaMobileGodOperations;
+    private readonly ICharacterGuoJiaHappyGodCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICharacterGuoJiaHappyGodCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterGuoJiaHappyGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterGuoJiaHappyGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreCharacterHostOperations _coreCharacterHostOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterGuoJiaHappyGodCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreShownEntityTurnPoliciesOperations _coreShownEntityTurnPoliciesOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreWushuangTacticRulesOperations _coreWushuangTacticRulesOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreNativePlayerDeathOperations _coreNativePlayerDeathOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreParticipantHandProgramsOperations _coreParticipantHandProgramsOperations;
+    private readonly ICharacterGuoJiaHappyGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterGuoJiaHappyGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterGuoJiaHappyGodCharacterGuoJiaHappyGodOperations _characterGuoJiaHappyGodOperations;
+    private readonly ICharacterGuoJiaHappyGodCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterGuoJiaHappyGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess;
+    internal CharacterGuoJiaHappyGodRuntime(ICharacterGuoJiaHappyGodCharacterGuoJiaMobileGodOperations characterGuoJiaMobileGodOperations, ICharacterGuoJiaHappyGodCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICharacterGuoJiaHappyGodCardZonesOperations cardZonesOperations, ICharacterGuoJiaHappyGodContentRegistryOperations contentRegistryOperations, ICharacterGuoJiaHappyGodResolutionStackOperations resolutionStackOperations, ICharacterGuoJiaHappyGodCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterGuoJiaHappyGodCoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterGuoJiaHappyGodCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterGuoJiaHappyGodCoreCharacterHostOperations coreCharacterHostOperations, ICharacterGuoJiaHappyGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterGuoJiaHappyGodCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterGuoJiaHappyGodCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterGuoJiaHappyGodCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterGuoJiaHappyGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterGuoJiaHappyGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterGuoJiaHappyGodCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterGuoJiaHappyGodCoreRuntimeOperations coreRuntimeOperations, ICharacterGuoJiaHappyGodCoreShownEntityTurnPoliciesOperations coreShownEntityTurnPoliciesOperations, ICharacterGuoJiaHappyGodCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterGuoJiaHappyGodCoreWushuangTacticRulesOperations coreWushuangTacticRulesOperations, ICharacterGuoJiaHappyGodCoreNativeCardUseOperations coreNativeCardUseOperations, ICharacterGuoJiaHappyGodCoreNativeNullificationOperations coreNativeNullificationOperations, ICharacterGuoJiaHappyGodCoreNativePlayerDeathOperations coreNativePlayerDeathOperations, ICharacterGuoJiaHappyGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterGuoJiaHappyGodCoreParticipantHandProgramsOperations coreParticipantHandProgramsOperations, ICharacterGuoJiaHappyGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterGuoJiaHappyGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterGuoJiaHappyGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterGuoJiaHappyGodCharacterGuoJiaHappyGodOperations characterGuoJiaHappyGodOperations, ICharacterGuoJiaHappyGodCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterGuoJiaHappyGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess)
+    {
+        this._characterGuoJiaMobileGodOperations = characterGuoJiaMobileGodOperations;
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterHostOperations = coreCharacterHostOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShownEntityTurnPoliciesOperations = coreShownEntityTurnPoliciesOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreWushuangTacticRulesOperations = coreWushuangTacticRulesOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePlayerDeathOperations = coreNativePlayerDeathOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreParticipantHandProgramsOperations = coreParticipantHandProgramsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterGuoJiaHappyGodOperations = characterGuoJiaHappyGodOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess = coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess;
+    }
+}

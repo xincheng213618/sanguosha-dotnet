@@ -1,0 +1,60 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterTaiShiCiMobileShiRuntime : global::CardGame.Core.IShiTaiShiCiFacts, global::CardGame.Core.IShiTaiShiCiOperations
+{
+    private readonly ICharacterTaiShiCiMobileShiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreProgramTurnPhaseOperations _coreProgramTurnPhaseOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICharacterTaiShiCiMobileShiCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterTaiShiCiMobileShiCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterTaiShiCiMobileShiKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterTaiShiCiMobileShiKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICharacterTaiShiCiMobileShiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterTaiShiCiMobileShiShiTaiShiCiOperations _shiTaiShiCiOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICharacterTaiShiCiMobileShiShiTzLieScanSequenceAccess _characterTaiShiCiMobileShiShiTzLieScanSequenceAccess;
+    internal CharacterTaiShiCiMobileShiRuntime(ICharacterTaiShiCiMobileShiContentRegistryOperations contentRegistryOperations, ICharacterTaiShiCiMobileShiCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterTaiShiCiMobileShiCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterTaiShiCiMobileShiCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterTaiShiCiMobileShiCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterTaiShiCiMobileShiCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICharacterTaiShiCiMobileShiCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterTaiShiCiMobileShiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterTaiShiCiMobileShiCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterTaiShiCiMobileShiCoreProgramTurnPhaseOperations coreProgramTurnPhaseOperations, ICharacterTaiShiCiMobileShiCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterTaiShiCiMobileShiCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICharacterTaiShiCiMobileShiCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterTaiShiCiMobileShiCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterTaiShiCiMobileShiKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterTaiShiCiMobileShiKernelCoreMainOperations kernelCoreMainOperations, ICharacterTaiShiCiMobileShiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterTaiShiCiMobileShiShiTaiShiCiOperations shiTaiShiCiOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICharacterTaiShiCiMobileShiShiTzLieScanSequenceAccess characterTaiShiCiMobileShiShiTzLieScanSequenceAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramTurnPhaseOperations = coreProgramTurnPhaseOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._shiTaiShiCiOperations = shiTaiShiCiOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._characterTaiShiCiMobileShiShiTzLieScanSequenceAccess = characterTaiShiCiMobileShiShiTzLieScanSequenceAccess;
+    }
+}

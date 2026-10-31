@@ -1,0 +1,19 @@
+#nullable enable
+namespace CardGame.Core.NativeOwners;
+internal sealed class ProgramTurnWindowIssuedCandidates(global::System.Func<global::CardGame.Core.ProgramPipelineHooks> getProgramPipelineHooks, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEnginePhaseHandSeizureEntries> getCoreGameEnginePhaseHandSeizureRuntime, global::CardGame.Core.EngineStates.CoreGameEnginePhaseNamePredictionState gameEnginePhaseNamePredictionState, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZhangShiPingOlEntries> getCharacterZhangShiPingOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEnginePhaseNamePredictionEntries> getCoreGameEnginePhaseNamePredictionRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineZhuijiProgramsEntries> getCoreGameEngineZhuijiProgramsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterLuZhiWeiOlEntries> getCharacterLuZhiWeiOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterLvQianOlEntries> getCharacterLvQianOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterWangKuangOlEntries> getCharacterWangKuangOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterLiuBaOlEntries> getCharacterLiuBaOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterCaoHongMouEntries> getCharacterCaoHongMouRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZhangXunAnniversaryEntries> getCharacterZhangXunAnniversaryRuntime) : IProgramTurnWindowIssuedCandidates
+{
+    public bool HasUnissuedTurnStartObligation(int ownerSeat) => getProgramPipelineHooks().HasUnissuedTurnStartObligation(ownerSeat);
+    public IEnumerable<ProgramTriggerCandidate> PhaseHandDebt(CharacterState owner, SkillProgramTriggerWindow window, int occurrence) => getCoreGameEnginePhaseHandSeizureRuntime().IssuedPhaseHandDebtCandidates(owner, window, occurrence);
+    public bool HasPhaseNamePredictions => gameEnginePhaseNamePredictionState.ReferenceToPhaseNamePredictions.Count != 0;
+
+    public bool HasOutstandingHongjiPhase(CharacterState owner, SkillProgramTriggerWindow window) => getCharacterZhangShiPingOlRuntime().HasOutstandingHongjiPhase(owner, window);
+    public IReadOnlyList<ProgramTriggerCandidate> IncludeHongjiPhaseCandidates(CharacterState owner, SkillProgramTriggerWindow window, IReadOnlyList<ProgramTriggerCandidate> ordinary) => getCharacterZhangShiPingOlRuntime().IncludeHongjiPhaseCandidates(owner, window, ordinary);
+    public void AppendPhaseNamePredictionCandidates(List<ProgramTriggerCandidate> candidates) => getCoreGameEnginePhaseNamePredictionRuntime().AppendPhaseNamePredictionCandidates(candidates);
+    public IEnumerable<ProgramTriggerCandidate> ZhuijiEnding(CharacterState owner) => getCoreGameEngineZhuijiProgramsRuntime().IssuedZhuijiEndingCandidates(owner);
+    public IEnumerable<ProgramTriggerCandidate> QingzhongEnding(CharacterState owner) => getCharacterLuZhiWeiOlRuntime().IssuedQingzhongEndingCandidates(owner);
+    public IEnumerable<ProgramTriggerCandidate> WeiluEnding(CharacterState owner) => getCharacterLvQianOlRuntime().IssuedWeiluEndingCandidates(owner);
+    public IEnumerable<ProgramTriggerCandidate> WangKuangRenxiaEnding(CharacterState owner) => getCharacterWangKuangOlRuntime().IssuedWangKuangRenxiaEndingCandidates(owner);
+    public IEnumerable<ProgramTriggerCandidate> TongduPlayEnding(CharacterState owner) => getCharacterLiuBaOlRuntime().IssuedTongduPlayEndingCandidates(owner);
+    public IEnumerable<ProgramTriggerCandidate> MouCaoHongPlayEnding(CharacterState owner) => getCharacterCaoHongMouRuntime().IssuedMouCaoHongPlayEndingCandidates(owner);
+    public IEnumerable<ProgramTriggerCandidate> AnniversaryZhangXunPlayEnding(CharacterState owner) => getCharacterZhangXunAnniversaryRuntime().IssuedAnniversaryZhangXunPlayEndingCandidates(owner);
+}

@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouChengYuComposition
 {
-    internal const string Lidan = "mou-ol:lidan", Danchi = "mou-ol:danchi";
+    internal const string Lidan = "mou-ol:lidan",Danchi = "mou-ol:danchi";
     [ProgramCatalogValidation(1630)]
     internal static void Validate(string path, SkillProgram p)
     {

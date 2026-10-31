@@ -1,0 +1,30 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreProgramNativeSlashQueriesRuntime
+{
+    private readonly ICoreProgramNativeSlashQueriesCharacterCaoChunOlOperations _characterCaoChunOlOperations;
+    private readonly ICoreProgramNativeSlashQueriesCharacterLvKuangLvXiangOlOperations _characterLvKuangLvXiangOlOperations;
+    private readonly ICoreProgramNativeSlashQueriesCharacterWuJingOlOperations _characterWuJingOlOperations;
+    private readonly ICoreProgramNativeSlashQueriesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramNativeSlashQueriesCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreProgramNativeSlashQueriesCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreProgramNativeSlashQueriesCoreRoundOnceCardlessProgramRequestsOperations _coreRoundOnceCardlessProgramRequestsOperations;
+    private readonly ICoreProgramNativeSlashQueriesCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    internal CoreProgramNativeSlashQueriesRuntime(ICoreProgramNativeSlashQueriesCharacterCaoChunOlOperations characterCaoChunOlOperations, ICoreProgramNativeSlashQueriesCharacterLvKuangLvXiangOlOperations characterLvKuangLvXiangOlOperations, ICoreProgramNativeSlashQueriesCharacterWuJingOlOperations characterWuJingOlOperations, ICoreProgramNativeSlashQueriesResolutionStackOperations resolutionStackOperations, ICoreProgramNativeSlashQueriesCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreProgramNativeSlashQueriesCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreProgramNativeSlashQueriesCoreRoundOnceCardlessProgramRequestsOperations coreRoundOnceCardlessProgramRequestsOperations, ICoreProgramNativeSlashQueriesCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations)
+    {
+        this._characterCaoChunOlOperations = characterCaoChunOlOperations;
+        this._characterLvKuangLvXiangOlOperations = characterLvKuangLvXiangOlOperations;
+        this._characterWuJingOlOperations = characterWuJingOlOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreRoundOnceCardlessProgramRequestsOperations = coreRoundOnceCardlessProgramRequestsOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+    }
+}

@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineActualHandGainObserversRuntime
+{
+    private readonly ICoreActualHandGainObserversContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreActualHandGainObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreActualHandGainObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreActualHandGainObserversCoreActualHandGainProgramsOperations _coreActualHandGainProgramsOperations;
+    private readonly ICoreActualHandGainObserversCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICoreActualHandGainObserversCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreActualHandGainObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICoreActualHandGainObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreActualHandGainObserversCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreActualHandGainObserversCoreActualHandGainObserversOperations _coreActualHandGainObserversOperations;
+    private readonly ICoreActualHandGainObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    internal CoreGameEngineActualHandGainObserversRuntime(ICoreActualHandGainObserversContentRegistryOperations contentRegistryOperations, ICoreActualHandGainObserversResolutionStackOperations resolutionStackOperations, ICoreActualHandGainObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreActualHandGainObserversCoreActualHandGainProgramsOperations coreActualHandGainProgramsOperations, ICoreActualHandGainObserversCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICoreActualHandGainObserversCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreActualHandGainObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICoreActualHandGainObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreActualHandGainObserversCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreActualHandGainObserversCoreActualHandGainObserversOperations coreActualHandGainObserversOperations, ICoreActualHandGainObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations2, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActualHandGainProgramsOperations = coreActualHandGainProgramsOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreActualHandGainObserversOperations = coreActualHandGainObserversOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    }
+}

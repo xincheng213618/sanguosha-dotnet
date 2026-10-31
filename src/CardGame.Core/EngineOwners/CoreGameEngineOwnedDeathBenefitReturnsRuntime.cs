@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineOwnedDeathBenefitReturnsRuntime : global::CardGame.Core.IOwnedDeathBenefitProgramHost
+{
+    private readonly ICoreOwnedDeathBenefitReturnsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreOwnedDeathBenefitReturnsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreOwnedDeathBenefitReturnsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreOwnedDeathBenefitReturnsCoreFixedRecipientBenefitsOperations _coreFixedRecipientBenefitsOperations;
+    private readonly ICoreOwnedDeathBenefitReturnsCorePairObtainShownGiftsOperations _corePairObtainShownGiftsOperations;
+    private readonly ICoreOwnedDeathBenefitReturnsCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreOwnedDeathBenefitReturnsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreOwnedDeathBenefitReturnsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreOwnedDeathBenefitReturnsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreOwnedDeathBenefitReturnsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineOwnedDeathBenefitReturnsRuntime(ICoreOwnedDeathBenefitReturnsContentRegistryOperations contentRegistryOperations, ICoreOwnedDeathBenefitReturnsResolutionStackOperations resolutionStackOperations, ICoreOwnedDeathBenefitReturnsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreOwnedDeathBenefitReturnsCoreFixedRecipientBenefitsOperations coreFixedRecipientBenefitsOperations, ICoreOwnedDeathBenefitReturnsCorePairObtainShownGiftsOperations corePairObtainShownGiftsOperations, ICoreOwnedDeathBenefitReturnsCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreOwnedDeathBenefitReturnsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreOwnedDeathBenefitReturnsCoreRuntimeOperations coreRuntimeOperations, ICoreOwnedDeathBenefitReturnsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreOwnedDeathBenefitReturnsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreFixedRecipientBenefitsOperations = coreFixedRecipientBenefitsOperations;
+        this._corePairObtainShownGiftsOperations = corePairObtainShownGiftsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

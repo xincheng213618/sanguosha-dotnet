@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramRandomTransfersRuntime
+{
+    private readonly ICoreProgramRandomTransfersCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreProgramRandomTransfersCharacterZhouYuMobileOperations _characterZhouYuMobileOperations;
+    private readonly ICoreProgramRandomTransfersCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramRandomTransfersRandomOperations _randomOperations;
+    private readonly ICoreProgramRandomTransfersCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreProgramRandomTransfersCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreProgramRandomTransfersCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramRandomTransfersCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramRandomTransfersCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreProgramRandomTransfersCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramRandomTransfersCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreProgramRandomTransfersCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreProgramRandomTransfersKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramRandomTransfersRuntime(ICoreProgramRandomTransfersCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreProgramRandomTransfersCharacterZhouYuMobileOperations characterZhouYuMobileOperations, ICoreProgramRandomTransfersCardZonesOperations cardZonesOperations, ICoreProgramRandomTransfersRandomOperations randomOperations, ICoreProgramRandomTransfersCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreProgramRandomTransfersCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreProgramRandomTransfersCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramRandomTransfersCoreRuntimeOperations coreRuntimeOperations, ICoreProgramRandomTransfersCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreProgramRandomTransfersCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramRandomTransfersCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreProgramRandomTransfersCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreProgramRandomTransfersKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._characterZhouYuMobileOperations = characterZhouYuMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._randomOperations = randomOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEnginePrivateCardOffersRuntime : global::CardGame.Core.IPrivateOfferProgramHost
+{
+    private readonly ICorePrivateCardOffersCardZonesOperations _cardZonesOperations;
+    private readonly ICorePrivateCardOffersContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePrivateCardOffersResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePrivateCardOffersCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePrivateCardOffersCoreFireTargetBenefitsOperations _coreFireTargetBenefitsOperations;
+    private readonly ICorePrivateCardOffersCoreGameTargetHandHpChoicesOperations _coreGameTargetHandHpChoicesOperations;
+    private readonly ICorePrivateCardOffersCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICorePrivateCardOffersCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePrivateCardOffersCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePrivateCardOffersCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICorePrivateCardOffersCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePrivateCardOffersCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICorePrivateCardOffersCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICorePrivateCardOffersCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICorePrivateCardOffersCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICorePrivateCardOffersCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICorePrivateCardOffersKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEnginePrivateCardOffersRuntime(ICorePrivateCardOffersCardZonesOperations cardZonesOperations, ICorePrivateCardOffersContentRegistryOperations contentRegistryOperations, ICorePrivateCardOffersResolutionStackOperations resolutionStackOperations, ICorePrivateCardOffersCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePrivateCardOffersCoreFireTargetBenefitsOperations coreFireTargetBenefitsOperations, ICorePrivateCardOffersCoreGameTargetHandHpChoicesOperations coreGameTargetHandHpChoicesOperations, ICorePrivateCardOffersCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICorePrivateCardOffersCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePrivateCardOffersCoreRuntimeOperations coreRuntimeOperations, ICorePrivateCardOffersCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICorePrivateCardOffersCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePrivateCardOffersCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICorePrivateCardOffersCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICorePrivateCardOffersCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICorePrivateCardOffersCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICorePrivateCardOffersCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICorePrivateCardOffersKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreFireTargetBenefitsOperations = coreFireTargetBenefitsOperations;
+        this._coreGameTargetHandHpChoicesOperations = coreGameTargetHandHpChoicesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

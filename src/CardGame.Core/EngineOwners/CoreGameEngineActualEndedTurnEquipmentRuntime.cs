@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
+{
+    private readonly ICoreActualEndedTurnEquipmentCardZonesOperations _cardZonesOperations;
+    private readonly ICoreActualEndedTurnEquipmentContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreActualEndedTurnEquipmentResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreCurrentTurnUseKindsOperations _coreCurrentTurnUseKindsOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreEquipmentDonationObserversOperations _coreEquipmentDonationObserversOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreEquipmentDonationProgramsOperations _coreEquipmentDonationProgramsOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreEquipmentPlacementAndHpPairOperations _coreEquipmentPlacementAndHpPairOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreActualEndedTurnEquipmentCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreActualEndedTurnEquipmentCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreActualEndedTurnEquipmentCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreActualEndedTurnEquipmentCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreActualEndedTurnEquipmentKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineActualEndedTurnEquipmentRuntime(ICoreActualEndedTurnEquipmentCardZonesOperations cardZonesOperations, ICoreActualEndedTurnEquipmentContentRegistryOperations contentRegistryOperations, ICoreActualEndedTurnEquipmentResolutionStackOperations resolutionStackOperations, ICoreActualEndedTurnEquipmentCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreActualEndedTurnEquipmentCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreActualEndedTurnEquipmentCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICoreActualEndedTurnEquipmentCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreActualEndedTurnEquipmentCoreCurrentTurnUseKindsOperations coreCurrentTurnUseKindsOperations, ICoreActualEndedTurnEquipmentCoreEquipmentDonationObserversOperations coreEquipmentDonationObserversOperations, ICoreActualEndedTurnEquipmentCoreEquipmentDonationProgramsOperations coreEquipmentDonationProgramsOperations, ICoreActualEndedTurnEquipmentCoreEquipmentPlacementAndHpPairOperations coreEquipmentPlacementAndHpPairOperations, ICoreActualEndedTurnEquipmentCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreActualEndedTurnEquipmentCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreActualEndedTurnEquipmentCoreRuntimeOperations coreRuntimeOperations, ICoreActualEndedTurnEquipmentCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreActualEndedTurnEquipmentCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreActualEndedTurnEquipmentCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreActualEndedTurnEquipmentCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreActualEndedTurnEquipmentCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreActualEndedTurnEquipmentKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCurrentTurnUseKindsOperations = coreCurrentTurnUseKindsOperations;
+        this._coreEquipmentDonationObserversOperations = coreEquipmentDonationObserversOperations;
+        this._coreEquipmentDonationProgramsOperations = coreEquipmentDonationProgramsOperations;
+        this._coreEquipmentPlacementAndHpPairOperations = coreEquipmentPlacementAndHpPairOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

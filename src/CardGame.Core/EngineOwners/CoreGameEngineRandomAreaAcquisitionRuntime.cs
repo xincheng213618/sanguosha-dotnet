@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineRandomAreaAcquisitionRuntime : global::CardGame.Core.IRandomAreaAcquisitionHost
+{
+    private readonly ICoreRandomAreaAcquisitionRandomOperations _randomOperations;
+    private readonly ICoreRandomAreaAcquisitionResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreOrderedPrintedSkillLossObserversOperations _coreOrderedPrintedSkillLossObserversOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreRandomAreaAcquisitionProofsOperations _coreRandomAreaAcquisitionProofsOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreRandomAreaAcquisitionCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreRandomAreaAcquisitionCoreShenwuNpcProgramsOperations _coreShenwuNpcProgramsOperations;
+    private readonly ICoreRandomAreaAcquisitionKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRandomAreaAcquisitionRuntime(ICoreRandomAreaAcquisitionRandomOperations randomOperations, ICoreRandomAreaAcquisitionResolutionStackOperations resolutionStackOperations, ICoreRandomAreaAcquisitionCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreRandomAreaAcquisitionCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreRandomAreaAcquisitionCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreRandomAreaAcquisitionCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreRandomAreaAcquisitionCoreOrderedPrintedSkillLossObserversOperations coreOrderedPrintedSkillLossObserversOperations, ICoreRandomAreaAcquisitionCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreRandomAreaAcquisitionCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreRandomAreaAcquisitionCoreRandomAreaAcquisitionProofsOperations coreRandomAreaAcquisitionProofsOperations, ICoreRandomAreaAcquisitionCoreRuntimeOperations coreRuntimeOperations, ICoreRandomAreaAcquisitionCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreRandomAreaAcquisitionCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreRandomAreaAcquisitionCoreTableOrderOperations coreTableOrderOperations, ICoreRandomAreaAcquisitionCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreRandomAreaAcquisitionCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreRandomAreaAcquisitionCoreShenwuNpcProgramsOperations coreShenwuNpcProgramsOperations, ICoreRandomAreaAcquisitionKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOrderedPrintedSkillLossObserversOperations = coreOrderedPrintedSkillLossObserversOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRandomAreaAcquisitionProofsOperations = coreRandomAreaAcquisitionProofsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreShenwuNpcProgramsOperations = coreShenwuNpcProgramsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

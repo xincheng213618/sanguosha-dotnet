@@ -1,0 +1,40 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CoreGameEngineSkillProgramsEntries
+{
+    internal void AssertProgramSkillState() => _resolve().AssertProgramSkillState();
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginProgramSkillDamage(global::CardGame.Core.ProgramSkillFrame frame, int targetSeat, int amount, global::CardGame.Core.ProgramParticipantReference? sourceReference = default, global::CardGame.Core.DamageNature? nature = default, bool sourceLess = false, int? explicitSourceSeat = default) => _resolve().BeginProgramSkillDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat);
+    internal void BeginProgramSkillDying(long parentFrameId, global::CardGame.Core.CharacterState victim) => _resolve().BeginProgramSkillDying(parentFrameId, victim);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginProgramSkillPindian(global::CardGame.Core.ProgramSkillFrame frame, int targetSeat) => _resolve().BeginProgramSkillPindian(frame, targetSeat);
+    internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.LegalAction> BuildProgramActions(global::CardGame.Core.CharacterState owner) => _resolve().BuildProgramActions(owner);
+    internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.LegalAction> BuildProgramActionsCore(global::CardGame.Core.CharacterState owner) => _resolve().BuildProgramActionsCore(owner);
+    internal bool CanSelectProgramActivationCard(global::CardGame.Core.ProgramExecutionPlan plan, global::CardGame.Core.Card card, int ownerSeat, string skillId) => _resolve().CanSelectProgramActivationCard(plan, card, ownerSeat, skillId);
+    internal void CompleteProgramSkillAfterDying(global::CardGame.Core.GameEngine.DyingCompletionReceipt dying) => _resolve().CompleteProgramSkillAfterDying(dying);
+    internal void ContinueAfterSelectedNativeUse(global::CardGame.Core.NativeUseReturnContext context) => _resolve().ContinueAfterSelectedNativeUse(context);
+    internal void ContinueProgramAfterBoundEquipmentUse(global::CardGame.Core.CardUseFrame completed) => _resolve().ContinueProgramAfterBoundEquipmentUse(completed);
+    internal void ContinueProgramAfterSelectedCardUse() => _resolve().ContinueProgramAfterSelectedCardUse();
+    internal global::CardGame.Core.SkillProgramAiHint CreateProgramAiHint(global::CardGame.Core.SkillProgram program, global::CardGame.Core.SkillProgramActivation activation, global::CardGame.Core.PlayerSkillContext context, bool faceDown) => _resolve().CreateProgramAiHint(program, activation, context, faceDown);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.SkillProgram> EnabledActivationPrograms(global::CardGame.Core.CharacterState player) => _resolve().EnabledActivationPrograms(player);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.SkillProgram> EnabledCardIdentityPrograms(global::CardGame.Core.CharacterState player) => _resolve().EnabledCardIdentityPrograms(player);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.SkillProgram> EnabledContributionPrograms(global::CardGame.Core.CharacterState player) => _resolve().EnabledContributionPrograms(player);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.SkillProgram> EnabledPassiveRulePrograms(global::CardGame.Core.CharacterState player) => _resolve().EnabledPassiveRulePrograms(player);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.SkillProgram> EnabledSkillPrograms(global::CardGame.Core.CharacterState player) => _resolve().EnabledSkillPrograms(player);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.IndexedSkillProgramTrigger> EnabledUniqueProgramTriggers(global::CardGame.Core.CharacterState player, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().EnabledUniqueProgramTriggers(player, window);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.SkillProgram> EnabledViewAsPrograms(global::CardGame.Core.CharacterState player) => _resolve().EnabledViewAsPrograms(player);
+    internal bool EvaluateProgramActivationCondition(global::CardGame.Core.SkillProgramCondition condition, global::CardGame.Core.PlayerSkillContext context, string skillId, string skillInstanceId) => _resolve().EvaluateProgramActivationCondition(condition, context, skillId, skillInstanceId);
+    internal void ExecuteProgramContribution(global::CardGame.Core.CharacterState provider, global::CardGame.Core.CharacterState skillOwner, global::CardGame.Core.LegalAction action, int cardId) => _resolve().ExecuteProgramContribution(provider, skillOwner, action, cardId);
+    internal void ExecuteProgramSkill(global::CardGame.Core.CharacterState owner, global::CardGame.Core.LegalAction action, global::System.Collections.Generic.IReadOnlyList<int> cards, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().ExecuteProgramSkill(owner, action, cards, targets);
+    internal void ExecuteValidatedProgramSkill(global::CardGame.Core.CharacterState owner, global::CardGame.Core.LegalAction action, global::System.Collections.Generic.IReadOnlyList<int> cards, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().ExecuteValidatedProgramSkill(owner, action, cards, targets);
+    internal void FinishProgramSkill(global::CardGame.Core.ProgramSkillFrame frame, bool completed) => _resolve().FinishProgramSkill(frame, completed);
+    internal global::CardGame.Core.SkillProgram GetEnabledSkillProgram(global::CardGame.Core.CharacterState player, string skillId) => _resolve().GetEnabledSkillProgram(player, skillId);
+    internal int GetProgramActivationMinimumCards(int ownerSeat, string skillId, global::CardGame.Core.SkillProgramActivation activation) => _resolve().GetProgramActivationMinimumCards(ownerSeat, skillId, activation);
+    internal bool HasFreeEquipmentSlotForOwnedHandEquipment(global::CardGame.Core.CharacterState owner, global::CardGame.Core.CharacterState target) => _resolve().HasFreeEquipmentSlotForOwnedHandEquipment(owner, target);
+    internal bool IsBoundEquipmentAwaitedMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsBoundEquipmentAwaitedMovement(frame, effect, pending);
+    internal void PendProgramExtraTurn(global::CardGame.Core.ProgramSkillFrame frame, int? targetSeat) => _resolve().PendProgramExtraTurn(frame, targetSeat);
+    internal global::CardGame.Core.Suit ProgramSameSuitInputSuit(global::CardGame.Core.CharacterState owner, int cardId, bool useEffectiveSuit) => _resolve().ProgramSameSuitInputSuit(owner, cardId, useEffectiveSuit);
+    internal void ResetProgramContributionUsesForPlayPhase(int providerSeat) => _resolve().ResetProgramContributionUsesForPlayPhase(providerSeat);
+    internal global::CardGame.Core.CommandResult SubmitUseProgramSkill(global::CardGame.Core.UseProgramSkillCommand command) => _resolve().SubmitUseProgramSkill(command);
+    internal global::CardGame.Core.SkillProgramStepOutcome UseProgramBoundCardByTarget(global::CardGame.Core.ProgramSkillFrame frame, int userSeat, string sourceBind) => _resolve().UseProgramBoundCardByTarget(frame, userSeat, sourceBind);
+    internal global::CardGame.Core.SkillProgramStepOutcome UseProgramSelectedCardsAs(global::CardGame.Core.ProgramSkillFrame frame, int targetSeat, string viewAsId, global::CardGame.Core.CardKind outputKind) => _resolve().UseProgramSelectedCardsAs(frame, targetSeat, viewAsId, outputKind);
+    internal global::CardGame.Core.CommandError? ValidateProgramSelection(global::CardGame.Core.LegalAction action, global::System.Collections.Generic.IReadOnlyList<int> cards, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().ValidateProgramSelection(action, cards, targets);
+}

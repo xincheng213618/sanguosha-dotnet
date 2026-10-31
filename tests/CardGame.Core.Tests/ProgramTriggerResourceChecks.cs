@@ -68,16 +68,16 @@ internal static class ProgramTriggerResourceChecks
             HumanRole = Role.Lord, UseInteractiveSetup = false, AdvanceAfterHumanCommands = false }, registry);
         if (!game.Submit(new StartGameCommand()).Accepted) throw new InvalidOperationException("Facts fixture failed to start.");
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-        var players = (IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", flags)!.GetValue(game)!;
+        var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", flags)!.GetValue(game)!;
         var action = new CardActionContext(1, null, CardActionType.Use, 0, 0, null, null, 1,
             CardKind.Slash, [1], [], [], effectiveSuit: Suit.Spade);
-        var capture = typeof(GameEngine).GetMethods(flags).Single(method => method.Name == "CaptureProgramTriggerFacts" && method.GetParameters().Length == 2);
+        var capture = global::FixtureRuntimeAccess.Engine.GetMethods(flags).Single(method => global::FixtureRuntimeAccess.OriginalName(method) == "CaptureProgramTriggerFacts" && method.GetParameters().Length == 2);
         var facts = (SkillProgramTriggerFacts)capture.Invoke(game, [players[0], action])!;
         AssertOmitted(facts, "CardActionCardIsBlack");
         players[0].SkillGrants.Grant(new SkillGrant("fixture:facts", id, "fixture:facts-instance", "fixture:facts"));
         var stack = (FrameStore)typeof(GameEngine).GetField("_resolutionStack", flags)!.GetValue(game)!;
         stack.Push(new DamageFrame(1000, 999, 1, 0, 1));
-        var before = typeof(GameEngine).GetMethod("TryBeginBeforeDamageProgramWindow", flags)!;
+        var before = global::FixtureRuntimeAccess.Engine.GetMethod("TryBeginBeforeDamageProgramWindow", flags)!;
         if (!(bool)before.Invoke(game, [1, 0, 1, DamageNature.Normal, BeforeDamageProgramContinuation.Attack, Type.Missing])!)
             throw new InvalidOperationException("Legacy before-damage fixture failed to pause.");
         var window = stack.OfType<BeforeDamageProgramWindowFrame>().Last();

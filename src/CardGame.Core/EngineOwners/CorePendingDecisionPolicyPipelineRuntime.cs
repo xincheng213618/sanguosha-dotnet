@@ -1,0 +1,32 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CorePendingDecisionPolicyPipelineRuntime
+{
+    private readonly ICorePendingDecisionPolicyPipelineCharacterGuoTuOlOperations _characterGuoTuOlOperations;
+    private readonly ICorePendingDecisionPolicyPipelineCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICorePendingDecisionPolicyPipelineCharacterLiuFengBoundaryOperations _characterLiuFengBoundaryOperations;
+    private readonly ICorePendingDecisionPolicyPipelineCharacterLiuZhangOlOperations _characterLiuZhangOlOperations;
+    private readonly ICorePendingDecisionPolicyPipelineCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICorePendingDecisionPolicyPipelineCoreChainedStateBasicConversionsOperations _coreChainedStateBasicConversionsOperations;
+    private readonly ICorePendingDecisionPolicyPipelineCoreDrawFundedDistinctBasicOffersOperations _coreDrawFundedDistinctBasicOffersOperations;
+    private readonly ICorePendingDecisionPolicyPipelineCoreRequestedDeckBasicsOperations _coreRequestedDeckBasicsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICorePlayerDecisionPendingDecisionBackingAccess _corePlayerDecisionPendingDecisionBackingAccess;
+    internal CorePendingDecisionPolicyPipelineRuntime(ICorePendingDecisionPolicyPipelineCharacterGuoTuOlOperations characterGuoTuOlOperations, ICorePendingDecisionPolicyPipelineCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICorePendingDecisionPolicyPipelineCharacterLiuFengBoundaryOperations characterLiuFengBoundaryOperations, ICorePendingDecisionPolicyPipelineCharacterLiuZhangOlOperations characterLiuZhangOlOperations, ICorePendingDecisionPolicyPipelineCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICorePendingDecisionPolicyPipelineCoreChainedStateBasicConversionsOperations coreChainedStateBasicConversionsOperations, ICorePendingDecisionPolicyPipelineCoreDrawFundedDistinctBasicOffersOperations coreDrawFundedDistinctBasicOffersOperations, ICorePendingDecisionPolicyPipelineCoreRequestedDeckBasicsOperations coreRequestedDeckBasicsOperations, global::CardGame.Core.EngineStates.Contracts.ICorePlayerDecisionPendingDecisionBackingAccess corePlayerDecisionPendingDecisionBackingAccess)
+    {
+        this._characterGuoTuOlOperations = characterGuoTuOlOperations;
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._characterLiuFengBoundaryOperations = characterLiuFengBoundaryOperations;
+        this._characterLiuZhangOlOperations = characterLiuZhangOlOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._coreChainedStateBasicConversionsOperations = coreChainedStateBasicConversionsOperations;
+        this._coreDrawFundedDistinctBasicOffersOperations = coreDrawFundedDistinctBasicOffersOperations;
+        this._coreRequestedDeckBasicsOperations = coreRequestedDeckBasicsOperations;
+        this._corePlayerDecisionPendingDecisionBackingAccess = corePlayerDecisionPendingDecisionBackingAccess;
+    }
+}

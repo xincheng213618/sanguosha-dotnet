@@ -28,7 +28,7 @@ internal static class ArmorAiChecks
         void CheckProjection()
         {
             var before = scene.Boundary();
-            var actors = ((IEnumerable<CharacterState>)typeof(GameEngine)
+            var actors = ((IEnumerable<CharacterState>)global::FixtureRuntimeAccess.Engine
                 .GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(scene.G)!).ToArray();
             Need(new[] { Jueqing, Gangzhi }.All(id => actors[2].SkillGrants.Grants.Any(grant =>
                     grant.IsEnabled && grant.SourceId == "campaign:shanhe" && grant.SkillId == id)),
@@ -38,7 +38,7 @@ internal static class ArmorAiChecks
             // not an assertion that the visible team fixture is an identity-concealment mode.
             var limited = complete with { Players = Array.AsReadOnly(complete.Players.Select(player =>
                 player.Seat == 2 ? player with { Skills = [], SecondarySkills = [] } : player).ToArray()) };
-            var method = typeof(GameEngine).GetMethod("CreateAiSkillContext", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            var method = global::FixtureRuntimeAccess.Engine.GetMethod("CreateAiSkillContext", BindingFlags.Instance | BindingFlags.NonPublic)!;
             var visible = (PlayerSkillContext)method.Invoke(scene.G, [actors[2], 0, complete])!;
             var unavailable = (PlayerSkillContext)method.Invoke(scene.G, [actors[2], 0, limited])!;
             var own = (PlayerSkillContext)method.Invoke(scene.G, [actors[2], 2, limited])!;

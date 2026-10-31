@@ -1,10 +1,18 @@
 namespace CardGame.Core;
 
+// The runtime consumes the match-owned generator directly; this contract never
+// creates another generator or copies its state.
+internal interface IMatchRandomSource : IProgramRuntimeOperations
+{
+    int Next(int exclusiveMax);
+    void Shuffle<T>(IList<T> values);
+}
+
 /// <summary>
 /// A tiny deterministic generator. Keeping its state in one integer makes seeded
 /// matches reproducible without depending on the implementation details of System.Random.
 /// </summary>
-internal sealed class DeterministicRandom
+internal sealed class DeterministicRandom : IMatchRandomSource
 {
     private uint _state;
 

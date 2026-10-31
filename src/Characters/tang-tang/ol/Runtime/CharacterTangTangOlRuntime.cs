@@ -1,0 +1,98 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterTangTangOlRuntime : global::CardGame.Core.ITangTangHost
+{
+    private readonly ICharacterTangTangOlCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICharacterTangTangOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterTangTangOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterTangTangOlPendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICharacterTangTangOlResolutionStackOperations2 _resolutionStackOperations;
+    private readonly ICharacterTangTangOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterTangTangOlCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterTangTangOlCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICharacterTangTangOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterTangTangOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterTangTangOlCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterTangTangOlCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterTangTangOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICharacterTangTangOlCoreOutsidePhaseDrawDiscardOperations _coreOutsidePhaseDrawDiscardOperations;
+    private readonly ICharacterTangTangOlCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterTangTangOlCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterTangTangOlCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterTangTangOlCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICharacterTangTangOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterTangTangOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterTangTangOlCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterTangTangOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterTangTangOlCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterTangTangOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterTangTangOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterTangTangOlCoreParticipantHandProgramsOperations _coreParticipantHandProgramsOperations;
+    private readonly ICharacterTangTangOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterTangTangOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterTangTangOlCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterTangTangOlCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICharacterTangTangOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterTangTangOlCharacterTangTangOlOperations _characterTangTangOlOperations;
+    private readonly ICharacterTangTangOlCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICharacterTangTangOlResolutionStackOperations _resolutionStackOperations2;
+    private readonly ICharacterTangTangOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICharacterTangTangOlCoreRecoveryReplacementDamageRidesOperations2 _coreRecoveryReplacementDamageRidesOperations2;
+    private readonly ICharacterTangTangOlKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterTangTangOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterTangTangOlRuntime(ICharacterTangTangOlCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICharacterTangTangOlCardZonesOperations cardZonesOperations, ICharacterTangTangOlContentRegistryOperations contentRegistryOperations, ICharacterTangTangOlPendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICharacterTangTangOlResolutionStackOperations2 resolutionStackOperations, ICharacterTangTangOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterTangTangOlCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterTangTangOlCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICharacterTangTangOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterTangTangOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterTangTangOlCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterTangTangOlCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterTangTangOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICharacterTangTangOlCoreOutsidePhaseDrawDiscardOperations coreOutsidePhaseDrawDiscardOperations, ICharacterTangTangOlCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterTangTangOlCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterTangTangOlCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterTangTangOlCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICharacterTangTangOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterTangTangOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterTangTangOlCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterTangTangOlCoreRuntimeOperations coreRuntimeOperations, ICharacterTangTangOlCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterTangTangOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterTangTangOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterTangTangOlCoreParticipantHandProgramsOperations coreParticipantHandProgramsOperations, ICharacterTangTangOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterTangTangOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterTangTangOlCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterTangTangOlCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICharacterTangTangOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterTangTangOlCharacterTangTangOlOperations characterTangTangOlOperations, ICharacterTangTangOlCharacterYanPuOlOperations characterYanPuOlOperations, ICharacterTangTangOlResolutionStackOperations resolutionStackOperations2, ICharacterTangTangOlCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICharacterTangTangOlCoreRecoveryReplacementDamageRidesOperations2 coreRecoveryReplacementDamageRidesOperations2, ICharacterTangTangOlKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterTangTangOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreOutsidePhaseDrawDiscardOperations = coreOutsidePhaseDrawDiscardOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreParticipantHandProgramsOperations = coreParticipantHandProgramsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterTangTangOlOperations = characterTangTangOlOperations;
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._resolutionStackOperations2 = resolutionStackOperations2;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreRecoveryReplacementDamageRidesOperations2 = coreRecoveryReplacementDamageRidesOperations2;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

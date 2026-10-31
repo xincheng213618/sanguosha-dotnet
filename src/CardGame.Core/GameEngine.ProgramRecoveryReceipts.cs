@@ -10,25 +10,3 @@ public sealed record ProgramRecoveryRequestedEvent(long ProgramFrameId, int Inst
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public HappyQiaoDualHealth? HappyQiaoBefore { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-    private void RecordProgramRecoveryRequest(ResolutionFrame? parent, RecoveryAttempt attempt) =>
-        HealthContinuations.RecordProgramRecoveryRequest(parent, attempt);
-
-    private bool ProgramRecoveryReplacementReceiptMatches(ProgramSkillFrame owner, RecoveryReplacementFrame recovery,
-        IReadOnlyList<IGameEvent> history) =>
-        HealthContinuations.ProgramRecoveryReplacementReceiptMatches(owner, recovery, history);
-
-    // One actual recovery owns one HP invoice. Native operations and primitive
-    // Recover use the same RecoveryFrame, including synchronous target batches.
-    private void RecordProgramRecoveryApplication(RecoveryFrame recovery, HpChangeContext change) =>
-        HealthContinuations.RecordProgramRecoveryApplication(recovery, change);
-
-    private bool ProgramRecoveryReceiptMatches(ProgramSkillFrame owner, HpChangedTriggerWindowFrame hp,
-        IReadOnlyList<IGameEvent> history) =>
-        HealthContinuations.ProgramRecoveryReceiptMatches(owner, hp, history);
-
-    private void ClearProgramRecoveryApplication(HpChangeContext change) =>
-        HealthContinuations.ClearProgramRecoveryApplication(change);
-}

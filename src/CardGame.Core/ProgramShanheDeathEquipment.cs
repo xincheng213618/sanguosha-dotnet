@@ -29,22 +29,4 @@ internal sealed class AbolishPublicTeamEnemyEquipmentSlotsHandler : ISkillProgra
 
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class ShanheDeathEquipmentProgramHost(GameEngine engine) : IShanheDeathEquipmentProgramHost
-    {
-        public void AbolishPublicTeamEnemyEquipmentSlots(ProgramSkillFrame frame) => engine.AbolishPublicTeamEnemyEquipmentSlots(frame);
-    }
-
-    private void AbolishPublicTeamEnemyEquipmentSlots(ProgramSkillFrame supplied)
-    {
-        var frame = GetActiveProgramFrame(supplied.Id);
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.OwnerDied, OwnerSeat: var owner, TargetSeat: var target } ||
-            owner != frame.OwnerSeat || target != owner || _players[owner].IsAlive)
-            throw new InvalidOperationException("Enemy equipment abolition requires its original owner's completed death.");
-        var enemies = _players.Where(player => player.IsAlive && PublicTeamEnemy(owner, player)).ToArray();
-        foreach (var enemy in enemies)
-        foreach (var slot in Enum.GetValues<EquipmentSlot>())
-            if (enemy.EquipmentSlotCapacity(slot) > 0)
-                SetEquipmentSlotCapacity(enemy, slot, 0);
-    }
 }

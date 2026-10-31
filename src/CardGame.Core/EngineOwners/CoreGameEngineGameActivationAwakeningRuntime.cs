@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineGameActivationAwakeningRuntime : global::CardGame.Core.IGameActivationAwakeningProgramHost
+{
+    private readonly ICoreGameActivationAwakeningCharacterGuoJiaMobileGodOperations _characterGuoJiaMobileGodOperations;
+    private readonly ICoreGameActivationAwakeningContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreGameActivationAwakeningResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreGameActivationAwakeningCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreGameActivationAwakeningCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreGameActivationAwakeningCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreGameActivationAwakeningCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreGameActivationAwakeningCoreDrawDiscardCategoryRefundOperations _coreDrawDiscardCategoryRefundOperations;
+    private readonly ICoreGameActivationAwakeningCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreGameActivationAwakeningCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreGameActivationAwakeningCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreGameActivationAwakeningCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICoreGameActivationAwakeningCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreGameActivationAwakeningCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreGameActivationAwakeningCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreGameActivationAwakeningCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreGameActivationAwakeningKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineGameActivationAwakeningRuntime(ICoreGameActivationAwakeningCharacterGuoJiaMobileGodOperations characterGuoJiaMobileGodOperations, ICoreGameActivationAwakeningContentRegistryOperations contentRegistryOperations, ICoreGameActivationAwakeningResolutionStackOperations resolutionStackOperations, ICoreGameActivationAwakeningCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreGameActivationAwakeningCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreGameActivationAwakeningCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreGameActivationAwakeningCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreGameActivationAwakeningCoreDrawDiscardCategoryRefundOperations coreDrawDiscardCategoryRefundOperations, ICoreGameActivationAwakeningCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreGameActivationAwakeningCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreGameActivationAwakeningCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreGameActivationAwakeningCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICoreGameActivationAwakeningCoreRuntimeOperations coreRuntimeOperations, ICoreGameActivationAwakeningCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreGameActivationAwakeningCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreGameActivationAwakeningCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreGameActivationAwakeningKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterGuoJiaMobileGodOperations = characterGuoJiaMobileGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDrawDiscardCategoryRefundOperations = coreDrawDiscardCategoryRefundOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

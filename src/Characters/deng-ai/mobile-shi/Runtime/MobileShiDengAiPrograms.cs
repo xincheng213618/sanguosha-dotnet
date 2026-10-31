@@ -21,7 +21,7 @@ public sealed record ShiDaReceipt(CardConversionSource Source, string Hash, Skil
     public int RandomIndex { get; init; } = -1;
     public uint RandomBefore { get; init; }
     public uint RandomAfter { get; init; }
-    private IReadOnlyList<int> _targets = [], _eligible = [], _history = [];
+    private IReadOnlyList<int> _targets = [],_eligible = [],_history = [];
     private IReadOnlyList<long> _nativeBatches = [];
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Eligible { get => _eligible; init => _eligible = Array.AsReadOnly(value.ToArray()); }

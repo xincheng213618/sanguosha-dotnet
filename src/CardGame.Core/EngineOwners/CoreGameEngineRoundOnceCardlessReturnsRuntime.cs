@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRoundOnceCardlessReturnsRuntime
+{
+    private readonly ICoreRoundOnceCardlessReturnsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreRoundOnceCardlessReturnsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreRoundOnceCardlessNativeResponsesOperations _coreRoundOnceCardlessNativeResponsesOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreRoundOnceCardlessNativeUsesOperations _coreRoundOnceCardlessNativeUsesOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreRoundOnceCardlessProgramRequestsOperations _coreRoundOnceCardlessProgramRequestsOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreNativeAiDecisionsOperations _coreNativeAiDecisionsOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreRoundOnceCardlessReturnsCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreRoundOnceCardlessReturnsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess _coreAiDiagnosticsThoughtSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRoundOnceCardlessReturnsRuntime(ICoreRoundOnceCardlessReturnsCardZonesOperations cardZonesOperations, ICoreRoundOnceCardlessReturnsResolutionStackOperations resolutionStackOperations, ICoreRoundOnceCardlessReturnsCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreRoundOnceCardlessReturnsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRoundOnceCardlessReturnsCoreCardActionsOperations coreCardActionsOperations, ICoreRoundOnceCardlessReturnsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreRoundOnceCardlessReturnsCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreRoundOnceCardlessReturnsCoreRoundOnceCardlessNativeResponsesOperations coreRoundOnceCardlessNativeResponsesOperations, ICoreRoundOnceCardlessReturnsCoreRoundOnceCardlessNativeUsesOperations coreRoundOnceCardlessNativeUsesOperations, ICoreRoundOnceCardlessReturnsCoreRoundOnceCardlessProgramRequestsOperations coreRoundOnceCardlessProgramRequestsOperations, ICoreRoundOnceCardlessReturnsCoreNativeAiDecisionsOperations coreNativeAiDecisionsOperations, ICoreRoundOnceCardlessReturnsCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreRoundOnceCardlessReturnsCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreRoundOnceCardlessReturnsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreRoundOnceCardlessReturnsCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreRoundOnceCardlessReturnsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess coreAiDiagnosticsThoughtSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreRoundOnceCardlessNativeResponsesOperations = coreRoundOnceCardlessNativeResponsesOperations;
+        this._coreRoundOnceCardlessNativeUsesOperations = coreRoundOnceCardlessNativeUsesOperations;
+        this._coreRoundOnceCardlessProgramRequestsOperations = coreRoundOnceCardlessProgramRequestsOperations;
+        this._coreNativeAiDecisionsOperations = coreNativeAiDecisionsOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreAiDiagnosticsThoughtSequenceAccess = coreAiDiagnosticsThoughtSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

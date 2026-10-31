@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime : global::CardGame.Core.IShanheS5TieqiProgramHost
+{
+    private readonly ICoreShanheS5MaSiblingsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreShanheS5MaSiblingsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheS5MaSiblingsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreSlashSuitDiscardOperations _coreSlashSuitDiscardOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreShanheS5MaSiblingsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheS5MaSiblingsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheS5MaSiblingsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheS5MaSiblingsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheS5MaSiblingsRuntime(ICoreShanheS5MaSiblingsCardZonesOperations cardZonesOperations, ICoreShanheS5MaSiblingsContentRegistryOperations contentRegistryOperations, ICoreShanheS5MaSiblingsResolutionStackOperations resolutionStackOperations, ICoreShanheS5MaSiblingsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreShanheS5MaSiblingsCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreShanheS5MaSiblingsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreShanheS5MaSiblingsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreShanheS5MaSiblingsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreShanheS5MaSiblingsCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICoreShanheS5MaSiblingsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheS5MaSiblingsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheS5MaSiblingsCoreRuntimeOperations coreRuntimeOperations, ICoreShanheS5MaSiblingsCoreSlashSuitDiscardOperations coreSlashSuitDiscardOperations, ICoreShanheS5MaSiblingsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreShanheS5MaSiblingsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheS5MaSiblingsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheS5MaSiblingsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheS5MaSiblingsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSlashSuitDiscardOperations = coreSlashSuitDiscardOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

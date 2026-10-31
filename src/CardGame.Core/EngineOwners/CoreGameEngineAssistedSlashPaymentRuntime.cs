@@ -1,0 +1,28 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineAssistedSlashPaymentRuntime
+{
+    private readonly ICoreAssistedSlashPaymentCharacterKongShuOlOperations _characterKongShuOlOperations;
+    private readonly ICoreAssistedSlashPaymentCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreAssistedSlashPaymentCoreNativePublicPileOriginalCardsOperations _coreNativePublicPileOriginalCardsOperations;
+    private readonly ICoreAssistedSlashPaymentCoreOwnPublicPileConversionsOperations _coreOwnPublicPileConversionsOperations;
+    private readonly ICoreAssistedSlashPaymentCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreAssistedSlashPaymentCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess;
+    internal CoreGameEngineAssistedSlashPaymentRuntime(ICoreAssistedSlashPaymentCharacterKongShuOlOperations characterKongShuOlOperations, ICoreAssistedSlashPaymentCoreCardConversionsOperations coreCardConversionsOperations, ICoreAssistedSlashPaymentCoreNativePublicPileOriginalCardsOperations coreNativePublicPileOriginalCardsOperations, ICoreAssistedSlashPaymentCoreOwnPublicPileConversionsOperations coreOwnPublicPileConversionsOperations, ICoreAssistedSlashPaymentCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreAssistedSlashPaymentCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess)
+    {
+        this._characterKongShuOlOperations = characterKongShuOlOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreNativePublicPileOriginalCardsOperations = coreNativePublicPileOriginalCardsOperations;
+        this._coreOwnPublicPileConversionsOperations = coreOwnPublicPileConversionsOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess = coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess;
+    }
+}

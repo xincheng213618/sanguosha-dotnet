@@ -20,6 +20,7 @@ internal enum ProgramPipelinePhase
     UnissuedTurnStartObligation,
     ObservesResponseUseCompletion,
     CardEntitySkillLabel,
+    CardSkillMarkProjection,
     SelectDiscardBatchIndexes,
     HealthChangeSubject,
     CaptureHealthChange,
@@ -39,7 +40,17 @@ internal enum ProgramPipelinePhase
     ParticipantPrompt,
     ParticipantHostState,
     CollectMovementCandidates,
-    BeforeNullificationFinished
+    BeforeNullificationFinished,
+    ExcludeOrdinaryMovementCandidate,
+    CreateMovementContext,
+    IsProgramMovementSettlement,
+    SelectLegacyMovementIndexes,
+    SelectLegacyDiscardIndexes,
+    BeginMovementBatch,
+    ObserveCommittedMovement,
+    CaptureMovementBatchFacts,
+    CompleteMovementBatch,
+    HandCardProjection
 }
 
 // Register next to the owning implementation with an explicit order; orders are
@@ -66,6 +77,7 @@ internal delegate bool ProgramDetachedBindingContinuation(ProgramSkillFrame fram
 internal delegate bool ProgramTurnStartObligationProbe(int seat);
 internal delegate bool ProgramResponseUseCompletionObservation(CardActionContext action);
 internal delegate string? ProgramCardEntitySkillLabelProvider(int cardId);
+internal delegate void ProgramCardSkillMarkProjection(int cardId, ref CardSkillMarkProjection projection);
 internal delegate int[]? ProgramDiscardBatchIndexSelector(
     CardMovementBatchContext batch, ProgramTriggerCandidate candidate, ProgramInstructionFeatures features);
 
@@ -82,6 +94,17 @@ internal delegate CardKind? ProgramVirtualEquipmentProvider(int seat, EquipmentS
 internal delegate PendingDecision? ProgramParticipantPromptProvider(PendingDecision issued, int actorSeat);
 internal delegate ParticipantPromptHostState? ProgramParticipantHostStateProvider();
 
+internal delegate bool ProgramOrdinaryMovementExclusion(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger);
+internal delegate ProgramSkillWindowContext? ProgramMovementContextProvider(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate);
+internal delegate bool ProgramMovementSettlementProbe(ProgramSkillFrame frame, CardMovementBatchContext batch);
+internal delegate int[]? ProgramLegacyMovementIndexSelector(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, CardLocation location);
+internal delegate int[]? ProgramLegacyDiscardIndexSelector(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger);
+internal delegate void ProgramMovementBatchStart(CardMovementBatchBuilder batch);
+internal delegate void ProgramCommittedMovementObservation(CardMovementBatchBuilder batch, CardMovementRecord movement);
+internal delegate void ProgramMovementBatchFactCapture(CardMovementBatchBuilder batch, IReadOnlyList<CardMovementRecord> movements);
+internal delegate CardMovementBatchContext ProgramMovementBatchCompletion(CardMovementBatchBuilder batch, CardMovementBatchContext completed);
+internal delegate CardSnapshot ProgramHandCardProjection(CharacterState owner, Card card, CardSnapshot snapshot);
+
 // Static metadata only; delegates are bound once per engine and never shared.
 internal sealed class ProgramPipelineHookCatalog
 {
@@ -90,6 +113,17 @@ internal sealed class ProgramPipelineHookCatalog
     private static readonly Dictionary<ProgramPipelinePhase, (Type DelegateType, Type[] Parameters, Type ReturnType)> Contracts =
         new()
         {
+            [ProgramPipelinePhase.HandCardProjection] = (typeof(ProgramHandCardProjection),
+                [typeof(CharacterState), typeof(Card), typeof(CardSnapshot)], typeof(CardSnapshot)),
+            [ProgramPipelinePhase.BeginMovementBatch] = (typeof(ProgramMovementBatchStart), [typeof(CardMovementBatchBuilder)], typeof(void)),
+            [ProgramPipelinePhase.ObserveCommittedMovement] = (typeof(ProgramCommittedMovementObservation), [typeof(CardMovementBatchBuilder), typeof(CardMovementRecord)], typeof(void)),
+            [ProgramPipelinePhase.CaptureMovementBatchFacts] = (typeof(ProgramMovementBatchFactCapture), [typeof(CardMovementBatchBuilder), typeof(IReadOnlyList<CardMovementRecord>)], typeof(void)),
+            [ProgramPipelinePhase.CompleteMovementBatch] = (typeof(ProgramMovementBatchCompletion), [typeof(CardMovementBatchBuilder), typeof(CardMovementBatchContext)], typeof(CardMovementBatchContext)),
+            [ProgramPipelinePhase.ExcludeOrdinaryMovementCandidate] = (typeof(ProgramOrdinaryMovementExclusion), [typeof(ProgramTriggerCandidate), typeof(SkillProgramTrigger)], typeof(bool)),
+            [ProgramPipelinePhase.CreateMovementContext] = (typeof(ProgramMovementContextProvider), [typeof(CardsMovedTriggerWindowFrame), typeof(ProgramTriggerCandidate)], typeof(ProgramSkillWindowContext)),
+            [ProgramPipelinePhase.IsProgramMovementSettlement] = (typeof(ProgramMovementSettlementProbe), [typeof(ProgramSkillFrame), typeof(CardMovementBatchContext)], typeof(bool)),
+            [ProgramPipelinePhase.SelectLegacyMovementIndexes] = (typeof(ProgramLegacyMovementIndexSelector), [typeof(CardMovementBatchContext), typeof(ProgramTriggerCandidate), typeof(SkillProgramTrigger), typeof(CardLocation)], typeof(int[])),
+            [ProgramPipelinePhase.SelectLegacyDiscardIndexes] = (typeof(ProgramLegacyDiscardIndexSelector), [typeof(CardMovementBatchContext), typeof(ProgramTriggerCandidate), typeof(SkillProgramTrigger)], typeof(int[])),
             [ProgramPipelinePhase.IncludeTriggerCandidate] = (typeof(ProgramTriggerCandidateIncluder),
                 [typeof(CharacterState), typeof(SkillProgramTriggerWindow), typeof(IReadOnlyList<ProgramTriggerCandidate>)],
                 typeof(IReadOnlyList<ProgramTriggerCandidate>)),
@@ -116,6 +150,8 @@ internal sealed class ProgramPipelineHookCatalog
                 [typeof(CardActionContext)], typeof(bool)),
             [ProgramPipelinePhase.CardEntitySkillLabel] = (typeof(ProgramCardEntitySkillLabelProvider),
                 [typeof(int)], typeof(string)),
+            [ProgramPipelinePhase.CardSkillMarkProjection] = (typeof(ProgramCardSkillMarkProjection),
+                [typeof(int), typeof(CardSkillMarkProjection).MakeByRefType()], typeof(void)),
             [ProgramPipelinePhase.SelectDiscardBatchIndexes] = (typeof(ProgramDiscardBatchIndexSelector),
                 [typeof(CardMovementBatchContext), typeof(ProgramTriggerCandidate), typeof(ProgramInstructionFeatures)],
                 typeof(int[])),
@@ -200,7 +236,7 @@ internal sealed class ProgramPipelineHookCatalog
             throw InvalidSignature(method);
         for (var index = 0; index < parameters.Length; index++)
             if (parameters[index].ParameterType != contract.Parameters[index] ||
-                parameters[index].IsOptional || parameters[index].ParameterType.IsByRef ||
+                parameters[index].IsOptional || parameters[index].IsIn || parameters[index].IsOut ||
                 parameters[index].GetCustomAttribute<ParamArrayAttribute>() is not null)
                 throw InvalidSignature(method);
     }
@@ -213,6 +249,15 @@ internal sealed class ProgramPipelineHookCatalog
 // position it replaced (fold, first-hit, or ordered fan-out).
 internal sealed class ProgramPipelineHooks
 {
+    private readonly ProgramMovementBatchStart[] _beginMovementBatch;
+    private readonly ProgramCommittedMovementObservation[] _observeCommittedMovement;
+    private readonly ProgramMovementBatchFactCapture[] _captureMovementBatchFacts;
+    private readonly ProgramMovementBatchCompletion[] _completeMovementBatch;
+    private readonly ProgramOrdinaryMovementExclusion[] _excludeOrdinaryMovementCandidate;
+    private readonly ProgramMovementContextProvider[] _createMovementContext;
+    private readonly ProgramMovementSettlementProbe[] _isProgramMovementSettlement;
+    private readonly ProgramLegacyMovementIndexSelector[] _selectLegacyMovementIndexes;
+    private readonly ProgramLegacyDiscardIndexSelector[] _selectLegacyDiscardIndexes;
     private readonly ProgramTriggerCandidateIncluder[] _includeTriggerCandidate;
     private readonly ProgramIssuedCardTriggerCollector[] _collectIssuedCardTrigger;
     private readonly ProgramMovementCandidateCollector[] _collectMovementCandidates;
@@ -225,6 +270,8 @@ internal sealed class ProgramPipelineHooks
     private readonly ProgramTurnStartObligationProbe[] _unissuedTurnStartObligation;
     private readonly ProgramResponseUseCompletionObservation[] _observesResponseUseCompletion;
     private readonly ProgramCardEntitySkillLabelProvider[] _cardEntitySkillLabel;
+    private readonly ProgramCardSkillMarkProjection[] _cardSkillMarkProjection;
+    private readonly ProgramHandCardProjection[] _handCardProjection;
     private readonly ProgramDiscardBatchIndexSelector[] _selectDiscardBatchIndexes;
 
     private readonly ProgramHealthChangeSubject[] _healthChangeSubject;
@@ -240,7 +287,7 @@ internal sealed class ProgramPipelineHooks
     private readonly Func<ProgramLifecycleTriggerWindowFrame, bool>[] _lifecycleWindowCompleted;
     private readonly Func<NullificationWindowFrame, bool>[] _beforeNullificationFinished;
     private readonly Action<List<TurnEndingBoundaryItem>>[] _appendTurnEndingItems;
-    private readonly Func<bool>[] _resumeScheduledPhase, _cancelScheduledPhase;
+    private readonly Func<bool>[] _resumeScheduledPhase,_cancelScheduledPhase;
     private readonly ProgramVirtualEquipmentProvider[] _virtualEquipment;
     private readonly ProgramParticipantPromptProvider[] _participantPrompt;
     private readonly ProgramParticipantHostStateProvider[] _participantHostState;
@@ -251,6 +298,15 @@ internal sealed class ProgramPipelineHooks
             .Select(registration => engine.BindRuntimeHandler(registration.Method, registration.DelegateType))
             .Select(bound => (T)(object)bound)
             .ToArray();
+        _beginMovementBatch = Bind<ProgramMovementBatchStart>(ProgramPipelinePhase.BeginMovementBatch);
+        _observeCommittedMovement = Bind<ProgramCommittedMovementObservation>(ProgramPipelinePhase.ObserveCommittedMovement);
+        _captureMovementBatchFacts = Bind<ProgramMovementBatchFactCapture>(ProgramPipelinePhase.CaptureMovementBatchFacts);
+        _completeMovementBatch = Bind<ProgramMovementBatchCompletion>(ProgramPipelinePhase.CompleteMovementBatch);
+        _excludeOrdinaryMovementCandidate = Bind<ProgramOrdinaryMovementExclusion>(ProgramPipelinePhase.ExcludeOrdinaryMovementCandidate);
+        _createMovementContext = Bind<ProgramMovementContextProvider>(ProgramPipelinePhase.CreateMovementContext);
+        _isProgramMovementSettlement = Bind<ProgramMovementSettlementProbe>(ProgramPipelinePhase.IsProgramMovementSettlement);
+        _selectLegacyMovementIndexes = Bind<ProgramLegacyMovementIndexSelector>(ProgramPipelinePhase.SelectLegacyMovementIndexes);
+        _selectLegacyDiscardIndexes = Bind<ProgramLegacyDiscardIndexSelector>(ProgramPipelinePhase.SelectLegacyDiscardIndexes);
         _includeTriggerCandidate = Bind<ProgramTriggerCandidateIncluder>(ProgramPipelinePhase.IncludeTriggerCandidate);
         _collectIssuedCardTrigger = Bind<ProgramIssuedCardTriggerCollector>(ProgramPipelinePhase.CollectIssuedCardTrigger);
         _collectMovementCandidates = Bind<ProgramMovementCandidateCollector>(ProgramPipelinePhase.CollectMovementCandidates);
@@ -263,6 +319,8 @@ internal sealed class ProgramPipelineHooks
         _unissuedTurnStartObligation = Bind<ProgramTurnStartObligationProbe>(ProgramPipelinePhase.UnissuedTurnStartObligation);
         _observesResponseUseCompletion = Bind<ProgramResponseUseCompletionObservation>(ProgramPipelinePhase.ObservesResponseUseCompletion);
         _cardEntitySkillLabel = Bind<ProgramCardEntitySkillLabelProvider>(ProgramPipelinePhase.CardEntitySkillLabel);
+        _cardSkillMarkProjection = Bind<ProgramCardSkillMarkProjection>(ProgramPipelinePhase.CardSkillMarkProjection);
+        _handCardProjection = Bind<ProgramHandCardProjection>(ProgramPipelinePhase.HandCardProjection);
         _selectDiscardBatchIndexes = Bind<ProgramDiscardBatchIndexSelector>(ProgramPipelinePhase.SelectDiscardBatchIndexes);
         _healthChangeSubject = Bind<ProgramHealthChangeSubject>(ProgramPipelinePhase.HealthChangeSubject);
         _captureHealthChange = Bind<ProgramHealthChangeCapture>(ProgramPipelinePhase.CaptureHealthChange);
@@ -283,6 +341,62 @@ internal sealed class ProgramPipelineHooks
         _participantPrompt = Bind<ProgramParticipantPromptProvider>(ProgramPipelinePhase.ParticipantPrompt);
         _participantHostState = Bind<ProgramParticipantHostStateProvider>(ProgramPipelinePhase.ParticipantHostState);
 
+    }
+
+    internal void BeginMovementBatch(CardMovementBatchBuilder batch)
+    {
+        foreach (var begin in _beginMovementBatch) begin(batch);
+    }
+
+    internal void ObserveCommittedMovement(CardMovementBatchBuilder batch, CardMovementRecord movement)
+    {
+        foreach (var observe in _observeCommittedMovement) observe(batch, movement);
+    }
+
+    internal void CaptureMovementBatchFacts(CardMovementBatchBuilder batch, IReadOnlyList<CardMovementRecord> movements)
+    {
+        foreach (var capture in _captureMovementBatchFacts) capture(batch, movements);
+    }
+
+    internal CardMovementBatchContext CompleteMovementBatch(CardMovementBatchBuilder batch, CardMovementBatchContext completed)
+    {
+        foreach (var complete in _completeMovementBatch) completed = complete(batch, completed);
+        return completed;
+    }
+
+    internal bool ExcludeOrdinaryMovementCandidate(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger)
+    {
+        foreach (var handler in _excludeOrdinaryMovementCandidate)
+            if (handler(candidate, trigger)) return true;
+        return false;
+    }
+
+    internal ProgramSkillWindowContext? CreateMovementContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
+    {
+        foreach (var handler in _createMovementContext)
+            if (handler(frame, candidate) is { } result) return result;
+        return null;
+    }
+
+    internal bool IsProgramMovementSettlement(ProgramSkillFrame frame, CardMovementBatchContext batch)
+    {
+        foreach (var handler in _isProgramMovementSettlement)
+            if (handler(frame, batch)) return true;
+        return false;
+    }
+
+    internal int[]? SelectLegacyMovementIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, CardLocation location)
+    {
+        foreach (var handler in _selectLegacyMovementIndexes)
+            if (handler(batch, candidate, trigger, location) is { } result) return result;
+        return null;
+    }
+
+    internal int[]? SelectLegacyDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger)
+    {
+        foreach (var handler in _selectLegacyDiscardIndexes)
+            if (handler(batch, candidate, trigger) is { } result) return result;
+        return null;
     }
 
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeTriggerCandidate(
@@ -361,6 +475,17 @@ internal sealed class ProgramPipelineHooks
             if (provider(cardId) is { } label)
                 (labels ??= []).Add(label);
         return (IReadOnlyList<string>?)labels ?? [];
+    }
+
+    internal void ProjectCardSkillMarks(int cardId, ref CardSkillMarkProjection projection)
+    {
+        foreach (var provider in _cardSkillMarkProjection) provider(cardId, ref projection);
+    }
+
+    internal CardSnapshot ProjectHandCard(CharacterState owner, Card card, CardSnapshot snapshot)
+    {
+        foreach (var provider in _handCardProjection) snapshot = provider(owner, card, snapshot);
+        return snapshot;
     }
 
     internal int[]? SelectDiscardBatchIndexes(
@@ -481,10 +606,4 @@ internal sealed class ProgramPipelineHooks
             if (provider(seat, slot) is { } kind) return kind;
         return null;
     }
-}
-
-public sealed partial class GameEngine
-{
-    private CardKind? ProgramVirtualEquipment(int seat, EquipmentSlot slot) =>
-        _programPipelineHooks.VirtualEquipment(seat, slot);
 }

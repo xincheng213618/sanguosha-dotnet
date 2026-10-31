@@ -26,7 +26,7 @@ internal sealed class AnniversaryMaTieHandler(SkillProgramEffectOp op) : ISkillP
 }
 internal static class AnniversaryMaTieComposition
 {
-    internal const string Quxian = "anniversary:quxian", Zhuiji = "anniversary:zhuiji";
+    internal const string Quxian = "anniversary:quxian",Zhuiji = "anniversary:zhuiji";
     [ProgramCatalogValidation(46700)] internal static void Validate(string path, SkillProgram p)
     {
         var ops = p.Triggers.SelectMany(t => t.Effects).Select(e => e.Op).ToArray();
@@ -64,7 +64,7 @@ public sealed record AnniversaryMaTieReceipt(CardConversionSource Source, string
     public bool HpPaid { get; init; }
     public int HpBefore { get; init; }
     public int HpAfter { get; init; }
-    private IReadOnlyList<int> _actors = [], _used = [], _materials = [];
+    private IReadOnlyList<int> _actors = [],_used = [],_materials = [];
     public IReadOnlyList<int> Actors { get => _actors; init => _actors = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Used { get => _used; init => _used = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Materials { get => _materials; init => _materials = Array.AsReadOnly(value.ToArray()); }

@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramTurnWindowEntryRuntimePortsRuntime : global::CardGame.Core.IProgramTurnWindowEntryFacts, global::CardGame.Core.IProgramTurnWindowIssuedCandidates, global::CardGame.Core.IProgramTurnWindowPhaseReceipts
+{
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCharacterCaoHongMouOperations _characterCaoHongMouOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCharacterLiuBaOlOperations _characterLiuBaOlOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCharacterLuZhiWeiOlOperations _characterLuZhiWeiOlOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCharacterLvQianOlOperations _characterLvQianOlOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCharacterWangKuangOlOperations _characterWangKuangOlOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCharacterZhangShiPingOlOperations _characterZhangShiPingOlOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCharacterZhangXunAnniversaryOperations _characterZhangXunAnniversaryOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCorePhaseHandSeizureOperations _corePhaseHandSeizureOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCorePhaseNamePredictionOperations _corePhaseNamePredictionOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreProgramTurnWindowEntryRuntimePortsCoreZhuijiProgramsOperations _coreZhuijiProgramsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnProgressionAccess _coreActualTurnProgressTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePhaseNamePredictionPhaseNamePredictionsAccess _coreGameEnginePhaseNamePredictionPhaseNamePredictionsAccess;
+    internal CoreProgramTurnWindowEntryRuntimePortsRuntime(ICoreProgramTurnWindowEntryRuntimePortsCharacterCaoHongMouOperations characterCaoHongMouOperations, ICoreProgramTurnWindowEntryRuntimePortsCharacterLiuBaOlOperations characterLiuBaOlOperations, ICoreProgramTurnWindowEntryRuntimePortsCharacterLuZhiWeiOlOperations characterLuZhiWeiOlOperations, ICoreProgramTurnWindowEntryRuntimePortsCharacterLvQianOlOperations characterLvQianOlOperations, ICoreProgramTurnWindowEntryRuntimePortsCharacterWangKuangOlOperations characterWangKuangOlOperations, ICoreProgramTurnWindowEntryRuntimePortsCharacterZhangShiPingOlOperations characterZhangShiPingOlOperations, ICoreProgramTurnWindowEntryRuntimePortsCharacterZhangXunAnniversaryOperations characterZhangXunAnniversaryOperations, ICoreProgramTurnWindowEntryRuntimePortsProgramPipelineHooksOperations programPipelineHooksOperations, ICoreProgramTurnWindowEntryRuntimePortsCorePhaseHandSeizureOperations corePhaseHandSeizureOperations, ICoreProgramTurnWindowEntryRuntimePortsCorePhaseNamePredictionOperations corePhaseNamePredictionOperations, ICoreProgramTurnWindowEntryRuntimePortsCoreTableOrderOperations coreTableOrderOperations, ICoreProgramTurnWindowEntryRuntimePortsCoreZhuijiProgramsOperations coreZhuijiProgramsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnProgressionAccess coreActualTurnProgressTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePhaseNamePredictionPhaseNamePredictionsAccess coreGameEnginePhaseNamePredictionPhaseNamePredictionsAccess)
+    {
+        this._characterCaoHongMouOperations = characterCaoHongMouOperations;
+        this._characterLiuBaOlOperations = characterLiuBaOlOperations;
+        this._characterLuZhiWeiOlOperations = characterLuZhiWeiOlOperations;
+        this._characterLvQianOlOperations = characterLvQianOlOperations;
+        this._characterWangKuangOlOperations = characterWangKuangOlOperations;
+        this._characterZhangShiPingOlOperations = characterZhangShiPingOlOperations;
+        this._characterZhangXunAnniversaryOperations = characterZhangXunAnniversaryOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._corePhaseHandSeizureOperations = corePhaseHandSeizureOperations;
+        this._corePhaseNamePredictionOperations = corePhaseNamePredictionOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreZhuijiProgramsOperations = coreZhuijiProgramsOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnProgressionAccess = coreActualTurnProgressTurnProgressionAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+        this._coreGameEnginePhaseNamePredictionPhaseNamePredictionsAccess = coreGameEnginePhaseNamePredictionPhaseNamePredictionsAccess;
+    }
+}

@@ -14,8 +14,6 @@ internal interface INativeDrawProducerQueries : IProgramSelectionQuery
     int BoundCardCount(ProgramSkillFrame frame, string bind);
     int PhaseSkillUsage(ProgramSkillFrame frame, string usageId);
     bool HasAttemptCapability { get; }
-    bool IsGameStartingDraw(ProgramSkillFrame frame);
-    bool IsGameStartingGainDraw(ProgramSkillFrame frame);
     bool IsLiushiClearDraw(ProgramSkillFrame frame);
     bool IsValidSeat(int seat);
     bool IsAlive(int seat);

@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterDuXiOlRuntime : global::CardGame.Core.IDuXiProgramHost
+{
+    private readonly ICharacterDuXiOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterDuXiOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterDuXiOlResolutionStackOperations2 _resolutionStackOperations;
+    private readonly ICharacterDuXiOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterDuXiOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterDuXiOlCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterDuXiOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICharacterDuXiOlCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterDuXiOlCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterDuXiOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterDuXiOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterDuXiOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterDuXiOlCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterDuXiOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterDuXiOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterDuXiOlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterDuXiOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterDuXiOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterDuXiOlCharacterDuXiOlOperations _characterDuXiOlOperations;
+    private readonly ICharacterDuXiOlResolutionStackOperations _resolutionStackOperations2;
+    private readonly ICharacterDuXiOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICharacterDuXiOlCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterDuXiOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundTurnSeatsAccess _coreActualRoundProgressRoundTurnSeatsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess _coreCommandJournalStorageEventsPendingEventsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICharacterDuXiOlDuXiSuitProjectionDuXiSuitProjectionEventCountDuXiSuitProjectionLastFactAccess _characterDuXiOlDuXiSuitProjectionDuXiSuitProjectionEventCountDuXiSuitProjectionLastFactAccess;
+    internal CharacterDuXiOlRuntime(ICharacterDuXiOlCardZonesOperations cardZonesOperations, ICharacterDuXiOlContentRegistryOperations contentRegistryOperations, ICharacterDuXiOlResolutionStackOperations2 resolutionStackOperations, ICharacterDuXiOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterDuXiOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterDuXiOlCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterDuXiOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICharacterDuXiOlCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterDuXiOlCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterDuXiOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterDuXiOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterDuXiOlCoreRuntimeOperations coreRuntimeOperations, ICharacterDuXiOlCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterDuXiOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterDuXiOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterDuXiOlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterDuXiOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterDuXiOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterDuXiOlCharacterDuXiOlOperations characterDuXiOlOperations, ICharacterDuXiOlResolutionStackOperations resolutionStackOperations2, ICharacterDuXiOlCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICharacterDuXiOlCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterDuXiOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundTurnSeatsAccess coreActualRoundProgressRoundTurnSeatsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess coreCommandJournalStorageEventsPendingEventsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICharacterDuXiOlDuXiSuitProjectionDuXiSuitProjectionEventCountDuXiSuitProjectionLastFactAccess characterDuXiOlDuXiSuitProjectionDuXiSuitProjectionEventCountDuXiSuitProjectionLastFactAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterDuXiOlOperations = characterDuXiOlOperations;
+        this._resolutionStackOperations2 = resolutionStackOperations2;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundTurnSeatsAccess = coreActualRoundProgressRoundTurnSeatsAccess;
+        this._coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreCommandJournalStorageEventsPendingEventsAccess = coreCommandJournalStorageEventsPendingEventsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._characterDuXiOlDuXiSuitProjectionDuXiSuitProjectionEventCountDuXiSuitProjectionLastFactAccess = characterDuXiOlDuXiSuitProjectionDuXiSuitProjectionEventCountDuXiSuitProjectionLastFactAccess;
+    }
+}

@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZhuLingOlRuntime : global::CardGame.Core.IZhuLingProgramHost
+{
+    private readonly ICharacterZhuLingOlCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICharacterZhuLingOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterZhuLingOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhuLingOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhuLingOlCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterZhuLingOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterZhuLingOlCoreCardRecoveryModifiersOperations _coreCardRecoveryModifiersOperations;
+    private readonly ICharacterZhuLingOlCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICharacterZhuLingOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterZhuLingOlCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterZhuLingOlCoreProgramBooleanStateExpirationOperations _coreProgramBooleanStateExpirationOperations;
+    private readonly ICharacterZhuLingOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhuLingOlCoreProgramPersistentStateOperations _coreProgramPersistentStateOperations;
+    private readonly ICharacterZhuLingOlCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICharacterZhuLingOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZhuLingOlCoreTurnHandLimitKindExemptionsOperations _coreTurnHandLimitKindExemptionsOperations;
+    private readonly ICharacterZhuLingOlCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICharacterZhuLingOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterZhuLingOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterZhuLingOlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterZhuLingOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterZhuLingOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterZhuLingOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterZhuLingOlRuntime(ICharacterZhuLingOlCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICharacterZhuLingOlCardZonesOperations cardZonesOperations, ICharacterZhuLingOlContentRegistryOperations contentRegistryOperations, ICharacterZhuLingOlResolutionStackOperations resolutionStackOperations, ICharacterZhuLingOlCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterZhuLingOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterZhuLingOlCoreCardRecoveryModifiersOperations coreCardRecoveryModifiersOperations, ICharacterZhuLingOlCoreCardUseModulesOperations coreCardUseModulesOperations, ICharacterZhuLingOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterZhuLingOlCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterZhuLingOlCoreProgramBooleanStateExpirationOperations coreProgramBooleanStateExpirationOperations, ICharacterZhuLingOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhuLingOlCoreProgramPersistentStateOperations coreProgramPersistentStateOperations, ICharacterZhuLingOlCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICharacterZhuLingOlCoreRuntimeOperations coreRuntimeOperations, ICharacterZhuLingOlCoreTurnHandLimitKindExemptionsOperations coreTurnHandLimitKindExemptionsOperations, ICharacterZhuLingOlCoreMatchLogOperations coreMatchLogOperations, ICharacterZhuLingOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterZhuLingOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterZhuLingOlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterZhuLingOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterZhuLingOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterZhuLingOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardRecoveryModifiersOperations = coreCardRecoveryModifiersOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramBooleanStateExpirationOperations = coreProgramBooleanStateExpirationOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramPersistentStateOperations = coreProgramPersistentStateOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandLimitKindExemptionsOperations = coreTurnHandLimitKindExemptionsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

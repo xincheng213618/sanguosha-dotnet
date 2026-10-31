@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramRandomSeatAcquisitionRuntimeRuntime : global::CardGame.Core.IProgramSeatAcquisitionFacts, global::CardGame.Core.IProgramSeatAcquisitionOperations
+{
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeRandomOperations _randomOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreOrderedPrintedSkillLossObserversOperations _coreOrderedPrintedSkillLossObserversOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreShenwuNpcProgramsOperations _coreShenwuNpcProgramsOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreProgramRandomSeatAcquisitionRuntimeProgramRandomSeatAcquisitionOperations _programRandomSeatAcquisitionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreProgramRandomSeatAcquisitionRuntimeRuntime(ICoreProgramRandomSeatAcquisitionRuntimeContentRegistryOperations contentRegistryOperations, ICoreProgramRandomSeatAcquisitionRuntimeRandomOperations randomOperations, ICoreProgramRandomSeatAcquisitionRuntimeResolutionStackOperations resolutionStackOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreOrderedPrintedSkillLossObserversOperations coreOrderedPrintedSkillLossObserversOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreTableOrderOperations coreTableOrderOperations, ICoreProgramRandomSeatAcquisitionRuntimeCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreShenwuNpcProgramsOperations coreShenwuNpcProgramsOperations, ICoreProgramRandomSeatAcquisitionRuntimeCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreProgramRandomSeatAcquisitionRuntimeProgramRandomSeatAcquisitionOperations programRandomSeatAcquisitionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOrderedPrintedSkillLossObserversOperations = coreOrderedPrintedSkillLossObserversOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreShenwuNpcProgramsOperations = coreShenwuNpcProgramsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._programRandomSeatAcquisitionOperations = programRandomSeatAcquisitionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -3,7 +3,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class CaoXianRuntime(ICaoXianFacts facts, ICaoXianNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : ICaoXianRuntime
 {
-    internal const string Lingxi = "ol:lingxi", Zhifou = "ol:zhifou", Action = "cao-xian-anniversary";
+    internal const string Lingxi = "ol:lingxi",Zhifou = "ol:zhifou",Action = "cao-xian-anniversary";
     internal static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     private CaoXianZhifouPaidEvent[] Paid(int owner) => facts.History<CaoXianZhifouPaidEvent>().Where(e => e.Source.OwnerSeat == owner && e.ActualTurn == facts.Turn).ToArray();
     private int[] Options(int owner) => Enumerable.Range(1, 3).Except(facts.History<CaoXianOptionEvent>().Where(e => e.Owner == owner && e.ActualTurn == facts.Turn).Select(e => e.Option)).ToArray();

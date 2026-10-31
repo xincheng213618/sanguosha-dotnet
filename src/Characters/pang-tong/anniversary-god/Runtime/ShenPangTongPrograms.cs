@@ -50,7 +50,7 @@ public sealed record ShenPangTongRevivedEvent(long DeathId, long ProgramFrameId,
 
 internal static class ShenPangTongComposition
 {
-    internal const string Luansuo="anniversary:luansuo", Fengliao="anniversary:fengliao", Kunyu="anniversary:kunyu";
+    internal const string Luansuo="anniversary:luansuo",Fengliao="anniversary:fengliao",Kunyu="anniversary:kunyu";
     [ProgramCatalogValidation(39200)] internal static void Validate(string path, SkillProgram p)
     {
         bool Own(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveShenPangTongFengliao or SkillProgramEffectOp.ResolveShenPangTongKunyu;

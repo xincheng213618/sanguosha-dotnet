@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreManualDiscardRuntimePortsRuntime : global::CardGame.Core.IManualDiscardCommands, global::CardGame.Core.IManualDiscardFacts, global::CardGame.Core.IManualDiscardTransitions
+{
+    private readonly ICoreManualDiscardRuntimePortsCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreManualDiscardRuntimePortsCorePlannedPhaseQuantitiesOperations _corePlannedPhaseQuantitiesOperations;
+    private readonly ICoreManualDiscardRuntimePortsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreManualDiscardRuntimePortsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreManualDiscardRuntimePortsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreManualDiscardRuntimePortsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreManualDiscardRuntimePortsCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreManualDiscardRuntimePortsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreManualDiscardRuntimePortsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreManualDiscardRuntimePortsKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    internal CoreManualDiscardRuntimePortsRuntime(ICoreManualDiscardRuntimePortsCoreActualTurnsOperations coreActualTurnsOperations, ICoreManualDiscardRuntimePortsCorePlannedPhaseQuantitiesOperations corePlannedPhaseQuantitiesOperations, ICoreManualDiscardRuntimePortsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreManualDiscardRuntimePortsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreManualDiscardRuntimePortsCoreMatchLogOperations coreMatchLogOperations, ICoreManualDiscardRuntimePortsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreManualDiscardRuntimePortsCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreManualDiscardRuntimePortsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreManualDiscardRuntimePortsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreManualDiscardRuntimePortsKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess)
+    {
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._corePlannedPhaseQuantitiesOperations = corePlannedPhaseQuantitiesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+    }
+}

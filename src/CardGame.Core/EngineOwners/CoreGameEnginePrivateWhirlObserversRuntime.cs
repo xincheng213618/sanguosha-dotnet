@@ -1,0 +1,30 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePrivateWhirlObserversRuntime
+{
+    private readonly ICorePrivateWhirlObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePrivateWhirlObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICorePrivateWhirlObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICorePrivateWhirlObserversCorePrivateWhirlOperations _corePrivateWhirlOperations;
+    private readonly ICorePrivateWhirlObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePrivateWhirlObserversCorePrivateWhirlObserversOperations _corePrivateWhirlObserversOperations;
+    private readonly ICorePrivateWhirlObserversCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEnginePrivateWhirlObserversRuntime(ICorePrivateWhirlObserversResolutionStackOperations resolutionStackOperations, ICorePrivateWhirlObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICorePrivateWhirlObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICorePrivateWhirlObserversCorePrivateWhirlOperations corePrivateWhirlOperations, ICorePrivateWhirlObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePrivateWhirlObserversCorePrivateWhirlObserversOperations corePrivateWhirlObserversOperations, ICorePrivateWhirlObserversCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateWhirlOperations = corePrivateWhirlOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePrivateWhirlObserversOperations = corePrivateWhirlObserversOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

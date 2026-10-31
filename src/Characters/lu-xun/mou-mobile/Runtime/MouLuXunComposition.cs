@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouLuXunComposition
 {
-    internal const string Qianxun = "mou-mobile:qianxun", Lianying = "mou-mobile:lianying";
+    internal const string Qianxun = "mou-mobile:qianxun",Lianying = "mou-mobile:lianying";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.RecordMouLuXunQianxun or
         SkillProgramEffectOp.UseMouLuXunRecordedTrick or SkillProgramEffectOp.DistributeMouLuXunLianying;
     [ProgramCatalogValidation(1500)]

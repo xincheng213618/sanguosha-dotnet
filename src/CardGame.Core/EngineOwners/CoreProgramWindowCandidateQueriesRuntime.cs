@@ -1,0 +1,26 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramWindowCandidateQueriesRuntime : global::CardGame.Core.IProgramWindowCandidateQueries
+{
+    private readonly ICoreProgramWindowCandidateQueriesCharacterYuanJiOlOperations _characterYuanJiOlOperations;
+    private readonly ICoreProgramWindowCandidateQueriesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramWindowCandidateQueriesKernelCoreProgramTriggerFactProjectorQueriesOperations _kernelCoreProgramTriggerFactProjectorQueriesOperations;
+    private readonly ICoreProgramWindowCandidateQueriesKernelCoreProgramTriggerRuntimeQueriesOperations _kernelCoreProgramTriggerRuntimeQueriesOperations;
+    private readonly ICoreProgramWindowCandidateQueriesProgramTriggerFactProjectorOperations _programTriggerFactProjectorOperations;
+    private readonly ICoreProgramWindowCandidateQueriesProgramTriggerOperations _programTriggerOperations;
+    internal CoreProgramWindowCandidateQueriesRuntime(ICoreProgramWindowCandidateQueriesCharacterYuanJiOlOperations characterYuanJiOlOperations, ICoreProgramWindowCandidateQueriesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramWindowCandidateQueriesKernelCoreProgramTriggerFactProjectorQueriesOperations kernelCoreProgramTriggerFactProjectorQueriesOperations, ICoreProgramWindowCandidateQueriesKernelCoreProgramTriggerRuntimeQueriesOperations kernelCoreProgramTriggerRuntimeQueriesOperations, ICoreProgramWindowCandidateQueriesProgramTriggerFactProjectorOperations programTriggerFactProjectorOperations, ICoreProgramWindowCandidateQueriesProgramTriggerOperations programTriggerOperations)
+    {
+        this._characterYuanJiOlOperations = characterYuanJiOlOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._kernelCoreProgramTriggerFactProjectorQueriesOperations = kernelCoreProgramTriggerFactProjectorQueriesOperations;
+        this._kernelCoreProgramTriggerRuntimeQueriesOperations = kernelCoreProgramTriggerRuntimeQueriesOperations;
+        this._programTriggerFactProjectorOperations = programTriggerFactProjectorOperations;
+        this._programTriggerOperations = programTriggerOperations;
+    }
+}

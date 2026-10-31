@@ -21,7 +21,7 @@ internal sealed class AnniversaryWangChangHandler(SkillProgramEffectOp operation
 }
 internal static class AnniversaryWangChangComposition
 {
-    internal const string Kaiji = "anniversary:kaiji", Pingxi = "anniversary:pingxi";
+    internal const string Kaiji = "anniversary:kaiji",Pingxi = "anniversary:pingxi";
     [ProgramCatalogValidation(46500)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryWangChangKaiji or SkillProgramEffectOp.ResolveAnniversaryWangChangPingxi)) return;
@@ -36,7 +36,7 @@ internal static class AnniversaryWangChangComposition
 public enum AnniversaryWangChangStage { OwnCards, Targets, ForeignCard, Drawing, MovementChildren, IssuingSlash, NativeSlash, ReturnedSlash, Completed }
 public sealed record AnniversaryWangChangReceipt(CardConversionSource Source, string Hash, SkillProgramEffectOp Operation, long ParentId, int Turn, int Phase, int Maximum, SkillPolarity Polarity, AnniversaryWangChangStage Stage)
 {
-    private IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>()), _targets = Array.AsReadOnly(Array.Empty<int>());
+    private IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>()),_targets = Array.AsReadOnly(Array.Empty<int>());
     private IReadOnlyList<CardMovementRecord> _moves = Array.AsReadOnly(Array.Empty<CardMovementRecord>());
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }

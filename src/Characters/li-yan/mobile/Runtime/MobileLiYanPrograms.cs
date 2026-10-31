@@ -42,36 +42,4 @@ internal sealed class MobileLiYanNextDrawHandler : ISkillProgramEffectHandler
 }
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class MobileLiYanNextDrawHost(GameEngine engine) : IMobileLiYanNextDrawHost
-    { public void Issue(ProgramSkillFrame frame, int targetSeat, int amount) => engine.IssueMobileLiYanNextDrawBonus(frame, targetSeat, amount); }
-    private void IssueMobileLiYanNextDrawBonus(ProgramSkillFrame supplied, int targetSeat, int amount)
-    {
-        var f = GetActiveProgramFrame(supplied.Id);
-        if (f.TriggerId is not null || f.SelectedTargetSeats is not [var selected] || selected != targetSeat ||
-            f.OwnerSeat == targetSeat || !IsValidPlayerSeat(targetSeat) || amount != 1 || f.InstructionIndex < 1 ||
-            ProgramInstructionResolver.Default.Resolve(f, _contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect.Op != SkillProgramEffectOp.IssueMobileLiYanNextDrawBonus ||
-            ProgramEventHistory<MobileLiYanNextDrawBonusIssuedEvent>().Any(e => e.ProgramFrameId == f.Id && e.InstructionIndex == f.InstructionIndex))
-            throw new InvalidOperationException("Mobile Duliang lost its original one-time selected-target future Draw instruction.");
-        if (_winner != Winner.None || !_players[targetSeat].IsAlive) return;
-        AdvanceEventRulesAndQueueFact(new MobileLiYanNextDrawBonusIssuedEvent(f.Id, f.InstructionIndex,
-            new(f.SkillId, GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, targetSeat, amount));
-    }
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 77900)]
-    private void AssignMobileLiYanNextDrawBonus(ActualDiscardRecoveryPhaseStartedEvent e)
-    {
-        if (e.Phase.Kind != ActualDiscardRecoveryPhaseKind.Draw || !_players[e.Phase.ActorSeat].IsAlive ||
-            !_contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.IssueMobileLiYanNextDrawBonus)) return;
-        var assigned = ProgramEventHistory<MobileLiYanNextDrawBonusAssignedEvent>().Select(x => (x.ProgramFrameId, x.InstructionIndex)).ToHashSet();
-        foreach (var grant in ProgramEventHistory<MobileLiYanNextDrawBonusIssuedEvent>().Where(x => x.TargetSeat == e.Phase.ActorSeat && !assigned.Contains((x.ProgramFrameId, x.InstructionIndex))).ToArray())
-            AdvanceEventRulesAndQueueFact(new MobileLiYanNextDrawBonusAssignedEvent(grant.ProgramFrameId, grant.InstructionIndex, e.Phase));
-    }
-    private int MobileLiYanNextDrawBonus(CharacterState player)
-    {
-        if (!_contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.IssueMobileLiYanNextDrawBonus) ||
-            CurrentActualDiscardRecoveryPhase() is not { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase || phase.ActorSeat != player.Seat) return 0;
-        var assigned = ProgramEventHistory<MobileLiYanNextDrawBonusAssignedEvent>().Where(x => x.Phase == phase)
-            .Select(x => (x.ProgramFrameId, x.InstructionIndex)).ToHashSet();
-        return ProgramEventHistory<MobileLiYanNextDrawBonusIssuedEvent>().Where(x => x.TargetSeat == player.Seat && assigned.Contains((x.ProgramFrameId, x.InstructionIndex))).Sum(x => x.Amount);
-    }
 }

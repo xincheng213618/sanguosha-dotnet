@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineShanheNullifiedTrickClaimsRuntime
+{
+    private readonly ICoreShanheNullifiedTrickClaimsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsCoreCurrentCardEnhancementsOperations _coreCurrentCardEnhancementsOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsCoreCurrentUsePhysicalClaimsOperations _coreCurrentUsePhysicalClaimsOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsCoreShanheDelayedNullifiedTrickClaimsOperations _coreShanheDelayedNullifiedTrickClaimsOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreShanheNullifiedTrickClaimsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess _coreMatchDefinitionModeDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheNullifiedTrickClaimsRuntime(ICoreShanheNullifiedTrickClaimsCardZonesOperations cardZonesOperations, ICoreShanheNullifiedTrickClaimsContentRegistryOperations contentRegistryOperations, ICoreShanheNullifiedTrickClaimsResolutionStackOperations resolutionStackOperations, ICoreShanheNullifiedTrickClaimsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheNullifiedTrickClaimsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreShanheNullifiedTrickClaimsCoreCurrentCardEnhancementsOperations coreCurrentCardEnhancementsOperations, ICoreShanheNullifiedTrickClaimsCoreCurrentUsePhysicalClaimsOperations coreCurrentUsePhysicalClaimsOperations, ICoreShanheNullifiedTrickClaimsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreShanheNullifiedTrickClaimsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreShanheNullifiedTrickClaimsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheNullifiedTrickClaimsCoreShanheDelayedNullifiedTrickClaimsOperations coreShanheDelayedNullifiedTrickClaimsOperations, ICoreShanheNullifiedTrickClaimsCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreShanheNullifiedTrickClaimsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreShanheNullifiedTrickClaimsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess coreMatchDefinitionModeDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentCardEnhancementsOperations = coreCurrentCardEnhancementsOperations;
+        this._coreCurrentUsePhysicalClaimsOperations = coreCurrentUsePhysicalClaimsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreShanheDelayedNullifiedTrickClaimsOperations = coreShanheDelayedNullifiedTrickClaimsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchDefinitionModeDefinitionOptionsAccess = coreMatchDefinitionModeDefinitionOptionsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

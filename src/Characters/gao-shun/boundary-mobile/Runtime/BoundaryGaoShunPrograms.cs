@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryGaoShunComposition
 {
-    internal const string Xianzhen = "boundary:xianzhen-mobile", Jinjiu = "boundary:jinjiu-mobile";
+    internal const string Xianzhen = "boundary:xianzhen-mobile",Jinjiu = "boundary:jinjiu-mobile";
     [ProgramCatalogValidation(57300)]
     internal static void Validate(string path, SkillProgram p)
     {

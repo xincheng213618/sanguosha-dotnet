@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime : global::CardGame.Core.ITurnDefaultStatsProgramHost
+{
+    private readonly ICoreTurnDefaultStatsCharacterCaoXiOlOperations _characterCaoXiOlOperations;
+    private readonly ICoreTurnDefaultStatsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreTurnDefaultStatsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreTurnDefaultStatsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreTurnDefaultStatsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreTurnDefaultStatsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreTurnDefaultStatsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreTurnDefaultStatsCoreTurnDefaultStatsValidationOperations _coreTurnDefaultStatsValidationOperations;
+    private readonly ICoreTurnDefaultStatsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreTurnDefaultStatsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreTurnDefaultStatsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreTurnDefaultStatsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess _coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess;
+    internal CoreGameEngineTurnDefaultStatsRuntime(ICoreTurnDefaultStatsCharacterCaoXiOlOperations characterCaoXiOlOperations, ICoreTurnDefaultStatsContentRegistryOperations contentRegistryOperations, ICoreTurnDefaultStatsResolutionStackOperations resolutionStackOperations, ICoreTurnDefaultStatsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreTurnDefaultStatsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreTurnDefaultStatsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreTurnDefaultStatsCoreRuntimeOperations coreRuntimeOperations, ICoreTurnDefaultStatsCoreTurnDefaultStatsValidationOperations coreTurnDefaultStatsValidationOperations, ICoreTurnDefaultStatsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreTurnDefaultStatsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreTurnDefaultStatsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreTurnDefaultStatsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess)
+    {
+        this._characterCaoXiOlOperations = characterCaoXiOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnDefaultStatsValidationOperations = coreTurnDefaultStatsValidationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess = coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess;
+    }
+}

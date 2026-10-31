@@ -64,7 +64,7 @@ public sealed record AnniversaryGuoZhaoCompletedEvent(long FrameId) : IGameEvent
 public sealed record AnniversaryGuoZhaoRecoveryIssuedEvent(long FrameId, int Amount, int OwnerHp, int TargetHp) : IGameEvent;
 internal static class AnniversaryGuoZhaoComposition
 {
-    internal const string Pianchong = "anniversary:pianchong", Zunwei = "anniversary:zunwei";
+    internal const string Pianchong = "anniversary:pianchong",Zunwei = "anniversary:zunwei";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveAnniversaryGuoZhaoPianchong or SkillProgramEffectOp.DrawAnniversaryGuoZhaoLostColor or SkillProgramEffectOp.ResolveAnniversaryGuoZhaoZunwei;
     [ProgramCatalogValidation(44300)] internal static void Validate(string path, SkillProgram p)
     {

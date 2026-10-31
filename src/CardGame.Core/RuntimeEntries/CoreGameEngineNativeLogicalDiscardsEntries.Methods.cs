@@ -1,0 +1,13 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CoreGameEngineNativeLogicalDiscardsEntries
+{
+    internal global::CardGame.Core.ProgramSkillFrame AppendFrameNativeLogicalDiscard(global::CardGame.Core.ProgramSkillFrame frame, int executorSeat, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.CardMoveReason reason) => _resolve().AppendFrameNativeLogicalDiscard(frame, executorSeat, ids, reason);
+    internal global::CardGame.Core.NativeLogicalDiscardInvocationDraft? CaptureNativeLogicalDiscardInvocation(int initiatorSeat, int executorSeat, global::System.Collections.Generic.IReadOnlyList<int> cardIds, global::CardGame.Core.CardMoveReason reason, long? parentFrameId = default) => _resolve().CaptureNativeLogicalDiscardInvocation(initiatorSeat, executorSeat, cardIds, reason, parentFrameId);
+    internal global::CardGame.Core.ProgramSkillFrame CompleteFrameNativeLogicalDiscard(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CompleteFrameNativeLogicalDiscard(frame);
+    internal void CompleteNativeLogicalDiscardInvocation(global::CardGame.Core.NativeLogicalDiscardInvocationDraft? draft, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord>? prepaidMaterials = default) => _resolve().CompleteNativeLogicalDiscardInvocation(draft, prepaidMaterials);
+    internal void MoveLogicalDiscard(int initiatorSeat, int executorSeat, global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardMoveReason reason, global::System.Action<global::CardGame.Core.CardMovementRecord>? beforeFact = default, long? parentFrameId = default) => _resolve().MoveLogicalDiscard(initiatorSeat, executorSeat, card, from, reason, beforeFact, parentFrameId);
+    internal void MoveLogicalDiscardCards(int initiatorSeat, int executorSeat, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardMoveReason reason) => _resolve().MoveLogicalDiscardCards(initiatorSeat, executorSeat, cards, from, reason);
+    internal void MoveProgramLogicalDiscard(global::CardGame.Core.ProgramSkillFrame frame, int executorSeat, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.CardMoveReason reason, global::System.Action<long, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord>>? afterPhysicalRecords = default) => _resolve().MoveProgramLogicalDiscard(frame, executorSeat, ids, reason, afterPhysicalRecords);
+    internal bool TracksNativeLogicalDiscards { get => _resolve().TracksNativeLogicalDiscards; }
+}

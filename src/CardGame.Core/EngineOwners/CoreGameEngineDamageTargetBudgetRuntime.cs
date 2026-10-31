@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDamageTargetBudgetRuntime : global::CardGame.Core.IDamageTargetBudgetHost
+{
+    private readonly ICoreDamageTargetBudgetContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDamageTargetBudgetResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDamageTargetBudgetCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDamageTargetBudgetCoreAttributedMarkerEventsOperations _coreAttributedMarkerEventsOperations;
+    private readonly ICoreDamageTargetBudgetCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreDamageTargetBudgetCoreCurrentUseTargetCandidateRefreshOperations _coreCurrentUseTargetCandidateRefreshOperations;
+    private readonly ICoreDamageTargetBudgetCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICoreDamageTargetBudgetCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICoreDamageTargetBudgetCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDamageTargetBudgetCoreProgramMarkerPaymentsOperations _coreProgramMarkerPaymentsOperations;
+    private readonly ICoreDamageTargetBudgetCoreRecipientCategorySlashTargetsOperations _coreRecipientCategorySlashTargetsOperations;
+    private readonly ICoreDamageTargetBudgetCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDamageTargetBudgetCoreUniqueLeaderTrickTargetsOperations _coreUniqueLeaderTrickTargetsOperations;
+    private readonly ICoreDamageTargetBudgetCoreNativeBorrowedSwordOperations _coreNativeBorrowedSwordOperations;
+    private readonly ICoreDamageTargetBudgetCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreDamageTargetBudgetCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreDamageTargetBudgetCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDamageTargetBudgetCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreDamageTargetBudgetKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineDamageTargetBudgetRuntime(ICoreDamageTargetBudgetContentRegistryOperations contentRegistryOperations, ICoreDamageTargetBudgetResolutionStackOperations resolutionStackOperations, ICoreDamageTargetBudgetCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDamageTargetBudgetCoreAttributedMarkerEventsOperations coreAttributedMarkerEventsOperations, ICoreDamageTargetBudgetCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreDamageTargetBudgetCoreCurrentUseTargetCandidateRefreshOperations coreCurrentUseTargetCandidateRefreshOperations, ICoreDamageTargetBudgetCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICoreDamageTargetBudgetCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICoreDamageTargetBudgetCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDamageTargetBudgetCoreProgramMarkerPaymentsOperations coreProgramMarkerPaymentsOperations, ICoreDamageTargetBudgetCoreRecipientCategorySlashTargetsOperations coreRecipientCategorySlashTargetsOperations, ICoreDamageTargetBudgetCoreRuntimeOperations coreRuntimeOperations, ICoreDamageTargetBudgetCoreUniqueLeaderTrickTargetsOperations coreUniqueLeaderTrickTargetsOperations, ICoreDamageTargetBudgetCoreNativeBorrowedSwordOperations coreNativeBorrowedSwordOperations, ICoreDamageTargetBudgetCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreDamageTargetBudgetCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreDamageTargetBudgetCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDamageTargetBudgetCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreDamageTargetBudgetKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreAttributedMarkerEventsOperations = coreAttributedMarkerEventsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentUseTargetCandidateRefreshOperations = coreCurrentUseTargetCandidateRefreshOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramMarkerPaymentsOperations = coreProgramMarkerPaymentsOperations;
+        this._coreRecipientCategorySlashTargetsOperations = coreRecipientCategorySlashTargetsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreUniqueLeaderTrickTargetsOperations = coreUniqueLeaderTrickTargetsOperations;
+        this._coreNativeBorrowedSwordOperations = coreNativeBorrowedSwordOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

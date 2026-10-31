@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRoundDistinctBasicUseRuntime
+{
+    private readonly ICoreRoundDistinctBasicUseCharacterHuCheErMouOperations _characterHuCheErMouOperations;
+    private readonly ICoreRoundDistinctBasicUseCardZonesOperations _cardZonesOperations;
+    private readonly ICoreRoundDistinctBasicUseContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRoundDistinctBasicUseResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreActualTurnDamageClaimsOperations _coreActualTurnDamageClaimsOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreCurrentSlashFireOffersOperations _coreCurrentSlashFireOffersOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreRoundDistinctBasicUseCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreProgramAllHandBonusOperationOperations _coreProgramAllHandBonusOperationOperations;
+    private readonly ICoreRoundDistinctBasicUseCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreRoundDistinctBasicUseKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRoundDistinctBasicUseRuntime(ICoreRoundDistinctBasicUseCharacterHuCheErMouOperations characterHuCheErMouOperations, ICoreRoundDistinctBasicUseCardZonesOperations cardZonesOperations, ICoreRoundDistinctBasicUseContentRegistryOperations contentRegistryOperations, ICoreRoundDistinctBasicUseResolutionStackOperations resolutionStackOperations, ICoreRoundDistinctBasicUseCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreRoundDistinctBasicUseCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreRoundDistinctBasicUseCoreActualTurnDamageClaimsOperations coreActualTurnDamageClaimsOperations, ICoreRoundDistinctBasicUseCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRoundDistinctBasicUseCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreRoundDistinctBasicUseCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreRoundDistinctBasicUseCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreRoundDistinctBasicUseCoreCurrentSlashFireOffersOperations coreCurrentSlashFireOffersOperations, ICoreRoundDistinctBasicUseCoreHandComparisonOperations coreHandComparisonOperations, ICoreRoundDistinctBasicUseCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreRoundDistinctBasicUseCoreRuntimeOperations coreRuntimeOperations, ICoreRoundDistinctBasicUseCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreRoundDistinctBasicUseCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreRoundDistinctBasicUseCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreRoundDistinctBasicUseCoreProgramAllHandBonusOperationOperations coreProgramAllHandBonusOperationOperations, ICoreRoundDistinctBasicUseCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreRoundDistinctBasicUseKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuCheErMouOperations = characterHuCheErMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActualTurnDamageClaimsOperations = coreActualTurnDamageClaimsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCurrentSlashFireOffersOperations = coreCurrentSlashFireOffersOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreProgramAllHandBonusOperationOperations = coreProgramAllHandBonusOperationOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

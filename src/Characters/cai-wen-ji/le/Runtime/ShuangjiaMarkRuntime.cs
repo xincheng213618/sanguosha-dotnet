@@ -9,6 +9,10 @@ internal sealed class ShuangjiaMarkRuntime(IDistanceRuleRuntimeQueries queries, 
     internal bool HasEntityMark(int cardId) => HasCapability &&
         queries.History<ShuangjiaInitialEntityMarkedEvent>().Any(fact => fact.CardId == cardId);
 
+    [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 120)]
+    private void ProjectCardSkillMark(int cardId, ref CardSkillMarkProjection projection) =>
+        projection.Append(HasEntityMark(cardId) ? "胡笳" : null);
+
     internal bool HasHandEntityMark(int ownerSeat, int cardId) =>
         participants.IsValidSeat(ownerSeat) && queries.Location(cardId) == CardLocation.Hand(ownerSeat) &&
         HasEntityMark(cardId);

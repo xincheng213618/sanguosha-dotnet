@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineFinalTargetSlashRuntime : global::CardGame.Core.IFinalTargetSlashProgramHost
+{
+    private readonly ICoreFinalTargetSlashCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
+    private readonly ICoreFinalTargetSlashCharacterHuangZhongBoundaryMobileOperations _characterHuangZhongBoundaryMobileOperations;
+    private readonly ICoreFinalTargetSlashCharacterHuangfuSongWumiaoOperations _characterHuangfuSongWumiaoOperations;
+    private readonly ICoreFinalTargetSlashCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
+    private readonly ICoreFinalTargetSlashContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreFinalTargetSlashResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFinalTargetSlashCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreFinalTargetSlashCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreFinalTargetSlashCoreAlcoholIdentityPoliciesOperations _coreAlcoholIdentityPoliciesOperations;
+    private readonly ICoreFinalTargetSlashCoreAlternatingSuitAndCompletedTopOperations _coreAlternatingSuitAndCompletedTopOperations;
+    private readonly ICoreFinalTargetSlashCoreAssistedFactionSlashOperations _coreAssistedFactionSlashOperations;
+    private readonly ICoreFinalTargetSlashCoreJudgedRankSlashPoliciesOperations _coreJudgedRankSlashPoliciesOperations;
+    private readonly ICoreFinalTargetSlashCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreFinalTargetSlashCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICoreFinalTargetSlashCoreProgramPersistentCombatPoliciesOperations _coreProgramPersistentCombatPoliciesOperations;
+    private readonly ICoreFinalTargetSlashCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreFinalTargetSlashCoreTurnRedSlashBenefitsOperations _coreTurnRedSlashBenefitsOperations;
+    private readonly ICoreFinalTargetSlashCoreNativeBorrowedSwordOperations _coreNativeBorrowedSwordOperations;
+    private readonly ICoreFinalTargetSlashCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreFinalTargetSlashCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICoreFinalTargetSlashCoreNativeQinglongOperations _coreNativeQinglongOperations;
+    private readonly ICoreFinalTargetSlashCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreFinalTargetSlashCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreFinalTargetSlashCoreProgramDistanceRulesOperations _coreProgramDistanceRulesOperations;
+    private readonly ICoreFinalTargetSlashCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreFinalTargetSlashKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineFinalTargetSlashRuntime(ICoreFinalTargetSlashCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICoreFinalTargetSlashCharacterHuangZhongBoundaryMobileOperations characterHuangZhongBoundaryMobileOperations, ICoreFinalTargetSlashCharacterHuangfuSongWumiaoOperations characterHuangfuSongWumiaoOperations, ICoreFinalTargetSlashCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICoreFinalTargetSlashContentRegistryOperations contentRegistryOperations, ICoreFinalTargetSlashResolutionStackOperations resolutionStackOperations, ICoreFinalTargetSlashCoreActionQueriesOperations coreActionQueriesOperations, ICoreFinalTargetSlashCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreFinalTargetSlashCoreAlcoholIdentityPoliciesOperations coreAlcoholIdentityPoliciesOperations, ICoreFinalTargetSlashCoreAlternatingSuitAndCompletedTopOperations coreAlternatingSuitAndCompletedTopOperations, ICoreFinalTargetSlashCoreAssistedFactionSlashOperations coreAssistedFactionSlashOperations, ICoreFinalTargetSlashCoreJudgedRankSlashPoliciesOperations coreJudgedRankSlashPoliciesOperations, ICoreFinalTargetSlashCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreFinalTargetSlashCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICoreFinalTargetSlashCoreProgramPersistentCombatPoliciesOperations coreProgramPersistentCombatPoliciesOperations, ICoreFinalTargetSlashCoreRuntimeOperations coreRuntimeOperations, ICoreFinalTargetSlashCoreTurnRedSlashBenefitsOperations coreTurnRedSlashBenefitsOperations, ICoreFinalTargetSlashCoreNativeBorrowedSwordOperations coreNativeBorrowedSwordOperations, ICoreFinalTargetSlashCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreFinalTargetSlashCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICoreFinalTargetSlashCoreNativeQinglongOperations coreNativeQinglongOperations, ICoreFinalTargetSlashCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreFinalTargetSlashCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreFinalTargetSlashCoreProgramDistanceRulesOperations coreProgramDistanceRulesOperations, ICoreFinalTargetSlashCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreFinalTargetSlashKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
+        this._characterHuangZhongBoundaryMobileOperations = characterHuangZhongBoundaryMobileOperations;
+        this._characterHuangfuSongWumiaoOperations = characterHuangfuSongWumiaoOperations;
+        this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreAlcoholIdentityPoliciesOperations = coreAlcoholIdentityPoliciesOperations;
+        this._coreAlternatingSuitAndCompletedTopOperations = coreAlternatingSuitAndCompletedTopOperations;
+        this._coreAssistedFactionSlashOperations = coreAssistedFactionSlashOperations;
+        this._coreJudgedRankSlashPoliciesOperations = coreJudgedRankSlashPoliciesOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramPersistentCombatPoliciesOperations = coreProgramPersistentCombatPoliciesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnRedSlashBenefitsOperations = coreTurnRedSlashBenefitsOperations;
+        this._coreNativeBorrowedSwordOperations = coreNativeBorrowedSwordOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._coreNativeQinglongOperations = coreNativeQinglongOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._coreProgramDistanceRulesOperations = coreProgramDistanceRulesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

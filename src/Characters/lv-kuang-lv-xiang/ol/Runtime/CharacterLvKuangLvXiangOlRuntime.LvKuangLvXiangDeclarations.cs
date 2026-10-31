@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterLvKuangLvXiangOlRuntime
+{
+    internal void BeginQigongDeclaration(ProgramSkillFrame f, PromptChoice choice)
+    {
+        if (!IsQigongRequest(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source) || source is null || _corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is null || choice.Cards is not [var id] || source.OwnerSeat != f.LvKuangLvXiang!.Actor || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(source.OwnerSeat))
+            throw new InvalidOperationException("Qigong declaration needs its actual selected actor's one original hand cost.");
+        var r = f.LvKuangLvXiang;
+        var kind = Enum.Parse<CardKind>(choice.Parameters["effective-kind"]);
+        var declaration = new QigongDeclarationRequest(r.Actor, id, source, kind, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LvKuangLvXiang = r with { Stage = "declaration", Declaration = declaration } });
+        var action = new LegalAction(LegalActionKind.Slash, id, r.Target, "齐攻原生声明用杀", PlayedCardKind: kind, TargetSeats: [r.Target])
+        {
+            ConversionSource = source
+        };
+        if (!_coreCardDeclarationsOperations.TryBeginCardDeclaration(_coreMatchParticipantsPlayersAccess._players[r.Actor], _coreAdvancedLifecycleOperations.GetAdvancedCard(id), kind, source, _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Use, r.Actor, action), [r.Target]))
+            throw new InvalidOperationException("Qigong failed to enter its actual native declaration.");
+    }
+
+    internal bool MatchesQigongDeclaration(ProgramSkillFrame f, CardDeclarationFrame d)
+    {
+        if (f.LvKuangLvXiang is not { Declaration: { } r, Stage: "declaration" } p || r.Actor != p.Actor || r.Actor != d.OwnerSeat || d.Return is not { Purpose: CardDeclarationPurpose.Use, UseAction: { } a } ret || ret.ParentFrameId != f.Id || ret.ParentKind != f.Kind || ret.ActorSeat != r.Actor || a.CardId != r.CardId || a.ConversionSource != r.Conversion || a.PlayedCardKind != r.Kind || !a.TargetSeats.SequenceEqual([p.Target]) || d.Payment is not { Claimed: false } payment || payment.Cost.CardId != r.CardId || payment.Cost.From != CardLocation.Hand(r.Actor) || payment.Source != r.Conversion || payment.DeclaredKind != r.Kind || payment.ProviderSeat != r.Actor || payment.ActorSeat != r.Actor || d.TurnNumber != p.Turn || p.Turn != _coreActualTurnProgressTurnNumberAccess._turnNumber || !d.TargetSeats.SequenceEqual([p.Target]))
+            return false;
+        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardDeclarationCommittedEvent>().Count(e => e.DeclarationId == d.Id && e.OwnerSeat == r.Actor && e.ActorSeat == r.Actor && e.DeclaredKind == r.Kind && e.TargetSeats.SequenceEqual([p.Target])) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.CardId == r.CardId && m.From == payment.Cost.From && m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay") == 1;
+    }
+
+    internal bool IsQigongDeclarationQuery(CharacterState actor, int? selectedId) => selectedId is { } id && _resolutionStackOperations._resolutionStack.LastOrDefault()is CardDeclarationFrame { Stage: CardDeclarationStage.Applying, Succeeded: true } d && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == d.Return.ParentFrameId)is ProgramSkillFrame root && MatchesQigongDeclaration(root, d) && d.OwnerSeat == actor.Seat && d.Payment.Cost.CardId == id && _coreCardDeclarationsOperations.UnclaimedDeclarationPayment(actor.Seat, id) == d.Payment;
+    internal bool IsQigongDeclarationChild(ProgramSkillFrame f, ResolutionFrame child) => child is CardDeclarationFrame d && MatchesQigongDeclaration(f, d);
+    internal bool TryApplyQigongDeclaration(CardDeclarationFrame declaration)
+    {
+        if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == declaration.Return.ParentFrameId)is not ProgramSkillFrame { LvKuangLvXiang: { Stage: "declaration", Declaration: { } d } p } root)
+            return false;
+        if (declaration.Stage != CardDeclarationStage.Applying || declaration.Succeeded != true || !MatchesQigongDeclaration(root, declaration) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != declaration.Id)
+            throw new InvalidOperationException("Qigong declaration lost its actual successful paid native application.");
+        _coreRuntimeOperations.ReplaceRuntimeFrame(root.Id, root with { LvKuangLvXiang = p with { Stage = "issuing", IssuingIds = [d.CardId], IssuingKind = d.Kind } });
+        _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[p.Actor], _coreMatchParticipantsPlayersAccess._players[p.Target], _coreAdvancedLifecycleOperations.GetAdvancedCard(d.CardId), d.Kind, p.Actor, countsTowardSlashLimit: false, conversionSource: d.Conversion, programSkillCardUseFrameId: root.Id);
+        return true;
+    }
+
+    internal bool TryReturnQigongDeclaration(CardDeclarationFrame d, bool success)
+    {
+        if (success || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == d.Return.ParentFrameId)is not ProgramSkillFrame { LvKuangLvXiang: { Stage: "declaration" } } root)
+            return false;
+        if (_resolutionStackOperations._resolutionStack.Any(f => f.Id == d.Id) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != root.Id || !MatchesQigongDeclaration(root, d) || d.Stage != CardDeclarationStage.Returning)
+            throw new InvalidOperationException("Qigong failed declaration returned a different original payment.");
+        FinishLvKuangLvXiang(root);
+        return true;
+    }
+
+    internal bool QigongDeclarationObserverEdge(int index)
+    {
+        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not CardDeclarationFrame d || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == d.Return.ParentFrameId)is not ProgramSkillFrame root || !MatchesQigongDeclaration(root, d))
+            return false;
+        if (_resolutionStackOperations._resolutionStack[index] is CardDeclarationChallengeFrame challenge)
+            return d.Stage == CardDeclarationStage.Challenging && challenge.ParentFrameId == d.Id && challenge.EligibleSeats.Distinct().Count() == challenge.EligibleSeats.Count && challenge.EligibleSeats.All(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && s != d.OwnerSeat);
+        if (_resolutionStackOperations._resolutionStack[index] is CardsMovedTriggerWindowFrame moved)
+            return d.Stage is CardDeclarationStage.Paying or CardDeclarationStage.Cleaning && d.ActiveChildFrameId == moved.Id && moved.ResumeDeclarationFrameId == d.Id && moved.Batch.ParentFrameId == d.Id && moved.Batch.Movements.Count == 1 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.CardId == d.Payment.Cost.CardId && (d.Stage == CardDeclarationStage.Paying ? m.From == d.Payment.Cost.From && m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay" : m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason.Value is "conversion.declaration.failed" or "conversion.declaration.cancelled"));
+        return _resolutionStackOperations._resolutionStack[index] is ProgramLifecycleTriggerWindowFrame skills && d.Stage == CardDeclarationStage.Granting && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.ResumeProgramFrameId == d.Id;
+    }
+}

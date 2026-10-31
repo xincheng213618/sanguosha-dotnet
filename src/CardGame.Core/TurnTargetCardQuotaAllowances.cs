@@ -34,20 +34,3 @@ internal sealed partial class TurnCardUseEffectStore
     internal void ExpireTargetCardQuotaAllowances(IReadOnlySet<long> ids) =>
         _targetCardQuotaAllowances.RemoveAll(g => ids.Contains(g.GrantSequence));
 }
-
-public sealed partial class GameEngine
-{
-    private bool HasTargetCardQuotaAllowance(int actor, int target) =>
-        TargetRules.HasQuotaAllowance(new(actor, target));
-
-    [ProgramTargetRule(ProgramTargetRulePoint.QuotaAllowance, 30)]
-    private bool GrantedTargetQuotaAllowed(ProgramTargetQuotaQuery query) =>
-        _turnCardUseEffects.HasTargetCardQuotaAllowance(_turnNumber, _currentSeat, query.ActorSeat, query.TargetSeat);
-}
-
-public sealed partial class GameEngine
-{
-    [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaAfterLimit, 110)]
-    private bool GrantedTargetSlashQuotaAfterLimit(ProgramSlashQuotaQuery query) =>
-        HasTargetCardQuotaAllowance(query.Actor.Seat, query.Target.Seat);
-}

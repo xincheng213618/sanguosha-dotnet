@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSimultaneousPindianClaimsRuntime
+{
+    private readonly ICoreSimultaneousPindianClaimsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSimultaneousPindianClaimsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreSimultaneousPindianClaimsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSimultaneousPindianClaimsCorePindianRandomSelectionsOperations _corePindianRandomSelectionsOperations;
+    private readonly ICoreSimultaneousPindianClaimsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreSimultaneousPindianClaimsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSimultaneousPindianClaimsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSimultaneousPindianClaimsCoreSimultaneousPindianOperations _coreSimultaneousPindianOperations;
+    private readonly ICoreSimultaneousPindianClaimsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreSimultaneousPindianClaimsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSimultaneousPindianClaimsRuntime(ICoreSimultaneousPindianClaimsCardZonesOperations cardZonesOperations, ICoreSimultaneousPindianClaimsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreSimultaneousPindianClaimsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSimultaneousPindianClaimsCorePindianRandomSelectionsOperations corePindianRandomSelectionsOperations, ICoreSimultaneousPindianClaimsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreSimultaneousPindianClaimsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSimultaneousPindianClaimsCoreRuntimeOperations coreRuntimeOperations, ICoreSimultaneousPindianClaimsCoreSimultaneousPindianOperations coreSimultaneousPindianOperations, ICoreSimultaneousPindianClaimsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreSimultaneousPindianClaimsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._corePindianRandomSelectionsOperations = corePindianRandomSelectionsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSimultaneousPindianOperations = coreSimultaneousPindianOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

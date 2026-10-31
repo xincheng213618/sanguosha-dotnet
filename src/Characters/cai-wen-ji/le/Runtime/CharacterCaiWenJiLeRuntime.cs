@@ -1,0 +1,67 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterCaiWenJiLeRuntime : global::CardGame.Core.ILeCaiWenJiBeifenHost, global::CardGame.Core.ILeCaiWenJiShuangjiaHost
+{
+    private readonly ICharacterCaiWenJiLeCharacterHuangGaiMouMobileOperations _characterHuangGaiMouMobileOperations;
+    private readonly ICharacterCaiWenJiLeCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterCaiWenJiLeContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterCaiWenJiLePendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICharacterCaiWenJiLeResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterCaiWenJiLeCoreCardDeclarationsOperations _coreCardDeclarationsOperations;
+    private readonly ICharacterCaiWenJiLeCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterCaiWenJiLeCoreCurrentSlashFireOffersOperations _coreCurrentSlashFireOffersOperations;
+    private readonly ICharacterCaiWenJiLeCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterCaiWenJiLeCoreOriginalHandEntityObserversOperations _coreOriginalHandEntityObserversOperations;
+    private readonly ICharacterCaiWenJiLeCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterCaiWenJiLeCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterCaiWenJiLeCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterCaiWenJiLeCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterCaiWenJiLeCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterCaiWenJiLeCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterCaiWenJiLeCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterCaiWenJiLeCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterCaiWenJiLeCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterCaiWenJiLeKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterCaiWenJiLeKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseAccess _coreActualTurnProgressPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
+    internal CharacterCaiWenJiLeRuntime(ICharacterCaiWenJiLeCharacterHuangGaiMouMobileOperations characterHuangGaiMouMobileOperations, ICharacterCaiWenJiLeCardZonesOperations cardZonesOperations, ICharacterCaiWenJiLeContentRegistryOperations contentRegistryOperations, ICharacterCaiWenJiLePendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICharacterCaiWenJiLeResolutionStackOperations resolutionStackOperations, ICharacterCaiWenJiLeCoreCardDeclarationsOperations coreCardDeclarationsOperations, ICharacterCaiWenJiLeCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterCaiWenJiLeCoreCurrentSlashFireOffersOperations coreCurrentSlashFireOffersOperations, ICharacterCaiWenJiLeCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterCaiWenJiLeCoreOriginalHandEntityObserversOperations coreOriginalHandEntityObserversOperations, ICharacterCaiWenJiLeCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterCaiWenJiLeCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterCaiWenJiLeCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterCaiWenJiLeCoreRuntimeOperations coreRuntimeOperations, ICharacterCaiWenJiLeCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterCaiWenJiLeCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterCaiWenJiLeCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterCaiWenJiLeCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterCaiWenJiLeCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterCaiWenJiLeKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterCaiWenJiLeKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseAccess coreActualTurnProgressPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess, global::CardGame.Core.RuntimeAccess.IClosedShuangjiaMarkRuntimeSource _closedShuangjiaMarkRuntimeSource)
+    {
+        this._characterHuangGaiMouMobileOperations = characterHuangGaiMouMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentSlashFireOffersOperations = coreCurrentSlashFireOffersOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOriginalHandEntityObserversOperations = coreOriginalHandEntityObserversOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressPhaseAccess = coreActualTurnProgressPhaseAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreMatchSetupSetupCompleteAccess = coreMatchSetupSetupCompleteAccess;
+        this._closedShuangjiaMarkRuntimeSource = _closedShuangjiaMarkRuntimeSource;
+    }
+
+    private readonly global::CardGame.Core.RuntimeAccess.IClosedShuangjiaMarkRuntimeSource _closedShuangjiaMarkRuntimeSource;
+}

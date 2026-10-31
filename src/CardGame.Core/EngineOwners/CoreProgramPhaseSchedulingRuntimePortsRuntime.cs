@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramPhaseSchedulingRuntimePortsRuntime : global::CardGame.Core.IProgramPhaseNativeEntries, global::CardGame.Core.IProgramPhaseNativeReturns, global::CardGame.Core.IProgramPhasePipelineHooks, global::CardGame.Core.IProgramPhaseQueries, global::CardGame.Core.IProgramPhaseScheduleState, global::CardGame.Core.IProgramPhaseSchedulingFacts
+{
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCharacterCaoXiOlOperations _characterCaoXiOlOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCharacterChengGongYingOlOperations _characterChengGongYingOlOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCharacterDuFuRenOlOperations _characterDuFuRenOlOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCharacterZhangShiPingOlOperations _characterZhangShiPingOlOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCharacterZhangYiOlOperations _characterZhangYiOlOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsProgramPhaseScheduleOperations _programPhaseScheduleOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCoreActualTurnSkillGrantsOperations _coreActualTurnSkillGrantsOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCoreGrantedEntityPhasesOperations _coreGrantedEntityPhasesOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCorePlayPhaseSkillGrantsOperations _corePlayPhaseSkillGrantsOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramPhaseSchedulingRuntimePortsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseAccess _coreActualTurnProgressPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreProgramPhaseSchedulingRuntimePortsRuntime(ICoreProgramPhaseSchedulingRuntimePortsCharacterCaoXiOlOperations characterCaoXiOlOperations, ICoreProgramPhaseSchedulingRuntimePortsCharacterChengGongYingOlOperations characterChengGongYingOlOperations, ICoreProgramPhaseSchedulingRuntimePortsCharacterDuFuRenOlOperations characterDuFuRenOlOperations, ICoreProgramPhaseSchedulingRuntimePortsCharacterZhangShiPingOlOperations characterZhangShiPingOlOperations, ICoreProgramPhaseSchedulingRuntimePortsCharacterZhangYiOlOperations characterZhangYiOlOperations, ICoreProgramPhaseSchedulingRuntimePortsProgramPhaseScheduleOperations programPhaseScheduleOperations, ICoreProgramPhaseSchedulingRuntimePortsProgramPipelineHooksOperations programPipelineHooksOperations, ICoreProgramPhaseSchedulingRuntimePortsCoreActualTurnsOperations coreActualTurnsOperations, ICoreProgramPhaseSchedulingRuntimePortsCoreActualTurnSkillGrantsOperations coreActualTurnSkillGrantsOperations, ICoreProgramPhaseSchedulingRuntimePortsCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICoreProgramPhaseSchedulingRuntimePortsCoreGrantedEntityPhasesOperations coreGrantedEntityPhasesOperations, ICoreProgramPhaseSchedulingRuntimePortsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramPhaseSchedulingRuntimePortsCorePlayPhaseSkillGrantsOperations corePlayPhaseSkillGrantsOperations, ICoreProgramPhaseSchedulingRuntimePortsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramPhaseSchedulingRuntimePortsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseAccess coreActualTurnProgressPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCaoXiOlOperations = characterCaoXiOlOperations;
+        this._characterChengGongYingOlOperations = characterChengGongYingOlOperations;
+        this._characterDuFuRenOlOperations = characterDuFuRenOlOperations;
+        this._characterZhangShiPingOlOperations = characterZhangShiPingOlOperations;
+        this._characterZhangYiOlOperations = characterZhangYiOlOperations;
+        this._programPhaseScheduleOperations = programPhaseScheduleOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreActualTurnSkillGrantsOperations = coreActualTurnSkillGrantsOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreGrantedEntityPhasesOperations = coreGrantedEntityPhasesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayPhaseSkillGrantsOperations = corePlayPhaseSkillGrantsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreActualTurnProgressPhaseAccess = coreActualTurnProgressPhaseAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineMatchedJudgmentPlacementsRuntime
+{
+    private readonly ICoreMatchedJudgmentPlacementsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreMatchedJudgmentPlacementsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreMatchedJudgmentPlacementsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCoreSuitDamagePreventionBenefitsOperations _coreSuitDamagePreventionBenefitsOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCoreSuitPreventionBenefitObserversOperations _coreSuitPreventionBenefitObserversOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreMatchedJudgmentPlacementsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreMatchedJudgmentPlacementsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineMatchedJudgmentPlacementsRuntime(ICoreMatchedJudgmentPlacementsCardZonesOperations cardZonesOperations, ICoreMatchedJudgmentPlacementsContentRegistryOperations contentRegistryOperations, ICoreMatchedJudgmentPlacementsResolutionStackOperations resolutionStackOperations, ICoreMatchedJudgmentPlacementsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreMatchedJudgmentPlacementsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreMatchedJudgmentPlacementsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreMatchedJudgmentPlacementsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreMatchedJudgmentPlacementsCoreRuntimeOperations coreRuntimeOperations, ICoreMatchedJudgmentPlacementsCoreSuitDamagePreventionBenefitsOperations coreSuitDamagePreventionBenefitsOperations, ICoreMatchedJudgmentPlacementsCoreSuitPreventionBenefitObserversOperations coreSuitPreventionBenefitObserversOperations, ICoreMatchedJudgmentPlacementsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreMatchedJudgmentPlacementsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreMatchedJudgmentPlacementsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreMatchedJudgmentPlacementsCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreMatchedJudgmentPlacementsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreMatchedJudgmentPlacementsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSuitDamagePreventionBenefitsOperations = coreSuitDamagePreventionBenefitsOperations;
+        this._coreSuitPreventionBenefitObserversOperations = coreSuitPreventionBenefitObserversOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

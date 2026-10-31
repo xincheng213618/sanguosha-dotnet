@@ -16,7 +16,7 @@ public sealed record ShiScReceipt(CardConversionSource Source, string Hash, Skil
     public bool Draw { get; init; }
     public bool Given { get; init; }
     public ShiScMaterial? Material { get; init; }
-    private readonly IReadOnlyList<int> _cards = [], _participants = [], _targets = [];
+    private readonly IReadOnlyList<int> _cards = [],_participants = [],_targets = [];
     private readonly IReadOnlyList<ShiScVote> _votes = [];
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Participants { get => _participants; init => _participants = Array.AsReadOnly(value.ToArray()); }

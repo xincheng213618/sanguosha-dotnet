@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineExtraEffectForeignSelectionRuntime
+{
+    private readonly ICoreExtraEffectForeignSelectionCharacterZhugeGuoLeOperations _characterZhugeGuoLeOperations;
+    private readonly ICoreExtraEffectForeignSelectionCardZonesOperations _cardZonesOperations;
+    private readonly ICoreExtraEffectForeignSelectionResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreCurrentUsePhysicalClaimsOperations _coreCurrentUsePhysicalClaimsOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreExtraCardEffectRoundsOperations _coreExtraCardEffectRoundsOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreMantianGuohaiOperations _coreMantianGuohaiOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreWushuangCombatTacticsOperations _coreWushuangCombatTacticsOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreWushuangTargetCardsOperations _coreWushuangTargetCardsOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreNativeTrickEffectsOperations _coreNativeTrickEffectsOperations;
+    private readonly ICoreExtraEffectForeignSelectionCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreExtraEffectForeignSelectionCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreExtraEffectForeignSelectionCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineExtraEffectForeignSelectionRuntime(ICoreExtraEffectForeignSelectionCharacterZhugeGuoLeOperations characterZhugeGuoLeOperations, ICoreExtraEffectForeignSelectionCardZonesOperations cardZonesOperations, ICoreExtraEffectForeignSelectionResolutionStackOperations resolutionStackOperations, ICoreExtraEffectForeignSelectionCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreExtraEffectForeignSelectionCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreExtraEffectForeignSelectionCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreExtraEffectForeignSelectionCoreCurrentUsePhysicalClaimsOperations coreCurrentUsePhysicalClaimsOperations, ICoreExtraEffectForeignSelectionCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreExtraEffectForeignSelectionCoreExtraCardEffectRoundsOperations coreExtraCardEffectRoundsOperations, ICoreExtraEffectForeignSelectionCoreMantianGuohaiOperations coreMantianGuohaiOperations, ICoreExtraEffectForeignSelectionCoreRuntimeOperations coreRuntimeOperations, ICoreExtraEffectForeignSelectionCoreWushuangCombatTacticsOperations coreWushuangCombatTacticsOperations, ICoreExtraEffectForeignSelectionCoreWushuangTargetCardsOperations coreWushuangTargetCardsOperations, ICoreExtraEffectForeignSelectionCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreExtraEffectForeignSelectionCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreExtraEffectForeignSelectionCoreNativeTrickEffectsOperations coreNativeTrickEffectsOperations, ICoreExtraEffectForeignSelectionCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreExtraEffectForeignSelectionCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreExtraEffectForeignSelectionCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterZhugeGuoLeOperations = characterZhugeGuoLeOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentUsePhysicalClaimsOperations = coreCurrentUsePhysicalClaimsOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreExtraCardEffectRoundsOperations = coreExtraCardEffectRoundsOperations;
+        this._coreMantianGuohaiOperations = coreMantianGuohaiOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreWushuangCombatTacticsOperations = coreWushuangCombatTacticsOperations;
+        this._coreWushuangTargetCardsOperations = coreWushuangTargetCardsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeTrickEffectsOperations = coreNativeTrickEffectsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

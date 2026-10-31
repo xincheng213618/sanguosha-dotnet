@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramHealthStateRuntimePortsRuntime : global::CardGame.Core.IProgramHealthStateFacts, global::CardGame.Core.IProgramHealthStateNativeEntries
+{
+    private readonly ICoreProgramHealthStateRuntimePortsCharacterDaQiaoXiaoQiaoHappyGodOperations _characterDaQiaoXiaoQiaoHappyGodOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCharacterSunJianMouOlOperations _characterSunJianMouOlOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreCharacterTurnedOverProgramsOperations _coreCharacterTurnedOverProgramsOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreQimeiProgramsOperations _coreQimeiProgramsOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreWushuangTacticRulesOperations _coreWushuangTacticRulesOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreNativeRecoveryFramesOperations _coreNativeRecoveryFramesOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreProgramHealthStateRuntimePortsCoreShenwuNpcProgramsOperations _coreShenwuNpcProgramsOperations;
+    internal CoreProgramHealthStateRuntimePortsRuntime(ICoreProgramHealthStateRuntimePortsCharacterDaQiaoXiaoQiaoHappyGodOperations characterDaQiaoXiaoQiaoHappyGodOperations, ICoreProgramHealthStateRuntimePortsCharacterSunJianMouOlOperations characterSunJianMouOlOperations, ICoreProgramHealthStateRuntimePortsProgramPipelineHooksOperations programPipelineHooksOperations, ICoreProgramHealthStateRuntimePortsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreProgramHealthStateRuntimePortsCoreCharacterTurnedOverProgramsOperations coreCharacterTurnedOverProgramsOperations, ICoreProgramHealthStateRuntimePortsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramHealthStateRuntimePortsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreProgramHealthStateRuntimePortsCoreQimeiProgramsOperations coreQimeiProgramsOperations, ICoreProgramHealthStateRuntimePortsCoreRuleQueriesOperations coreRuleQueriesOperations, ICoreProgramHealthStateRuntimePortsCoreWushuangTacticRulesOperations coreWushuangTacticRulesOperations, ICoreProgramHealthStateRuntimePortsCoreMatchLogOperations coreMatchLogOperations, ICoreProgramHealthStateRuntimePortsCoreNativeRecoveryFramesOperations coreNativeRecoveryFramesOperations, ICoreProgramHealthStateRuntimePortsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreProgramHealthStateRuntimePortsCoreShenwuNpcProgramsOperations coreShenwuNpcProgramsOperations)
+    {
+        this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;
+        this._characterSunJianMouOlOperations = characterSunJianMouOlOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreCharacterTurnedOverProgramsOperations = coreCharacterTurnedOverProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreQimeiProgramsOperations = coreQimeiProgramsOperations;
+        this._coreRuleQueriesOperations = coreRuleQueriesOperations;
+        this._coreWushuangTacticRulesOperations = coreWushuangTacticRulesOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeRecoveryFramesOperations = coreNativeRecoveryFramesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreShenwuNpcProgramsOperations = coreShenwuNpcProgramsOperations;
+    }
+}

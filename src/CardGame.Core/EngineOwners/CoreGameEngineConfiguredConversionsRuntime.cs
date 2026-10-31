@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineConfiguredConversionsRuntime
+{
+    private readonly ICoreConfiguredConversionsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreConfiguredConversionsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreConfiguredConversionsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreConfiguredConversionsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreConfiguredConversionsCoreActivityOrdinaryTricksOperations _coreActivityOrdinaryTricksOperations;
+    private readonly ICoreConfiguredConversionsCoreLastZoneConversionsOperations _coreLastZoneConversionsOperations;
+    private readonly ICoreConfiguredConversionsCoreOwnPublicPileConversionsOperations _coreOwnPublicPileConversionsOperations;
+    private readonly ICoreConfiguredConversionsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreConfiguredConversionsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreConfiguredConversionsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreConfiguredConversionsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreConfiguredConversionsCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreConfiguredConversionsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreConfiguredConversionsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineConfiguredConversionsConfiguredConversionTiersDeclaredConversionCardsAccess _coreGameEngineConfiguredConversionsConfiguredConversionTiersDeclaredConversionCardsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess _coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    internal CoreGameEngineConfiguredConversionsRuntime(ICoreConfiguredConversionsCardZonesOperations cardZonesOperations, ICoreConfiguredConversionsContentRegistryOperations contentRegistryOperations, ICoreConfiguredConversionsResolutionStackOperations resolutionStackOperations, ICoreConfiguredConversionsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreConfiguredConversionsCoreActivityOrdinaryTricksOperations coreActivityOrdinaryTricksOperations, ICoreConfiguredConversionsCoreLastZoneConversionsOperations coreLastZoneConversionsOperations, ICoreConfiguredConversionsCoreOwnPublicPileConversionsOperations coreOwnPublicPileConversionsOperations, ICoreConfiguredConversionsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreConfiguredConversionsCoreRuntimeOperations coreRuntimeOperations, ICoreConfiguredConversionsCoreMatchLogOperations coreMatchLogOperations, ICoreConfiguredConversionsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreConfiguredConversionsCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreConfiguredConversionsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreConfiguredConversionsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineConfiguredConversionsConfiguredConversionTiersDeclaredConversionCardsAccess coreGameEngineConfiguredConversionsConfiguredConversionTiersDeclaredConversionCardsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess coreGameEngineSkillProgramsProgramPhaseUsesAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActivityOrdinaryTricksOperations = coreActivityOrdinaryTricksOperations;
+        this._coreLastZoneConversionsOperations = coreLastZoneConversionsOperations;
+        this._coreOwnPublicPileConversionsOperations = coreOwnPublicPileConversionsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineConfiguredConversionsConfiguredConversionTiersDeclaredConversionCardsAccess = coreGameEngineConfiguredConversionsConfiguredConversionTiersDeclaredConversionCardsAccess;
+        this._coreGameEngineSkillProgramsProgramPhaseUsesAccess = coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    }
+}

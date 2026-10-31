@@ -119,7 +119,7 @@ internal static class AnniversaryShenSunQuanChecks
     private static bool Unlocked(GameEngine g)
     {
         var locked = E<AnniversaryJichaoLockedEvent>(g).Last();
-        return (bool)typeof(GameEngine).GetMethod("AnniversaryJichaoUnlocked", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(g, [0, locked.SkillInstanceId])!;
+        return (bool)global::FixtureRuntimeAccess.Engine.GetMethod("AnniversaryJichaoUnlocked", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(g, [0, locked.SkillInstanceId])!;
     }
     private static void Continue(GameEngine g) => Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
     private static void Play(GameEngine g) => Reach(g, p => p.Kind == DecisionKind.PlayCard && p.PlayerSeat == 0);

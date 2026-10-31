@@ -23,7 +23,6 @@ internal interface IProgramPaidCardFacts : IProgramSelectionQuery
     IReadOnlyList<Card> Judgment(int seat);
     IReadOnlyList<Card> CardsAt(CardLocation location);
     CardLocation Location(int cardId);
-    CardSnapshot Snapshot(Card card);
     int ProviderSeat(ProgramSkillFrame frame);
     SkillProgramEffect OwnedSelectionEffect(ProgramSkillFrame frame);
     bool IsSatisfiedOwnHandReward(ProgramSkillFrame frame, SkillProgramEffect effect);
@@ -51,9 +50,6 @@ internal interface IProgramPaidCardOperations : IProgramRuntimeOperations
     void Cancel(ProgramSkillFrame frame, string reason);
     void SetCardSet(long frameId, string bind, IReadOnlyList<int> ids, SkillProgramCardSetVisibility visibility,
         IReadOnlyList<CardLocation>? locations = null, Suit? frozenSuit = null);
-    NativeLogicalDiscardInvocationDraft? CaptureLogicalDiscard(int initiator, int executor, IReadOnlyList<int> ids,
-        CardMoveReason reason, long? parentFrameId = null);
-    void CompleteLogicalDiscard(NativeLogicalDiscardInvocationDraft? invocation);
     void Move(Card card, CardLocation source, CardLocation destination, CardMoveReason reason,
         CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified);
     bool MoveToProcessing(ProgramSkillFrame frame, Card card, CardLocation source, CardMoveReason reason,
@@ -75,15 +71,20 @@ internal sealed partial class ProgramPaidCardRuntime
     private readonly IProgramRuntimeFrames _frames;
     private readonly IProgramRuntimePrompts _prompts;
     private readonly IProgramRuntimeEvents _events;
+    private readonly IProgramCardSnapshotQueries _snapshots;
+    private readonly INativeLogicalDiscardOperations _logicalDiscards;
 
     internal ProgramPaidCardRuntime(IProgramPaidCardFacts facts, IProgramPaidCardOperations operations,
-        IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events)
+        IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events,
+        IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards)
     {
         _facts = facts;
         _operations = operations;
         _frames = frames;
         _prompts = prompts;
         _events = events;
+        _snapshots = snapshots;
+        _logicalDiscards = logicalDiscards;
     }
 
     private static ProgramSkillCardSetBinding CardSet(ProgramSkillFrame frame, string bind) =>
@@ -93,104 +94,4 @@ internal sealed partial class ProgramPaidCardRuntime
 
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class ProgramPaidCardFacts(GameEngine engine) : IProgramPaidCardFacts
-    {
-        public int PlayerCount => engine._playerCount;
-        public IReadOnlyList<int> Seats => Array.AsReadOnly(engine._players.Select(player => player.Seat).ToArray());
-        public int Seat(int seat) => engine._players[seat].Seat;
-        public bool IsValidSeat(int seat) => engine.IsValidPlayerSeat(seat);
-        public bool IsAlive(int seat) => engine._players[seat].IsAlive;
-        public bool IsHuman(int seat) => engine._players[seat].IsHuman;
-        public string Name(int seat) => engine._players[seat].Name;
-        public bool EquipmentAreaAbolished(int seat) => engine._players[seat].EquipmentAreaAbolished;
-        public bool JudgmentAreaAbolished(int seat) => engine._players[seat].JudgmentAreaAbolished;
-        public int EquipmentSlotCapacity(int seat, EquipmentSlot slot) => engine._players[seat].EquipmentSlotCapacity(slot);
-        public EquipmentSlot FieldEquipmentSlot(Card card) => engine.FieldEquipmentSlot(card);
-        public bool HasSkillInstance(int seat, string skillId, string instanceId) =>
-            engine.HasRuntimeSkillInstance(engine._players[seat], skillId, instanceId);
-        public ContentSkillDefinition Skill(string skillId) => engine._contentRegistry!.GetSkill(skillId);
-        public PlayerSkillContext SkillContext(int seat) => engine.CreateSkillContext(engine._players[seat]);
-        public IReadOnlyList<Card> Hand(int seat) => Array.AsReadOnly(engine.GetHand(engine._players[seat]).ToArray());
-        public IReadOnlyList<Card> Equipment(int seat) => Array.AsReadOnly(engine.GetEquipment(engine._players[seat]).ToArray());
-        public IReadOnlyList<Card> Judgment(int seat) => Array.AsReadOnly(engine.GetJudgment(engine._players[seat]).ToArray());
-        public IReadOnlyList<Card> CardsAt(CardLocation location) => Array.AsReadOnly(engine._cardZones.CardsAt(location).ToArray());
-        public CardLocation Location(int cardId) => engine._cardZones.GetLocation(cardId);
-        public CardSnapshot Snapshot(Card card) => engine.ToSnapshot(card);
-        public int ProviderSeat(ProgramSkillFrame frame) => engine.GuanParentAction(frame).ProviderSeat;
-        public SkillProgramEffect OwnedSelectionEffect(ProgramSkillFrame frame) => engine.GetOwnedSelectionEffect(frame);
-        public bool IsSatisfiedOwnHandReward(ProgramSkillFrame frame, SkillProgramEffect effect) => engine.IsAnniversaryLeiBoSelfLoot(frame, effect);
-        public bool ForeignDiscardPrevented(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) =>
-            engine.IsForeignEquipmentDiscardPrevented(chooser, card, source, intent);
-        public bool SelfDiscardForbidden(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) =>
-            engine.IsSelfHandCategoryDiscardForbidden(chooser, card, source, intent);
-        public bool AllowsOwnedCardPayment(ProgramSkillFrame frame, CardLocation source, Card card) =>
-            engine.AllowsPostCostSlashRedirectPayment(frame, source, card);
-        public bool IsActiveSourceEquipment(int owner, string skillId, string instanceId, Card card) =>
-            engine.IsActiveProgramSourceEquipmentCard(owner, skillId, instanceId, card);
-        public bool IsZixiJudgment(int cardId) => engine.IsZixiQinJudgmentCard(cardId);
-        public bool CanTransferZixiJudgment(Card card, int destinationSeat) => engine.CanTransferZixiQinJudgmentCard(card, destinationSeat);
-        public bool HasCardPolicy(int seat, SkillProgramCardPolicyKind policy) => engine.HasCardPolicy(engine._players[seat], policy);
-        public CardKind JudgmentKind(Card card) => engine.GetJudgmentEffectiveCardKind(card);
-        public bool IsDelayedCard(CardKind kind) => GameEngine.IsDelayedCard(kind);
-        public bool HasJudgmentEffectiveCard(int seat, CardKind kind) => engine.HasJudgmentEffectiveCard(engine._players[seat], kind);
-        public Suit EffectiveSuit(int seat, Card card) => engine.EffectiveSuit(engine._players[seat], card);
-        public int CountLivingInAttackRange(int seat) => engine.CountLivingInAttackRange(seat);
-        public IReadOnlyList<int> TargetSeats(int owner, SkillProgramTargetKind kind, ProgramSkillWindowContext? context) =>
-            engine.GetProgramTargetSeats(owner, kind, context);
-        public bool CanSelectPindianOpponent(ProgramSkillFrame frame, int seat) => engine.CanSelectProgramPindianOpponent(frame, seat);
-        public Card[] ClaimableDamageCards(ProgramSkillFrame frame) => engine.GetClaimableProgramDamageCards(frame);
-        public bool FrozenSuitMatchesChoice(ProgramSkillFrame frame, string cardBind, string choiceBind) =>
-            engine.DoesProgramFrozenSuitMatchChoice(frame, cardBind, choiceBind);
-        public bool BoundCardsMatchCategories(ProgramSkillFrame frame, string bind, IReadOnlyList<SkillProgramCardCategory> categories) =>
-            engine.DoProgramBoundCardsMatchCategories(frame, bind, categories);
-    }
-
-    [ProgramCapability]
-    private sealed class ProgramPaidCardOperations(GameEngine engine) : IProgramPaidCardOperations
-    {
-        public void Cancel(ProgramSkillFrame frame, string reason) => engine.CancelProgramBindingAndCleanup(frame, reason);
-        public void SetCardSet(long frameId, string bind, IReadOnlyList<int> ids, SkillProgramCardSetVisibility visibility,
-            IReadOnlyList<CardLocation>? locations = null, Suit? frozenSuit = null) =>
-            engine.SetProgramCardSet(frameId, bind, ids, visibility, locations, frozenSuit);
-        public NativeLogicalDiscardInvocationDraft? CaptureLogicalDiscard(int initiator, int executor, IReadOnlyList<int> ids,
-            CardMoveReason reason, long? parentFrameId = null) =>
-            engine.CaptureNativeLogicalDiscardInvocation(initiator, executor, ids, reason, parentFrameId);
-        public void CompleteLogicalDiscard(NativeLogicalDiscardInvocationDraft? invocation) =>
-            engine.CompleteNativeLogicalDiscardInvocation(invocation);
-        public void Move(Card card, CardLocation source, CardLocation destination, CardMoveReason reason,
-            CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified) =>
-            engine.MoveCard(card, source, destination, reason, disclosure: disclosure);
-        public bool MoveToProcessing(ProgramSkillFrame frame, Card card, CardLocation source, CardMoveReason reason,
-            CardMovementDisclosure disclosure)
-        {
-            var before = engine._movementSequence;
-            engine.MoveCard(card, source, CardLocation.Processing, reason, disclosure: disclosure);
-            if (engine._cardZones.GetLocation(card.Id) == CardLocation.Processing) return true;
-            // A generated field entity can be destroyed by this exact first
-            // departure. Credit that real payment; never run a second transfer
-            // from Processing or report an obtain that did not take place.
-            if (engine._resolutionStack.LastOrDefault()?.Id == frame.Id && source.Zone == CardZoneKind.Equipment &&
-                engine._cardMovements.Where(move => move.Sequence > before && move.CardId == card.Id).ToArray() is [var movement] &&
-                movement.CardKind == card.Kind && movement.From == source && movement.To == CardLocation.OutsideGame &&
-                movement.Reason == reason && engine._cardZones.GetLocation(card.Id) == movement.To &&
-                engine.IsEphemeralCardDestroyedMaterial(movement)) return false;
-            throw new InvalidOperationException("A selected transfer lost its exact first processing entry or native destruction proof.");
-        }
-        public bool SettleRetainedGain(ProgramSkillFrame frame, Card card, CardLocation source,
-            CardLocation destination, CardMoveReason reason) =>
-            engine.TrySettleHappyWeiYanRetainedGain(card, source, destination, reason, frame.Id);
-        public void Give(ProgramSkillFrame frame, int giver, Card card, CardLocation source, CardLocation destination, CardMoveReason reason, bool throughProcessing, CardMovementDisclosure disclosure)
-        {
-            if (SettleRetainedGain(frame, card, source, destination, reason)) return;
-            var before = engine._movementSequence;
-            if (throughProcessing && !MoveToProcessing(frame, card, source, reason, disclosure)) return;
-            engine.MoveCard(card, throughProcessing ? CardLocation.Processing : source, destination, reason,
-                engine.NativeGiveCompletion(frame.Id, giver, destination.OwnerSeat!.Value, [card.Id], before), disclosure: disclosure);
-        }
-        public bool BeginMovementWindow() => engine.TryBeginCardsMovedProgramWindow();
-        public bool BeginPublicHandReveal(long frameId, string returnKey) => engine.TryBeginPublicHandRevealWindow(frameId, returnKey);
-        public void ReturnMovement(long frameId) => engine.ReturnRuntimeProgramMovement(frameId);
-        public void Log(string type, string message, int? actor = null) => engine.AddLog(type, message, actor);
-    }
 }

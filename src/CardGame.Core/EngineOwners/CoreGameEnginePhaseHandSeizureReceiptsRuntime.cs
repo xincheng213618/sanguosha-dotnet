@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePhaseHandSeizureReceiptsRuntime
+{
+    private readonly ICorePhaseHandSeizureReceiptsCardZonesOperations _cardZonesOperations;
+    private readonly ICorePhaseHandSeizureReceiptsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePhaseHandSeizureReceiptsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePhaseHandSeizureReceiptsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICorePhaseHandSeizureReceiptsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePhaseHandSeizureReceiptsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICorePhaseHandSeizureReceiptsCorePhaseHandSeizureOperations _corePhaseHandSeizureOperations;
+    private readonly ICorePhaseHandSeizureReceiptsCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICorePhaseHandSeizureReceiptsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEnginePhaseHandSeizureReceiptsRuntime(ICorePhaseHandSeizureReceiptsCardZonesOperations cardZonesOperations, ICorePhaseHandSeizureReceiptsContentRegistryOperations contentRegistryOperations, ICorePhaseHandSeizureReceiptsResolutionStackOperations resolutionStackOperations, ICorePhaseHandSeizureReceiptsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICorePhaseHandSeizureReceiptsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePhaseHandSeizureReceiptsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICorePhaseHandSeizureReceiptsCorePhaseHandSeizureOperations corePhaseHandSeizureOperations, ICorePhaseHandSeizureReceiptsCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICorePhaseHandSeizureReceiptsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._corePhaseHandSeizureOperations = corePhaseHandSeizureOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

@@ -38,6 +38,9 @@ public sealed record MobileSimaJilueChoiceEvent(long FrameId, CardConversionSour
 public sealed record MobileSimaJilueDrawReturnedEvent(long FrameId, int OwnerSeat, int Requested, int Actual, long Before, long After) : IGameEvent;
 internal static class MobileSimaYiComposition
 {
+    internal static IReadOnlyList<string> LearningSkills { get; } = Array.AsReadOnly(new[]
+        { "classic:guicai", "classic:fangzhu", "classic:jizhi", "classic:zhiheng", "classic:wansha" });
+
     [ProgramCatalogValidation(40425)] internal static void Validate(string path, SkillProgram p)
     {
         var ops = p.Triggers.SelectMany(t => t.Effects).Select(e => e.Op).ToArray();

@@ -55,7 +55,7 @@ internal sealed class ShenCaoPiHandler(SkillProgramEffectOp op) : ISkillProgramE
 { public SkillProgramEffectOp Op => op; public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int seat, ISkillProgramEffectHost h) => h.GetCapability<IShenCaoPiHost>().Resolve(f, op); }
 internal static class ShenCaoPiComposition
 {
-    internal const string Yinzhi = "anniversary:yinzhi", Keming = "anniversary:keming";
+    internal const string Yinzhi = "anniversary:yinzhi",Keming = "anniversary:keming";
     [ProgramCatalogValidation(39700)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op is >= SkillProgramEffectOp.ApplyShenCaoPiYinzhi and <= SkillProgramEffectOp.ArmKemingSkillEcho)) return;

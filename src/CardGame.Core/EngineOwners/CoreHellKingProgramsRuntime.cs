@@ -1,0 +1,84 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreHellKingProgramsRuntime : global::CardGame.Core.IHellKingProgramHost
+{
+    private readonly ICoreHellKingProgramsCharacterHuangGaiMouMobileOperations _characterHuangGaiMouMobileOperations;
+    private readonly ICoreHellKingProgramsCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreHellKingProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreHellKingProgramsRandomOperations _randomOperations;
+    private readonly ICoreHellKingProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHellKingProgramsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreHellKingProgramsCoreActualPlayPhaseCardUsesOperations _coreActualPlayPhaseCardUsesOperations;
+    private readonly ICoreHellKingProgramsCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreHellKingProgramsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreHellKingProgramsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreHellKingProgramsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreHellKingProgramsCoreIssuedPlayUsePoliciesOperations _coreIssuedPlayUsePoliciesOperations;
+    private readonly ICoreHellKingProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreHellKingProgramsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreHellKingProgramsCoreOutsidePhaseDrawDiscardOperations _coreOutsidePhaseDrawDiscardOperations;
+    private readonly ICoreHellKingProgramsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreHellKingProgramsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreHellKingProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreHellKingProgramsCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICoreHellKingProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreHellKingProgramsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreHellKingProgramsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreHellKingProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreHellKingProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreHellKingProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreHellKingProgramsCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreHellKingProgramsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreHellKingProgramsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreHellKingProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess _coreMatchDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CoreHellKingProgramsRuntime(ICoreHellKingProgramsCharacterHuangGaiMouMobileOperations characterHuangGaiMouMobileOperations, ICoreHellKingProgramsCharacterLuMengMouOperations characterLuMengMouOperations, ICoreHellKingProgramsContentRegistryOperations contentRegistryOperations, ICoreHellKingProgramsRandomOperations randomOperations, ICoreHellKingProgramsResolutionStackOperations resolutionStackOperations, ICoreHellKingProgramsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreHellKingProgramsCoreActualPlayPhaseCardUsesOperations coreActualPlayPhaseCardUsesOperations, ICoreHellKingProgramsCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreHellKingProgramsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreHellKingProgramsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreHellKingProgramsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreHellKingProgramsCoreIssuedPlayUsePoliciesOperations coreIssuedPlayUsePoliciesOperations, ICoreHellKingProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreHellKingProgramsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreHellKingProgramsCoreOutsidePhaseDrawDiscardOperations coreOutsidePhaseDrawDiscardOperations, ICoreHellKingProgramsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreHellKingProgramsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreHellKingProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreHellKingProgramsCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICoreHellKingProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreHellKingProgramsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreHellKingProgramsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreHellKingProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreHellKingProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreHellKingProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreHellKingProgramsCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreHellKingProgramsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreHellKingProgramsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreHellKingProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess coreMatchDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess)
+    {
+        this._characterHuangGaiMouMobileOperations = characterHuangGaiMouMobileOperations;
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreActualPlayPhaseCardUsesOperations = coreActualPlayPhaseCardUsesOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreIssuedPlayUsePoliciesOperations = coreIssuedPlayUsePoliciesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreOutsidePhaseDrawDiscardOperations = coreOutsidePhaseDrawDiscardOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchDefinitionPlayerCountAccess = coreMatchDefinitionPlayerCountAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+    }
+}

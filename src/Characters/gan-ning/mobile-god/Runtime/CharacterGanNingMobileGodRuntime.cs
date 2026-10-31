@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterGanNingMobileGodRuntime : global::CardGame.Core.IMobileCampClaimHost
+{
+    private readonly ICharacterGanNingMobileGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterGanNingMobileGodCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICharacterGanNingMobileGodCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICharacterGanNingMobileGodCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterGanNingMobileGodCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterGanNingMobileGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterGanNingMobileGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterGanNingMobileGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterGanNingMobileGodCoreStrategicProgramsOperations _coreStrategicProgramsOperations;
+    private readonly ICharacterGanNingMobileGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterGanNingMobileGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterGanNingMobileGodRuntime(ICharacterGanNingMobileGodResolutionStackOperations resolutionStackOperations, ICharacterGanNingMobileGodCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICharacterGanNingMobileGodCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICharacterGanNingMobileGodCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterGanNingMobileGodCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterGanNingMobileGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterGanNingMobileGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterGanNingMobileGodCoreRuntimeOperations coreRuntimeOperations, ICharacterGanNingMobileGodCoreStrategicProgramsOperations coreStrategicProgramsOperations, ICharacterGanNingMobileGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterGanNingMobileGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreStrategicProgramsOperations = coreStrategicProgramsOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

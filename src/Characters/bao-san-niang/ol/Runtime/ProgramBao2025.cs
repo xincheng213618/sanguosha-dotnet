@@ -9,7 +9,7 @@ public enum ProgramBao2025Stage
 public sealed record LimitedSkillResetEntry(CardConversionSource Source, string GameplayHash, string UsageId, int Before);
 public sealed record ProgramBao2025Receipt
 {
-    private IReadOnlyList<int> _cards = [], _targets = [], _selected = [], _damaged = [];
+    private IReadOnlyList<int> _cards = [],_targets = [],_selected = [],_damaged = [];
     private IReadOnlyList<CardLocation> _from = [];
     private IReadOnlyList<PromptChoice> _choices = [];
     private IReadOnlyList<string> _lostGrants = [];

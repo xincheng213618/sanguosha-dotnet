@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CharacterSunHaoMobileRuntime
+{
+    private readonly ICharacterSunHaoMobileCharacterHeQiOlOperations _characterHeQiOlOperations;
+    private readonly ICharacterSunHaoMobileCharacterSunHaoOlOperations _characterSunHaoOlOperations;
+    private readonly ICharacterSunHaoMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSunHaoMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSunHaoMobileCoreCurrentTurnSkillSuppressionsOperations _coreCurrentTurnSkillSuppressionsOperations;
+    private readonly ICharacterSunHaoMobileCoreHpConditionalSkillGrantsOperations _coreHpConditionalSkillGrantsOperations;
+    private readonly ICharacterSunHaoMobileCoreLordSkillProjectionsOperations _coreLordSkillProjectionsOperations;
+    private readonly ICharacterSunHaoMobileCorePrivateGeneralLibrariesOperations _corePrivateGeneralLibrariesOperations;
+    private readonly ICharacterSunHaoMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSunHaoMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterSunHaoMobileCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterSunHaoMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterSunHaoMobileCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterSunHaoMobileCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICharacterSunHaoMobileCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICharacterSunHaoMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterSunHaoMobileRuntime(ICharacterSunHaoMobileCharacterHeQiOlOperations characterHeQiOlOperations, ICharacterSunHaoMobileCharacterSunHaoOlOperations characterSunHaoOlOperations, ICharacterSunHaoMobileContentRegistryOperations contentRegistryOperations, ICharacterSunHaoMobileResolutionStackOperations resolutionStackOperations, ICharacterSunHaoMobileCoreCurrentTurnSkillSuppressionsOperations coreCurrentTurnSkillSuppressionsOperations, ICharacterSunHaoMobileCoreHpConditionalSkillGrantsOperations coreHpConditionalSkillGrantsOperations, ICharacterSunHaoMobileCoreLordSkillProjectionsOperations coreLordSkillProjectionsOperations, ICharacterSunHaoMobileCorePrivateGeneralLibrariesOperations corePrivateGeneralLibrariesOperations, ICharacterSunHaoMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSunHaoMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterSunHaoMobileCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterSunHaoMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterSunHaoMobileCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterSunHaoMobileCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICharacterSunHaoMobileCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICharacterSunHaoMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHeQiOlOperations = characterHeQiOlOperations;
+        this._characterSunHaoOlOperations = characterSunHaoOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCurrentTurnSkillSuppressionsOperations = coreCurrentTurnSkillSuppressionsOperations;
+        this._coreHpConditionalSkillGrantsOperations = coreHpConditionalSkillGrantsOperations;
+        this._coreLordSkillProjectionsOperations = coreLordSkillProjectionsOperations;
+        this._corePrivateGeneralLibrariesOperations = corePrivateGeneralLibrariesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

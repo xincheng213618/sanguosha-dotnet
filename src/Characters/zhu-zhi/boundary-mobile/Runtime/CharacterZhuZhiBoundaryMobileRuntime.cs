@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZhuZhiBoundaryMobileRuntime : global::CardGame.Core.IBoundaryZhuZhiHost
+{
+    private readonly ICharacterZhuZhiBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreAttributedMarkerEventsOperations _coreAttributedMarkerEventsOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreDyingOwnedCardSelectionsOperations _coreDyingOwnedCardSelectionsOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCorePrepPoisonOutcomesOperations _corePrepPoisonOutcomesOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterZhuZhiBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterZhuZhiBoundaryMobileRuntime(ICharacterZhuZhiBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterZhuZhiBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterZhuZhiBoundaryMobileCoreAttributedMarkerEventsOperations coreAttributedMarkerEventsOperations, ICharacterZhuZhiBoundaryMobileCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterZhuZhiBoundaryMobileCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterZhuZhiBoundaryMobileCoreDyingOwnedCardSelectionsOperations coreDyingOwnedCardSelectionsOperations, ICharacterZhuZhiBoundaryMobileCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterZhuZhiBoundaryMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterZhuZhiBoundaryMobileCorePrepPoisonOutcomesOperations corePrepPoisonOutcomesOperations, ICharacterZhuZhiBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhuZhiBoundaryMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhuZhiBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterZhuZhiBoundaryMobileCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterZhuZhiBoundaryMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterZhuZhiBoundaryMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterZhuZhiBoundaryMobileCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICharacterZhuZhiBoundaryMobileCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterZhuZhiBoundaryMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterZhuZhiBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAttributedMarkerEventsOperations = coreAttributedMarkerEventsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDyingOwnedCardSelectionsOperations = coreDyingOwnedCardSelectionsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePrepPoisonOutcomesOperations = corePrepPoisonOutcomesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

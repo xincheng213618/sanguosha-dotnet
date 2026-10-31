@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouZhouYuMobileComposition
 {
-    internal const string Yingzi = "mou-mobile:yingzi", Fanjian = "mou-mobile:fanjian";
+    internal const string Yingzi = "mou-mobile:yingzi",Fanjian = "mou-mobile:fanjian";
     [ProgramCatalogValidation(1050)]
     internal static void ValidateProgram(string path, SkillProgram p)
     {

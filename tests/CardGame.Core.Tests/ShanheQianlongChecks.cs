@@ -115,9 +115,9 @@ internal static class ShanheQianlongChecks
 
     private static int Limit(GameEngine game, int seat)
     {
-        var players = (IReadOnlyList<CharacterState>)typeof(GameEngine)
+        var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine
             .GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(game)!;
-        var evaluation = (RuleQueryEvaluation)typeof(GameEngine)
+        var evaluation = (RuleQueryEvaluation)global::FixtureRuntimeAccess.Engine
             .GetMethod("CalculateSlashUseLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(game, [players[seat], null, null])!;
         Need(evaluation.Value is FiniteRuleQueryValue, "Potential fixture must retain a finite native Slash limit.");
         return ((FiniteRuleQueryValue)evaluation.Value).Value;

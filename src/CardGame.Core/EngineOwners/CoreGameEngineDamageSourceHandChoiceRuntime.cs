@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDamageSourceHandChoiceRuntime : global::CardGame.Core.IDamageSourceHandChoiceHost
+{
+    private readonly ICoreDamageSourceHandChoiceCardZonesOperations _cardZonesOperations;
+    private readonly ICoreDamageSourceHandChoiceContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDamageSourceHandChoiceResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreNamedAmbushOperations _coreNamedAmbushOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreDamageSourceHandChoiceCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreNativeDamageCompletionOperations _coreNativeDamageCompletionOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreDamageSourceHandChoiceCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDamageSourceHandChoiceCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreDamageSourceHandChoiceCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreDamageSourceHandChoiceCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreDamageSourceHandChoiceKernelCoreGameEngineProgramAttackAttemptOperations _kernelCoreGameEngineProgramAttackAttemptOperations;
+    private readonly ICoreDamageSourceHandChoiceKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineDamageSourceHandChoiceRuntime(ICoreDamageSourceHandChoiceCardZonesOperations cardZonesOperations, ICoreDamageSourceHandChoiceContentRegistryOperations contentRegistryOperations, ICoreDamageSourceHandChoiceResolutionStackOperations resolutionStackOperations, ICoreDamageSourceHandChoiceCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreDamageSourceHandChoiceCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDamageSourceHandChoiceCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreDamageSourceHandChoiceCoreNamedAmbushOperations coreNamedAmbushOperations, ICoreDamageSourceHandChoiceCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDamageSourceHandChoiceCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreDamageSourceHandChoiceCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreDamageSourceHandChoiceCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDamageSourceHandChoiceCoreRuntimeOperations coreRuntimeOperations, ICoreDamageSourceHandChoiceCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreDamageSourceHandChoiceCoreNativeDamageCompletionOperations coreNativeDamageCompletionOperations, ICoreDamageSourceHandChoiceCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreDamageSourceHandChoiceCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDamageSourceHandChoiceCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreDamageSourceHandChoiceCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreDamageSourceHandChoiceCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreDamageSourceHandChoiceKernelCoreGameEngineProgramAttackAttemptOperations kernelCoreGameEngineProgramAttackAttemptOperations, ICoreDamageSourceHandChoiceKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreNamedAmbushOperations = coreNamedAmbushOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeDamageCompletionOperations = coreNativeDamageCompletionOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineProgramAttackAttemptOperations = kernelCoreGameEngineProgramAttackAttemptOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

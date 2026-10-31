@@ -1,0 +1,78 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSunShangxiangSpOlRuntime : global::CardGame.Core.ISpSunShangxiangOlHost
+{
+    private readonly ICharacterSunShangxiangSpOlCharacterGuoJiaMobileGodOperations _characterGuoJiaMobileGodOperations;
+    private readonly ICharacterSunShangxiangSpOlCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICharacterSunShangxiangSpOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSunShangxiangSpOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterSunShangxiangSpOlCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterSunShangxiangSpOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterSunShangxiangSpOlCharacterSunShangxiangSpOlOperations _characterSunShangxiangSpOlOperations;
+    private readonly ICharacterSunShangxiangSpOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICharacterSunShangxiangSpOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterSunShangxiangSpOlRuntime(ICharacterSunShangxiangSpOlCharacterGuoJiaMobileGodOperations characterGuoJiaMobileGodOperations, ICharacterSunShangxiangSpOlCharacterYanPuOlOperations characterYanPuOlOperations, ICharacterSunShangxiangSpOlContentRegistryOperations contentRegistryOperations, ICharacterSunShangxiangSpOlResolutionStackOperations resolutionStackOperations, ICharacterSunShangxiangSpOlCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICharacterSunShangxiangSpOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterSunShangxiangSpOlCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICharacterSunShangxiangSpOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterSunShangxiangSpOlCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterSunShangxiangSpOlCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterSunShangxiangSpOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterSunShangxiangSpOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterSunShangxiangSpOlCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterSunShangxiangSpOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSunShangxiangSpOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterSunShangxiangSpOlCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterSunShangxiangSpOlCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICharacterSunShangxiangSpOlCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterSunShangxiangSpOlCoreRuntimeOperations coreRuntimeOperations, ICharacterSunShangxiangSpOlCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterSunShangxiangSpOlCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterSunShangxiangSpOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterSunShangxiangSpOlCoreTableOrderOperations coreTableOrderOperations, ICharacterSunShangxiangSpOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterSunShangxiangSpOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterSunShangxiangSpOlCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterSunShangxiangSpOlCharacterSunShangxiangSpOlOperations characterSunShangxiangSpOlOperations, ICharacterSunShangxiangSpOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICharacterSunShangxiangSpOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterGuoJiaMobileGodOperations = characterGuoJiaMobileGodOperations;
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._characterSunShangxiangSpOlOperations = characterSunShangxiangSpOlOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

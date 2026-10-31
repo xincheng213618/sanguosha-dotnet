@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryWuGuoTaiMobile
 {
-    internal const string Ganlu = "boundary:ganlu-mobile", Buyi = "boundary:buyi-mobile";
+    internal const string Ganlu = "boundary:ganlu-mobile",Buyi = "boundary:buyi-mobile";
 }
 internal interface IBoundaryWuGuoTaiQueries : IProgramSelectionQuery { bool CanExchange(int owner, int first, int second); }
 

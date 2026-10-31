@@ -1,0 +1,86 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineKuangfuReceiptsRuntime
+{
+    private readonly ICoreKuangfuReceiptsCharacterLiuPanOlOperations _characterLiuPanOlOperations;
+    private readonly ICoreKuangfuReceiptsCharacterMaChengOlOperations _characterMaChengOlOperations;
+    private readonly ICoreKuangfuReceiptsCharacterMaWanOlOperations _characterMaWanOlOperations;
+    private readonly ICoreKuangfuReceiptsCharacterMaXiuMaTieOlOperations _characterMaXiuMaTieOlOperations;
+    private readonly ICoreKuangfuReceiptsCharacterQianZhaoOlOperations _characterQianZhaoOlOperations;
+    private readonly ICoreKuangfuReceiptsCharacterYangFuOlOperations _characterYangFuOlOperations;
+    private readonly ICoreKuangfuReceiptsCharacterZhangYanOlOperations _characterZhangYanOlOperations;
+    private readonly ICoreKuangfuReceiptsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreKuangfuReceiptsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreKuangfuReceiptsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreKuangfuReceiptsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreKuangfuReceiptsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreKuangfuReceiptsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreKuangfuReceiptsCoreCurrentSlashFireOffersOperations _coreCurrentSlashFireOffersOperations;
+    private readonly ICoreKuangfuReceiptsCoreDyingSuitsAndHistoricalUseObserversOperations _coreDyingSuitsAndHistoricalUseObserversOperations;
+    private readonly ICoreKuangfuReceiptsCoreHalfHandPhaseDebtDamageObserversOperations _coreHalfHandPhaseDebtDamageObserversOperations;
+    private readonly ICoreKuangfuReceiptsCoreKuangfuOperations _coreKuangfuOperations;
+    private readonly ICoreKuangfuReceiptsCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreKuangfuReceiptsCoreOriginalTargetAdditionsOperations _coreOriginalTargetAdditionsOperations;
+    private readonly ICoreKuangfuReceiptsCorePaidColorDamageClaimObserversOperations _corePaidColorDamageClaimObserversOperations;
+    private readonly ICoreKuangfuReceiptsCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreKuangfuReceiptsCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreKuangfuReceiptsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreKuangfuReceiptsCoreSameTypeActualUseAidOperations _coreSameTypeActualUseAidOperations;
+    private readonly ICoreKuangfuReceiptsCoreShortRangeSlashTargetsOperations _coreShortRangeSlashTargetsOperations;
+    private readonly ICoreKuangfuReceiptsCoreShownEntityTurnPoliciesOperations _coreShownEntityTurnPoliciesOperations;
+    private readonly ICoreKuangfuReceiptsCoreUnrespondableCounterspellsOperations _coreUnrespondableCounterspellsOperations;
+    private readonly ICoreKuangfuReceiptsCoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    private readonly ICoreKuangfuReceiptsCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICoreKuangfuReceiptsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreKuangfuReceiptsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreKuangfuReceiptsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreKuangfuReceiptsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineKuangfuReceiptsRuntime(ICoreKuangfuReceiptsCharacterLiuPanOlOperations characterLiuPanOlOperations, ICoreKuangfuReceiptsCharacterMaChengOlOperations characterMaChengOlOperations, ICoreKuangfuReceiptsCharacterMaWanOlOperations characterMaWanOlOperations, ICoreKuangfuReceiptsCharacterMaXiuMaTieOlOperations characterMaXiuMaTieOlOperations, ICoreKuangfuReceiptsCharacterQianZhaoOlOperations characterQianZhaoOlOperations, ICoreKuangfuReceiptsCharacterYangFuOlOperations characterYangFuOlOperations, ICoreKuangfuReceiptsCharacterZhangYanOlOperations characterZhangYanOlOperations, ICoreKuangfuReceiptsContentRegistryOperations contentRegistryOperations, ICoreKuangfuReceiptsResolutionStackOperations resolutionStackOperations, ICoreKuangfuReceiptsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreKuangfuReceiptsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreKuangfuReceiptsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreKuangfuReceiptsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreKuangfuReceiptsCoreCurrentSlashFireOffersOperations coreCurrentSlashFireOffersOperations, ICoreKuangfuReceiptsCoreDyingSuitsAndHistoricalUseObserversOperations coreDyingSuitsAndHistoricalUseObserversOperations, ICoreKuangfuReceiptsCoreHalfHandPhaseDebtDamageObserversOperations coreHalfHandPhaseDebtDamageObserversOperations, ICoreKuangfuReceiptsCoreKuangfuOperations coreKuangfuOperations, ICoreKuangfuReceiptsCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreKuangfuReceiptsCoreOriginalTargetAdditionsOperations coreOriginalTargetAdditionsOperations, ICoreKuangfuReceiptsCorePaidColorDamageClaimObserversOperations corePaidColorDamageClaimObserversOperations, ICoreKuangfuReceiptsCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreKuangfuReceiptsCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreKuangfuReceiptsCoreRuntimeOperations coreRuntimeOperations, ICoreKuangfuReceiptsCoreSameTypeActualUseAidOperations coreSameTypeActualUseAidOperations, ICoreKuangfuReceiptsCoreShortRangeSlashTargetsOperations coreShortRangeSlashTargetsOperations, ICoreKuangfuReceiptsCoreShownEntityTurnPoliciesOperations coreShownEntityTurnPoliciesOperations, ICoreKuangfuReceiptsCoreUnrespondableCounterspellsOperations coreUnrespondableCounterspellsOperations, ICoreKuangfuReceiptsCoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations, ICoreKuangfuReceiptsCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICoreKuangfuReceiptsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreKuangfuReceiptsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreKuangfuReceiptsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreKuangfuReceiptsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLiuPanOlOperations = characterLiuPanOlOperations;
+        this._characterMaChengOlOperations = characterMaChengOlOperations;
+        this._characterMaWanOlOperations = characterMaWanOlOperations;
+        this._characterMaXiuMaTieOlOperations = characterMaXiuMaTieOlOperations;
+        this._characterQianZhaoOlOperations = characterQianZhaoOlOperations;
+        this._characterYangFuOlOperations = characterYangFuOlOperations;
+        this._characterZhangYanOlOperations = characterZhangYanOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentSlashFireOffersOperations = coreCurrentSlashFireOffersOperations;
+        this._coreDyingSuitsAndHistoricalUseObserversOperations = coreDyingSuitsAndHistoricalUseObserversOperations;
+        this._coreHalfHandPhaseDebtDamageObserversOperations = coreHalfHandPhaseDebtDamageObserversOperations;
+        this._coreKuangfuOperations = coreKuangfuOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreOriginalTargetAdditionsOperations = coreOriginalTargetAdditionsOperations;
+        this._corePaidColorDamageClaimObserversOperations = corePaidColorDamageClaimObserversOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSameTypeActualUseAidOperations = coreSameTypeActualUseAidOperations;
+        this._coreShortRangeSlashTargetsOperations = coreShortRangeSlashTargetsOperations;
+        this._coreShownEntityTurnPoliciesOperations = coreShownEntityTurnPoliciesOperations;
+        this._coreUnrespondableCounterspellsOperations = coreUnrespondableCounterspellsOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

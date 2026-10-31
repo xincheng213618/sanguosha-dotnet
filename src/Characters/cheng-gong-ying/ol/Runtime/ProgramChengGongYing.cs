@@ -27,7 +27,7 @@ public sealed record ChengGongYingReshuffle(long BatchId, long ParentFrameId, lo
 public sealed record ChengGongYingReceipt(CardConversionSource Source, string GameplayHash, long WindowId, int Turn, int TurnOwner,
     ChengGongYingStage Stage, int? Recipient = null, int InitialHandCount = 0, int Count = 0, long Before = 0, long After = 0, int ActualCount = 0)
 {
-    private IReadOnlyList<int> _candidates = [], _selected = [];
+    private IReadOnlyList<int> _candidates = [],_selected = [];
     private IReadOnlyList<ChengGongYingReshuffle> _shuffles = [];
     public IReadOnlyList<int> Candidates { get => _candidates; init => _candidates = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Selected { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }

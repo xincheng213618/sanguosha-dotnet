@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineEphemeralCardMaterialsRuntime
+{
+    private readonly ICoreEphemeralCardMaterialsCharacterDengAiAnniversaryGodOperations _characterDengAiAnniversaryGodOperations;
+    private readonly ICoreEphemeralCardMaterialsCharacterDiaoChanLeOperations _characterDiaoChanLeOperations;
+    private readonly ICoreEphemeralCardMaterialsCharacterZhangFenAnniversaryOperations _characterZhangFenAnniversaryOperations;
+    private readonly ICoreEphemeralCardMaterialsCharacterZuoCiHappyGodOperations _characterZuoCiHappyGodOperations;
+    private readonly ICoreEphemeralCardMaterialsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreEphemeralCardMaterialsCoreCardUsePaymentsOperations _coreCardUsePaymentsOperations;
+    private readonly ICoreEphemeralCardMaterialsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreEphemeralCardMaterialsCoreShanheStartingResourcesOperations _coreShanheStartingResourcesOperations;
+    private readonly ICoreEphemeralCardMaterialsCoreWushuangShopCardsOperations _coreWushuangShopCardsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineEphemeralCardMaterialsRuntime(ICoreEphemeralCardMaterialsCharacterDengAiAnniversaryGodOperations characterDengAiAnniversaryGodOperations, ICoreEphemeralCardMaterialsCharacterDiaoChanLeOperations characterDiaoChanLeOperations, ICoreEphemeralCardMaterialsCharacterZhangFenAnniversaryOperations characterZhangFenAnniversaryOperations, ICoreEphemeralCardMaterialsCharacterZuoCiHappyGodOperations characterZuoCiHappyGodOperations, ICoreEphemeralCardMaterialsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreEphemeralCardMaterialsCoreCardUsePaymentsOperations coreCardUsePaymentsOperations, ICoreEphemeralCardMaterialsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreEphemeralCardMaterialsCoreShanheStartingResourcesOperations coreShanheStartingResourcesOperations, ICoreEphemeralCardMaterialsCoreWushuangShopCardsOperations coreWushuangShopCardsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._characterDengAiAnniversaryGodOperations = characterDengAiAnniversaryGodOperations;
+        this._characterDiaoChanLeOperations = characterDiaoChanLeOperations;
+        this._characterZhangFenAnniversaryOperations = characterZhangFenAnniversaryOperations;
+        this._characterZuoCiHappyGodOperations = characterZuoCiHappyGodOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUsePaymentsOperations = coreCardUsePaymentsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreShanheStartingResourcesOperations = coreShanheStartingResourcesOperations;
+        this._coreWushuangShopCardsOperations = coreWushuangShopCardsOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineCappedHandRefreshProgramsRuntime : global::CardGame.Core.ICappedHandRefreshProgramHost
+{
+    private readonly ICoreCappedHandRefreshProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreCappedHandRefreshProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCappedHandRefreshProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCappedHandRefreshProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreCappedHandRefreshProgramsCoreDeathProgramsOperations _coreDeathProgramsOperations;
+    private readonly ICoreCappedHandRefreshProgramsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreCappedHandRefreshProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreCappedHandRefreshProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreCappedHandRefreshProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCappedHandRefreshProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreCappedHandRefreshProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreCappedHandRefreshProgramsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreCappedHandRefreshProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreCappedHandRefreshProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreCappedHandRefreshProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineCappedHandRefreshProgramsRuntime(ICoreCappedHandRefreshProgramsCardZonesOperations cardZonesOperations, ICoreCappedHandRefreshProgramsContentRegistryOperations contentRegistryOperations, ICoreCappedHandRefreshProgramsResolutionStackOperations resolutionStackOperations, ICoreCappedHandRefreshProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreCappedHandRefreshProgramsCoreDeathProgramsOperations coreDeathProgramsOperations, ICoreCappedHandRefreshProgramsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreCappedHandRefreshProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreCappedHandRefreshProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreCappedHandRefreshProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreCappedHandRefreshProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreCappedHandRefreshProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreCappedHandRefreshProgramsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreCappedHandRefreshProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreCappedHandRefreshProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreCappedHandRefreshProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreDeathProgramsOperations = coreDeathProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

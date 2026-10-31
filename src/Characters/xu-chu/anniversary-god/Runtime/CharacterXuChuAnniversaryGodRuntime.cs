@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterXuChuAnniversaryGodRuntime : global::CardGame.Core.IShenXuChuHost
+{
+    private readonly ICharacterXuChuAnniversaryGodCharacterXuChuHappyGodOperations _characterXuChuHappyGodOperations;
+    private readonly ICharacterXuChuAnniversaryGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterXuChuAnniversaryGodRandomOperations _randomOperations;
+    private readonly ICharacterXuChuAnniversaryGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreAttributedMarkerEventsOperations _coreAttributedMarkerEventsOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreParticipantHandProgramsOperations _coreParticipantHandProgramsOperations;
+    private readonly ICharacterXuChuAnniversaryGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterXuChuAnniversaryGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterXuChuAnniversaryGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess _coreActualTurnProgressCurrentSeatAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterXuChuAnniversaryGodRuntime(ICharacterXuChuAnniversaryGodCharacterXuChuHappyGodOperations characterXuChuHappyGodOperations, ICharacterXuChuAnniversaryGodContentRegistryOperations contentRegistryOperations, ICharacterXuChuAnniversaryGodRandomOperations randomOperations, ICharacterXuChuAnniversaryGodResolutionStackOperations resolutionStackOperations, ICharacterXuChuAnniversaryGodCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterXuChuAnniversaryGodCoreAttributedMarkerEventsOperations coreAttributedMarkerEventsOperations, ICharacterXuChuAnniversaryGodCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterXuChuAnniversaryGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterXuChuAnniversaryGodCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterXuChuAnniversaryGodCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterXuChuAnniversaryGodCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterXuChuAnniversaryGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterXuChuAnniversaryGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterXuChuAnniversaryGodCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterXuChuAnniversaryGodCoreRuntimeOperations coreRuntimeOperations, ICharacterXuChuAnniversaryGodCoreTableOrderOperations coreTableOrderOperations, ICharacterXuChuAnniversaryGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterXuChuAnniversaryGodCoreParticipantHandProgramsOperations coreParticipantHandProgramsOperations, ICharacterXuChuAnniversaryGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterXuChuAnniversaryGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterXuChuAnniversaryGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess coreActualTurnProgressCurrentSeatAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterXuChuHappyGodOperations = characterXuChuHappyGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreAttributedMarkerEventsOperations = coreAttributedMarkerEventsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreParticipantHandProgramsOperations = coreParticipantHandProgramsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatAccess = coreActualTurnProgressCurrentSeatAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,78 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDiamondDelayedProgramsRuntime : global::CardGame.Core.IDiamondDelayedProgramHost
+{
+    private readonly ICoreDiamondDelayedProgramsCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICoreDiamondDelayedProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreDiamondDelayedProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDiamondDelayedProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreActualDiscardPhaseLedgerOperations _coreActualDiscardPhaseLedgerOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreProgramPhaseColorRestrictionsOperations _coreProgramPhaseColorRestrictionsOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreResponseEntityExchangeOperations _coreResponseEntityExchangeOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreDiamondDelayedProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDiamondDelayedProgramsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreDiamondDelayedProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreDiamondDelayedProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreDiamondDelayedProgramsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineDiamondDelayedProgramsRuntime(ICoreDiamondDelayedProgramsCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICoreDiamondDelayedProgramsCardZonesOperations cardZonesOperations, ICoreDiamondDelayedProgramsContentRegistryOperations contentRegistryOperations, ICoreDiamondDelayedProgramsResolutionStackOperations resolutionStackOperations, ICoreDiamondDelayedProgramsCoreActualDiscardPhaseLedgerOperations coreActualDiscardPhaseLedgerOperations, ICoreDiamondDelayedProgramsCoreActualTurnsOperations coreActualTurnsOperations, ICoreDiamondDelayedProgramsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreDiamondDelayedProgramsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDiamondDelayedProgramsCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreDiamondDelayedProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreDiamondDelayedProgramsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreDiamondDelayedProgramsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreDiamondDelayedProgramsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreDiamondDelayedProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDiamondDelayedProgramsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreDiamondDelayedProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDiamondDelayedProgramsCoreProgramPhaseColorRestrictionsOperations coreProgramPhaseColorRestrictionsOperations, ICoreDiamondDelayedProgramsCoreResponseEntityExchangeOperations coreResponseEntityExchangeOperations, ICoreDiamondDelayedProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreDiamondDelayedProgramsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreDiamondDelayedProgramsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreDiamondDelayedProgramsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreDiamondDelayedProgramsCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreDiamondDelayedProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreDiamondDelayedProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDiamondDelayedProgramsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreDiamondDelayedProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreDiamondDelayedProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreDiamondDelayedProgramsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualDiscardPhaseLedgerOperations = coreActualDiscardPhaseLedgerOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramPhaseColorRestrictionsOperations = coreProgramPhaseColorRestrictionsOperations;
+        this._coreResponseEntityExchangeOperations = coreResponseEntityExchangeOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

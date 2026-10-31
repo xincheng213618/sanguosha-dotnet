@@ -21,7 +21,7 @@ internal sealed class MobileFunanCommittedUseContract : IProgramCommittedUseCont
 
 internal static class MobileXueZongComposition
 {
-    internal const string Funan = "mobile:funan", Reward = "obtained-use-unanswered", State = "mobile-response-exchange";
+    internal const string Funan = "mobile:funan",Reward = "obtained-use-unanswered",State = "mobile-response-exchange";
     internal static void ValidateReward(SkillProgramTrigger t)
     {
         if(t.Id!=Reward || t.Window!=SkillProgramTriggerWindow.CardUseCompleted || t.OwnerRelation!=SkillProgramCardActionOwnerRelation.Actor ||

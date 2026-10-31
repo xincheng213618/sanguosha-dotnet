@@ -222,10 +222,7 @@ internal sealed partial class ProgramRuntimeHooks
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramRuntimeHookCatalog> RuntimeHookMetadata = new(() =>
-        ProgramRuntimeHookCatalog.Discover(RuntimeModuleMethods), true);
     private ProgramRuntimeHooks? _runtimeHooks;
-    private ProgramRuntimeHooks RuntimeHooks => _runtimeHooks ??= new(RuntimeHookMetadata.Value,
+    private ProgramRuntimeHooks RuntimeHooks => _runtimeHooks ??= new(global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksDefinitions.RuntimeHookMetadata.Value,
         BindRuntimeHandler, _modeRuntime.RuntimeHooks);
-    private void ValidateModeRuntimeHookPriorities() => RuntimeHookMetadata.Value.ValidateAdditional(_modeRuntime.RuntimeHooks);
 }

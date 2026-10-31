@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterTaishiCiMobileGodRuntime : global::CardGame.Core.IShenTaishiCiHost
+{
+    private readonly ICharacterTaishiCiMobileGodCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterTaishiCiMobileGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterTaishiCiMobileGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICharacterTaishiCiMobileGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterTaishiCiMobileGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterTaishiCiMobileGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterTaishiCiMobileGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterTaishiCiMobileGodRuntime(ICharacterTaishiCiMobileGodCardZonesOperations cardZonesOperations, ICharacterTaishiCiMobileGodContentRegistryOperations contentRegistryOperations, ICharacterTaishiCiMobileGodResolutionStackOperations resolutionStackOperations, ICharacterTaishiCiMobileGodCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterTaishiCiMobileGodCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterTaishiCiMobileGodCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterTaishiCiMobileGodCoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterTaishiCiMobileGodCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterTaishiCiMobileGodCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICharacterTaishiCiMobileGodCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterTaishiCiMobileGodCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterTaishiCiMobileGodCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterTaishiCiMobileGodCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICharacterTaishiCiMobileGodCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterTaishiCiMobileGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterTaishiCiMobileGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterTaishiCiMobileGodCoreRuntimeOperations coreRuntimeOperations, ICharacterTaishiCiMobileGodCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterTaishiCiMobileGodCoreTableOrderOperations coreTableOrderOperations, ICharacterTaishiCiMobileGodCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterTaishiCiMobileGodCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICharacterTaishiCiMobileGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterTaishiCiMobileGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterTaishiCiMobileGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterTaishiCiMobileGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

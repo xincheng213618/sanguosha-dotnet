@@ -16,10 +16,10 @@ using CardGame.Core;
 internal static class IdentityAiEvaluation
 {
     private static readonly string[] Camps = ["LordAndLoyalists", "Rebels", "Renegade"];
-    private static readonly FieldInfo BrainsField = typeof(GameEngine).GetField(
+    private static readonly FieldInfo BrainsField = global::FixtureRuntimeAccess.Engine.GetField(
         "_aiBrains", BindingFlags.Instance | BindingFlags.NonPublic) ??
         throw new InvalidOperationException("Identity evaluation cannot find the engine AI map.");
-    private static readonly FieldInfo GeneratedCardsField = typeof(GameEngine).GetField(
+    private static readonly FieldInfo GeneratedCardsField = global::FixtureRuntimeAccess.Engine.GetField(
         "_generatedPhysicalCardIds", BindingFlags.Instance | BindingFlags.NonPublic) ??
         throw new InvalidOperationException("Identity evaluation cannot find native physical-card generation provenance.");
     private const int MaximumTurns = 240;
@@ -442,11 +442,12 @@ internal static class IdentityAiEvaluation
     private sealed class MatchProgressProbe : IDisposable
     {
         private const int MaximumProgressSamples = 256;
-        private static readonly Dictionary<string, FieldInfo> DiagnosticFields = new[]
+        private static readonly Dictionary<string, MemberInfo> DiagnosticFields = new[]
         {
             "_turnNumber", "_currentSeat", "_phase", "_status", "_thoughtSequence", "_resolutionSequence",
             "_movementSequence", "_pendingEvents", "_cardMovements", "_resolutionStack", "_aiThoughts", "_pendingDecisionBacking"
-        }.ToDictionary(name => name, name => typeof(GameEngine).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic) ??
+        }.ToDictionary(name => name, name => (MemberInfo?)FixtureRuntimeAccess.Engine.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic) ??
+            (name == "_resolutionSequence" ? FixtureRuntimeAccess.Engine.GetProperty(name, BindingFlags.Instance | BindingFlags.NonPublic) : null) ??
             throw new InvalidOperationException("Identity progress diagnostics cannot find " + name));
         private readonly EvaluationJournal _journal;
         private readonly MatchIdentity _identity;
@@ -474,6 +475,13 @@ internal static class IdentityAiEvaluation
             _journal.Write(new { Kind = "InitialSetup", Utc = DateTimeOffset.UtcNow, Match = _identity,
                 InitialStateHash = hash, Roster = roster, TrustedLocalOnly = true });
 
+        private static object? ReadDiagnostic(GameEngine game, string name) => DiagnosticFields[name] switch
+        {
+            FieldInfo field => field.GetValue(game),
+            PropertyInfo property => property.GetValue(game),
+            _ => throw new InvalidOperationException("Unsupported identity progress diagnostic " + name)
+        };
+
         private void Sample()
         {
             try
@@ -491,7 +499,7 @@ internal static class IdentityAiEvaluation
                 // diagnostic scalars and immutable last-record references; never
                 // project a view, enumerate mutable zones, call rules or lock it.
                 // Samples need not describe an atomic/committed game state.
-                object? Read(string name) => game is null ? null : DiagnosticFields[name].GetValue(game);
+                object? Read(string name) => game is null ? null : ReadDiagnostic(game, name);
                 var frames = Read("_resolutionStack") as IReadOnlyList<ResolutionFrame>;
                 var thoughts = Read("_aiThoughts") as IList;
                 var pending = Read("_pendingDecisionBacking") as PendingDecision;
@@ -535,7 +543,7 @@ internal static class IdentityAiEvaluation
                 // records the actual failed boundary, even for sub-5s failures.
                 StopSampling();
                 const int jsonCharacterLimit = 32768;
-                var pending = DiagnosticFields["_pendingDecisionBacking"].GetValue(game) as PendingDecision;
+                var pending = ReadDiagnostic(game, "_pendingDecisionBacking") as PendingDecision;
                 var frames = game.ResolutionStack.TakeLast(6).Select(frame =>
                 {
                     var program = frame as ProgramSkillFrame;

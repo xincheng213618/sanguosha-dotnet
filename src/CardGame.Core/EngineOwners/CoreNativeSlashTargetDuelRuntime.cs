@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeSlashTargetDuelRuntime
+{
+    private readonly ICoreNativeSlashTargetDuelContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNativeSlashTargetDuelProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICoreNativeSlashTargetDuelResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreDamageTargetRegionObtainOperations _coreDamageTargetRegionObtainOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreExtraCardEffectRoundsOperations _coreExtraCardEffectRoundsOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreNativeAiDecisionsOperations _coreNativeAiDecisionsOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreNativeDuelOperations _coreNativeDuelOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreNativeSlashTargetDuelCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreNativeSlashTargetDuelKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreNativeSlashTargetDuelKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeSlashTargetDuelRuntime(ICoreNativeSlashTargetDuelContentRegistryOperations contentRegistryOperations, ICoreNativeSlashTargetDuelProgramPipelineHooksOperations programPipelineHooksOperations, ICoreNativeSlashTargetDuelResolutionStackOperations resolutionStackOperations, ICoreNativeSlashTargetDuelCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativeSlashTargetDuelCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreNativeSlashTargetDuelCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreNativeSlashTargetDuelCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreNativeSlashTargetDuelCoreDamageTargetRegionObtainOperations coreDamageTargetRegionObtainOperations, ICoreNativeSlashTargetDuelCoreExtraCardEffectRoundsOperations coreExtraCardEffectRoundsOperations, ICoreNativeSlashTargetDuelCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreNativeSlashTargetDuelCoreMatchLogOperations coreMatchLogOperations, ICoreNativeSlashTargetDuelCoreNativeAiDecisionsOperations coreNativeAiDecisionsOperations, ICoreNativeSlashTargetDuelCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreNativeSlashTargetDuelCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeSlashTargetDuelCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreNativeSlashTargetDuelCoreNativeDuelOperations coreNativeDuelOperations, ICoreNativeSlashTargetDuelCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreNativeSlashTargetDuelCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreNativeSlashTargetDuelKernelCoreMainOperations kernelCoreMainOperations, ICoreNativeSlashTargetDuelKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreDamageTargetRegionObtainOperations = coreDamageTargetRegionObtainOperations;
+        this._coreExtraCardEffectRoundsOperations = coreExtraCardEffectRoundsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeAiDecisionsOperations = coreNativeAiDecisionsOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeDuelOperations = coreNativeDuelOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramEquipmentRecastRecoveriesRuntime
+{
+    private readonly ICoreProgramEquipmentRecastRecoveriesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramEquipmentRecastRecoveriesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramEquipmentRecastRecoveriesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreProgramEquipmentRecastRecoveriesCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreProgramEquipmentRecastRecoveriesCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreProgramEquipmentRecastRecoveriesCoreNativeRecastInvocationsOperations _coreNativeRecastInvocationsOperations;
+    private readonly ICoreProgramEquipmentRecastRecoveriesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramEquipmentRecastRecoveriesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramEquipmentRecastRecoveriesCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreProgramEquipmentRecastRecoveriesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramEquipmentRecastRecoveriesRuntime(ICoreProgramEquipmentRecastRecoveriesContentRegistryOperations contentRegistryOperations, ICoreProgramEquipmentRecastRecoveriesResolutionStackOperations resolutionStackOperations, ICoreProgramEquipmentRecastRecoveriesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreProgramEquipmentRecastRecoveriesCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreProgramEquipmentRecastRecoveriesCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreProgramEquipmentRecastRecoveriesCoreNativeRecastInvocationsOperations coreNativeRecastInvocationsOperations, ICoreProgramEquipmentRecastRecoveriesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramEquipmentRecastRecoveriesCoreRuntimeOperations coreRuntimeOperations, ICoreProgramEquipmentRecastRecoveriesCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreProgramEquipmentRecastRecoveriesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeRecastInvocationsOperations = coreNativeRecastInvocationsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

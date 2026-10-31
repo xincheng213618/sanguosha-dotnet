@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouLuZhiOlComposition
 {
-    internal const string Sibing = "mou-ol:sibing", Liance = "mou-ol:liance";
+    internal const string Sibing = "mou-ol:sibing",Liance = "mou-ol:liance";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouLuZhiSibingPress or SkillProgramEffectOp.ResolveMouLuZhiSibingRetaliation or SkillProgramEffectOp.ResolveMouLuZhiLiance;
     [ProgramCatalogValidation(1510)]
     internal static void Validate(string path, SkillProgram p)

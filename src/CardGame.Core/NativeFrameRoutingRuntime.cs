@@ -51,30 +51,4 @@ internal sealed class NativeFrameRoutingRuntime(IProgramRuntimeFrames frames,
 
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class NativeFrameRoutingFacts(GameEngine engine) : INativeFrameRoutingFacts
-    {
-        public int FrameCount => engine._resolutionStack.Count;
-        public int LastFrameIndex(long id) => engine._resolutionStack.FindLastIndex(frame => frame.Id == id);
-        public ResolutionFrame FrameAt(int index) => engine._resolutionStack[index];
-    }
-
-    [ProgramCapability]
-    private sealed class NativeFrameRoutes(GameEngine engine) : INativeFrameRoutes
-    {
-        public bool TryAdvance(ResolutionFrame frame) => engine.ModeNativeFrames.TryAdvance(engine, frame);
-    }
-
-    [ProgramCapability]
-    private sealed class NativeProgramExecution(GameEngine engine) : INativeProgramExecution
-    {
-        public bool TryResume(long frameId) => engine.TryBeginProgramSkillInvocation(frameId) ||
-            ProgramContinuations.Value.TryResume(engine, frameId);
-        public void Execute(long frameId)
-        {
-            if (engine.TryBeginProgramSkillInvocation(frameId)) return;
-            var host = new ProgramSkillHost(engine);
-            new SkillProgramExecutor().Run(frameId, host, host);
-        }
-    }
 }

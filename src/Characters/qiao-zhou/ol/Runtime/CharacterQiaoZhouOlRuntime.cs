@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterQiaoZhouOlRuntime : global::CardGame.Core.IQiaoZhouProgramHost
+{
+    private readonly ICharacterQiaoZhouOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterQiaoZhouOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterQiaoZhouOlPendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICharacterQiaoZhouOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterQiaoZhouOlTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICharacterQiaoZhouOlCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICharacterQiaoZhouOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterQiaoZhouOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterQiaoZhouOlCoreDeferredTurnEndPreludesOperations _coreDeferredTurnEndPreludesOperations;
+    private readonly ICharacterQiaoZhouOlCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterQiaoZhouOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICharacterQiaoZhouOlCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterQiaoZhouOlCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterQiaoZhouOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterQiaoZhouOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterQiaoZhouOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterQiaoZhouOlCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterQiaoZhouOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterQiaoZhouOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterQiaoZhouOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterQiaoZhouOlCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterQiaoZhouOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterQiaoZhouOlCharacterQiaoZhouOlOperations _characterQiaoZhouOlOperations;
+    private readonly ICharacterQiaoZhouOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICharacterQiaoZhouOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterQiaoZhouOlRuntime(ICharacterQiaoZhouOlCardZonesOperations cardZonesOperations, ICharacterQiaoZhouOlContentRegistryOperations contentRegistryOperations, ICharacterQiaoZhouOlPendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICharacterQiaoZhouOlResolutionStackOperations resolutionStackOperations, ICharacterQiaoZhouOlTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICharacterQiaoZhouOlCoreActualTurnsOperations coreActualTurnsOperations, ICharacterQiaoZhouOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterQiaoZhouOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterQiaoZhouOlCoreDeferredTurnEndPreludesOperations coreDeferredTurnEndPreludesOperations, ICharacterQiaoZhouOlCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterQiaoZhouOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICharacterQiaoZhouOlCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterQiaoZhouOlCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterQiaoZhouOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterQiaoZhouOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterQiaoZhouOlCoreRuntimeOperations coreRuntimeOperations, ICharacterQiaoZhouOlCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterQiaoZhouOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterQiaoZhouOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterQiaoZhouOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterQiaoZhouOlCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterQiaoZhouOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterQiaoZhouOlCharacterQiaoZhouOlOperations characterQiaoZhouOlOperations, ICharacterQiaoZhouOlCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICharacterQiaoZhouOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreDeferredTurnEndPreludesOperations = coreDeferredTurnEndPreludesOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterQiaoZhouOlOperations = characterQiaoZhouOlOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

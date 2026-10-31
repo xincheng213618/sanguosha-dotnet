@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLiangXingOlRuntime : global::CardGame.Core.ILiangXingProgramHost, global::CardGame.Core.ILuelveCounterSlashProgramHost
+{
+    private readonly ICharacterLiangXingOlCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICharacterLiangXingOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterLiangXingOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLiangXingOlCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterLiangXingOlCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICharacterLiangXingOlCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICharacterLiangXingOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterLiangXingOlCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICharacterLiangXingOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLiangXingOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLiangXingOlCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICharacterLiangXingOlCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICharacterLiangXingOlCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICharacterLiangXingOlCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICharacterLiangXingOlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterLiangXingOlCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICharacterLiangXingOlCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterLiangXingOlKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICharacterLiangXingOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterLiangXingOlRuntime(ICharacterLiangXingOlCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICharacterLiangXingOlCardZonesOperations cardZonesOperations, ICharacterLiangXingOlResolutionStackOperations resolutionStackOperations, ICharacterLiangXingOlCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterLiangXingOlCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICharacterLiangXingOlCoreCardActionsOperations coreCardActionsOperations, ICharacterLiangXingOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterLiangXingOlCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICharacterLiangXingOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLiangXingOlCoreRuntimeOperations coreRuntimeOperations, ICharacterLiangXingOlCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICharacterLiangXingOlCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICharacterLiangXingOlCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICharacterLiangXingOlCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICharacterLiangXingOlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterLiangXingOlCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICharacterLiangXingOlCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterLiangXingOlKernelCoreMainOperations kernelCoreMainOperations, ICharacterLiangXingOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

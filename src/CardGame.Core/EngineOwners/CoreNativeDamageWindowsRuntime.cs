@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeDamageWindowsRuntime
+{
+    private readonly ICoreNativeDamageWindowsCharacterBaoXinOlOperations _characterBaoXinOlOperations;
+    private readonly ICoreNativeDamageWindowsCharacterBeiMiHuOlOperations _characterBeiMiHuOlOperations;
+    private readonly ICoreNativeDamageWindowsCharacterGuanHaiOlOperations _characterGuanHaiOlOperations;
+    private readonly ICoreNativeDamageWindowsCharacterHuLieMouOperations _characterHuLieMouOperations;
+    private readonly ICoreNativeDamageWindowsCharacterHuangQuanOlOperations _characterHuangQuanOlOperations;
+    private readonly ICoreNativeDamageWindowsCharacterKanZeAnniversaryOperations _characterKanZeAnniversaryOperations;
+    private readonly ICoreNativeDamageWindowsCharacterLuSuMouOperations _characterLuSuMouOperations;
+    private readonly ICoreNativeDamageWindowsCharacterMangYaChangAnniversaryOperations _characterMangYaChangAnniversaryOperations;
+    private readonly ICoreNativeDamageWindowsCharacterSimaHuiOlOperations _characterSimaHuiOlOperations;
+    private readonly ICoreNativeDamageWindowsCharacterTaoQianOlOperations _characterTaoQianOlOperations;
+    private readonly ICoreNativeDamageWindowsCharacterXiZhiCaiOlOperations _characterXiZhiCaiOlOperations;
+    private readonly ICoreNativeDamageWindowsCharacterZhangFenAnniversaryOperations _characterZhangFenAnniversaryOperations;
+    private readonly ICoreNativeDamageWindowsCharacterZhangYanOlOperations _characterZhangYanOlOperations;
+    private readonly ICoreNativeDamageWindowsCharacterZhaoXiangOlOperations _characterZhaoXiangOlOperations;
+    private readonly ICoreNativeDamageWindowsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNativeDamageWindowsProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICoreNativeDamageWindowsCoreDamageAdjacencyServicesOperations _coreDamageAdjacencyServicesOperations;
+    private readonly ICoreNativeDamageWindowsCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreNativeDamageWindowsCoreDamageCounterpartAcquisitionOperations _coreDamageCounterpartAcquisitionOperations;
+    private readonly ICoreNativeDamageWindowsCoreLastDamageSourceReciprocityOperations _coreLastDamageSourceReciprocityOperations;
+    private readonly ICoreNativeDamageWindowsCoreOrderedPrintedSkillLossOperations _coreOrderedPrintedSkillLossOperations;
+    private readonly ICoreNativeDamageWindowsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreNativeDamageWindowsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreNativeDamageWindowsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreNativeDamageWindowsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreNativeDamageWindowsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeDamageWindowsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreNativeDamageWindowsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess _coreMatchDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeDamageWindowsRuntime(ICoreNativeDamageWindowsCharacterBaoXinOlOperations characterBaoXinOlOperations, ICoreNativeDamageWindowsCharacterBeiMiHuOlOperations characterBeiMiHuOlOperations, ICoreNativeDamageWindowsCharacterGuanHaiOlOperations characterGuanHaiOlOperations, ICoreNativeDamageWindowsCharacterHuLieMouOperations characterHuLieMouOperations, ICoreNativeDamageWindowsCharacterHuangQuanOlOperations characterHuangQuanOlOperations, ICoreNativeDamageWindowsCharacterKanZeAnniversaryOperations characterKanZeAnniversaryOperations, ICoreNativeDamageWindowsCharacterLuSuMouOperations characterLuSuMouOperations, ICoreNativeDamageWindowsCharacterMangYaChangAnniversaryOperations characterMangYaChangAnniversaryOperations, ICoreNativeDamageWindowsCharacterSimaHuiOlOperations characterSimaHuiOlOperations, ICoreNativeDamageWindowsCharacterTaoQianOlOperations characterTaoQianOlOperations, ICoreNativeDamageWindowsCharacterXiZhiCaiOlOperations characterXiZhiCaiOlOperations, ICoreNativeDamageWindowsCharacterZhangFenAnniversaryOperations characterZhangFenAnniversaryOperations, ICoreNativeDamageWindowsCharacterZhangYanOlOperations characterZhangYanOlOperations, ICoreNativeDamageWindowsCharacterZhaoXiangOlOperations characterZhaoXiangOlOperations, ICoreNativeDamageWindowsContentRegistryOperations contentRegistryOperations, ICoreNativeDamageWindowsProgramPipelineHooksOperations programPipelineHooksOperations, ICoreNativeDamageWindowsCoreDamageAdjacencyServicesOperations coreDamageAdjacencyServicesOperations, ICoreNativeDamageWindowsCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreNativeDamageWindowsCoreDamageCounterpartAcquisitionOperations coreDamageCounterpartAcquisitionOperations, ICoreNativeDamageWindowsCoreLastDamageSourceReciprocityOperations coreLastDamageSourceReciprocityOperations, ICoreNativeDamageWindowsCoreOrderedPrintedSkillLossOperations coreOrderedPrintedSkillLossOperations, ICoreNativeDamageWindowsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreNativeDamageWindowsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreNativeDamageWindowsCoreRuntimeOperations coreRuntimeOperations, ICoreNativeDamageWindowsCoreTableOrderOperations coreTableOrderOperations, ICoreNativeDamageWindowsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeDamageWindowsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreNativeDamageWindowsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess coreMatchDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterBaoXinOlOperations = characterBaoXinOlOperations;
+        this._characterBeiMiHuOlOperations = characterBeiMiHuOlOperations;
+        this._characterGuanHaiOlOperations = characterGuanHaiOlOperations;
+        this._characterHuLieMouOperations = characterHuLieMouOperations;
+        this._characterHuangQuanOlOperations = characterHuangQuanOlOperations;
+        this._characterKanZeAnniversaryOperations = characterKanZeAnniversaryOperations;
+        this._characterLuSuMouOperations = characterLuSuMouOperations;
+        this._characterMangYaChangAnniversaryOperations = characterMangYaChangAnniversaryOperations;
+        this._characterSimaHuiOlOperations = characterSimaHuiOlOperations;
+        this._characterTaoQianOlOperations = characterTaoQianOlOperations;
+        this._characterXiZhiCaiOlOperations = characterXiZhiCaiOlOperations;
+        this._characterZhangFenAnniversaryOperations = characterZhangFenAnniversaryOperations;
+        this._characterZhangYanOlOperations = characterZhangYanOlOperations;
+        this._characterZhaoXiangOlOperations = characterZhaoXiangOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._coreDamageAdjacencyServicesOperations = coreDamageAdjacencyServicesOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDamageCounterpartAcquisitionOperations = coreDamageCounterpartAcquisitionOperations;
+        this._coreLastDamageSourceReciprocityOperations = coreLastDamageSourceReciprocityOperations;
+        this._coreOrderedPrintedSkillLossOperations = coreOrderedPrintedSkillLossOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchDefinitionPlayerCountAccess = coreMatchDefinitionPlayerCountAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

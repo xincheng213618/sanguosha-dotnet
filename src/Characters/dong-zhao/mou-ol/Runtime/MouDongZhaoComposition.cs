@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouDongZhaoComposition
 {
-    internal const string Shunji = "mou-ol:shunji", Yishi = "mou-ol:yishi";
+    internal const string Shunji = "mou-ol:shunji",Yishi = "mou-ol:yishi";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouDongZhaoShunji or
         SkillProgramEffectOp.ResolveMouDongZhaoYishi or SkillProgramEffectOp.DrawMouDongZhaoYishiLoss;
     [ProgramCatalogValidation(1570)]

@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineWushuangShopCardsRuntime
+{
+    private readonly ICoreWushuangShopCardsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreWushuangShopCardsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreWushuangShopCardsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreWushuangShopCardsCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreWushuangShopCardsCoreDelayedNullificationOperations _coreDelayedNullificationOperations;
+    private readonly ICoreWushuangShopCardsCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreWushuangShopCardsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreWushuangShopCardsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreWushuangShopCardsCoreTrustedCardZoneDiagnosticsOperations _coreTrustedCardZoneDiagnosticsOperations;
+    private readonly ICoreWushuangShopCardsCoreWushuangModeProjectionOperations _coreWushuangModeProjectionOperations;
+    private readonly ICoreWushuangShopCardsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    internal CoreGameEngineWushuangShopCardsRuntime(ICoreWushuangShopCardsCardZonesOperations cardZonesOperations, ICoreWushuangShopCardsResolutionStackOperations resolutionStackOperations, ICoreWushuangShopCardsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreWushuangShopCardsCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreWushuangShopCardsCoreDelayedNullificationOperations coreDelayedNullificationOperations, ICoreWushuangShopCardsCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreWushuangShopCardsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreWushuangShopCardsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreWushuangShopCardsCoreTrustedCardZoneDiagnosticsOperations coreTrustedCardZoneDiagnosticsOperations, ICoreWushuangShopCardsCoreWushuangModeProjectionOperations coreWushuangModeProjectionOperations, ICoreWushuangShopCardsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreDelayedNullificationOperations = coreDelayedNullificationOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreTrustedCardZoneDiagnosticsOperations = coreTrustedCardZoneDiagnosticsOperations;
+        this._coreWushuangModeProjectionOperations = coreWushuangModeProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess = coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    }
+}

@@ -1,0 +1,82 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePlayCardHistoryRuntime
+{
+    private readonly ICorePlayCardHistoryCharacterGuanHaiOlOperations _characterGuanHaiOlOperations;
+    private readonly ICorePlayCardHistoryCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
+    private readonly ICorePlayCardHistoryCharacterHuangfuSongWumiaoOperations _characterHuangfuSongWumiaoOperations;
+    private readonly ICorePlayCardHistoryCharacterMiHengLeOperations _characterMiHengLeOperations;
+    private readonly ICorePlayCardHistoryCharacterSunQuanAnniversaryGodOperations _characterSunQuanAnniversaryGodOperations;
+    private readonly ICorePlayCardHistoryCharacterWeiYanMobileShiOperations _characterWeiYanMobileShiOperations;
+    private readonly ICorePlayCardHistoryCharacterZhangFeiAnniversaryGodOperations _characterZhangFeiAnniversaryGodOperations;
+    private readonly ICorePlayCardHistoryCardZonesOperations _cardZonesOperations;
+    private readonly ICorePlayCardHistoryContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePlayCardHistorySkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICorePlayCardHistoryCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICorePlayCardHistoryCoreActivityOrdinaryTricksOperations _coreActivityOrdinaryTricksOperations;
+    private readonly ICorePlayCardHistoryCoreActualTurnViewAsOperations _coreActualTurnViewAsOperations;
+    private readonly ICorePlayCardHistoryCoreBoundDiscardSlashBenefitsOperations _coreBoundDiscardSlashBenefitsOperations;
+    private readonly ICorePlayCardHistoryCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICorePlayCardHistoryCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICorePlayCardHistoryCoreNamedUseConversionsOperations _coreNamedUseConversionsOperations;
+    private readonly ICorePlayCardHistoryCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICorePlayCardHistoryCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICorePlayCardHistoryCoreProgramCardUseRulesOperations _coreProgramCardUseRulesOperations;
+    private readonly ICorePlayCardHistoryCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICorePlayCardHistoryCoreRoundGainedSourceUsesOperations _coreRoundGainedSourceUsesOperations;
+    private readonly ICorePlayCardHistoryCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICorePlayCardHistoryCoreWushuangJinzhiOperations _coreWushuangJinzhiOperations;
+    private readonly ICorePlayCardHistoryCoreGuanduEventProgramsOperations _coreGuanduEventProgramsOperations;
+    private readonly ICorePlayCardHistoryCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICorePlayCardHistoryCoreNativeMultiTargetActionsOperations _coreNativeMultiTargetActionsOperations;
+    private readonly ICorePlayCardHistoryCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICorePlayCardHistoryCoreProgramTieredRoundConversionOperations _coreProgramTieredRoundConversionOperations;
+    private readonly ICorePlayCardHistoryCoreTurnTargetCardQuotaAllowancesOperations _coreTurnTargetCardQuotaAllowancesOperations;
+    private readonly ICorePlayCardHistoryKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess _coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    internal CoreGameEnginePlayCardHistoryRuntime(ICorePlayCardHistoryCharacterGuanHaiOlOperations characterGuanHaiOlOperations, ICorePlayCardHistoryCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICorePlayCardHistoryCharacterHuangfuSongWumiaoOperations characterHuangfuSongWumiaoOperations, ICorePlayCardHistoryCharacterMiHengLeOperations characterMiHengLeOperations, ICorePlayCardHistoryCharacterSunQuanAnniversaryGodOperations characterSunQuanAnniversaryGodOperations, ICorePlayCardHistoryCharacterWeiYanMobileShiOperations characterWeiYanMobileShiOperations, ICorePlayCardHistoryCharacterZhangFeiAnniversaryGodOperations characterZhangFeiAnniversaryGodOperations, ICorePlayCardHistoryCardZonesOperations cardZonesOperations, ICorePlayCardHistoryContentRegistryOperations contentRegistryOperations, ICorePlayCardHistorySkillRuntimeStateOperations skillRuntimeStateOperations, ICorePlayCardHistoryCoreActionQueriesOperations coreActionQueriesOperations, ICorePlayCardHistoryCoreActivityOrdinaryTricksOperations coreActivityOrdinaryTricksOperations, ICorePlayCardHistoryCoreActualTurnViewAsOperations coreActualTurnViewAsOperations, ICorePlayCardHistoryCoreBoundDiscardSlashBenefitsOperations coreBoundDiscardSlashBenefitsOperations, ICorePlayCardHistoryCoreCardConversionsOperations coreCardConversionsOperations, ICorePlayCardHistoryCoreCardUseModulesOperations coreCardUseModulesOperations, ICorePlayCardHistoryCoreNamedUseConversionsOperations coreNamedUseConversionsOperations, ICorePlayCardHistoryCoreNationalSkillsOperations coreNationalSkillsOperations, ICorePlayCardHistoryCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICorePlayCardHistoryCoreProgramCardUseRulesOperations coreProgramCardUseRulesOperations, ICorePlayCardHistoryCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICorePlayCardHistoryCoreRoundGainedSourceUsesOperations coreRoundGainedSourceUsesOperations, ICorePlayCardHistoryCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICorePlayCardHistoryCoreWushuangJinzhiOperations coreWushuangJinzhiOperations, ICorePlayCardHistoryCoreGuanduEventProgramsOperations coreGuanduEventProgramsOperations, ICorePlayCardHistoryCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICorePlayCardHistoryCoreNativeMultiTargetActionsOperations coreNativeMultiTargetActionsOperations, ICorePlayCardHistoryCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICorePlayCardHistoryCoreProgramTieredRoundConversionOperations coreProgramTieredRoundConversionOperations, ICorePlayCardHistoryCoreTurnTargetCardQuotaAllowancesOperations coreTurnTargetCardQuotaAllowancesOperations, ICorePlayCardHistoryKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess coreGameEngineSkillProgramsProgramPhaseUsesAccess)
+    {
+        this._characterGuanHaiOlOperations = characterGuanHaiOlOperations;
+        this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
+        this._characterHuangfuSongWumiaoOperations = characterHuangfuSongWumiaoOperations;
+        this._characterMiHengLeOperations = characterMiHengLeOperations;
+        this._characterSunQuanAnniversaryGodOperations = characterSunQuanAnniversaryGodOperations;
+        this._characterWeiYanMobileShiOperations = characterWeiYanMobileShiOperations;
+        this._characterZhangFeiAnniversaryGodOperations = characterZhangFeiAnniversaryGodOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreActivityOrdinaryTricksOperations = coreActivityOrdinaryTricksOperations;
+        this._coreActualTurnViewAsOperations = coreActualTurnViewAsOperations;
+        this._coreBoundDiscardSlashBenefitsOperations = coreBoundDiscardSlashBenefitsOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreNamedUseConversionsOperations = coreNamedUseConversionsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCardUseRulesOperations = coreProgramCardUseRulesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRoundGainedSourceUsesOperations = coreRoundGainedSourceUsesOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreWushuangJinzhiOperations = coreWushuangJinzhiOperations;
+        this._coreGuanduEventProgramsOperations = coreGuanduEventProgramsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeMultiTargetActionsOperations = coreNativeMultiTargetActionsOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramTieredRoundConversionOperations = coreProgramTieredRoundConversionOperations;
+        this._coreTurnTargetCardQuotaAllowancesOperations = coreTurnTargetCardQuotaAllowancesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineSkillProgramsProgramPhaseUsesAccess = coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    }
+}

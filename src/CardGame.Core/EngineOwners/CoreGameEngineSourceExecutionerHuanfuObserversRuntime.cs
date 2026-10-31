@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSourceExecutionerHuanfuObserversRuntime
+{
+    private readonly ICoreSourceExecutionerHuanfuObserversContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSourceExecutionerHuanfuObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSourceExecutionerHuanfuObserversCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreSourceExecutionerHuanfuObserversCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreSourceExecutionerHuanfuObserversCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreSourceExecutionerHuanfuObserversCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSourceExecutionerHuanfuObserversCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSourceExecutionerHuanfuObserversCoreSourceExecutionerHuanfuOperations _coreSourceExecutionerHuanfuOperations;
+    private readonly ICoreSourceExecutionerHuanfuObserversCoreSourceExecutionerYishiOperations _coreSourceExecutionerYishiOperations;
+    private readonly ICoreSourceExecutionerHuanfuObserversCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSourceExecutionerHuanfuObserversRuntime(ICoreSourceExecutionerHuanfuObserversContentRegistryOperations contentRegistryOperations, ICoreSourceExecutionerHuanfuObserversResolutionStackOperations resolutionStackOperations, ICoreSourceExecutionerHuanfuObserversCoreCardActionsOperations coreCardActionsOperations, ICoreSourceExecutionerHuanfuObserversCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreSourceExecutionerHuanfuObserversCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreSourceExecutionerHuanfuObserversCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSourceExecutionerHuanfuObserversCoreRuntimeOperations coreRuntimeOperations, ICoreSourceExecutionerHuanfuObserversCoreSourceExecutionerHuanfuOperations coreSourceExecutionerHuanfuOperations, ICoreSourceExecutionerHuanfuObserversCoreSourceExecutionerYishiOperations coreSourceExecutionerYishiOperations, ICoreSourceExecutionerHuanfuObserversCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSourceExecutionerHuanfuOperations = coreSourceExecutionerHuanfuOperations;
+        this._coreSourceExecutionerYishiOperations = coreSourceExecutionerYishiOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

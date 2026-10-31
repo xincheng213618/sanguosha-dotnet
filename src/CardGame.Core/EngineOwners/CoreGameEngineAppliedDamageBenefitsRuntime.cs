@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineAppliedDamageBenefitsRuntime : global::CardGame.Core.IAppliedDamageBenefitProgramHost
+{
+    private readonly ICoreAppliedDamageBenefitsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreAppliedDamageBenefitsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreAppliedDamageBenefitsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreAppliedDamageBenefitsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreAppliedDamageBenefitsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreAppliedDamageBenefitsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreAppliedDamageBenefitsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreAppliedDamageBenefitsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreAppliedDamageBenefitsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreAppliedDamageBenefitsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreAppliedDamageBenefitsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreAppliedDamageBenefitsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreAppliedDamageBenefitsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreAppliedDamageBenefitsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineAppliedDamageBenefitsRuntime(ICoreAppliedDamageBenefitsContentRegistryOperations contentRegistryOperations, ICoreAppliedDamageBenefitsResolutionStackOperations resolutionStackOperations, ICoreAppliedDamageBenefitsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreAppliedDamageBenefitsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreAppliedDamageBenefitsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreAppliedDamageBenefitsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreAppliedDamageBenefitsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreAppliedDamageBenefitsCoreRuntimeOperations coreRuntimeOperations, ICoreAppliedDamageBenefitsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreAppliedDamageBenefitsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreAppliedDamageBenefitsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreAppliedDamageBenefitsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreAppliedDamageBenefitsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreAppliedDamageBenefitsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

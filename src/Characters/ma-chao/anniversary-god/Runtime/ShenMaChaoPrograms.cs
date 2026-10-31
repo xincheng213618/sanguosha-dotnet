@@ -52,7 +52,7 @@ internal sealed class HengwuCommittedUseContract : IProgramCommittedUseContract
 }
 internal static class ShenMaChaoComposition
 {
-    internal const string Shouli = "anniversary:shouli", Hengwu = "anniversary:hengwu", Slash = "field-offensive-mount-slash", Dodge = "field-defensive-mount-dodge";
+    internal const string Shouli = "anniversary:shouli",Hengwu = "anniversary:hengwu",Slash = "field-offensive-mount-slash",Dodge = "field-defensive-mount-dodge";
     [ProgramCatalogValidation(39000)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Any(e => e.Op is SkillProgramEffectOp.DealShouliStartingMounts or SkillProgramEffectOp.DrawHengwuFieldSuitEquipment)) return;

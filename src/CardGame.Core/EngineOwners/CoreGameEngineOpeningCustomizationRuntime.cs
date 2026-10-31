@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineOpeningCustomizationRuntime
+{
+    private readonly ICoreOpeningCustomizationCardZonesOperations _cardZonesOperations;
+    private readonly ICoreOpeningCustomizationRandomOperations _randomOperations;
+    private readonly ICoreOpeningCustomizationResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreOpeningCustomizationCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreOpeningCustomizationCoreMatchParticipantSetupOperations _coreMatchParticipantSetupOperations;
+    private readonly ICoreOpeningCustomizationCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreOpeningCustomizationCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreOpeningCustomizationCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreOpeningCustomizationCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreOpeningCustomizationCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreOpeningCustomizationKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreOpeningCustomizationKernelCoreGameEngineRuntimeOperations _kernelCoreGameEngineRuntimeOperations;
+    private readonly ICoreOpeningCustomizationKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    internal CoreGameEngineOpeningCustomizationRuntime(ICoreOpeningCustomizationCardZonesOperations cardZonesOperations, ICoreOpeningCustomizationRandomOperations randomOperations, ICoreOpeningCustomizationResolutionStackOperations resolutionStackOperations, ICoreOpeningCustomizationCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreOpeningCustomizationCoreMatchParticipantSetupOperations coreMatchParticipantSetupOperations, ICoreOpeningCustomizationCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreOpeningCustomizationCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreOpeningCustomizationCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreOpeningCustomizationCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreOpeningCustomizationCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreOpeningCustomizationKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreOpeningCustomizationKernelCoreGameEngineRuntimeOperations kernelCoreGameEngineRuntimeOperations, ICoreOpeningCustomizationKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreMatchParticipantSetupOperations = coreMatchParticipantSetupOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreGameEngineRuntimeOperations = kernelCoreGameEngineRuntimeOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreMatchSetupSetupCompleteAccess = coreMatchSetupSetupCompleteAccess;
+        this._coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess = coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    }
+}

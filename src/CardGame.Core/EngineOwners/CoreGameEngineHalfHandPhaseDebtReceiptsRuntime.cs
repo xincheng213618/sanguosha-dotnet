@@ -1,0 +1,32 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineHalfHandPhaseDebtReceiptsRuntime
+{
+    private readonly ICoreHalfHandPhaseDebtReceiptsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreHalfHandPhaseDebtReceiptsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHalfHandPhaseDebtReceiptsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreHalfHandPhaseDebtReceiptsCoreHalfHandPhaseDebtProgramsOperations _coreHalfHandPhaseDebtProgramsOperations;
+    private readonly ICoreHalfHandPhaseDebtReceiptsCoreHalfHandTargetSupportOperations _coreHalfHandTargetSupportOperations;
+    private readonly ICoreHalfHandPhaseDebtReceiptsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineHalfHandPhaseDebtReceiptsRuntime(ICoreHalfHandPhaseDebtReceiptsContentRegistryOperations contentRegistryOperations, ICoreHalfHandPhaseDebtReceiptsResolutionStackOperations resolutionStackOperations, ICoreHalfHandPhaseDebtReceiptsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreHalfHandPhaseDebtReceiptsCoreHalfHandPhaseDebtProgramsOperations coreHalfHandPhaseDebtProgramsOperations, ICoreHalfHandPhaseDebtReceiptsCoreHalfHandTargetSupportOperations coreHalfHandTargetSupportOperations, ICoreHalfHandPhaseDebtReceiptsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreHalfHandPhaseDebtProgramsOperations = coreHalfHandPhaseDebtProgramsOperations;
+        this._coreHalfHandTargetSupportOperations = coreHalfHandTargetSupportOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

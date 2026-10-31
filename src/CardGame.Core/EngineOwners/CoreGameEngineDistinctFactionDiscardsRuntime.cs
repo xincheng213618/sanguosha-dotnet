@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDistinctFactionDiscardsRuntime : global::CardGame.Core.IDistinctFactionDiscardHost
+{
+    private readonly ICoreDistinctFactionDiscardsCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICoreDistinctFactionDiscardsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreDistinctFactionDiscardsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDistinctFactionDiscardsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreNativeAiDecisionsOperations _coreNativeAiDecisionsOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreDistinctFactionDiscardsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDistinctFactionDiscardsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreDistinctFactionDiscardsCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreDistinctFactionDiscardsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess _coreAiDiagnosticsThoughtSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess _coreMatchDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineDistinctFactionDiscardsRuntime(ICoreDistinctFactionDiscardsCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICoreDistinctFactionDiscardsCardZonesOperations cardZonesOperations, ICoreDistinctFactionDiscardsContentRegistryOperations contentRegistryOperations, ICoreDistinctFactionDiscardsResolutionStackOperations resolutionStackOperations, ICoreDistinctFactionDiscardsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreDistinctFactionDiscardsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreDistinctFactionDiscardsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreDistinctFactionDiscardsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreDistinctFactionDiscardsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDistinctFactionDiscardsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreDistinctFactionDiscardsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreDistinctFactionDiscardsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDistinctFactionDiscardsCoreRuntimeOperations coreRuntimeOperations, ICoreDistinctFactionDiscardsCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICoreDistinctFactionDiscardsCoreNativeAiDecisionsOperations coreNativeAiDecisionsOperations, ICoreDistinctFactionDiscardsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreDistinctFactionDiscardsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreDistinctFactionDiscardsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDistinctFactionDiscardsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreDistinctFactionDiscardsCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreDistinctFactionDiscardsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess coreAiDiagnosticsThoughtSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess coreMatchDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativeAiDecisionsOperations = coreNativeAiDecisionsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreAiDiagnosticsThoughtSequenceAccess = coreAiDiagnosticsThoughtSequenceAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchDefinitionPlayerCountAccess = coreMatchDefinitionPlayerCountAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

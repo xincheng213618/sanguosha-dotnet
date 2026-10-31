@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineCardSupplyCompletionRuntime
+{
+    private readonly ICoreCardSupplyCompletionCharacterGuoTuOlOperations _characterGuoTuOlOperations;
+    private readonly ICoreCardSupplyCompletionContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCardSupplyCompletionPendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICoreCardSupplyCompletionResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCardSupplyCompletionCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreCardSupplyCompletionCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreCardSupplyCompletionCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreCardSupplyCompletionCoreDeferredTurnEndPreludesOperations _coreDeferredTurnEndPreludesOperations;
+    private readonly ICoreCardSupplyCompletionCoreOwnPublicPileConversionsOperations _coreOwnPublicPileConversionsOperations;
+    private readonly ICoreCardSupplyCompletionCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreCardSupplyCompletionCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreCardSupplyCompletionCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCardSupplyCompletionCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICoreCardSupplyCompletionCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreCardSupplyCompletionCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreCardSupplyCompletionCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreCardSupplyCompletionCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreCardSupplyCompletionCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreCardSupplyCompletionCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreCardSupplyCompletionCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreCardSupplyCompletionKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess _coreGameEngineHpChangeProgramsPendingHpChangesAccess;
+    internal CoreGameEngineCardSupplyCompletionRuntime(ICoreCardSupplyCompletionCharacterGuoTuOlOperations characterGuoTuOlOperations, ICoreCardSupplyCompletionContentRegistryOperations contentRegistryOperations, ICoreCardSupplyCompletionPendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICoreCardSupplyCompletionResolutionStackOperations resolutionStackOperations, ICoreCardSupplyCompletionCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreCardSupplyCompletionCoreCardActionsOperations coreCardActionsOperations, ICoreCardSupplyCompletionCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreCardSupplyCompletionCoreDeferredTurnEndPreludesOperations coreDeferredTurnEndPreludesOperations, ICoreCardSupplyCompletionCoreOwnPublicPileConversionsOperations coreOwnPublicPileConversionsOperations, ICoreCardSupplyCompletionCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreCardSupplyCompletionCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreCardSupplyCompletionCoreRuntimeOperations coreRuntimeOperations, ICoreCardSupplyCompletionCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICoreCardSupplyCompletionCoreTableOrderOperations coreTableOrderOperations, ICoreCardSupplyCompletionCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreCardSupplyCompletionCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreCardSupplyCompletionCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreCardSupplyCompletionCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreCardSupplyCompletionCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreCardSupplyCompletionCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreCardSupplyCompletionKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess coreGameEngineHpChangeProgramsPendingHpChangesAccess)
+    {
+        this._characterGuoTuOlOperations = characterGuoTuOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDeferredTurnEndPreludesOperations = coreDeferredTurnEndPreludesOperations;
+        this._coreOwnPublicPileConversionsOperations = coreOwnPublicPileConversionsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineHpChangeProgramsPendingHpChangesAccess = coreGameEngineHpChangeProgramsPendingHpChangesAccess;
+    }
+}

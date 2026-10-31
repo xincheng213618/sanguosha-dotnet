@@ -108,12 +108,12 @@ internal static partial class ShanheCampaignChecks
     private static (int Draw, int Slash, int HandLimit) RankNativeCounters(GameEngine battle)
     {
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-        var player = ((IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", flags)!.GetValue(battle)!)[0];
-        var draw = (RuleQueryEvaluation)typeof(GameEngine).GetMethod("EvaluateDrawCount", flags)!.Invoke(battle, [player])!;
+        var player = ((IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", flags)!.GetValue(battle)!)[0];
+        var draw = (RuleQueryEvaluation)global::FixtureRuntimeAccess.Engine.GetMethod("EvaluateDrawCount", flags)!.Invoke(battle, [player])!;
         Require(draw.Value is FiniteRuleQueryValue, "The rank fixture's native normal draw count is finite.");
         return (((FiniteRuleQueryValue)draw.Value).Value,
-            (int)typeof(GameEngine).GetMethod("GetSlashUseLimit", flags)!.Invoke(battle, [player, null, null])!,
-            (int)typeof(GameEngine).GetMethod("GetHandLimit", flags)!.Invoke(battle, [player])!);
+            (int)global::FixtureRuntimeAccess.Engine.GetMethod("GetSlashUseLimit", flags)!.Invoke(battle, [player, null, null])!,
+            (int)global::FixtureRuntimeAccess.Engine.GetMethod("GetHandLimit", flags)!.Invoke(battle, [player])!);
     }
 
     public static void GeneralRankBonusesFreezeOnceAndLegacyRecipesStayUnchanged()

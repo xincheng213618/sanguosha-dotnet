@@ -1,0 +1,24 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramPhaseColorRestrictionsRuntime
+{
+    private readonly ICoreProgramPhaseColorRestrictionsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramPhaseColorRestrictionsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreProgramPhaseColorRestrictionsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess _coreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess;
+    internal CoreGameEngineProgramPhaseColorRestrictionsRuntime(ICoreProgramPhaseColorRestrictionsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramPhaseColorRestrictionsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreProgramPhaseColorRestrictionsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess coreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess)
+    {
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess = coreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess;
+    }
+}

@@ -1,0 +1,84 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheS5GongsunZanRuntime : global::CardGame.Core.IShanheS5GongsunProgramHost
+{
+    private readonly ICoreShanheS5GongsunZanCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICoreShanheS5GongsunZanCardZonesOperations _cardZonesOperations;
+    private readonly ICoreShanheS5GongsunZanContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheS5GongsunZanResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheS5GongsunZanCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreShanheS5GongsunZanCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreShanheS5GongsunZanCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreShanheS5GongsunZanCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreCurrentUsePhysicalClaimsOperations _coreCurrentUsePhysicalClaimsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheS5GongsunZanCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheS5GongsunZanCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheS5GongsunZanCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreNativeAiDecisionsOperations _coreNativeAiDecisionsOperations;
+    private readonly ICoreShanheS5GongsunZanCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheS5GongsunZanCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreShanheS5GongsunZanCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheS5GongsunZanCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheS5GongsunZanCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreShanheS5GongsunZanCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreShanheS5GongsunZanCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreShanheS5GongsunZanCoreTeamActivityProgramsOperations _coreTeamActivityProgramsOperations;
+    private readonly ICoreShanheS5GongsunZanKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess _coreAiDiagnosticsThoughtSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheS5GongsunZanRuntime(ICoreShanheS5GongsunZanCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICoreShanheS5GongsunZanCardZonesOperations cardZonesOperations, ICoreShanheS5GongsunZanContentRegistryOperations contentRegistryOperations, ICoreShanheS5GongsunZanResolutionStackOperations resolutionStackOperations, ICoreShanheS5GongsunZanCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreShanheS5GongsunZanCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreShanheS5GongsunZanCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheS5GongsunZanCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreShanheS5GongsunZanCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreShanheS5GongsunZanCoreCurrentUsePhysicalClaimsOperations coreCurrentUsePhysicalClaimsOperations, ICoreShanheS5GongsunZanCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreShanheS5GongsunZanCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreShanheS5GongsunZanCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreShanheS5GongsunZanCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreShanheS5GongsunZanCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreShanheS5GongsunZanCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICoreShanheS5GongsunZanCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheS5GongsunZanCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheS5GongsunZanCoreRuntimeOperations coreRuntimeOperations, ICoreShanheS5GongsunZanCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreShanheS5GongsunZanCoreNativeAiDecisionsOperations coreNativeAiDecisionsOperations, ICoreShanheS5GongsunZanCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheS5GongsunZanCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreShanheS5GongsunZanCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheS5GongsunZanCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheS5GongsunZanCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreShanheS5GongsunZanCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreShanheS5GongsunZanCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreShanheS5GongsunZanCoreTeamActivityProgramsOperations coreTeamActivityProgramsOperations, ICoreShanheS5GongsunZanKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess coreAiDiagnosticsThoughtSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreCurrentUsePhysicalClaimsOperations = coreCurrentUsePhysicalClaimsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreNativeAiDecisionsOperations = coreNativeAiDecisionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreTeamActivityProgramsOperations = coreTeamActivityProgramsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreAiDiagnosticsThoughtSequenceAccess = coreAiDiagnosticsThoughtSequenceAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

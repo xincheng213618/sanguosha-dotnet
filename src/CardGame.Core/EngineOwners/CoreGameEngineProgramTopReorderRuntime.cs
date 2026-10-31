@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramTopReorderRuntime
+{
+    private readonly ICoreProgramTopReorderCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICoreProgramTopReorderCharacterZhugeGuoOlOperations _characterZhugeGuoOlOperations;
+    private readonly ICoreProgramTopReorderCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramTopReorderContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramTopReorderResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramTopReorderCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreProgramTopReorderCoreExactTopReorderProgramsOperations _coreExactTopReorderProgramsOperations;
+    private readonly ICoreProgramTopReorderCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramTopReorderCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreProgramTopReorderCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramTopReorderCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICoreProgramTopReorderCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramTopReorderCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreProgramTopReorderCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreProgramTopReorderCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreProgramTopReorderCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramTopReorderCorePopulationTopReorderProgramsOperations _corePopulationTopReorderProgramsOperations;
+    private readonly ICoreProgramTopReorderCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreProgramTopReorderKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreProgramTopReorderKernelCoreGameEngineRuntimeOperations _kernelCoreGameEngineRuntimeOperations;
+    private readonly ICoreProgramTopReorderKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramTopReorderRuntime(ICoreProgramTopReorderCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICoreProgramTopReorderCharacterZhugeGuoOlOperations characterZhugeGuoOlOperations, ICoreProgramTopReorderCardZonesOperations cardZonesOperations, ICoreProgramTopReorderContentRegistryOperations contentRegistryOperations, ICoreProgramTopReorderResolutionStackOperations resolutionStackOperations, ICoreProgramTopReorderCoreActualTurnsOperations coreActualTurnsOperations, ICoreProgramTopReorderCoreExactTopReorderProgramsOperations coreExactTopReorderProgramsOperations, ICoreProgramTopReorderCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramTopReorderCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreProgramTopReorderCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramTopReorderCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICoreProgramTopReorderCoreRuntimeOperations coreRuntimeOperations, ICoreProgramTopReorderCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreProgramTopReorderCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreProgramTopReorderCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreProgramTopReorderCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramTopReorderCorePopulationTopReorderProgramsOperations corePopulationTopReorderProgramsOperations, ICoreProgramTopReorderCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreProgramTopReorderKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreProgramTopReorderKernelCoreGameEngineRuntimeOperations kernelCoreGameEngineRuntimeOperations, ICoreProgramTopReorderKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._characterZhugeGuoOlOperations = characterZhugeGuoOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreExactTopReorderProgramsOperations = coreExactTopReorderProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePopulationTopReorderProgramsOperations = corePopulationTopReorderProgramsOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreGameEngineRuntimeOperations = kernelCoreGameEngineRuntimeOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

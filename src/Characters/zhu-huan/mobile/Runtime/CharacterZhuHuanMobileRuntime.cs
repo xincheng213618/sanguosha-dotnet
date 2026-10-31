@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZhuHuanMobileRuntime : global::CardGame.Core.IMobileZhuHuanPingkouHost
+{
+    private readonly ICharacterZhuHuanMobileCharacterZhuHuanBoundaryMobileOperations _characterZhuHuanBoundaryMobileOperations;
+    private readonly ICharacterZhuHuanMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhuHuanMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhuHuanMobileCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterZhuHuanMobileCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterZhuHuanMobileCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterZhuHuanMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZhuHuanMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhuHuanMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZhuHuanMobileCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterZhuHuanMobileCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterZhuHuanMobileCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterZhuHuanMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterZhuHuanMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterZhuHuanMobileCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterZhuHuanMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterZhuHuanMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterZhuHuanMobileRuntime(ICharacterZhuHuanMobileCharacterZhuHuanBoundaryMobileOperations characterZhuHuanBoundaryMobileOperations, ICharacterZhuHuanMobileContentRegistryOperations contentRegistryOperations, ICharacterZhuHuanMobileResolutionStackOperations resolutionStackOperations, ICharacterZhuHuanMobileCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterZhuHuanMobileCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterZhuHuanMobileCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterZhuHuanMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhuHuanMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhuHuanMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterZhuHuanMobileCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterZhuHuanMobileCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterZhuHuanMobileCoreTableOrderOperations coreTableOrderOperations, ICharacterZhuHuanMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterZhuHuanMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterZhuHuanMobileCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterZhuHuanMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterZhuHuanMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterZhuHuanBoundaryMobileOperations = characterZhuHuanBoundaryMobileOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramJudgmentRuntimePortsRuntime : global::CardGame.Core.IProgramJudgmentNativeProofs, global::CardGame.Core.IProgramJudgmentProducer
+{
+    private readonly ICoreProgramJudgmentRuntimePortsCharacterGuoJiaMobileGodOperations _characterGuoJiaMobileGodOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCharacterGuoJiaMouOperations _characterGuoJiaMouOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCharacterMaYuanYiOlOperations _characterMaYuanYiOlOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCharacterQianZhaoOlOperations _characterQianZhaoOlOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCharacterZhangFeiAnniversaryGodOperations _characterZhangFeiAnniversaryGodOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCharacterZhangJiOlOperations _characterZhangJiOlOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCharacterZhongHuiAnniversaryGodOperations _characterZhongHuiAnniversaryGodOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCharacterZhouQunOlOperations _characterZhouQunOlOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCoreDamageJudgmentSuitPaymentsOperations _coreDamageJudgmentSuitPaymentsOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCoreSourceHuojieOperations _coreSourceHuojieOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCoreNativeJudgmentOperations _coreNativeJudgmentOperations;
+    private readonly ICoreProgramJudgmentRuntimePortsCoreWushuangCombatProgramsOperations _coreWushuangCombatProgramsOperations;
+    internal CoreProgramJudgmentRuntimePortsRuntime(ICoreProgramJudgmentRuntimePortsCharacterGuoJiaMobileGodOperations characterGuoJiaMobileGodOperations, ICoreProgramJudgmentRuntimePortsCharacterGuoJiaMouOperations characterGuoJiaMouOperations, ICoreProgramJudgmentRuntimePortsCharacterMaYuanYiOlOperations characterMaYuanYiOlOperations, ICoreProgramJudgmentRuntimePortsCharacterQianZhaoOlOperations characterQianZhaoOlOperations, ICoreProgramJudgmentRuntimePortsCharacterZhangFeiAnniversaryGodOperations characterZhangFeiAnniversaryGodOperations, ICoreProgramJudgmentRuntimePortsCharacterZhangJiOlOperations characterZhangJiOlOperations, ICoreProgramJudgmentRuntimePortsCharacterZhongHuiAnniversaryGodOperations characterZhongHuiAnniversaryGodOperations, ICoreProgramJudgmentRuntimePortsCharacterZhouQunOlOperations characterZhouQunOlOperations, ICoreProgramJudgmentRuntimePortsCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreProgramJudgmentRuntimePortsCoreDamageJudgmentSuitPaymentsOperations coreDamageJudgmentSuitPaymentsOperations, ICoreProgramJudgmentRuntimePortsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreProgramJudgmentRuntimePortsCoreSourceHuojieOperations coreSourceHuojieOperations, ICoreProgramJudgmentRuntimePortsCoreNativeJudgmentOperations coreNativeJudgmentOperations, ICoreProgramJudgmentRuntimePortsCoreWushuangCombatProgramsOperations coreWushuangCombatProgramsOperations)
+    {
+        this._characterGuoJiaMobileGodOperations = characterGuoJiaMobileGodOperations;
+        this._characterGuoJiaMouOperations = characterGuoJiaMouOperations;
+        this._characterMaYuanYiOlOperations = characterMaYuanYiOlOperations;
+        this._characterQianZhaoOlOperations = characterQianZhaoOlOperations;
+        this._characterZhangFeiAnniversaryGodOperations = characterZhangFeiAnniversaryGodOperations;
+        this._characterZhangJiOlOperations = characterZhangJiOlOperations;
+        this._characterZhongHuiAnniversaryGodOperations = characterZhongHuiAnniversaryGodOperations;
+        this._characterZhouQunOlOperations = characterZhouQunOlOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDamageJudgmentSuitPaymentsOperations = coreDamageJudgmentSuitPaymentsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreSourceHuojieOperations = coreSourceHuojieOperations;
+        this._coreNativeJudgmentOperations = coreNativeJudgmentOperations;
+        this._coreWushuangCombatProgramsOperations = coreWushuangCombatProgramsOperations;
+    }
+}

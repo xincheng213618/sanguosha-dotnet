@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime : global::CardGame.Core.IPrepPoisonOutcomeHost
+{
+    private readonly ICorePrepPoisonOutcomesObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICorePrepPoisonOutcomesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePrepPoisonOutcomesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICorePrepPoisonOutcomesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICorePrepPoisonOutcomesCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICorePrepPoisonOutcomesCoreDamageTargetSkillRoundDrawOperations _coreDamageTargetSkillRoundDrawOperations;
+    private readonly ICorePrepPoisonOutcomesCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICorePrepPoisonOutcomesCoreIdentityConcealmentOperations _coreIdentityConcealmentOperations;
+    private readonly ICorePrepPoisonOutcomesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICorePrepPoisonOutcomesCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICorePrepPoisonOutcomesCoreProgramJudgmentOutcomesOperations _coreProgramJudgmentOutcomesOperations;
+    private readonly ICorePrepPoisonOutcomesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePrepPoisonOutcomesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePrepPoisonOutcomesCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICorePrepPoisonOutcomesCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICorePrepPoisonOutcomesCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICorePrepPoisonOutcomesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEnginePrepPoisonOutcomesRuntime(ICorePrepPoisonOutcomesObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICorePrepPoisonOutcomesResolutionStackOperations resolutionStackOperations, ICorePrepPoisonOutcomesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICorePrepPoisonOutcomesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICorePrepPoisonOutcomesCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICorePrepPoisonOutcomesCoreDamageTargetSkillRoundDrawOperations coreDamageTargetSkillRoundDrawOperations, ICorePrepPoisonOutcomesCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICorePrepPoisonOutcomesCoreIdentityConcealmentOperations coreIdentityConcealmentOperations, ICorePrepPoisonOutcomesCoreNationalSkillsOperations coreNationalSkillsOperations, ICorePrepPoisonOutcomesCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICorePrepPoisonOutcomesCoreProgramJudgmentOutcomesOperations coreProgramJudgmentOutcomesOperations, ICorePrepPoisonOutcomesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePrepPoisonOutcomesCoreRuntimeOperations coreRuntimeOperations, ICorePrepPoisonOutcomesCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICorePrepPoisonOutcomesCoreSkillProgramsOperations coreSkillProgramsOperations, ICorePrepPoisonOutcomesCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICorePrepPoisonOutcomesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDamageTargetSkillRoundDrawOperations = coreDamageTargetSkillRoundDrawOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreIdentityConcealmentOperations = coreIdentityConcealmentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramJudgmentOutcomesOperations = coreProgramJudgmentOutcomesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

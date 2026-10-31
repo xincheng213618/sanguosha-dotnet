@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CoreGameEngineZhaoZhongProvenanceRuntime
+{
+    internal void IndexZhaoZhongNativeDrawInvoices()
+    {
+        // Typed history snapshots are immutable and change identity whenever
+        // their committed/pending facts change. This index stores facts only;
+        // every query still verifies the actual materials and active proof.
+        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawInvocationRecordedEvent>();
+        if (ReferenceEquals(facts, _coreGameEngineZhaoZhongProvenanceZhaoZhongDrawInvocationCountsZhaoZhongDrawInvoiceFactsZhaoZhongDrawInvoicesAccess._zhaoZhongDrawInvoiceFacts))
+            return;
+        _coreGameEngineZhaoZhongProvenanceZhaoZhongDrawInvocationCountsZhaoZhongDrawInvoiceFactsZhaoZhongDrawInvoicesAccess._zhaoZhongDrawInvoices = facts.GroupBy(fact => (fact.TurnNumber, fact.OwnerSeat)).ToDictionary(group => group.Key, group => group.ToArray());
+        _coreGameEngineZhaoZhongProvenanceZhaoZhongDrawInvocationCountsZhaoZhongDrawInvoiceFactsZhaoZhongDrawInvoicesAccess._zhaoZhongDrawInvocationCounts = facts.GroupBy(fact => fact.InvocationId).ToDictionary(group => group.Key, group => group.Count());
+        _coreGameEngineZhaoZhongProvenanceZhaoZhongDrawInvocationCountsZhaoZhongDrawInvoiceFactsZhaoZhongDrawInvoicesAccess._zhaoZhongDrawInvoiceFacts = facts;
+    }
+
+    internal bool IsNativeDrawGainMovement(CardMovementRecord movement)
+    {
+        if (movement.From != CardLocation.DrawPile || movement.To.Zone != CardZoneKind.Hand || movement.To.OwnerSeat is not { } recipient || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(movement))
+            return false;
+        IndexZhaoZhongNativeDrawInvoices();
+        var invoices = (_coreGameEngineZhaoZhongProvenanceZhaoZhongDrawInvocationCountsZhaoZhongDrawInvoiceFactsZhaoZhongDrawInvoicesAccess._zhaoZhongDrawInvoices.GetValueOrDefault((movement.TurnNumber, recipient)) ?? []).Where(e => movement.Sequence > e.SequenceBefore && movement.Sequence <= e.SequenceAfter).ToArray();
+        if (invoices is not [var invoice] || invoice.InvocationId <= 0 || invoice.LastBatchId <= 0 || invoice.ActualCount <= 0 || invoice.Requested < invoice.ActualCount || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(invoice.OwnerSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(invoice.ActualTurnOwnerSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(invoice.PhaseActorSeat) || invoice.TurnNumber < 1 || invoice.SequenceBefore < 0 || invoice.SequenceAfter <= invoice.SequenceBefore || invoice.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || invoice.Reason == CardMoveReasons.InitialDeal || _coreGameEngineZhaoZhongProvenanceZhaoZhongDrawInvocationCountsZhaoZhongDrawInvoiceFactsZhaoZhongDrawInvoicesAccess._zhaoZhongDrawInvocationCounts.GetValueOrDefault(invoice.InvocationId) != 1)
+            return false;
+        // This native completion fact was issued only after DrawCards verified
+        // every actual ID against its structured invocation. Rebuild that exact
+        // material proof even after its final movement window has drained.
+        var materials = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.TurnNumber == invoice.TurnNumber && m.Sequence > invoice.SequenceBefore && m.Sequence <= invoice.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(recipient) && m.Reason == invoice.Reason).OrderBy(m => m.Sequence).ToArray();
+        if (materials.Length != invoice.ActualCount || materials.Select(m => m.CardId).Distinct().Count() != materials.Length || materials.Select(m => m.Sequence).Distinct().Count() != materials.Length || !materials.Contains(movement))
+            return false;
+        var currentProof = _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Select(b => b.NativeDrawInvocation).Concat(_resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Select(f => f.Batch.NativeDrawInvocation)).FirstOrDefault(p => p?.InvocationId == invoice.InvocationId);
+        return currentProof is null || _coreOutsidePhaseDrawDiscardOperations.ValidNativeDrawInvocation(currentProof) && currentProof.Materials.Select(m => new NativeDrawMaterial(m.CardId, m.PrintedKind, m.MovementSequence)).SequenceEqual(materials.Select(m => new NativeDrawMaterial(m.CardId, m.CardKind, m.Sequence)));
+    }
+}

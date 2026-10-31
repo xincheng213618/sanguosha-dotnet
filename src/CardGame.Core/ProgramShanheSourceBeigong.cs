@@ -38,7 +38,7 @@ public sealed record SourceXingxiaPaymentEvent(long ProgramFrameId, int OwnerSea
 
 internal static class SourceBeigongIds
 {
-    internal const string Dingxi = "shanhe:source-dingxi-3601", Huojie = "shanhe:source-huojie-3603", Xingxia = "shanhe:source-xingxia-1117";
+    internal const string Dingxi = "shanhe:source-dingxi-3601",Huojie = "shanhe:source-huojie-3603",Xingxia = "shanhe:source-xingxia-1117";
 }
 internal interface ISourceBeigongHost
 { SkillProgramStepOutcome Run(ProgramSkillFrame frame, SkillProgramEffectOp op); }

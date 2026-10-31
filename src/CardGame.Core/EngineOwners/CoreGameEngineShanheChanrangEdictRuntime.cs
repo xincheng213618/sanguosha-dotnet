@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime : global::CardGame.Core.IShanheChanrangHost
+{
+    private readonly ICoreShanheChanrangEdictCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreShanheChanrangEdictContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheChanrangEdictResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheChanrangEdictCoreActualHandGainProgramsOperations _coreActualHandGainProgramsOperations;
+    private readonly ICoreShanheChanrangEdictCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreShanheChanrangEdictCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheChanrangEdictCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreShanheChanrangEdictCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreShanheChanrangEdictCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreShanheChanrangEdictCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreShanheChanrangEdictCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheChanrangEdictCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheChanrangEdictCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheChanrangEdictCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheChanrangEdictCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheChanrangEdictCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheChanrangEdictKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheChanrangEdictRuntime(ICoreShanheChanrangEdictCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreShanheChanrangEdictContentRegistryOperations contentRegistryOperations, ICoreShanheChanrangEdictResolutionStackOperations resolutionStackOperations, ICoreShanheChanrangEdictCoreActualHandGainProgramsOperations coreActualHandGainProgramsOperations, ICoreShanheChanrangEdictCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreShanheChanrangEdictCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheChanrangEdictCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreShanheChanrangEdictCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreShanheChanrangEdictCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreShanheChanrangEdictCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreShanheChanrangEdictCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheChanrangEdictCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheChanrangEdictCoreRuntimeOperations coreRuntimeOperations, ICoreShanheChanrangEdictCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheChanrangEdictCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheChanrangEdictCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheChanrangEdictKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualHandGainProgramsOperations = coreActualHandGainProgramsOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

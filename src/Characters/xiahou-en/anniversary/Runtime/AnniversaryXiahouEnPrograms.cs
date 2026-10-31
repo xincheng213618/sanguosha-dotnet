@@ -28,7 +28,7 @@ internal sealed class AnniversaryXiahouEnHandler(SkillProgramEffectOp operation)
 }
 internal static class AnniversaryXiahouEnComposition
 {
-    internal const string Chijian = "anniversary:chijian", Shiwu = "anniversary:shiwu", Duel = "other-actual-turn-duel", Damage = "duel-actual-damage", Death = "killer-obtains-sword";
+    internal const string Chijian = "anniversary:chijian",Shiwu = "anniversary:shiwu",Duel = "other-actual-turn-duel",Damage = "duel-actual-damage",Death = "killer-obtains-sword";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveAnniversaryXiahouEnShiwu or
         SkillProgramEffectOp.ResolveAnniversaryXiahouEnShiwuDamage or SkillProgramEffectOp.BequeathAnniversaryXiahouEnChijian;
     [ProgramCatalogValidation(45000)] internal static void Validate(string path, SkillProgram p)

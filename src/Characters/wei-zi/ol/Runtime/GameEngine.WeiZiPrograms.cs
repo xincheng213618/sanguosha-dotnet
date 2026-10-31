@@ -31,28 +31,4 @@ public sealed record YuanziDrawPendingState(int RecipientSeat);
 
 public sealed partial class GameEngine
 {
-
-    // Prompt router: every Wei Zi prompt rides one op, so the shared program
-    // dispatch hands each accepted choice back through this single entry.
-    [ProgramAnswer("yuanzi-draw", "yuanzi-decline", "liejie-pick", "liejie-finish", "liejie-decline")]
-    private void ResolveWeiZiProgramChoice(PromptChoice selected)
-    {
-        switch (selected.Parameters.GetValueOrDefault("program-action"))
-        {
-            case "yuanzi-draw" or "yuanzi-decline": ResolveYuanziDrawChoice(selected); return;
-            case "liejie-pick" or "liejie-finish" or "liejie-decline": ResolveLiejieDiscardChoice(selected); return;
-            default: throw new InvalidOperationException("The Wei Zi choice lost its action parameter.");
-        }
-    }
-
-    [ProgramCapability]
-    private sealed class WeiZiProgramCapability(GameEngine engine) : IWeiZiProgramHost
-    {
-        public SkillProgramStepOutcome YuanziResolve(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.YuanziProgramResolve(frame, effect);
-        public SkillProgramStepOutcome YuanziDamageDraw(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.YuanziProgramDamageDraw(frame, effect);
-        public SkillProgramStepOutcome LiejieSourceDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.LiejieProgramSourceDiscard(frame, effect);
-    }
 }

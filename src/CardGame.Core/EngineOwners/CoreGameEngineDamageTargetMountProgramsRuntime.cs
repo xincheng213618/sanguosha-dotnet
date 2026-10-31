@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDamageTargetMountProgramsRuntime : global::CardGame.Core.IDamageTargetMountProgramHost
+{
+    private readonly ICoreDamageTargetMountProgramsCharacterGongsunZanBoundaryMobileOperations _characterGongsunZanBoundaryMobileOperations;
+    private readonly ICoreDamageTargetMountProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreDamageTargetMountProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDamageTargetMountProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreActualDiscardPhaseLedgerOperations _coreActualDiscardPhaseLedgerOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreProgramOtherOwnedCardDiscardsOperations _coreProgramOtherOwnedCardDiscardsOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreDamageTargetMountProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDamageTargetMountProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreDamageTargetMountProgramsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineDamageTargetMountProgramsRuntime(ICoreDamageTargetMountProgramsCharacterGongsunZanBoundaryMobileOperations characterGongsunZanBoundaryMobileOperations, ICoreDamageTargetMountProgramsCardZonesOperations cardZonesOperations, ICoreDamageTargetMountProgramsContentRegistryOperations contentRegistryOperations, ICoreDamageTargetMountProgramsResolutionStackOperations resolutionStackOperations, ICoreDamageTargetMountProgramsCoreActualDiscardPhaseLedgerOperations coreActualDiscardPhaseLedgerOperations, ICoreDamageTargetMountProgramsCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreDamageTargetMountProgramsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreDamageTargetMountProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreDamageTargetMountProgramsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreDamageTargetMountProgramsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreDamageTargetMountProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDamageTargetMountProgramsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreDamageTargetMountProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDamageTargetMountProgramsCoreProgramOtherOwnedCardDiscardsOperations coreProgramOtherOwnedCardDiscardsOperations, ICoreDamageTargetMountProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreDamageTargetMountProgramsCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreDamageTargetMountProgramsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreDamageTargetMountProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreDamageTargetMountProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDamageTargetMountProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreDamageTargetMountProgramsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterGongsunZanBoundaryMobileOperations = characterGongsunZanBoundaryMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualDiscardPhaseLedgerOperations = coreActualDiscardPhaseLedgerOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramOtherOwnedCardDiscardsOperations = coreProgramOtherOwnedCardDiscardsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

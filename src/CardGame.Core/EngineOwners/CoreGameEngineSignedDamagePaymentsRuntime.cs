@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime : global::CardGame.Core.ISignedDamagePaymentHost
+{
+    private readonly ICoreSignedDamagePaymentsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSignedDamagePaymentsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSignedDamagePaymentsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSignedDamagePaymentsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreSignedDamagePaymentsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSignedDamagePaymentsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreSignedDamagePaymentsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreSignedDamagePaymentsCoreModeAllegianceOperations _coreModeAllegianceOperations;
+    private readonly ICoreSignedDamagePaymentsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreSignedDamagePaymentsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreSignedDamagePaymentsCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreSignedDamagePaymentsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSignedDamagePaymentsCoreRecipientScopedDamageOperations _coreRecipientScopedDamageOperations;
+    private readonly ICoreSignedDamagePaymentsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSignedDamagePaymentsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreSignedDamagePaymentsCoreSuitDamagePreventionBenefitsOperations _coreSuitDamagePreventionBenefitsOperations;
+    private readonly ICoreSignedDamagePaymentsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreSignedDamagePaymentsCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICoreSignedDamagePaymentsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreSignedDamagePaymentsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSignedDamagePaymentsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreSignedDamagePaymentsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSignedDamagePaymentsRuntime(ICoreSignedDamagePaymentsCardZonesOperations cardZonesOperations, ICoreSignedDamagePaymentsContentRegistryOperations contentRegistryOperations, ICoreSignedDamagePaymentsResolutionStackOperations resolutionStackOperations, ICoreSignedDamagePaymentsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreSignedDamagePaymentsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSignedDamagePaymentsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreSignedDamagePaymentsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreSignedDamagePaymentsCoreModeAllegianceOperations coreModeAllegianceOperations, ICoreSignedDamagePaymentsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreSignedDamagePaymentsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreSignedDamagePaymentsCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreSignedDamagePaymentsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSignedDamagePaymentsCoreRecipientScopedDamageOperations coreRecipientScopedDamageOperations, ICoreSignedDamagePaymentsCoreRuntimeOperations coreRuntimeOperations, ICoreSignedDamagePaymentsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreSignedDamagePaymentsCoreSuitDamagePreventionBenefitsOperations coreSuitDamagePreventionBenefitsOperations, ICoreSignedDamagePaymentsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreSignedDamagePaymentsCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICoreSignedDamagePaymentsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreSignedDamagePaymentsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSignedDamagePaymentsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreSignedDamagePaymentsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreModeAllegianceOperations = coreModeAllegianceOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecipientScopedDamageOperations = coreRecipientScopedDamageOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreSuitDamagePreventionBenefitsOperations = coreSuitDamagePreventionBenefitsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

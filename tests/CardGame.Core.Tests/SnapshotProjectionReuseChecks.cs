@@ -7,8 +7,8 @@ using CardGame.Core;
 internal static class SnapshotProjectionReuseChecks
 {
     private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.NonPublic;
-    private static readonly MethodInfo Ordinary = typeof(GameEngine).GetMethod("ToSnapshot", Flags)!;
-    private static readonly MethodInfo Judgment = typeof(GameEngine).GetMethod("ToJudgmentSnapshot", Flags)!;
+    private static readonly MethodInfo Ordinary = global::FixtureRuntimeAccess.Engine.GetMethod("ToSnapshot", Flags)!;
+    private static readonly MethodInfo Judgment = global::FixtureRuntimeAccess.Engine.GetMethod("ToJudgmentSnapshot", Flags)!;
 
     public static void OrdinaryCardReusePreservesAppearancePrivacyAndReplay()
     {
@@ -141,7 +141,7 @@ internal static class SnapshotProjectionReuseChecks
             var deposits = Field<List<DeferredPublicPileDeposit>>(projection, "_deferredPublicPileDeposits");
             var skillId = registry.Skills.Keys.First();
             var source = new CardConversionSource(skillId, "fixture", 0, "fixture-instance");
-            var hasBan = typeof(GameEngine).GetMethod("HasIssuedPlayPhaseUseBan", Flags)!
+            var hasBan = global::FixtureRuntimeAccess.Engine.GetMethod("HasIssuedPlayPhaseUseBan", Flags)!
                 .CreateDelegate<Func<int, bool>>(projection);
             Set("_turnNumber", 7); Set("_currentSeat", 0); Set("_cardUseDebitPhaseInstanceId", 4);
             Set("_phase", TurnPhase.Play);
@@ -200,7 +200,7 @@ internal static class SnapshotProjectionReuseChecks
                 }
                 return result!;
             }
-            void Set(string name, object value) => typeof(GameEngine).GetField(name, Flags)!.SetValue(projection, value);
+            void Set(string name, object value) => global::FixtureRuntimeAccess.Engine.GetField(name, Flags)!.SetValue(projection, value);
             void Reject<T>(IReadOnlyList<T> values)
             {
                 var rejected = false;
@@ -246,7 +246,7 @@ internal static class SnapshotProjectionReuseChecks
     private static CardSnapshot Project(GameEngine game, Card card) => (CardSnapshot)Ordinary.Invoke(game, [card])!;
     private static CardSnapshot ProjectJudgment(GameEngine game, Card card) => (CardSnapshot)Judgment.Invoke(game, [card])!;
     private static CardSnapshot Expected(Card card) => new(card.Id, card.Kind, card.Suit, card.Rank, card.DisplayName, card.RankText);
-    private static T Field<T>(GameEngine game, string name) => (T)typeof(GameEngine).GetField(name, Flags)!.GetValue(game)!;
+    private static T Field<T>(GameEngine game, string name) => (T)global::FixtureRuntimeAccess.Engine.GetField(name, Flags)!.GetValue(game)!;
     private static string EventJson(EventEnvelope item) => JsonSerializer.Serialize(new
     {
         item.Id, item.ParentId, item.Sequence, item.Revision, item.CorrelationId,

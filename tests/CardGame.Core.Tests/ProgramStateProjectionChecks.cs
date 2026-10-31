@@ -34,7 +34,7 @@ internal static class ProgramStateProjectionChecks
         var hasInstance = Method("HasRuntimeSkillInstance").CreateDelegate<Func<CharacterState, string, string, bool>>(game);
         var shard = Method("GetSkillBindingShard").CreateDelegate<Func<CharacterState, SkillBindingShard>>(game);
         var publicRules = Method("GetHandComparisonPublicRuleStates").CreateDelegate<Func<CharacterState, string, IReadOnlyList<ProgramPublicRuleStateSnapshot>?>>(game);
-        var boolean = typeof(GameEngine).GetMethod("GetProgramBooleanState", Flags, null,
+        var boolean = global::FixtureRuntimeAccess.Engine.GetMethod("GetProgramBooleanState", Flags, null,
             [typeof(int), typeof(string), typeof(string), typeof(string)], null)!
             .CreateDelegate<Func<int, string, string, string, bool>>(game);
         Set("_turnNumber", 1); Set("_currentSeat", 0);
@@ -166,7 +166,7 @@ internal static class ProgramStateProjectionChecks
         void VerifyPlayerFreeze(SkillRuntimeStateSnapshot snapshot)
         {
             var player = game.CreateSnapshot(0).Players[0] with { SkillRuntimeStates = [snapshot] };
-            var frozen = (PlayerSnapshot)Method("FreezePlayer", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, [player])!;
+            var frozen = (PlayerSnapshot)typeof(PlayerViewFreezer).GetMethod("FreezePlayer", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, [player])!;
             var value = frozen.SkillRuntimeStates!.Single();
             var json = JsonSerializer.Serialize(frozen);
             RejectReadOnly(frozen.SkillRuntimeStates, snapshot);
@@ -180,13 +180,13 @@ internal static class ProgramStateProjectionChecks
             Require(JsonSerializer.Serialize(frozen) == json, "Frozen observer lists and nested policy collections must reject replacement.");
         }
 
-        void Set(string name, int value) => typeof(GameEngine).GetField(name, Flags)!.SetValue(game, value);
+        void Set(string name, int value) => global::FixtureRuntimeAccess.Engine.GetField(name, Flags)!.SetValue(game, value);
     }
 
     private static CardUseEffectSource Source(int owner, string skill, string instance) => new(skill, "fixture", owner, instance);
     private static void DictionarySnapshotsRemainDetachedAndReadOnly()
     {
-        var freeze = Method("FreezeViewDictionary", BindingFlags.Static | BindingFlags.NonPublic)
+        var freeze = typeof(PlayerViewFreezer).GetMethod("FreezeViewDictionary", BindingFlags.Static | BindingFlags.NonPublic)!
             .MakeGenericMethod(typeof(string), typeof(int))
             .CreateDelegate<Func<IReadOnlyDictionary<string, int>?, IReadOnlyDictionary<string, int>?>>();
         var input = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -217,8 +217,8 @@ internal static class ProgramStateProjectionChecks
         var grant = new SkillGrant(instance, skill, instance, "acquired:projection-audit");
         owner.SkillGrants.Grant(grant); return grant;
     }
-    private static MethodInfo Method(string name, BindingFlags flags = Flags) => typeof(GameEngine).GetMethod(name, flags)!;
-    private static T Field<T>(GameEngine game, string name) => (T)typeof(GameEngine).GetField(name, Flags)!.GetValue(game)!;
+    private static MethodInfo Method(string name, BindingFlags flags = Flags) => global::FixtureRuntimeAccess.Engine.GetMethod(name, flags)!;
+    private static T Field<T>(GameEngine game, string name) => (T)global::FixtureRuntimeAccess.Engine.GetField(name, Flags)!.GetValue(game)!;
     private static void RejectReadOnly<T>(IReadOnlyList<T> values, T replacement)
     {
         Require(values is IList<T> { IsReadOnly: true }, "The original immutable collection boundary must remain present.");

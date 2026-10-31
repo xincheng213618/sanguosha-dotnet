@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineShanheSourceChunlao3161Runtime
+{
+    private readonly ICoreShanheSourceChunlao3161CardZonesOperations _cardZonesOperations;
+    private readonly ICoreShanheSourceChunlao3161ContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheSourceChunlao3161ResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceChunlao3161CoreAdjacentDiscardStorageOperations _coreAdjacentDiscardStorageOperations;
+    private readonly ICoreShanheSourceChunlao3161CoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheSourceChunlao3161CoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreShanheSourceChunlao3161CoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreShanheSourceChunlao3161CoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreShanheSourceChunlao3161CoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheSourceChunlao3161CoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheSourceChunlao3161CoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheSourceChunlao3161CoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreShanheSourceChunlao3161CorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheSourceChunlao3161CorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreShanheSourceChunlao3161CoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreShanheSourceChunlao3161KernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheSourceChunlao3161Runtime(ICoreShanheSourceChunlao3161CardZonesOperations cardZonesOperations, ICoreShanheSourceChunlao3161ContentRegistryOperations contentRegistryOperations, ICoreShanheSourceChunlao3161ResolutionStackOperations resolutionStackOperations, ICoreShanheSourceChunlao3161CoreAdjacentDiscardStorageOperations coreAdjacentDiscardStorageOperations, ICoreShanheSourceChunlao3161CoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheSourceChunlao3161CoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreShanheSourceChunlao3161CoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreShanheSourceChunlao3161CoreNationalSkillsOperations coreNationalSkillsOperations, ICoreShanheSourceChunlao3161CoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheSourceChunlao3161CoreRuntimeOperations coreRuntimeOperations, ICoreShanheSourceChunlao3161CoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheSourceChunlao3161CoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreShanheSourceChunlao3161CorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheSourceChunlao3161CorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreShanheSourceChunlao3161CoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreShanheSourceChunlao3161KernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdjacentDiscardStorageOperations = coreAdjacentDiscardStorageOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -11,7 +11,7 @@ internal static partial class YangFuChecks
     private static PlayerSnapshot V(GameEngine g,int seat)=>g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,g.State.Players.Count).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
     private static T[] E<T>(GameEngine g)where T:IGameEvent=>g.Events.Select(e=>e.Payload).OfType<T>().ToArray();
-    private static int? Ordinal(GameEngine g,CardActionContext a)=>(int?)typeof(GameEngine).GetMethod("CapturedWholeActualTurnActorUseOrdinal",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(g,[a]);
+    private static int? Ordinal(GameEngine g,CardActionContext a)=>(int?)global::FixtureRuntimeAccess.Engine.GetMethod("CapturedWholeActualTurnActorUseOrdinal",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(g,[a]);
     private static bool Action(GameEngine g,string a)=>P(g)?.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")==a)==true;
     private static bool Targets(GameEngine g)=>Action(g,"bingzhong-target");
     private static void AssertBingzhongAcceptedMutation(GameEngine g)
@@ -21,7 +21,7 @@ internal static partial class YangFuChecks
         Need(accepted is[var original]&&original.Action.TargetSeats.SequenceEqual([1])&&use.Action!.TargetSeats.SequenceEqual([1,3])&&
             tail.OriginalTargets.SequenceEqual([1])&&tail.AddedTargets.SequenceEqual([3]),
             "Bingzhong extends the owning native action from its frozen single-target acceptance and retains the exact typed target tail.");
-        var proof=typeof(GameEngine).GetMethod("RebuildAcceptedActualHandGainUse",BindingFlags.Instance|BindingFlags.NonPublic)!;
+        var proof=global::FixtureRuntimeAccess.Engine.GetMethod("RebuildAcceptedActualHandGainUse",BindingFlags.Instance|BindingFlags.NonPublic)!;
         bool Rebuild(CardUseFrame candidate,IGameEvent[] facts)
         {
             var at=Array.FindIndex(facts,e=>e is CardActionAcceptedEvent a&&a.Action.ActionId==tail.ActionId);

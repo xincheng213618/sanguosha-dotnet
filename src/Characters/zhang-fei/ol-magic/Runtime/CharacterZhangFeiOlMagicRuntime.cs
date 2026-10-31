@@ -1,0 +1,76 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZhangFeiOlMagicRuntime : global::CardGame.Core.IMoZhangFeiFacts, global::CardGame.Core.IMoZhangFeiOperations
+{
+    private readonly ICharacterZhangFeiOlMagicCharacterSharedGameEngineOlMoRumoOperations _characterSharedGameEngineOlMoRumoOperations;
+    private readonly ICharacterZhangFeiOlMagicCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterZhangFeiOlMagicContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhangFeiOlMagicObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICharacterZhangFeiOlMagicResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreCurrentTurnSkillSuppressionsOperations _coreCurrentTurnSkillSuppressionsOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreNativeDrawAttemptsOperations _coreNativeDrawAttemptsOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterZhangFeiOlMagicCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterZhangFeiOlMagicCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterZhangFeiOlMagicCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterZhangFeiOlMagicKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterZhangFeiOlMagicKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterZhangFeiOlMagicMoZhangFeiOperations _moZhangFeiOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess _coreMatchDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
+    internal CharacterZhangFeiOlMagicRuntime(ICharacterZhangFeiOlMagicCharacterSharedGameEngineOlMoRumoOperations characterSharedGameEngineOlMoRumoOperations, ICharacterZhangFeiOlMagicCardZonesOperations cardZonesOperations, ICharacterZhangFeiOlMagicContentRegistryOperations contentRegistryOperations, ICharacterZhangFeiOlMagicObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICharacterZhangFeiOlMagicResolutionStackOperations resolutionStackOperations, ICharacterZhangFeiOlMagicCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICharacterZhangFeiOlMagicCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterZhangFeiOlMagicCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterZhangFeiOlMagicCoreCurrentTurnSkillSuppressionsOperations coreCurrentTurnSkillSuppressionsOperations, ICharacterZhangFeiOlMagicCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterZhangFeiOlMagicCoreNativeDrawAttemptsOperations coreNativeDrawAttemptsOperations, ICharacterZhangFeiOlMagicCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterZhangFeiOlMagicCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhangFeiOlMagicCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhangFeiOlMagicCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICharacterZhangFeiOlMagicCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterZhangFeiOlMagicCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterZhangFeiOlMagicCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterZhangFeiOlMagicCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterZhangFeiOlMagicCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterZhangFeiOlMagicCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterZhangFeiOlMagicKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterZhangFeiOlMagicKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterZhangFeiOlMagicMoZhangFeiOperations moZhangFeiOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess coreMatchDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess)
+    {
+        this._characterSharedGameEngineOlMoRumoOperations = characterSharedGameEngineOlMoRumoOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreCurrentTurnSkillSuppressionsOperations = coreCurrentTurnSkillSuppressionsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeDrawAttemptsOperations = coreNativeDrawAttemptsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._moZhangFeiOperations = moZhangFeiOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchDefinitionPlayerCountAccess = coreMatchDefinitionPlayerCountAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreMatchSetupSetupCompleteAccess = coreMatchSetupSetupCompleteAccess;
+    }
+}

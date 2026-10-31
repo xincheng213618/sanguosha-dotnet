@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CharacterPangDeBoundaryMobileRuntime
+{
+    private readonly ICharacterPangDeBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterPangDeBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterPangDeBoundaryMobileCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterPangDeBoundaryMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterPangDeBoundaryMobileCoreCurrentUsePhysicalClaimsOperations _coreCurrentUsePhysicalClaimsOperations;
+    private readonly ICharacterPangDeBoundaryMobileCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterPangDeBoundaryMobileCoreFinalTargetSlashOperations _coreFinalTargetSlashOperations;
+    private readonly ICharacterPangDeBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterPangDeBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterPangDeBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CharacterPangDeBoundaryMobileRuntime(ICharacterPangDeBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterPangDeBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterPangDeBoundaryMobileCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterPangDeBoundaryMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterPangDeBoundaryMobileCoreCurrentUsePhysicalClaimsOperations coreCurrentUsePhysicalClaimsOperations, ICharacterPangDeBoundaryMobileCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterPangDeBoundaryMobileCoreFinalTargetSlashOperations coreFinalTargetSlashOperations, ICharacterPangDeBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterPangDeBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterPangDeBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCurrentUsePhysicalClaimsOperations = coreCurrentUsePhysicalClaimsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreFinalTargetSlashOperations = coreFinalTargetSlashOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

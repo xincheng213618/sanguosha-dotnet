@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineRoundGainedTrickTargetsRuntime : global::CardGame.Core.IRoundGainedSourceUseHost
+{
+    private readonly ICoreRoundGainedTrickTargetsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRoundGainedTrickTargetsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreRoundGainedEquipmentDrawsOperations _coreRoundGainedEquipmentDrawsOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreRoundGainedSourceUsesOperations _coreRoundGainedSourceUsesOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreUniqueLeaderTrickTargetsOperations _coreUniqueLeaderTrickTargetsOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreNativeBorrowedSwordOperations _coreNativeBorrowedSwordOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreRoundGainedTrickTargetsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreRoundGainedTrickTargetsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreRoundGainedTrickTargetsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRoundGainedTrickTargetsRuntime(ICoreRoundGainedTrickTargetsContentRegistryOperations contentRegistryOperations, ICoreRoundGainedTrickTargetsResolutionStackOperations resolutionStackOperations, ICoreRoundGainedTrickTargetsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRoundGainedTrickTargetsCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICoreRoundGainedTrickTargetsCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICoreRoundGainedTrickTargetsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreRoundGainedTrickTargetsCoreRoundGainedEquipmentDrawsOperations coreRoundGainedEquipmentDrawsOperations, ICoreRoundGainedTrickTargetsCoreRoundGainedSourceUsesOperations coreRoundGainedSourceUsesOperations, ICoreRoundGainedTrickTargetsCoreRuntimeOperations coreRuntimeOperations, ICoreRoundGainedTrickTargetsCoreUniqueLeaderTrickTargetsOperations coreUniqueLeaderTrickTargetsOperations, ICoreRoundGainedTrickTargetsCoreNativeBorrowedSwordOperations coreNativeBorrowedSwordOperations, ICoreRoundGainedTrickTargetsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreRoundGainedTrickTargetsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreRoundGainedTrickTargetsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreRoundGainedTrickTargetsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRoundGainedEquipmentDrawsOperations = coreRoundGainedEquipmentDrawsOperations;
+        this._coreRoundGainedSourceUsesOperations = coreRoundGainedSourceUsesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreUniqueLeaderTrickTargetsOperations = coreUniqueLeaderTrickTargetsOperations;
+        this._coreNativeBorrowedSwordOperations = coreNativeBorrowedSwordOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

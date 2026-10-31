@@ -41,7 +41,7 @@ public sealed record AnniversaryFengXiDrawReturnedEvent(long FrameId, int Target
 
 internal static class AnniversaryFengXiComposition
 {
-    internal const string Yusui = "anniversary:yusui", Boyan = "anniversary:boyan";
+    internal const string Yusui = "anniversary:yusui",Boyan = "anniversary:boyan";
     [ProgramCatalogValidation(44500)] internal static void Validate(string path, SkillProgram p)
     {
         if (p.Id is not (Yusui or Boyan) && !p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryFengXiYusui or SkillProgramEffectOp.ResolveAnniversaryFengXiBoyan)) return;

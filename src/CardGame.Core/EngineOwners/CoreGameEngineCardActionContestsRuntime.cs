@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineCardActionContestsRuntime : global::CardGame.Core.ICardActionContestProgramHost
+{
+    private readonly ICoreCardActionContestsCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
+    private readonly ICoreCardActionContestsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCardActionContestsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCardActionContestsCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreCardActionContestsCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreCardActionContestsCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreCardActionContestsCoreEquipmentSlotGroupProgramsOperations _coreEquipmentSlotGroupProgramsOperations;
+    private readonly ICoreCardActionContestsCorePindianOperations _corePindianOperations;
+    private readonly ICoreCardActionContestsCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICoreCardActionContestsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCardActionContestsCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICoreCardActionContestsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreCardActionContestsCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreCardActionContestsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineCardActionContestsRuntime(ICoreCardActionContestsCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICoreCardActionContestsContentRegistryOperations contentRegistryOperations, ICoreCardActionContestsResolutionStackOperations resolutionStackOperations, ICoreCardActionContestsCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreCardActionContestsCoreCardActionsOperations coreCardActionsOperations, ICoreCardActionContestsCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreCardActionContestsCoreEquipmentSlotGroupProgramsOperations coreEquipmentSlotGroupProgramsOperations, ICoreCardActionContestsCorePindianOperations corePindianOperations, ICoreCardActionContestsCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICoreCardActionContestsCoreRuntimeOperations coreRuntimeOperations, ICoreCardActionContestsCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICoreCardActionContestsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreCardActionContestsCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreCardActionContestsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreEquipmentSlotGroupProgramsOperations = coreEquipmentSlotGroupProgramsOperations;
+        this._corePindianOperations = corePindianOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

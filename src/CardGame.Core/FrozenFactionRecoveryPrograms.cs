@@ -63,7 +63,7 @@ public sealed class DrawToFrozenFactionCountHandler : ISkillProgramEffectHandler
 }
 internal static class FrozenFactionRecoveryComposition
 {
-    internal const string FactionNumber = "faction-count", DamageNumber = "game-damage-points";
+    internal const string FactionNumber = "faction-count",DamageNumber = "game-damage-points";
 
     internal static void Validate(string path, IReadOnlyList<SkillProgramEffect> effects,
         SkillProgramTriggerWindow window, SkillProgramTriggerSubject? subject,

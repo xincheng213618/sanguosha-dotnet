@@ -20,7 +20,7 @@ internal sealed class HappyGongxinHandler : ISkillProgramEffectHandler
 }
 internal static class HappyGongxinComposition
 {
-    internal const string Skill = "happy:gongxin", Group = "sole-red-hand";
+    internal const string Skill = "happy:gongxin",Group = "sole-red-hand";
     [ProgramCatalogValidation(41600)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op == SkillProgramEffectOp.BindHappyShenLuMengGongxinTarget)) return;

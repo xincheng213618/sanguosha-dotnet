@@ -4,7 +4,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class MouLuSuAnniversaryRuntime(IMouLuSuAnniversaryFacts facts, IMouLuSuAnniversaryNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouLuSuAnniversaryRuntime
 {
-    internal const string Mingshi = "mou:mingshi", Mengmou = "mou:mengmou", Action = "mou-lu-su-anniversary";
+    internal const string Mingshi = "mou:mingshi",Mengmou = "mou:mengmou",Action = "mou-lu-su-anniversary";
     private static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     private bool Used(int owner, bool yin) => facts.History<MouLuSuAnniversaryAcceptedEvent>().Any(e => e.Owner == owner && e.Turn == facts.Turn && e.Yin == yin);
     private MouLuSuAnniversaryDrawTicketEvent? Ticket(int owner, string instance) => facts.Phase() is { } p ? facts.History<MouLuSuAnniversaryDrawTicketEvent>().SingleOrDefault(e => e.Source.OwnerSeat == owner && e.Source.SkillInstanceId == instance && e.Phase == p && !facts.History<MouLuSuAnniversaryDrawConsumedEvent>().Any(c => c.Source == e.Source && c.Phase == p)) : null;

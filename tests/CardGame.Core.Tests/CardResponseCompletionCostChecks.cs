@@ -208,8 +208,8 @@ internal static class CardResponseCompletionCostChecks
         var receipt = completion.ResponseCompletion!;
         var store = typeof(GameEngine).GetField("_resolutionStack", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         var replace = store.GetType().GetMethod("Replace")!;
-        var assert = typeof(GameEngine).GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var project = typeof(GameEngine).GetMethod("ProjectTypedResponseCompletionHealthCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var assert = global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var project = global::FixtureRuntimeAccess.Engine.GetMethod("ProjectTypedResponseCompletionHealthCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
         var positive = project.Invoke(game, null)!;
         Require((positive.GetType().GetProperty("Owner")!.GetValue(positive) as CardUseFrame)?.Id == useId &&
             (long?)positive.GetType().GetProperty("OwnedDyingId")!.GetValue(positive) == ownedDyingId &&
@@ -249,8 +249,8 @@ internal static class CardResponseCompletionCostChecks
     {
         var store = typeof(GameEngine).GetField("_resolutionStack", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         var replace = store.GetType().GetMethod("Replace")!;
-        var assert = typeof(GameEngine).GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var project = typeof(GameEngine).GetMethod("ProjectTypedResponseCompletionHealthCursor", BindingFlags.Instance | BindingFlags.NonPublic);
+        var assert = global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var project = global::FixtureRuntimeAccess.Engine.GetMethod("ProjectTypedResponseCompletionHealthCursor", BindingFlags.Instance | BindingFlags.NonPublic);
         assert.Invoke(game, null);
         var dying = game.ResolutionStack.OfType<DyingFrame>().Single();
         var hp = game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single();
@@ -425,7 +425,7 @@ internal static class CardResponseCompletionCostChecks
 
     private static void VerifyCommittedSlashProjection(GameEngine game, long useId, long? dyingId)
     {
-        var method = typeof(GameEngine).GetMethod("ProjectTypedCommittedSlashPaymentCursor", BindingFlags.Instance | BindingFlags.NonPublic);
+        var method = global::FixtureRuntimeAccess.Engine.GetMethod("ProjectTypedCommittedSlashPaymentCursor", BindingFlags.Instance | BindingFlags.NonPublic);
         // The same real chain may be run against an unchanged older Core for a
         // final-invariant negative. The helper assertion applies to the new Core.
         if (method is null) return;
@@ -440,8 +440,8 @@ internal static class CardResponseCompletionCostChecks
     {
         var store = typeof(GameEngine).GetField("_resolutionStack", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         var replace = store.GetType().GetMethod("Replace")!;
-        var assert = typeof(GameEngine).GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var project = typeof(GameEngine).GetMethod("ProjectTypedCommittedSlashPaymentCursor", BindingFlags.Instance | BindingFlags.NonPublic);
+        var assert = global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var project = global::FixtureRuntimeAccess.Engine.GetMethod("ProjectTypedCommittedSlashPaymentCursor", BindingFlags.Instance | BindingFlags.NonPublic);
         assert.Invoke(game, null);
         var dying = game.ResolutionStack.OfType<DyingFrame>().Single();
         var payment = game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single();
@@ -506,7 +506,7 @@ internal static class CardResponseCompletionCostChecks
         }) Reject(malformed);
         // This host-only contradictory acceptance proves that clearing the flag
         // cannot downgrade an existing same-Action acceptance to declaration proof.
-        var pending = (List<IGameEvent>)typeof(GameEngine).GetField("_pendingEvents", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var pending = (List<IGameEvent>)global::FixtureRuntimeAccess.Engine.GetField("_pendingEvents", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         var forgedAcceptance = new CardActionAcceptedEvent(CopyCommittedSlashAction(native.Action!, providerSeat: 1));
         pending.Add(forgedAcceptance);
         try { Reject(native with { ProgramUseAccepted = false }); }
@@ -529,8 +529,8 @@ internal static class CardResponseCompletionCostChecks
         var observer = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == SlashPaymentReplacement);
         var store = typeof(GameEngine).GetField("_resolutionStack", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         var replace = store.GetType().GetMethod("Replace")!;
-        var assert = typeof(GameEngine).GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var project = typeof(GameEngine).GetMethod("ProjectTypedCommittedSlashPaymentCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var assert = global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var project = global::FixtureRuntimeAccess.Engine.GetMethod("ProjectTypedCommittedSlashPaymentCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
         var originals = game.ResolutionStack.ToDictionary(f => f.Id);
         foreach (var malformed in new ResolutionFrame[]
         {
@@ -564,8 +564,8 @@ internal static class CardResponseCompletionCostChecks
     {
         var store = typeof(GameEngine).GetField("_resolutionStack", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         var replace = store.GetType().GetMethod("Replace")!;
-        var assert = typeof(GameEngine).GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var project = typeof(GameEngine).GetMethod("ProjectTypedCommittedSlashPaymentCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var assert = global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var project = global::FixtureRuntimeAccess.Engine.GetMethod("ProjectTypedCommittedSlashPaymentCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
         var originals = game.ResolutionStack.ToDictionary(f => f.Id);
         var observer = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == SlashPaymentHpObserver);
         foreach (var malformed in new ResolutionFrame[]

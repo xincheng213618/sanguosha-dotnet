@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheEmptySlotEquipmentRuntime : global::CardGame.Core.IShanheEmptySlotEquipmentProgramHost
+{
+    private readonly ICoreShanheEmptySlotEquipmentCardZonesOperations _cardZonesOperations;
+    private readonly ICoreShanheEmptySlotEquipmentContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheEmptySlotEquipmentRandomOperations _randomOperations;
+    private readonly ICoreShanheEmptySlotEquipmentCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreShanheEmptySlotEquipmentCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreShanheEmptySlotEquipmentCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheEmptySlotEquipmentCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreShanheEmptySlotEquipmentCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreShanheEmptySlotEquipmentCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheEmptySlotEquipmentCoreTrustedCardZoneDiagnosticsOperations _coreTrustedCardZoneDiagnosticsOperations;
+    private readonly ICoreShanheEmptySlotEquipmentKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess _coreActualTurnProgressCurrentSeatAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess _coreMatchDefinitionModeDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    internal CoreGameEngineShanheEmptySlotEquipmentRuntime(ICoreShanheEmptySlotEquipmentCardZonesOperations cardZonesOperations, ICoreShanheEmptySlotEquipmentContentRegistryOperations contentRegistryOperations, ICoreShanheEmptySlotEquipmentRandomOperations randomOperations, ICoreShanheEmptySlotEquipmentCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreShanheEmptySlotEquipmentCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreShanheEmptySlotEquipmentCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheEmptySlotEquipmentCoreMatchLogOperations coreMatchLogOperations, ICoreShanheEmptySlotEquipmentCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreShanheEmptySlotEquipmentCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheEmptySlotEquipmentCoreTrustedCardZoneDiagnosticsOperations coreTrustedCardZoneDiagnosticsOperations, ICoreShanheEmptySlotEquipmentKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess coreActualTurnProgressCurrentSeatAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess coreMatchDefinitionModeDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTrustedCardZoneDiagnosticsOperations = coreTrustedCardZoneDiagnosticsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatAccess = coreActualTurnProgressCurrentSeatAccess;
+        this._coreMatchDefinitionModeDefinitionOptionsAccess = coreMatchDefinitionModeDefinitionOptionsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess = coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    }
+}

@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreWenheActivityProgramsRuntime : global::CardGame.Core.IWenheActivityProgramHost
+{
+    private readonly ICoreWenheActivityProgramsCoreActivityBattleRulesOperations _coreActivityBattleRulesOperations;
+    private readonly ICoreWenheActivityProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreWenheActivityProgramsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreWenheActivityProgramsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreWenheActivityProgramsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreWenheActivityProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreWenheActivityProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreWenheActivityProgramsCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreWenheActivityProgramsCoreWenheChaosOperations _coreWenheChaosOperations;
+    private readonly ICoreWenheActivityProgramsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreWenheActivityProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionAccess _coreMatchDefinitionModeDefinitionAccess;
+    internal CoreWenheActivityProgramsRuntime(ICoreWenheActivityProgramsCoreActivityBattleRulesOperations coreActivityBattleRulesOperations, ICoreWenheActivityProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreWenheActivityProgramsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreWenheActivityProgramsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreWenheActivityProgramsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreWenheActivityProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreWenheActivityProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreWenheActivityProgramsCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreWenheActivityProgramsCoreWenheChaosOperations coreWenheChaosOperations, ICoreWenheActivityProgramsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreWenheActivityProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionAccess coreMatchDefinitionModeDefinitionAccess)
+    {
+        this._coreActivityBattleRulesOperations = coreActivityBattleRulesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreWenheChaosOperations = coreWenheChaosOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchDefinitionModeDefinitionAccess = coreMatchDefinitionModeDefinitionAccess;
+    }
+}

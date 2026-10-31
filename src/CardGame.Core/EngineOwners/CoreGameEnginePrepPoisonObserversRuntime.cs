@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePrepPoisonObserversRuntime
+{
+    private readonly ICorePrepPoisonObserversResolutionStackOperations2 _resolutionStackOperations;
+    private readonly ICorePrepPoisonObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICorePrepPoisonObserversCoreOrderedPrintedSkillLossObserversOperations2 _coreOrderedPrintedSkillLossObserversOperations;
+    private readonly ICorePrepPoisonObserversCorePrepPoisonOutcomesOperations _corePrepPoisonOutcomesOperations;
+    private readonly ICorePrepPoisonObserversCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICorePrepPoisonObserversCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePrepPoisonObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePrepPoisonObserversResolutionStackOperations _resolutionStackOperations2;
+    private readonly ICorePrepPoisonObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICorePrepPoisonObserversCoreOrderedPrintedSkillLossObserversOperations _coreOrderedPrintedSkillLossObserversOperations2;
+    private readonly ICorePrepPoisonObserversCorePrepPoisonObserversOperations _corePrepPoisonObserversOperations;
+    private readonly ICorePrepPoisonObserversCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICorePrepPoisonObserversKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    internal CoreGameEnginePrepPoisonObserversRuntime(ICorePrepPoisonObserversResolutionStackOperations2 resolutionStackOperations, ICorePrepPoisonObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICorePrepPoisonObserversCoreOrderedPrintedSkillLossObserversOperations2 coreOrderedPrintedSkillLossObserversOperations, ICorePrepPoisonObserversCorePrepPoisonOutcomesOperations corePrepPoisonOutcomesOperations, ICorePrepPoisonObserversCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICorePrepPoisonObserversCoreRuntimeOperations coreRuntimeOperations, ICorePrepPoisonObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePrepPoisonObserversResolutionStackOperations resolutionStackOperations2, ICorePrepPoisonObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICorePrepPoisonObserversCoreOrderedPrintedSkillLossObserversOperations coreOrderedPrintedSkillLossObserversOperations2, ICorePrepPoisonObserversCorePrepPoisonObserversOperations corePrepPoisonObserversOperations, ICorePrepPoisonObserversCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICorePrepPoisonObserversKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreOrderedPrintedSkillLossObserversOperations = coreOrderedPrintedSkillLossObserversOperations;
+        this._corePrepPoisonOutcomesOperations = corePrepPoisonOutcomesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._resolutionStackOperations2 = resolutionStackOperations2;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreOrderedPrintedSkillLossObserversOperations2 = coreOrderedPrintedSkillLossObserversOperations2;
+        this._corePrepPoisonObserversOperations = corePrepPoisonObserversOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+    }
+}

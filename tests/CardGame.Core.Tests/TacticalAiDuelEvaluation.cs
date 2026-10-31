@@ -14,7 +14,7 @@ using CardGame.Core;
 /// </summary>
 internal static class TacticalAiDuelEvaluation
 {
-    private static readonly FieldInfo BrainsField = typeof(GameEngine).GetField(
+    private static readonly FieldInfo BrainsField = global::FixtureRuntimeAccess.Engine.GetField(
         "_aiBrains", BindingFlags.Instance | BindingFlags.NonPublic) ??
         throw new InvalidOperationException("The AI evaluation fixture cannot find the engine brain map.");
 

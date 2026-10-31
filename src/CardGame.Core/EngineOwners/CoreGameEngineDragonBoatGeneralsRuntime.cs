@@ -1,0 +1,78 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime : global::CardGame.Core.IDragonBoatAllyQuery, global::CardGame.Core.IDragonBoatGeneralHost
+{
+    private readonly ICoreDragonBoatGeneralsCharacterHuangQuanOlOperations _characterHuangQuanOlOperations;
+    private readonly ICoreDragonBoatGeneralsCharacterLiuQiOlOperations _characterLiuQiOlOperations;
+    private readonly ICoreDragonBoatGeneralsCharacterSuFeiOlOperations _characterSuFeiOlOperations;
+    private readonly ICoreDragonBoatGeneralsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDragonBoatGeneralsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDragonBoatGeneralsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDragonBoatGeneralsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreDragonBoatGeneralsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreDragonBoatGeneralsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreDragonBoatGeneralsCoreCompletedCategoryUseProofOperations _coreCompletedCategoryUseProofOperations;
+    private readonly ICoreDragonBoatGeneralsCoreDragonBoatActivitiesOperations _coreDragonBoatActivitiesOperations;
+    private readonly ICoreDragonBoatGeneralsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreDragonBoatGeneralsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreDragonBoatGeneralsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreDragonBoatGeneralsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDragonBoatGeneralsCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICoreDragonBoatGeneralsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDragonBoatGeneralsCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreDragonBoatGeneralsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreDragonBoatGeneralsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreDragonBoatGeneralsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreDragonBoatGeneralsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDragonBoatGeneralsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreDragonBoatGeneralsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreDragonBoatGeneralsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreDragonBoatGeneralsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDragonBoatGeneralsSynchronizingDragonBoatGrantsAccess _coreGameEngineDragonBoatGeneralsSynchronizingDragonBoatGrantsAccess;
+    internal CoreGameEngineDragonBoatGeneralsRuntime(ICoreDragonBoatGeneralsCharacterHuangQuanOlOperations characterHuangQuanOlOperations, ICoreDragonBoatGeneralsCharacterLiuQiOlOperations characterLiuQiOlOperations, ICoreDragonBoatGeneralsCharacterSuFeiOlOperations characterSuFeiOlOperations, ICoreDragonBoatGeneralsContentRegistryOperations contentRegistryOperations, ICoreDragonBoatGeneralsResolutionStackOperations resolutionStackOperations, ICoreDragonBoatGeneralsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDragonBoatGeneralsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreDragonBoatGeneralsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreDragonBoatGeneralsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreDragonBoatGeneralsCoreCompletedCategoryUseProofOperations coreCompletedCategoryUseProofOperations, ICoreDragonBoatGeneralsCoreDragonBoatActivitiesOperations coreDragonBoatActivitiesOperations, ICoreDragonBoatGeneralsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreDragonBoatGeneralsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDragonBoatGeneralsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreDragonBoatGeneralsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDragonBoatGeneralsCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICoreDragonBoatGeneralsCoreRuntimeOperations coreRuntimeOperations, ICoreDragonBoatGeneralsCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreDragonBoatGeneralsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreDragonBoatGeneralsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreDragonBoatGeneralsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreDragonBoatGeneralsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDragonBoatGeneralsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreDragonBoatGeneralsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreDragonBoatGeneralsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreDragonBoatGeneralsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDragonBoatGeneralsSynchronizingDragonBoatGrantsAccess coreGameEngineDragonBoatGeneralsSynchronizingDragonBoatGrantsAccess)
+    {
+        this._characterHuangQuanOlOperations = characterHuangQuanOlOperations;
+        this._characterLiuQiOlOperations = characterLiuQiOlOperations;
+        this._characterSuFeiOlOperations = characterSuFeiOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreCompletedCategoryUseProofOperations = coreCompletedCategoryUseProofOperations;
+        this._coreDragonBoatActivitiesOperations = coreDragonBoatActivitiesOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+        this._coreGameEngineDragonBoatGeneralsSynchronizingDragonBoatGrantsAccess = coreGameEngineDragonBoatGeneralsSynchronizingDragonBoatGrantsAccess;
+    }
+}

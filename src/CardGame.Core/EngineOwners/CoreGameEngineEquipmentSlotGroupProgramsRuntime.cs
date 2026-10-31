@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineEquipmentSlotGroupProgramsRuntime : global::CardGame.Core.IEquipmentSlotGroupProgramHost
+{
+    private readonly ICoreEquipmentSlotGroupProgramsCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCoreNativeRecastInvocationsOperations _coreNativeRecastInvocationsOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCoreProgramEquipmentRecastRecoveriesOperations _coreProgramEquipmentRecastRecoveriesOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreEquipmentSlotGroupProgramsProgramTargetSelectionOperations _programTargetSelectionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineEquipmentSlotGroupProgramsRuntime(ICoreEquipmentSlotGroupProgramsCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICoreEquipmentSlotGroupProgramsCardZonesOperations cardZonesOperations, ICoreEquipmentSlotGroupProgramsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreEquipmentSlotGroupProgramsCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreEquipmentSlotGroupProgramsCoreNativeRecastInvocationsOperations coreNativeRecastInvocationsOperations, ICoreEquipmentSlotGroupProgramsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreEquipmentSlotGroupProgramsCoreProgramEquipmentRecastRecoveriesOperations coreProgramEquipmentRecastRecoveriesOperations, ICoreEquipmentSlotGroupProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreEquipmentSlotGroupProgramsCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICoreEquipmentSlotGroupProgramsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreEquipmentSlotGroupProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreEquipmentSlotGroupProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreEquipmentSlotGroupProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreEquipmentSlotGroupProgramsProgramTargetSelectionOperations programTargetSelectionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreNativeRecastInvocationsOperations = coreNativeRecastInvocationsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramEquipmentRecastRecoveriesOperations = coreProgramEquipmentRecastRecoveriesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._programTargetSelectionOperations = programTargetSelectionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRoundOnceCardlessBasicRuntime
+{
+    private readonly ICoreRoundOnceCardlessBasicCharacterZhouYuOlMouOperations _characterZhouYuOlMouOperations;
+    private readonly ICoreRoundOnceCardlessBasicContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRoundOnceCardlessBasicCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRoundOnceCardlessBasicCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreRoundOnceCardlessBasicCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreRoundOnceCardlessBasicCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreRoundOnceCardlessBasicCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
+    private readonly ICoreRoundOnceCardlessBasicKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineRoundOnceCardlessBasicRuntime(ICoreRoundOnceCardlessBasicCharacterZhouYuOlMouOperations characterZhouYuOlMouOperations, ICoreRoundOnceCardlessBasicContentRegistryOperations contentRegistryOperations, ICoreRoundOnceCardlessBasicCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRoundOnceCardlessBasicCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreRoundOnceCardlessBasicCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreRoundOnceCardlessBasicCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreRoundOnceCardlessBasicCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICoreRoundOnceCardlessBasicKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._characterZhouYuOlMouOperations = characterZhouYuOlMouOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

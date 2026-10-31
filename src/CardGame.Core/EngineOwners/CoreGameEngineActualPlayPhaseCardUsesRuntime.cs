@@ -1,0 +1,30 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineActualPlayPhaseCardUsesRuntime
+{
+    private readonly ICoreActualPlayPhaseCardUsesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreActualPlayPhaseCardUsesCoreAlternatingSuitAndCompletedTopOperations _coreAlternatingSuitAndCompletedTopOperations;
+    private readonly ICoreActualPlayPhaseCardUsesCoreEndingHistoricalUsesOperations _coreEndingHistoricalUsesOperations;
+    private readonly ICoreActualPlayPhaseCardUsesCorePhaseNamePredictionOperations _corePhaseNamePredictionOperations;
+    private readonly ICoreActualPlayPhaseCardUsesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess _coreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineActualPlayPhaseCardUsesRuntime(ICoreActualPlayPhaseCardUsesContentRegistryOperations contentRegistryOperations, ICoreActualPlayPhaseCardUsesCoreAlternatingSuitAndCompletedTopOperations coreAlternatingSuitAndCompletedTopOperations, ICoreActualPlayPhaseCardUsesCoreEndingHistoricalUsesOperations coreEndingHistoricalUsesOperations, ICoreActualPlayPhaseCardUsesCorePhaseNamePredictionOperations corePhaseNamePredictionOperations, ICoreActualPlayPhaseCardUsesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess coreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAlternatingSuitAndCompletedTopOperations = coreAlternatingSuitAndCompletedTopOperations;
+        this._coreEndingHistoricalUsesOperations = coreEndingHistoricalUsesOperations;
+        this._corePhaseNamePredictionOperations = corePhaseNamePredictionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess = coreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

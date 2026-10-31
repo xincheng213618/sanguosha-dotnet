@@ -1,0 +1,32 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDamageCounterpartAcquisitionRuntime : global::CardGame.Core.IDamageCounterpartAcquisitionHost
+{
+    private readonly ICoreDamageCounterpartAcquisitionContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDamageCounterpartAcquisitionResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDamageCounterpartAcquisitionCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDamageCounterpartAcquisitionCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDamageCounterpartAcquisitionCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICoreDamageCounterpartAcquisitionCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreDamageCounterpartAcquisitionCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreDamageCounterpartAcquisitionKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    internal CoreGameEngineDamageCounterpartAcquisitionRuntime(ICoreDamageCounterpartAcquisitionContentRegistryOperations contentRegistryOperations, ICoreDamageCounterpartAcquisitionResolutionStackOperations resolutionStackOperations, ICoreDamageCounterpartAcquisitionCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDamageCounterpartAcquisitionCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDamageCounterpartAcquisitionCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICoreDamageCounterpartAcquisitionCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreDamageCounterpartAcquisitionCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreDamageCounterpartAcquisitionKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    }
+}

@@ -1,0 +1,62 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterLuSuMouEntries
+{
+    internal void AppendMouLuSuIssuedDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.DamageTriggerCandidate> result) => _resolve().AppendMouLuSuIssuedDamageCandidates(attack, window, result);
+    internal void BeginMouLuSuPlayedCompleted(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMouLuSuPlayedCompleted(f);
+    internal void BindMouLuSuUse(global::CardGame.Core.CardUseDeclaredEvent fact) => _resolve().BindMouLuSuUse(fact);
+    internal void CaptureMouLuSuNativeTransferProducer(global::CardGame.Core.CardMovementRecord m) => _resolve().CaptureMouLuSuNativeTransferProducer(m);
+    internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> CollectMouLuSuGainCandidates(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CollectMouLuSuGainCandidates(batch);
+    internal void CollectWindow_CollectMouLuSuGainCandidates(global::CardGame.Core.CardMovementBatchContext batch, global::System.Collections.Generic.List<global::CardGame.Core.ProgramTriggerCandidate> result) => _resolve().CollectWindow_CollectMouLuSuGainCandidates(batch, result);
+    internal global::CardGame.Core.ProgramSkillWindowContext CreateMouLuSuGainContext(global::CardGame.Core.CardsMovedTriggerWindowFrame p, global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().CreateMouLuSuGainContext(p, c);
+    internal bool ExcludeOrdinaryMovement_IsMouLuSuGainTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsMouLuSuGainTrigger(candidate, trigger);
+    internal void FinishMouLuSuPlayedAccepted(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouLuSuPlayedAccepted(f);
+    internal void FinishMouLuSuPlayedCompleted(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouLuSuPlayedCompleted(f);
+    internal bool IsIssuedMouLuSuDamageCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedMouLuSuDamageCandidate(candidate, context);
+    internal bool IsMouLuSuPaymentFrame(global::CardGame.Core.ChainedStateBasicFrame p) => _resolve().IsMouLuSuPaymentFrame(p);
+    internal bool IsMouLuSuPaymentFrame2(global::CardGame.Core.DrawFundedDistinctBasicFrame p) => _resolve().IsMouLuSuPaymentFrame(p);
+    internal bool IsMouLuSuPlayedCostFinished(global::CardGame.Core.ProgramCardTriggerWindowFrame w, global::CardGame.Core.CardActionCost cost) => _resolve().IsMouLuSuPlayedCostFinished(w, cost);
+    internal bool IsMouLuSuPlayedWindow(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().IsMouLuSuPlayedWindow(action, window);
+    internal bool IsMouLuSuUseQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsMouLuSuUseQuery(actor);
+    internal void IssueMouLuSuPlayed(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouLuSuPlayed(f);
+    internal void IssueMouLuSuPlayedDeclaration(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouLuSuPlayedDeclaration(f);
+    internal void IssueMouLuSuUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouLuSuUse(f);
+    internal bool MatchesMouLuSuPlayedDeclaration(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardDeclarationFrame d) => _resolve().MatchesMouLuSuPlayedDeclaration(f, d);
+    internal bool MouLuSuAdvanceChildren() => _resolve().MouLuSuAdvanceChildren();
+    internal bool MouLuSuBeforeDamage(long id) => _resolve().MouLuSuBeforeDamage(id);
+    internal bool MouLuSuDamageWindow(long id) => _resolve().MouLuSuDamageWindow(id);
+    internal bool MouLuSuDying() => _resolve().MouLuSuDying();
+    internal bool MouLuSuEdge(int i) => _resolve().MouLuSuEdge(i);
+    internal bool MouLuSuFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouLuSuFirstChild(f, child);
+    internal int? MouLuSuGainPeer(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().MouLuSuGainPeer(c, w);
+    internal (int Peer, int Index)[] MouLuSuGainPeers(global::CardGame.Core.CardMovementBatchContext batch, int owner) => _resolve().MouLuSuGainPeers(batch, owner);
+    internal bool MouLuSuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? op, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MouLuSuMovement(f, op, p);
+    internal bool MouLuSuNativeMatches(global::CardGame.Core.CardUseFrame use) => _resolve().MouLuSuNativeMatches(use);
+    internal bool MouLuSuNoSlashDebit(long id, int actor) => _resolve().MouLuSuNoSlashDebit(id, actor);
+    internal bool MouLuSuPaymentParent(long paymentId, long? parent, long? request, int cursor, global::CardGame.Core.CardConversionSource source, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().MouLuSuPaymentParent(paymentId, parent, request, cursor, source, kind, targets);
+    internal bool MouLuSuPlayedDeclarationEdge(int i) => _resolve().MouLuSuPlayedDeclarationEdge(i);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.MouLuSuAnniversaryPlayedPlan> MouLuSuPlayedPlans(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouLuSuPlayedPlans(f);
+    internal global::CardGame.Core.MouLuSuAnniversaryPlayedReturn? MouLuSuPlayedWindowReturn(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().MouLuSuPlayedWindowReturn(action, window);
+    internal bool MouLuSuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame rr) => _resolve().MouLuSuRecoveryParent(f, rr);
+    internal bool MouLuSuRequestedQuota(global::CardGame.Core.ProgramSlashQuotaQuery q) => _resolve().MouLuSuRequestedQuota(q);
+    internal global::CardGame.Core.ProgramSkillFrame? MouLuSuRoot() => _resolve().MouLuSuRoot();
+    internal global::CardGame.Core.ProgramSkillFrame? MouLuSuSlotParent(global::CardGame.Core.EquipmentSlotNamedUseDraft slot) => _resolve().MouLuSuSlotParent(slot);
+    internal bool MouLuSuSuffix(int n) => _resolve().MouLuSuSuffix(n);
+    internal int? MouLuSuTransferSource(global::CardGame.Core.CardMovementRecord m) => _resolve().MouLuSuTransferSource(m);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> MouLuSuUseActions(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouLuSuUseActions(f);
+    internal global::CardGame.Core.ProgramSkillFrame? MouLuSuUseQuery(int actor) => _resolve().MouLuSuUseQuery(actor);
+    internal bool? ProveMouLuSuMovement(global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ProveMouLuSuMovement(trigger, candidate, context);
+    internal void RecordMouLuSuOwnedTransferProducer(global::CardGame.Core.CardMovementRecord m, int recipient, long producer) => _resolve().RecordMouLuSuOwnedTransferProducer(m, recipient, producer);
+    internal bool ReturnMouLuSuAttack() => _resolve().ReturnMouLuSuAttack();
+    internal bool ReturnMouLuSuPlayedDeclaration(global::CardGame.Core.CardDeclarationFrame d, bool succeeded) => _resolve().ReturnMouLuSuPlayedDeclaration(d, succeeded);
+    internal void ReturnMouLuSuPublicReveal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnMouLuSuPublicReveal(f);
+    internal void ReturnMouLuSuUse(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnMouLuSuUse(use);
+    internal void SettleMouLuSuUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SettleMouLuSuUse(f);
+    internal bool TryCancelMouLuSuPayment(long id) => _resolve().TryCancelMouLuSuPayment(id);
+    internal global::CardGame.Core.ProgramSkillWindowContext? TryCreateMouLuSuGainContext(global::CardGame.Core.CardsMovedTriggerWindowFrame frame, global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().TryCreateMouLuSuGainContext(frame, candidate);
+    internal bool TryReturnMouLuSuPlayedWindow(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().TryReturnMouLuSuPlayedWindow(window);
+    internal bool ValidMouLuSuPlayedWindow(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().ValidMouLuSuPlayedWindow(window);
+    internal void ValidateMouLuSuUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateMouLuSuUse(use);
+    internal bool HasMouLuSuAnniversary { get => _resolve().HasMouLuSuAnniversary; }
+    internal global::CardGame.Core.MouLuSuAnniversaryRuntime MouLuSuAnniversary { get => _resolve().MouLuSuAnniversary; }
+}

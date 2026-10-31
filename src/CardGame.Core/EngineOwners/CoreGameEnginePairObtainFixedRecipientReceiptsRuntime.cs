@@ -1,0 +1,30 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePairObtainFixedRecipientReceiptsRuntime
+{
+    private readonly ICorePairObtainFixedRecipientReceiptsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePairObtainFixedRecipientReceiptsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePairObtainFixedRecipientReceiptsCoreFixedRecipientBenefitsOperations _coreFixedRecipientBenefitsOperations;
+    private readonly ICorePairObtainFixedRecipientReceiptsCorePairObtainShownGiftsOperations _corePairObtainShownGiftsOperations;
+    private readonly ICorePairObtainFixedRecipientReceiptsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEnginePairObtainFixedRecipientReceiptsRuntime(ICorePairObtainFixedRecipientReceiptsContentRegistryOperations contentRegistryOperations, ICorePairObtainFixedRecipientReceiptsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePairObtainFixedRecipientReceiptsCoreFixedRecipientBenefitsOperations coreFixedRecipientBenefitsOperations, ICorePairObtainFixedRecipientReceiptsCorePairObtainShownGiftsOperations corePairObtainShownGiftsOperations, ICorePairObtainFixedRecipientReceiptsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreFixedRecipientBenefitsOperations = coreFixedRecipientBenefitsOperations;
+        this._corePairObtainShownGiftsOperations = corePairObtainShownGiftsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

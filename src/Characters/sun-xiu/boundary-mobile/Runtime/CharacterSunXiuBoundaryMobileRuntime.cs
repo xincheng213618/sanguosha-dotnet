@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSunXiuBoundaryMobileRuntime : global::CardGame.Core.IBoundarySunXiuHost, global::CardGame.Core.IBoundarySunXiuSelectionQuery
+{
+    private readonly ICharacterSunXiuBoundaryMobileCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterSunXiuBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSunXiuBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreLordSkillProjectionsOperations _coreLordSkillProjectionsOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterSunXiuBoundaryMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterSunXiuBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess _coreActualTurnProgressCurrentSeatAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterSunXiuBoundaryMobileRuntime(ICharacterSunXiuBoundaryMobileCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICharacterSunXiuBoundaryMobileCardZonesOperations cardZonesOperations, ICharacterSunXiuBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterSunXiuBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterSunXiuBoundaryMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterSunXiuBoundaryMobileCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterSunXiuBoundaryMobileCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterSunXiuBoundaryMobileCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterSunXiuBoundaryMobileCoreLordSkillProjectionsOperations coreLordSkillProjectionsOperations, ICharacterSunXiuBoundaryMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterSunXiuBoundaryMobileCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterSunXiuBoundaryMobileCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterSunXiuBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSunXiuBoundaryMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterSunXiuBoundaryMobileCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterSunXiuBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterSunXiuBoundaryMobileCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterSunXiuBoundaryMobileCoreTableOrderOperations coreTableOrderOperations, ICharacterSunXiuBoundaryMobileCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICharacterSunXiuBoundaryMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterSunXiuBoundaryMobileCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICharacterSunXiuBoundaryMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterSunXiuBoundaryMobileCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterSunXiuBoundaryMobileCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterSunXiuBoundaryMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterSunXiuBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess coreActualTurnProgressCurrentSeatAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreLordSkillProjectionsOperations = coreLordSkillProjectionsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatAccess = coreActualTurnProgressCurrentSeatAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

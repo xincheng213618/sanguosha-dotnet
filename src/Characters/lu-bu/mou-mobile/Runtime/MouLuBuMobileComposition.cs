@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouLuBuMobileComposition
 {
-    internal const string Wushuang = "mou-mobile:wushuang", Liyu = "mou-mobile:liyu";
+    internal const string Wushuang = "mou-mobile:wushuang",Liyu = "mou-mobile:liyu";
     [ProgramCatalogValidation(1380)]
     internal static void ValidateProgram(string path, SkillProgram p)
     {

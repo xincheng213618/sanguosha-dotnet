@@ -105,7 +105,7 @@ internal static class ExceptionReportChecks
     private static void FailNextSelection(MainViewModel vm)
     {
         var game = Program.Engine(vm);
-        var count = typeof(GameEngine).GetField("_initialCardCount", PrivateInstance)!;
+        var count = global::FixtureRuntimeAccess.Engine.GetField("_initialCardCount", PrivateInstance)!;
         count.SetValue(game, (int)count.GetValue(game)! + 1);
         Program.Assert(vm.IsGeneralSelectionPending && vm.GeneralChoices.Count > 0, "Fixture needs a real human general selection.");
         vm.SelectGeneralChoiceCommand.Execute(vm.GeneralChoices[0]);

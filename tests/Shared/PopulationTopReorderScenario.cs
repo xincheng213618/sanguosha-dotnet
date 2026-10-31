@@ -19,9 +19,9 @@ internal static class PopulationTopReorderScenario
     internal static PendingDecision? Pending(GameEngine g)=>g.PendingDecision??Enumerable.Range(0,g.CreateSnapshot(0).Players.Count).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p!=null);
     internal static ProgramSkillFrame Frame(GameEngine g)=>g.ResolutionStack.OfType<ProgramSkillFrame>().Last();
     internal static object Zones(GameEngine g)=>typeof(GameEngine).GetField("_cardZones",Flags)!.GetValue(g)!;
-    internal static CharacterState[] Players(GameEngine g)=>((IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players",Flags)!.GetValue(g)!).ToArray();
+    internal static CharacterState[] Players(GameEngine g)=>((IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players",Flags)!.GetValue(g)!).ToArray();
     internal static int[] Pile(GameEngine g)=>((IReadOnlyList<Card>)Zones(g).GetType().GetMethod("CardsAt")!.Invoke(Zones(g),[CardLocation.DrawPile])!).Reverse().Select(c=>c.Id).ToArray();
-    internal static bool Eligible(GameEngine g,string? instance=null)=>(bool)typeof(GameEngine).GetMethod("GetProgramBooleanState",Flags,null,[typeof(int),typeof(string),typeof(string),typeof(string)],null)!.Invoke(g,
+    internal static bool Eligible(GameEngine g,string? instance=null)=>(bool)global::FixtureRuntimeAccess.Engine.GetMethod("GetProgramBooleanState",Flags,null,[typeof(int),typeof(string),typeof(string),typeof(string)],null)!.Invoke(g,
         [0,Skill,instance??Players(g)[0].SkillGrants.Grants.Single(x=>x.SkillId==Skill).SkillInstanceId,"eligible-end-reorder"])!;
     internal static string? Action(PromptChoice c)=>c.Parameters.GetValueOrDefault("program-action");
     internal static void Accept(GameEngine g,GameCommand command){var r=g.Submit(command);if(!r.Accepted)Capture(g,command);Require(r.Accepted,r.Error?.Message??"Command rejected.");}

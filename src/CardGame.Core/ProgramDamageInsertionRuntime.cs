@@ -70,19 +70,4 @@ internal sealed class ProgramDamageInsertionRuntime(IProgramDamageInsertionFacts
 
 public sealed partial class GameEngine
 {
-    private ProgramDamageInsertionRuntime DamageInsertions => GetRuntimeModule<ProgramDamageInsertionRuntime>();
-
-    [ProgramCapability]
-    private sealed class ProgramDamageInsertionFacts(GameEngine engine) : IProgramDamageInsertionFacts
-    {
-        public int FrameCount => engine._resolutionStack.Count;
-        public ResolutionFrame FrameAt(int index) => engine._resolutionStack[index];
-        public int FrameIndex(long frameId) => engine._resolutionStack.FindIndex(frame => frame.Id == frameId);
-        public bool HasIssuedLink(int index) => engine._resolutionStack.HasIssuedLink(index);
-        public bool HasConsistentChild(int index) => engine.ProgramChildResolutionEdge(index);
-        public long? AttackOwnerFrameId => engine.CurrentDamageAttempt?.ResolutionId;
-        public long? DyingFrameId => engine.ActiveDying?.Id;
-    }
-
-    private bool IsOriginalDyingSuspendedByProgramInsertion(DyingFrame dying) => DamageInsertions.IsSuspended(dying);
 }

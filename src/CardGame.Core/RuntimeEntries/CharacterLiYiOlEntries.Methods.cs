@@ -1,0 +1,60 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterLiYiOlEntries
+{
+    internal void AddLiYiAttackRangeBaseTerms(global::CardGame.Core.ProgramAttackRangeQuery query, global::System.Collections.Generic.List<global::CardGame.Core.RuleQueryBaseTerm> terms) => _resolve().AddLiYiAttackRangeBaseTerms(query, terms);
+    internal bool AdvanceLiYiChildren() => _resolve().AdvanceLiYiChildren();
+    internal void AnswerChanshuang(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerChanshuang(selected);
+    internal void AssertLiYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLiYi(f);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginChanshuang(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginChanshuang(supplied, op);
+    internal void BeginChanshuangFactionRequest(global::CardGame.Core.ProgramSkillFrame f, int actor, int target) => _resolve().BeginChanshuangFactionRequest(f, actor, target);
+    internal void BindChanshuangSlashUse(global::CardGame.Core.CardUseFrame supplied) => _resolve().BindChanshuangSlashUse(supplied);
+    internal bool CanOfferChanshuangEnding(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferChanshuangEnding(c, t, context);
+    internal global::CardGame.Core.IGameEvent[] ChanshuangActualTurnHistory() => _resolve().ChanshuangActualTurnHistory();
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ChanshuangChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChanshuangChoices(f);
+    internal int ChanshuangChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChanshuangChooser(f);
+    internal bool ChanshuangSlashQuotaBeforeLimit(global::CardGame.Core.ProgramSlashQuotaQuery query) => _resolve().ChanshuangSlashQuotaBeforeLimit(query);
+    internal global::CardGame.Core.CardConversionSource ChanshuangSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChanshuangSource(f);
+    internal global::CardGame.Core.PromptChoice ChooseChanshuangActiveAi(global::CardGame.Core.PendingDecision p) => _resolve().ChooseChanshuangActiveAi(p);
+    internal global::CardGame.Core.PromptChoice ChooseChanshuangAi(global::CardGame.Core.PendingDecision p) => _resolve().ChooseChanshuangAi(p);
+    internal global::CardGame.Core.PromptChoice ChooseChanshuangEndingAi(global::CardGame.Core.PendingDecision p) => _resolve().ChooseChanshuangEndingAi(p);
+    internal void CompleteChanshuangItem(global::CardGame.Core.ProgramSkillFrame f, bool actual) => _resolve().CompleteChanshuangItem(f, actual);
+    internal void ContinueChanshuang(long id) => _resolve().ContinueChanshuang(id);
+    internal bool ContinueIssuedLiYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueIssuedLiYi(f);
+    internal int CurrentChanshuangMask(int actor) => _resolve().CurrentChanshuangMask(actor);
+    internal bool DrainLiYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainLiYi(f);
+    internal void FinishChanshuang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishChanshuang(f);
+    internal bool FinishChanshuangSuppliedSlashFailure(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishChanshuangSuppliedSlashFailure(f);
+    internal bool HasIssuedChanshuangSlash(long? useId, int actor) => _resolve().HasIssuedChanshuangSlash(useId, actor);
+    internal bool HasIssuedChanshuangSlashDebitExemption(long useId, int actorSeat) => _resolve().HasIssuedChanshuangSlashDebitExemption(useId, actorSeat);
+    internal bool HasLiYiBeforeDamageObserver(long id) => _resolve().HasLiYiBeforeDamageObserver(id);
+    internal bool HasLiYiDamageObserver(long id) => _resolve().HasLiYiDamageObserver(id);
+    internal bool HasLiYiVirtualStoneAxe(global::CardGame.Core.CharacterState player, int? excludedEquipmentId = default, global::CardGame.Core.EquipmentSlot? excludedEquipmentSlot = default) => _resolve().HasLiYiVirtualStoneAxe(player, excludedEquipmentId, excludedEquipmentSlot);
+    internal bool IsChanshuangFactionOrigin(global::CardGame.Core.ProgramSkillFrame f, int actor, int target, string resultBind) => _resolve().IsChanshuangFactionOrigin(f, actor, target, resultBind);
+    internal bool IsChanshuangNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsChanshuangNativeSettlementBatch(f, batch);
+    internal bool IsChanshuangRemovedMaterial(long useId, int cardId) => _resolve().IsChanshuangRemovedMaterial(useId, cardId);
+    internal bool IsChanshuangSlashQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsChanshuangSlashQuery(actor);
+    internal bool IsChanshuangSlashRequest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsChanshuangSlashRequest(f);
+    internal bool IsIssuedChanshuangUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedChanshuangUse(use);
+    internal bool IsLiYiDying() => _resolve().IsLiYiDying();
+    internal bool IsLiYiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsLiYiMovement(f, effect, pending);
+    internal bool IsLiYiPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsLiYiPaidMovement(f, m);
+    internal bool IsLiYiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiYiRecoveryParent(f, recovery);
+    internal bool LiYiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().LiYiFirstChild(f, child);
+    internal global::CardGame.Core.ProgramSkillFrame? LiYiObserverRoot() => _resolve().LiYiObserverRoot();
+    internal void PayChanshuangCards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayChanshuangCards(f);
+    internal void PrepareChanshuangSuppliedSlash(global::CardGame.Core.ProgramSkillFrame supplied, int actorSeat, int providerSeat, int targetSeat, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> materials, global::CardGame.Core.CardConversionSource? conversionSource, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardConversionSource>? additionalConversionSources = default) => _resolve().PrepareChanshuangSuppliedSlash(supplied, actorSeat, providerSeat, targetSeat, kind, materials, conversionSource, additionalConversionSources);
+    internal void PublishChanshuang(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().PublishChanshuang(supplied);
+    internal void RecordChanshuangSlashPayment(global::CardGame.Core.CardMovedEvent e) => _resolve().RecordChanshuangSlashPayment(e);
+    internal bool ResumeChanshuangSuppliedSlash(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ResumeChanshuangSuppliedSlash(supplied);
+    internal bool ResumeLiYi(long id) => _resolve().ResumeLiYi(id);
+    internal bool ReturnChanshuangAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnChanshuangAttack(completion);
+    internal void ReturnChanshuangNative(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnChanshuangNative(use);
+    internal bool ReturnLiYiMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnLiYiMovement(f);
+    internal void SettleChanshuangNative(global::CardGame.Core.ChanshuangNativeOrigin o) => _resolve().SettleChanshuangNative(o);
+    internal bool TryGetChanshuangSlashRequest(global::CardGame.Core.ProgramSkillFrame f, scoped out int actorSeat, scoped out global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().TryGetChanshuangSlashRequest(f, out actorSeat, out targets);
+    internal bool ValidateChanshuangFactionSlashParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidateChanshuangFactionSlashParent(pending, f);
+    internal void ValidateChanshuangNative(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateChanshuangNative(use);
+    internal bool WindowSettlement_IsChanshuangNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().WindowSettlement_IsChanshuangNativeSettlementBatch(frame, batch);
+    internal bool HasLiYiCapability { get => _resolve().HasLiYiCapability; }
+}

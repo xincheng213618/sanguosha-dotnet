@@ -9,6 +9,7 @@ internal static class NativeLogicalDiscardChecks
 
     public static void WholeLogicalDiscardsKeepCrossPromptAndMixedMaterialInvoicesCold()
     {
+        CaptureUsesOriginalMovementCounter();
         foreach(var shortCost in new[]{false,true})
         {
             var(g,r)=Start();
@@ -59,6 +60,26 @@ internal static class NativeLogicalDiscardChecks
             Need(paid.InitiatorSeat==0&&paid.ExecutorSeat==0&&paid.SubjectSeat==1&&paid.ActualCount==1&&paid.HandCount==1,
                 "A real foreign opaque Hand dismantlement belongs to its skill initiator and actual chooser, rather than the victim.");_=Cold(g,r);
         }
+    }
+
+    private static void CaptureUsesOriginalMovementCounter()
+    {
+        var (game, _) = Start();
+        const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        var field = global::FixtureRuntimeAccess.Engine.GetField("_movementSequence", flags)!;
+        var counter = (int)field.GetValue(game)!;
+        var movements = (IReadOnlyList<CardMovementRecord>)global::FixtureRuntimeAccess.Engine.GetField("_cardMovements", flags)!.GetValue(game)!;
+        var lastSequence = movements[^1].Sequence;
+        try
+        {
+            field.SetValue(game, checked(counter + 37));
+            var draft = game.GetRuntimeModule<NativeLogicalDiscardRuntime>().Capture(0, 0,
+                [V(game).Hand[0].Id], new CardMoveReason("fixture.logical-discard.counter"));
+            Need(draft is not null && draft.SequenceBefore == counter + 37 && draft.SequenceBefore != lastSequence &&
+                    movements[^1].Sequence == lastSequence,
+                "Logical discard captures the original movement counter even when it differs from the last physical record; capture must not manufacture a movement.");
+        }
+        finally { field.SetValue(game, counter); }
     }
     private static PlayerSnapshot V(GameEngine g)=>g.CreateSnapshot(0).Players[0];
     private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);

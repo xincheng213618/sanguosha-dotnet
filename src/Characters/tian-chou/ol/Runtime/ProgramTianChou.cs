@@ -16,7 +16,7 @@ public sealed record TianChouShandaoUseOrigin(long ProgramFrameId, int Instructi
 public sealed record TianChouShandaoReceipt(CardConversionSource Source, string GameplayHash, int InstructionIndex,
     int ActualTurn, int PhaseInstanceId, long StartedAt, TianChouShandaoStage Stage = TianChouShandaoStage.Targets)
 {
-    private readonly IReadOnlyList<int> _candidates = Array.AsReadOnly(Array.Empty<int>()), _targets = Array.AsReadOnly(Array.Empty<int>());
+    private readonly IReadOnlyList<int> _candidates = Array.AsReadOnly(Array.Empty<int>()),_targets = Array.AsReadOnly(Array.Empty<int>());
     private readonly IReadOnlyList<TianChouShandaoTop> _tops = Array.AsReadOnly(Array.Empty<TianChouShandaoTop>());
     public IReadOnlyList<int> Candidates { get => _candidates; init => _candidates = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }

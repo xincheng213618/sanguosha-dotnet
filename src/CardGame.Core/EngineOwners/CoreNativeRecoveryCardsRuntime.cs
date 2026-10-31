@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeRecoveryCardsRuntime
+{
+    private readonly ICoreNativeRecoveryCardsCharacterDaQiaoXiaoQiaoHappyGodOperations _characterDaQiaoXiaoQiaoHappyGodOperations;
+    private readonly ICoreNativeRecoveryCardsCharacterSunQuanMobileOperations _characterSunQuanMobileOperations;
+    private readonly ICoreNativeRecoveryCardsCharacterXunXuAnniversaryOperations _characterXunXuAnniversaryOperations;
+    private readonly ICoreNativeRecoveryCardsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreNativeRecoveryCardsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNativeRecoveryCardsCoreCardDeclarationsOperations _coreCardDeclarationsOperations;
+    private readonly ICoreNativeRecoveryCardsCoreCardRecoveryModifiersOperations _coreCardRecoveryModifiersOperations;
+    private readonly ICoreNativeRecoveryCardsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreNativeRecoveryCardsCoreExtraCardEffectRoundsOperations _coreExtraCardEffectRoundsOperations;
+    private readonly ICoreNativeRecoveryCardsCoreNativeRecoveryDamageOperations _coreNativeRecoveryDamageOperations;
+    private readonly ICoreNativeRecoveryCardsCoreNextCardTargetAdjustmentsOperations _coreNextCardTargetAdjustmentsOperations;
+    private readonly ICoreNativeRecoveryCardsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreNativeRecoveryCardsCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreNativeRecoveryCardsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreNativeRecoveryCardsCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICoreNativeRecoveryCardsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeRecoveryCardsCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICoreNativeRecoveryCardsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreNativeRecoveryCardsCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreNativeRecoveryCardsCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreNativeRecoveryCardsCoreNativeRecoveryFramesOperations _coreNativeRecoveryFramesOperations;
+    private readonly ICoreNativeRecoveryCardsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNativeRecoveryCardsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreNativeRecoveryCardsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess;
+    internal CoreNativeRecoveryCardsRuntime(ICoreNativeRecoveryCardsCharacterDaQiaoXiaoQiaoHappyGodOperations characterDaQiaoXiaoQiaoHappyGodOperations, ICoreNativeRecoveryCardsCharacterSunQuanMobileOperations characterSunQuanMobileOperations, ICoreNativeRecoveryCardsCharacterXunXuAnniversaryOperations characterXunXuAnniversaryOperations, ICoreNativeRecoveryCardsCardZonesOperations cardZonesOperations, ICoreNativeRecoveryCardsResolutionStackOperations resolutionStackOperations, ICoreNativeRecoveryCardsCoreCardDeclarationsOperations coreCardDeclarationsOperations, ICoreNativeRecoveryCardsCoreCardRecoveryModifiersOperations coreCardRecoveryModifiersOperations, ICoreNativeRecoveryCardsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreNativeRecoveryCardsCoreExtraCardEffectRoundsOperations coreExtraCardEffectRoundsOperations, ICoreNativeRecoveryCardsCoreNativeRecoveryDamageOperations coreNativeRecoveryDamageOperations, ICoreNativeRecoveryCardsCoreNextCardTargetAdjustmentsOperations coreNextCardTargetAdjustmentsOperations, ICoreNativeRecoveryCardsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreNativeRecoveryCardsCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreNativeRecoveryCardsCoreRuntimeOperations coreRuntimeOperations, ICoreNativeRecoveryCardsCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICoreNativeRecoveryCardsCoreMatchLogOperations coreMatchLogOperations, ICoreNativeRecoveryCardsCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICoreNativeRecoveryCardsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreNativeRecoveryCardsCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreNativeRecoveryCardsCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreNativeRecoveryCardsCoreNativeRecoveryFramesOperations coreNativeRecoveryFramesOperations, ICoreNativeRecoveryCardsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeRecoveryCardsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreNativeRecoveryCardsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess)
+    {
+        this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;
+        this._characterSunQuanMobileOperations = characterSunQuanMobileOperations;
+        this._characterXunXuAnniversaryOperations = characterXunXuAnniversaryOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;
+        this._coreCardRecoveryModifiersOperations = coreCardRecoveryModifiersOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreExtraCardEffectRoundsOperations = coreExtraCardEffectRoundsOperations;
+        this._coreNativeRecoveryDamageOperations = coreNativeRecoveryDamageOperations;
+        this._coreNextCardTargetAdjustmentsOperations = coreNextCardTargetAdjustmentsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativeRecoveryFramesOperations = coreNativeRecoveryFramesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess = coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess;
+    }
+}

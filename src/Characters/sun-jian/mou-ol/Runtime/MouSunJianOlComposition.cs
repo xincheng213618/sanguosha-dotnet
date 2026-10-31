@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouSunJianOlComposition
 {
-    internal const string Yipo = "mou-ol:yipo", Hulie = "mou-ol:hulie";
+    internal const string Yipo = "mou-ol:yipo",Hulie = "mou-ol:hulie";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouSunJianYipo or SkillProgramEffectOp.OfferMouSunJianHulieDamage or SkillProgramEffectOp.ResolveMouSunJianHulieCounter;
     [ProgramCatalogValidation(1470)]
     internal static void Validate(string path, SkillProgram p)

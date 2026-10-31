@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterShiXieMobileRuntime : global::CardGame.Core.IMobileShiXieHost
+{
+    private readonly ICharacterShiXieMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterShiXieMobileCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterShiXieMobileCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterShiXieMobileCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterShiXieMobileCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterShiXieMobileCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICharacterShiXieMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterShiXieMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterShiXieMobileCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterShiXieMobileCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly ICharacterShiXieMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterShiXieMobileCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterShiXieMobileCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICharacterShiXieMobileCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterShiXieMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterShiXieMobileRuntime(ICharacterShiXieMobileResolutionStackOperations resolutionStackOperations, ICharacterShiXieMobileCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterShiXieMobileCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterShiXieMobileCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterShiXieMobileCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterShiXieMobileCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICharacterShiXieMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterShiXieMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterShiXieMobileCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterShiXieMobileCoreRuleQueriesOperations coreRuleQueriesOperations, ICharacterShiXieMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterShiXieMobileCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterShiXieMobileCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICharacterShiXieMobileCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterShiXieMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuleQueriesOperations = coreRuleQueriesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSourceDingxiRuntime
+{
+    private readonly ICoreSourceDingxiCharacterCuiYanOlOperations _characterCuiYanOlOperations;
+    private readonly ICoreSourceDingxiCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSourceDingxiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSourceDingxiResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSourceDingxiCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreSourceDingxiCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreSourceDingxiCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreSourceDingxiCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreSourceDingxiCoreNativeUsedDiscardOriginsOperations _coreNativeUsedDiscardOriginsOperations;
+    private readonly ICoreSourceDingxiCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreSourceDingxiCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreSourceDingxiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreSourceDingxiCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSourceDingxiCoreProgramOrdinaryTrickUsesOperations _coreProgramOrdinaryTrickUsesOperations;
+    private readonly ICoreSourceDingxiCorePublicPileSourcesOperations _corePublicPileSourcesOperations;
+    private readonly ICoreSourceDingxiCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSourceDingxiCoreSourceBeigongOperations _coreSourceBeigongOperations;
+    private readonly ICoreSourceDingxiCoreSourceDingxiNativeOperations _coreSourceDingxiNativeOperations;
+    private readonly ICoreSourceDingxiCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreSourceDingxiCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreSourceDingxiCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSourceDingxiCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreSourceDingxiCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly ICoreSourceDingxiCoreProgramTargetRulesOperations _coreProgramTargetRulesOperations;
+    private readonly ICoreSourceDingxiCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreSourceDingxiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSourceDingxiRuntime(ICoreSourceDingxiCharacterCuiYanOlOperations characterCuiYanOlOperations, ICoreSourceDingxiCardZonesOperations cardZonesOperations, ICoreSourceDingxiContentRegistryOperations contentRegistryOperations, ICoreSourceDingxiResolutionStackOperations resolutionStackOperations, ICoreSourceDingxiCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreSourceDingxiCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreSourceDingxiCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreSourceDingxiCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreSourceDingxiCoreNativeUsedDiscardOriginsOperations coreNativeUsedDiscardOriginsOperations, ICoreSourceDingxiCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreSourceDingxiCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreSourceDingxiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreSourceDingxiCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSourceDingxiCoreProgramOrdinaryTrickUsesOperations coreProgramOrdinaryTrickUsesOperations, ICoreSourceDingxiCorePublicPileSourcesOperations corePublicPileSourcesOperations, ICoreSourceDingxiCoreRuntimeOperations coreRuntimeOperations, ICoreSourceDingxiCoreSourceBeigongOperations coreSourceBeigongOperations, ICoreSourceDingxiCoreSourceDingxiNativeOperations coreSourceDingxiNativeOperations, ICoreSourceDingxiCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreSourceDingxiCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreSourceDingxiCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSourceDingxiCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreSourceDingxiCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, ICoreSourceDingxiCoreProgramTargetRulesOperations coreProgramTargetRulesOperations, ICoreSourceDingxiCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreSourceDingxiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCuiYanOlOperations = characterCuiYanOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeUsedDiscardOriginsOperations = coreNativeUsedDiscardOriginsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramOrdinaryTrickUsesOperations = coreProgramOrdinaryTrickUsesOperations;
+        this._corePublicPileSourcesOperations = corePublicPileSourcesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSourceBeigongOperations = coreSourceBeigongOperations;
+        this._coreSourceDingxiNativeOperations = coreSourceDingxiNativeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreProgramTargetRulesOperations = coreProgramTargetRulesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

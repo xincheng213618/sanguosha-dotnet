@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CoreGameEngineTargetedTrickHandHpAiRuntime
+{
+    internal double UnequalHandHpPublicChoiceScore(int owner, int target, bool draw)
+    {
+        var snapshot = _corePlayerViewProjectionOperations.CreateSnapshot(owner);
+        var publicTarget = snapshot.Players[target];
+        if (!publicTarget.IsAlive || publicTarget.HandCount == publicTarget.Hp || !draw && publicTarget.HandCount == 0)
+            return double.NegativeInfinity;
+        // Cancellation of DrawTwo already has public alliance/card-effect pricing.
+        // One card gets half that value; equalizing also gives the owner one card.
+        var cancelDraw = _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreCardEffectIntervention(snapshot, CardKind.DrawTwo, target) / 2d;
+        var adjustment = draw ? -cancelDraw : cancelDraw;
+        var equals = publicTarget.HandCount + (draw ? 1 : -1) == publicTarget.Hp;
+        return adjustment + (equals ? 8d : 0d);
+    }
+
+    internal double TargetedTrickPublicChoiceScore(int owner, CardUseFrame use, PromptChoice choice)
+    {
+        if (choice.Targets.Count == 0)
+            return 0d;
+        var branch = choice.Parameters["branch"];
+        var target = choice.Targets[0];
+        var score = _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreCardEffectIntervention(_corePlayerViewProjectionOperations.CreateSnapshot(owner), use.CardKind, target);
+        return branch is "ineffective" or "remove" ? score : -score;
+    }
+
+    internal double GetTargetedTrickHandHpPublicScore(int owner, IReadOnlyList<SkillProgramEffect> effects, ProgramSkillWindowContext? context)
+    {
+        if (effects.Any(e => e.Op == SkillProgramEffectOp.ResolveUnequalHandHpEnding))
+            return _corePlayerViewProjectionOperations.CreateSnapshot(owner).Players.Where(p => p.IsAlive && p.HandCount != p.Hp).SelectMany(p => new[] { UnequalHandHpPublicChoiceScore(owner, p.Seat, true), UnequalHandHpPublicChoiceScore(owner, p.Seat, false) }).Append(0d).Max();
+        return context is not null && _coreTargetedOrdinaryTrickOperations.TryGetTargetedOrdinaryTrickUse(context, out var use, out _) ? _coreTargetedOrdinaryTrickOperations.TargetedTrickChoices(0, use, effects.Any(e => e.Op == SkillProgramEffectOp.AdjustTargetedOrdinaryTrick && global::CardGame.Core.EngineOwners.CoreGameEngineTargetedOrdinaryTrickRuntime.TargetedTrickRemovesTargets(e))).Select(c => TargetedTrickPublicChoiceScore(owner, use, c)).DefaultIfEmpty(0d).Max() : 0d;
+    }
+}

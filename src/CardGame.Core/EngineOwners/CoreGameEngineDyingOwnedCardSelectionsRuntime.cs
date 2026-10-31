@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDyingOwnedCardSelectionsRuntime : global::CardGame.Core.IDyingOwnedCardProgramHost
+{
+    private readonly ICoreDyingOwnedCardSelectionsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreDyingOwnedCardSelectionsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDyingOwnedCardSelectionsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDyingOwnedCardSelectionsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreDyingOwnedCardSelectionsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDyingOwnedCardSelectionsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreDyingOwnedCardSelectionsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreDyingOwnedCardSelectionsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreDyingOwnedCardSelectionsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDyingOwnedCardSelectionsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDyingOwnedCardSelectionsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreDyingOwnedCardSelectionsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDyingOwnedCardSelectionsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreDyingOwnedCardSelectionsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineDyingOwnedCardSelectionsRuntime(ICoreDyingOwnedCardSelectionsCardZonesOperations cardZonesOperations, ICoreDyingOwnedCardSelectionsContentRegistryOperations contentRegistryOperations, ICoreDyingOwnedCardSelectionsResolutionStackOperations resolutionStackOperations, ICoreDyingOwnedCardSelectionsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreDyingOwnedCardSelectionsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDyingOwnedCardSelectionsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreDyingOwnedCardSelectionsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDyingOwnedCardSelectionsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreDyingOwnedCardSelectionsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDyingOwnedCardSelectionsCoreRuntimeOperations coreRuntimeOperations, ICoreDyingOwnedCardSelectionsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreDyingOwnedCardSelectionsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDyingOwnedCardSelectionsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreDyingOwnedCardSelectionsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

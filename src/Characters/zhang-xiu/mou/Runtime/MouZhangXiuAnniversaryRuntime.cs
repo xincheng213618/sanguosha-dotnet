@@ -3,8 +3,8 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class MouZhangXiuAnniversaryRuntime(IMouZhangXiuAnniversaryFacts facts, IMouZhangXiuAnniversaryNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouZhangXiuAnniversaryRuntime
 {
-    internal const string Fuxi = "mou:fuxi", Haoyi = "mou:haoyi", Action = "mou-zhang-xiu-anniversary";
-    internal const string GiveReason = "skill-program.mou:fuxi.give", DiscardReason = "skill-program.mou:fuxi.discard", DrawReason = "skill-program.mou:fuxi.draw", ClaimReason = "skill-program.mou:haoyi.claim", DistributionReason = "skill-program.mou:haoyi.distribute";
+    internal const string Fuxi = "mou:fuxi",Haoyi = "mou:haoyi",Action = "mou-zhang-xiu-anniversary";
+    internal const string GiveReason = "skill-program.mou:fuxi.give",DiscardReason = "skill-program.mou:fuxi.discard",DrawReason = "skill-program.mou:fuxi.draw",ClaimReason = "skill-program.mou:haoyi.claim",DistributionReason = "skill-program.mou:haoyi.distribute";
     internal static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     // Current physical card names classify discard entities; past converted
     // faces do not turn their printed materials into new damage-card names.

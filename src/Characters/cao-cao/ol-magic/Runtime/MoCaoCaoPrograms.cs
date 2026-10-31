@@ -12,7 +12,7 @@ public sealed record MoCaoCaoBachaoReceipt(CardConversionSource Source, string G
     public long After { get; init; }
     public int PaidCardId { get; init; }
     public bool Accepted { get; init; }
-    private IReadOnlyList<int> _participants = Array.AsReadOnly(Array.Empty<int>()), _protected = Array.AsReadOnly(Array.Empty<int>());
+    private IReadOnlyList<int> _participants = Array.AsReadOnly(Array.Empty<int>()),_protected = Array.AsReadOnly(Array.Empty<int>());
     private IReadOnlyList<MoCaoCaoVote> _votes = Array.AsReadOnly(Array.Empty<MoCaoCaoVote>());
     public IReadOnlyList<int> Participants { get => _participants; init => _participants = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> ProtectedSeats { get => _protected; init => _protected = Array.AsReadOnly(value.ToArray()); }

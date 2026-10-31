@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePreventionDrawObserversRuntime
+{
+    private readonly ICorePreventionDrawObserversContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePreventionDrawObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePreventionDrawObserversCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICorePreventionDrawObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICorePreventionDrawObserversCoreParticipantPreventionOperations _coreParticipantPreventionOperations;
+    private readonly ICorePreventionDrawObserversCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICorePreventionDrawObserversCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICorePreventionDrawObserversCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess _coreCommandJournalStorageEventsPendingEventsAccess;
+    internal CoreGameEnginePreventionDrawObserversRuntime(ICorePreventionDrawObserversContentRegistryOperations contentRegistryOperations, ICorePreventionDrawObserversResolutionStackOperations resolutionStackOperations, ICorePreventionDrawObserversCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICorePreventionDrawObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICorePreventionDrawObserversCoreParticipantPreventionOperations coreParticipantPreventionOperations, ICorePreventionDrawObserversCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICorePreventionDrawObserversCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICorePreventionDrawObserversCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess coreCommandJournalStorageEventsPendingEventsAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreParticipantPreventionOperations = coreParticipantPreventionOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreCommandJournalStorageEventsPendingEventsAccess = coreCommandJournalStorageEventsPendingEventsAccess;
+    }
+}

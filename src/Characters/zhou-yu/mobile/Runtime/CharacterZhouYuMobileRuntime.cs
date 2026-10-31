@@ -1,0 +1,57 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CharacterZhouYuMobileRuntime
+{
+    private readonly ICharacterZhouYuMobileCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICharacterZhouYuMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterZhouYuMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhouYuMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhouYuMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterZhouYuMobileCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterZhouYuMobileCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterZhouYuMobileCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterZhouYuMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZhouYuMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhouYuMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZhouYuMobileCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterZhouYuMobileCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterZhouYuMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterZhouYuMobileCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterZhouYuMobileCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterZhouYuMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterZhouYuMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterZhouYuMobileRuntime(ICharacterZhouYuMobileCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICharacterZhouYuMobileCardZonesOperations cardZonesOperations, ICharacterZhouYuMobileContentRegistryOperations contentRegistryOperations, ICharacterZhouYuMobileResolutionStackOperations resolutionStackOperations, ICharacterZhouYuMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterZhouYuMobileCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterZhouYuMobileCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterZhouYuMobileCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterZhouYuMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhouYuMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhouYuMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterZhouYuMobileCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterZhouYuMobileCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterZhouYuMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterZhouYuMobileCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterZhouYuMobileCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterZhouYuMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterZhouYuMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.RuntimeAccess.IClosedHandCardViewQueriesSource _closedHandCardViewQueriesSource)
+    {
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._closedHandCardViewQueriesSource = _closedHandCardViewQueriesSource;
+    }
+
+    private readonly global::CardGame.Core.RuntimeAccess.IClosedHandCardViewQueriesSource _closedHandCardViewQueriesSource;
+}

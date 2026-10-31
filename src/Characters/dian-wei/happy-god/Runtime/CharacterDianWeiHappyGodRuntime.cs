@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterDianWeiHappyGodRuntime : global::CardGame.Core.IHappyDianWeiHost
+{
+    private readonly ICharacterDianWeiHappyGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterDianWeiHappyGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterDianWeiHappyGodCoreDeathProgramsOperations _coreDeathProgramsOperations;
+    private readonly ICharacterDianWeiHappyGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterDianWeiHappyGodCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterDianWeiHappyGodCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterDianWeiHappyGodCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICharacterDianWeiHappyGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterDianWeiHappyGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterDianWeiHappyGodCoreRecipientScopedDamageOperations _coreRecipientScopedDamageOperations;
+    private readonly ICharacterDianWeiHappyGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterDianWeiHappyGodCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterDianWeiHappyGodCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICharacterDianWeiHappyGodCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICharacterDianWeiHappyGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterDianWeiHappyGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterDianWeiHappyGodCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterDianWeiHappyGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterDianWeiHappyGodCoreTeamActivityProgramsOperations _coreTeamActivityProgramsOperations;
+    private readonly ICharacterDianWeiHappyGodKernelCoreGameEngineProgramAttackAttemptOperations _kernelCoreGameEngineProgramAttackAttemptOperations;
+    private readonly ICharacterDianWeiHappyGodKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICharacterDianWeiHappyGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterDianWeiHappyGodProgramLifecycleWindowOperations _programLifecycleWindowOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess _coreMatchDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterDianWeiHappyGodRuntime(ICharacterDianWeiHappyGodContentRegistryOperations contentRegistryOperations, ICharacterDianWeiHappyGodResolutionStackOperations resolutionStackOperations, ICharacterDianWeiHappyGodCoreDeathProgramsOperations coreDeathProgramsOperations, ICharacterDianWeiHappyGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterDianWeiHappyGodCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterDianWeiHappyGodCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterDianWeiHappyGodCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICharacterDianWeiHappyGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterDianWeiHappyGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterDianWeiHappyGodCoreRecipientScopedDamageOperations coreRecipientScopedDamageOperations, ICharacterDianWeiHappyGodCoreRuntimeOperations coreRuntimeOperations, ICharacterDianWeiHappyGodCoreTableOrderOperations coreTableOrderOperations, ICharacterDianWeiHappyGodCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICharacterDianWeiHappyGodCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICharacterDianWeiHappyGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterDianWeiHappyGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterDianWeiHappyGodCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterDianWeiHappyGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterDianWeiHappyGodCoreTeamActivityProgramsOperations coreTeamActivityProgramsOperations, ICharacterDianWeiHappyGodKernelCoreGameEngineProgramAttackAttemptOperations kernelCoreGameEngineProgramAttackAttemptOperations, ICharacterDianWeiHappyGodKernelCoreMainOperations kernelCoreMainOperations, ICharacterDianWeiHappyGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterDianWeiHappyGodProgramLifecycleWindowOperations programLifecycleWindowOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess coreMatchDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDeathProgramsOperations = coreDeathProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecipientScopedDamageOperations = coreRecipientScopedDamageOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreTeamActivityProgramsOperations = coreTeamActivityProgramsOperations;
+        this._kernelCoreGameEngineProgramAttackAttemptOperations = kernelCoreGameEngineProgramAttackAttemptOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._programLifecycleWindowOperations = programLifecycleWindowOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchDefinitionPlayerCountAccess = coreMatchDefinitionPlayerCountAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

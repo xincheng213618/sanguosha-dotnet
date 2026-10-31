@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZhangJiaoAnniversaryGodRuntime : global::CardGame.Core.IAnniversaryZhangJiaoHost
+{
+    private readonly ICharacterZhangJiaoAnniversaryGodCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodRandomOperations _randomOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreStrategicProgramsOperations _coreStrategicProgramsOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterZhangJiaoAnniversaryGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterZhangJiaoAnniversaryGodRuntime(ICharacterZhangJiaoAnniversaryGodCardZonesOperations cardZonesOperations, ICharacterZhangJiaoAnniversaryGodContentRegistryOperations contentRegistryOperations, ICharacterZhangJiaoAnniversaryGodRandomOperations randomOperations, ICharacterZhangJiaoAnniversaryGodResolutionStackOperations resolutionStackOperations, ICharacterZhangJiaoAnniversaryGodCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterZhangJiaoAnniversaryGodCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICharacterZhangJiaoAnniversaryGodCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterZhangJiaoAnniversaryGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterZhangJiaoAnniversaryGodCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICharacterZhangJiaoAnniversaryGodCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterZhangJiaoAnniversaryGodCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICharacterZhangJiaoAnniversaryGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhangJiaoAnniversaryGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhangJiaoAnniversaryGodCoreRuntimeOperations coreRuntimeOperations, ICharacterZhangJiaoAnniversaryGodCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterZhangJiaoAnniversaryGodCoreStrategicProgramsOperations coreStrategicProgramsOperations, ICharacterZhangJiaoAnniversaryGodCoreTableOrderOperations coreTableOrderOperations, ICharacterZhangJiaoAnniversaryGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterZhangJiaoAnniversaryGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterZhangJiaoAnniversaryGodCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterZhangJiaoAnniversaryGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterZhangJiaoAnniversaryGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterZhangJiaoAnniversaryGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreStrategicProgramsOperations = coreStrategicProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

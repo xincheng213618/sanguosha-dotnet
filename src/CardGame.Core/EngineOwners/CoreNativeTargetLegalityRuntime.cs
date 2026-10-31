@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeTargetLegalityRuntime
+{
+    private readonly ICoreNativeTargetLegalityCharacterCuiYanOlOperations _characterCuiYanOlOperations;
+    private readonly ICoreNativeTargetLegalityCharacterWuJingOlOperations _characterWuJingOlOperations;
+    private readonly ICoreNativeTargetLegalityCharacterZhugeLiangWumiaoOperations _characterZhugeLiangWumiaoOperations;
+    private readonly ICoreNativeTargetLegalityResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNativeTargetLegalityCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreNativeTargetLegalityCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreNativeTargetLegalityCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreNativeTargetLegalityCoreAlternatingSuitAndCompletedTopOperations _coreAlternatingSuitAndCompletedTopOperations;
+    private readonly ICoreNativeTargetLegalityCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreNativeTargetLegalityCoreLiYiNativeQueriesOperations _coreLiYiNativeQueriesOperations;
+    private readonly ICoreNativeTargetLegalityCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreNativeTargetLegalityCoreProgramCardUseRulesOperations _coreProgramCardUseRulesOperations;
+    private readonly ICoreNativeTargetLegalityCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly ICoreNativeTargetLegalityCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreNativeTargetLegalityCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreNativeTargetLegalityCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreNativeTargetLegalityCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreNativeTargetLegalityCoreProgramCardLegalityOperations _coreProgramCardLegalityOperations;
+    private readonly ICoreNativeTargetLegalityCoreProgramDistanceRulesOperations _coreProgramDistanceRulesOperations;
+    private readonly ICoreNativeTargetLegalityCoreProgramTargetRulesOperations _coreProgramTargetRulesOperations;
+    internal CoreNativeTargetLegalityRuntime(ICoreNativeTargetLegalityCharacterCuiYanOlOperations characterCuiYanOlOperations, ICoreNativeTargetLegalityCharacterWuJingOlOperations characterWuJingOlOperations, ICoreNativeTargetLegalityCharacterZhugeLiangWumiaoOperations characterZhugeLiangWumiaoOperations, ICoreNativeTargetLegalityResolutionStackOperations resolutionStackOperations, ICoreNativeTargetLegalityCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreNativeTargetLegalityCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreNativeTargetLegalityCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreNativeTargetLegalityCoreAlternatingSuitAndCompletedTopOperations coreAlternatingSuitAndCompletedTopOperations, ICoreNativeTargetLegalityCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreNativeTargetLegalityCoreLiYiNativeQueriesOperations coreLiYiNativeQueriesOperations, ICoreNativeTargetLegalityCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreNativeTargetLegalityCoreProgramCardUseRulesOperations coreProgramCardUseRulesOperations, ICoreNativeTargetLegalityCoreRuleQueriesOperations coreRuleQueriesOperations, ICoreNativeTargetLegalityCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreNativeTargetLegalityCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreNativeTargetLegalityCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreNativeTargetLegalityCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreNativeTargetLegalityCoreProgramCardLegalityOperations coreProgramCardLegalityOperations, ICoreNativeTargetLegalityCoreProgramDistanceRulesOperations coreProgramDistanceRulesOperations, ICoreNativeTargetLegalityCoreProgramTargetRulesOperations coreProgramTargetRulesOperations)
+    {
+        this._characterCuiYanOlOperations = characterCuiYanOlOperations;
+        this._characterWuJingOlOperations = characterWuJingOlOperations;
+        this._characterZhugeLiangWumiaoOperations = characterZhugeLiangWumiaoOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreAlternatingSuitAndCompletedTopOperations = coreAlternatingSuitAndCompletedTopOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreLiYiNativeQueriesOperations = coreLiYiNativeQueriesOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramCardUseRulesOperations = coreProgramCardUseRulesOperations;
+        this._coreRuleQueriesOperations = coreRuleQueriesOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramCardLegalityOperations = coreProgramCardLegalityOperations;
+        this._coreProgramDistanceRulesOperations = coreProgramDistanceRulesOperations;
+        this._coreProgramTargetRulesOperations = coreProgramTargetRulesOperations;
+    }
+}

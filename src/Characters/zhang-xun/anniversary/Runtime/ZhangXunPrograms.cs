@@ -6,7 +6,7 @@ internal abstract class AnniversaryZhangXunDescriptor : ProgramOperationDescript
 {
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
     public override ISkillProgramEffectHandler Handler => Op == SkillProgramEffectOp.ArmAnniversaryZhangXunSuizheng ? Arm : Choose;
-    private static readonly AnniversaryZhangXunHandler Arm = new(SkillProgramEffectOp.ArmAnniversaryZhangXunSuizheng), Choose = new(SkillProgramEffectOp.ChooseAnniversaryZhangXunSuizhengSlash);
+    private static readonly AnniversaryZhangXunHandler Arm = new(SkillProgramEffectOp.ArmAnniversaryZhangXunSuizheng),Choose = new(SkillProgramEffectOp.ChooseAnniversaryZhangXunSuizhengSlash);
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.SelectTarget, static (_, c) => c.PublicControlValue(3));
 }
 internal sealed class ArmAnniversaryZhangXunSuizhengDescriptor : AnniversaryZhangXunDescriptor
@@ -43,7 +43,7 @@ public sealed record ZhangXunSuizhengTargetChosenEvent(long FrameId, long LeaseI
 public sealed record ZhangXunSuizhengPhaseClosedEvent(long LeaseId, long WindowId, int ActualTurn, int PhaseInstance, bool Activated) : IGameEvent;
 internal static class AnniversaryZhangXunComposition
 {
-    internal const string Skill = "anniversary:suizheng", Arm = "arm-next-actual-turn", Followup = "issued-play-end-slash";
+    internal const string Skill = "anniversary:suizheng",Arm = "arm-next-actual-turn",Followup = "issued-play-end-slash";
     [ProgramCatalogValidation(45200)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op is SkillProgramEffectOp.ArmAnniversaryZhangXunSuizheng or SkillProgramEffectOp.ChooseAnniversaryZhangXunSuizhengSlash)) return;

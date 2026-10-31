@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
+{
+    private readonly ICoreSimultaneousPindianSelectionsCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCharacterPangJiOlOperations _characterPangJiOlOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSimultaneousPindianSelectionsRandomOperations _randomOperations;
+    private readonly ICoreSimultaneousPindianSelectionsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCoreAlcoholIdentityPoliciesOperations _coreAlcoholIdentityPoliciesOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCorePindianPoliciesOperations _corePindianPoliciesOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCorePindianRandomSelectionsOperations _corePindianRandomSelectionsOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCoreSimultaneousPindianOperations _coreSimultaneousPindianOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreSimultaneousPindianSelectionsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreSimultaneousPindianSelectionsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSimultaneousPindianSelectionsRuntime(ICoreSimultaneousPindianSelectionsCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICoreSimultaneousPindianSelectionsCharacterPangJiOlOperations characterPangJiOlOperations, ICoreSimultaneousPindianSelectionsCardZonesOperations cardZonesOperations, ICoreSimultaneousPindianSelectionsRandomOperations randomOperations, ICoreSimultaneousPindianSelectionsResolutionStackOperations resolutionStackOperations, ICoreSimultaneousPindianSelectionsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreSimultaneousPindianSelectionsCoreAlcoholIdentityPoliciesOperations coreAlcoholIdentityPoliciesOperations, ICoreSimultaneousPindianSelectionsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSimultaneousPindianSelectionsCorePindianPoliciesOperations corePindianPoliciesOperations, ICoreSimultaneousPindianSelectionsCorePindianRandomSelectionsOperations corePindianRandomSelectionsOperations, ICoreSimultaneousPindianSelectionsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreSimultaneousPindianSelectionsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSimultaneousPindianSelectionsCoreRuntimeOperations coreRuntimeOperations, ICoreSimultaneousPindianSelectionsCoreSimultaneousPindianOperations coreSimultaneousPindianOperations, ICoreSimultaneousPindianSelectionsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreSimultaneousPindianSelectionsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreSimultaneousPindianSelectionsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreSimultaneousPindianSelectionsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;
+        this._characterPangJiOlOperations = characterPangJiOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlcoholIdentityPoliciesOperations = coreAlcoholIdentityPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._corePindianPoliciesOperations = corePindianPoliciesOperations;
+        this._corePindianRandomSelectionsOperations = corePindianRandomSelectionsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSimultaneousPindianOperations = coreSimultaneousPindianOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

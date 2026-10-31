@@ -28,7 +28,7 @@ public sealed record AnniversaryZhuZhiBranchEvent(long FrameId, CardConversionSo
 
 internal static class AnniversaryZhuZhiComposition
 {
-    internal const string Skill = "anniversary:anguo", Activation = "three-minimum-benefits";
+    internal const string Skill = "anniversary:anguo",Activation = "three-minimum-benefits";
     internal static readonly string[] Branches = ["target-hand", "target-hp", "target-equipment", "owner-hand", "owner-hp", "owner-equipment"];
     [ProgramCatalogValidation(45800)] internal static void Validate(string path, SkillProgram p)
     {
@@ -51,56 +51,4 @@ internal static class AnniversaryZhuZhiComposition
 
 public sealed partial class GameEngine
 {
-    [ProgramCapability] private sealed class AnniversaryZhuZhiHost(GameEngine engine) : IAnniversaryZhuZhiHost
-    { public SkillProgramStepOutcome Qualify(ProgramSkillFrame frame, string resultBind) => engine.QualifyAnniversaryAnguo(frame, resultBind); }
-
-    private SkillProgramStepOutcome QualifyAnniversaryAnguo(ProgramSkillFrame supplied, string bind)
-    {
-        var f = GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != AnniversaryZhuZhiComposition.Skill || f.ActivationId != AnniversaryZhuZhiComposition.Activation || f.TriggerId is not null || f.SelectedTargetSeats is not [var selected] || selected == f.OwnerSeat ||
-            !AnniversaryZhuZhiComposition.Branches.Contains(bind) || f.ChoiceBindings.Any(b => b.Name == bind) || GetPausedPrivateOfferEffect(f) is not { Op: SkillProgramEffectOp.ResolveAnniversaryZhuZhiAnguo } paused || paused.ResultBind != bind)
-            throw new InvalidOperationException("Anguo must qualify its original accepted other participant and current unbound branch.");
-        var own = bind.StartsWith("owner-", StringComparison.Ordinal); var recipient = own ? f.OwnerSeat : selected; var branch = bind[(bind.IndexOf('-') + 1)..];
-        var eligible = _players[recipient].IsAlive;
-        if (own)
-        {
-            var targetResult = f.ChoiceBindings.Single(b => b.Name == "target-" + branch);
-            eligible &= targetResult.ChooserSeat == f.OwnerSeat && targetResult.OptionId == "skip";
-        }
-        if (eligible && branch == "hp")
-        {
-            eligible = _players[recipient].HasHpValue;
-            if (eligible)
-            {
-                var participants = _players.Where(p => p.IsAlive && p.HasHpValue).ToArray();
-                foreach (var p in participants)
-                    if (TryBeginHappyQiaoQuery(GetActiveProgramFrame(f.Id), p.Seat, "instruction-hp")) return SkillProgramStepOutcome.AwaitChild;
-                f = GetActiveProgramFrame(f.Id);
-                var current = HappyQiaoQueryValue(f, recipient, "instruction-hp");
-                eligible = participants.All(p => current <= HappyQiaoQueryValue(f, p.Seat, "instruction-hp"));
-            }
-        }
-        else if (eligible)
-        {
-            var count = branch == "hand" ? GetHand(_players[recipient]).Count : GetEquipment(_players[recipient]).Count;
-            eligible = _players.Where(p => p.IsAlive).All(p => count <= (branch == "hand" ? GetHand(p).Count : GetEquipment(p).Count));
-        }
-        f = GetActiveProgramFrame(f.Id);
-        ReplaceRuntimeTop(f with { ChoiceBindings = Array.AsReadOnly(f.ChoiceBindings.Append(new ProgramChoiceResultBinding(bind, eligible ? "perform" : "skip", f.OwnerSeat)).ToArray()) });
-        AdvanceEventRulesAndQueueFact(new AnniversaryZhuZhiBranchEvent(f.Id, new(f.SkillId, GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), bind, recipient, eligible));
-        return SkillProgramStepOutcome.Continue;
-    }
-
-    private bool IsAnniversaryZhuZhiChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding binding)
-    {
-        if (f.SkillId != AnniversaryZhuZhiComposition.Skill || f.ActivationId != AnniversaryZhuZhiComposition.Activation || f.TriggerId is not null ||
-            f.SelectedTargetSeats is not [var selected] || selected == f.OwnerSeat || binding.ChooserSeat != f.OwnerSeat || binding.OptionId is not ("perform" or "skip") ||
-            !AnniversaryZhuZhiComposition.Branches.Contains(binding.Name)) return false;
-        var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistry.GetSkill(f.SkillId).Program!);
-        if (plan.Instructions.Take(f.InstructionIndex).Count(e => e.Op == SkillProgramEffectOp.ResolveAnniversaryZhuZhiAnguo && e.ResultBind == binding.Name) != 1) return false;
-        var own = binding.Name.StartsWith("owner-", StringComparison.Ordinal); var recipient = own ? f.OwnerSeat : selected;
-        var source = new CardConversionSource(f.SkillId, GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-        if (own && binding.OptionId == "perform" && f.ChoiceBindings.SingleOrDefault(b => b.Name == "target-" + binding.Name[6..])?.OptionId != "skip") return false;
-        return ProgramEventHistory<AnniversaryZhuZhiBranchEvent>().Count(e => e == new AnniversaryZhuZhiBranchEvent(f.Id, source, binding.Name, recipient, binding.OptionId == "perform")) == 1;
-    }
 }

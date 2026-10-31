@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterCaoCaoOlGodRuntime : global::CardGame.Core.IOlGuixinHost
+{
+    private readonly ICharacterCaoCaoOlGodCharacterCaoCaoMobileGodOperations _characterCaoCaoMobileGodOperations;
+    private readonly ICharacterCaoCaoOlGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterCaoCaoOlGodRandomOperations _randomOperations;
+    private readonly ICharacterCaoCaoOlGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterCaoCaoOlGodCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterCaoCaoOlGodCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterCaoCaoOlGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterCaoCaoOlGodCoreOrderedPrintedSkillLossObserversOperations _coreOrderedPrintedSkillLossObserversOperations;
+    private readonly ICharacterCaoCaoOlGodCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterCaoCaoOlGodCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterCaoCaoOlGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterCaoCaoOlGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterCaoCaoOlGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterCaoCaoOlGodCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterCaoCaoOlGodCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterCaoCaoOlGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterCaoCaoOlGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterCaoCaoOlGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterCaoCaoOlGodCoreShenwuNpcProgramsOperations _coreShenwuNpcProgramsOperations;
+    private readonly ICharacterCaoCaoOlGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterCaoCaoOlGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterCaoCaoOlGodRuntime(ICharacterCaoCaoOlGodCharacterCaoCaoMobileGodOperations characterCaoCaoMobileGodOperations, ICharacterCaoCaoOlGodContentRegistryOperations contentRegistryOperations, ICharacterCaoCaoOlGodRandomOperations randomOperations, ICharacterCaoCaoOlGodResolutionStackOperations resolutionStackOperations, ICharacterCaoCaoOlGodCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterCaoCaoOlGodCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterCaoCaoOlGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterCaoCaoOlGodCoreOrderedPrintedSkillLossObserversOperations coreOrderedPrintedSkillLossObserversOperations, ICharacterCaoCaoOlGodCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterCaoCaoOlGodCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterCaoCaoOlGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterCaoCaoOlGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterCaoCaoOlGodCoreRuntimeOperations coreRuntimeOperations, ICharacterCaoCaoOlGodCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterCaoCaoOlGodCoreTableOrderOperations coreTableOrderOperations, ICharacterCaoCaoOlGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterCaoCaoOlGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterCaoCaoOlGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterCaoCaoOlGodCoreShenwuNpcProgramsOperations coreShenwuNpcProgramsOperations, ICharacterCaoCaoOlGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterCaoCaoOlGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCaoCaoMobileGodOperations = characterCaoCaoMobileGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOrderedPrintedSkillLossObserversOperations = coreOrderedPrintedSkillLossObserversOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreShenwuNpcProgramsOperations = coreShenwuNpcProgramsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

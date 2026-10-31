@@ -25,7 +25,7 @@ public sealed record KongShuReceipt(CardConversionSource Source, string Gameplay
     public int ActualDrawCount { get; init; }
     public long Before { get; init; }
     public long After { get; init; }
-    private readonly IReadOnlyList<int> _drawRecipients = Array.AsReadOnly(Array.Empty<int>()), _discardRecipients = Array.AsReadOnly(Array.Empty<int>()), _selected = Array.AsReadOnly(Array.Empty<int>()), _grain = Array.AsReadOnly(Array.Empty<int>());
+    private readonly IReadOnlyList<int> _drawRecipients = Array.AsReadOnly(Array.Empty<int>()),_discardRecipients = Array.AsReadOnly(Array.Empty<int>()),_selected = Array.AsReadOnly(Array.Empty<int>()),_grain = Array.AsReadOnly(Array.Empty<int>());
     private readonly IReadOnlyList<KongShuEntity> _materials = Array.AsReadOnly(Array.Empty<KongShuEntity>());
     public IReadOnlyList<int> DrawRecipients { get => _drawRecipients; init => _drawRecipients = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> DiscardRecipients { get => _discardRecipients; init => _discardRecipients = Array.AsReadOnly(value.ToArray()); }

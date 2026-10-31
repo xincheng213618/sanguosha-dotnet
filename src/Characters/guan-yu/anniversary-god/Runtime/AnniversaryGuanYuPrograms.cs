@@ -46,27 +46,4 @@ internal static class AnniversaryGuanYuComposition
 
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class AnniversaryGuanYuNightmareHost(GameEngine engine) : IAnniversaryGuanYuNightmareHost
-    {
-        public void RecordNightmare(ProgramSkillFrame frame) => engine.RecordAnniversaryGuanYuNightmare(frame);
-    }
-
-    private void RecordAnniversaryGuanYuNightmare(ProgramSkillFrame supplied)
-    {
-        var frame = GetActiveProgramFrame(supplied.Id);
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.DamageAppliedBeforeDying, Amount: > 0 } context ||
-            ActiveDamageTrigger is not { } damage || damage.Id != context.ParentFrameId)
-            throw new InvalidOperationException("Wuhun lost its actual applied-damage point.");
-        var target = frame.TriggerId == "outgoing-nightmare" ? context.TargetSeat : context.SourceSeat;
-        if (target is { } seat && IsValidPlayerSeat(seat))
-            MutateParticipantMarker(frame, seat, PlayerMarkerKind.Nightmare, 1);
-    }
-
-    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 40825, SkillProgramEffectOp.Draw)]
-    private bool AllowsAnniversaryGuanYuHeartSlashDraw(ProgramTriggerLegalityContext gate) =>
-        gate.SkillId != "anniversary-god:wushen" ||
-        gate.Context.Facts is { DamageCardSuit: Suit.Heart, DamageCardIsSlash: true, DamageSourceIsOwner: true } &&
-        ActiveDamageTrigger is { } damage && damage.Id == gate.Context.ParentFrameId &&
-        GetDamageTriggerAttack(damage).CardUserSeat == gate.OwnerSeat;
 }

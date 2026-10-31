@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreHealthContinuationServicesRuntime : global::CardGame.Core.IHealthContinuationFacts, global::CardGame.Core.IHealthContinuationProtocols
+{
+    private readonly ICoreHealthContinuationServicesCharacterCaoSongOlOperations _characterCaoSongOlOperations;
+    private readonly ICoreHealthContinuationServicesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreHealthContinuationServicesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHealthContinuationServicesCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreHealthContinuationServicesCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICoreHealthContinuationServicesCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreHealthContinuationServicesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreHealthContinuationServicesCoreCardUsePaymentsOperations _coreCardUsePaymentsOperations;
+    private readonly ICoreHealthContinuationServicesCoreCompletedCategoryUseProofOperations _coreCompletedCategoryUseProofOperations;
+    private readonly ICoreHealthContinuationServicesCoreEquipmentPlacementAndHpPairOperations _coreEquipmentPlacementAndHpPairOperations;
+    private readonly ICoreHealthContinuationServicesCoreNativeRecoveryDamageOperations _coreNativeRecoveryDamageOperations;
+    private readonly ICoreHealthContinuationServicesCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreHealthContinuationServicesCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreHealthContinuationServicesCoreRecoveryAmountBonusesOperations _coreRecoveryAmountBonusesOperations;
+    private readonly ICoreHealthContinuationServicesCoreResponseCompletionOperations _coreResponseCompletionOperations;
+    private readonly ICoreHealthContinuationServicesCoreResponseCompletionHealthOperations _coreResponseCompletionHealthOperations;
+    private readonly ICoreHealthContinuationServicesCoreWenhePoisonOperations _coreWenhePoisonOperations;
+    private readonly ICoreHealthContinuationServicesCoreProgramRuntimeHooksOperations _coreProgramRuntimeHooksOperations;
+    private readonly ICoreHealthContinuationServicesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess _coreGameEngineHpChangeProgramsPendingHpChangesAccess;
+    internal CoreHealthContinuationServicesRuntime(ICoreHealthContinuationServicesCharacterCaoSongOlOperations characterCaoSongOlOperations, ICoreHealthContinuationServicesContentRegistryOperations contentRegistryOperations, ICoreHealthContinuationServicesResolutionStackOperations resolutionStackOperations, ICoreHealthContinuationServicesCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreHealthContinuationServicesCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICoreHealthContinuationServicesCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreHealthContinuationServicesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreHealthContinuationServicesCoreCardUsePaymentsOperations coreCardUsePaymentsOperations, ICoreHealthContinuationServicesCoreCompletedCategoryUseProofOperations coreCompletedCategoryUseProofOperations, ICoreHealthContinuationServicesCoreEquipmentPlacementAndHpPairOperations coreEquipmentPlacementAndHpPairOperations, ICoreHealthContinuationServicesCoreNativeRecoveryDamageOperations coreNativeRecoveryDamageOperations, ICoreHealthContinuationServicesCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreHealthContinuationServicesCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreHealthContinuationServicesCoreRecoveryAmountBonusesOperations coreRecoveryAmountBonusesOperations, ICoreHealthContinuationServicesCoreResponseCompletionOperations coreResponseCompletionOperations, ICoreHealthContinuationServicesCoreResponseCompletionHealthOperations coreResponseCompletionHealthOperations, ICoreHealthContinuationServicesCoreWenhePoisonOperations coreWenhePoisonOperations, ICoreHealthContinuationServicesCoreProgramRuntimeHooksOperations coreProgramRuntimeHooksOperations, ICoreHealthContinuationServicesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess coreGameEngineHpChangeProgramsPendingHpChangesAccess)
+    {
+        this._characterCaoSongOlOperations = characterCaoSongOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUsePaymentsOperations = coreCardUsePaymentsOperations;
+        this._coreCompletedCategoryUseProofOperations = coreCompletedCategoryUseProofOperations;
+        this._coreEquipmentPlacementAndHpPairOperations = coreEquipmentPlacementAndHpPairOperations;
+        this._coreNativeRecoveryDamageOperations = coreNativeRecoveryDamageOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRecoveryAmountBonusesOperations = coreRecoveryAmountBonusesOperations;
+        this._coreResponseCompletionOperations = coreResponseCompletionOperations;
+        this._coreResponseCompletionHealthOperations = coreResponseCompletionHealthOperations;
+        this._coreWenhePoisonOperations = coreWenhePoisonOperations;
+        this._coreProgramRuntimeHooksOperations = coreProgramRuntimeHooksOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineHpChangeProgramsPendingHpChangesAccess = coreGameEngineHpChangeProgramsPendingHpChangesAccess;
+    }
+}

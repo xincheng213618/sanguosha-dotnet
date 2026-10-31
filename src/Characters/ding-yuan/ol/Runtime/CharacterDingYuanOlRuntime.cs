@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterDingYuanOlRuntime : global::CardGame.Core.IAdoptedChildSelectionQuery, global::CardGame.Core.IDingYuanProgramHost
+{
+    private readonly ICharacterDingYuanOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterDingYuanOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterDingYuanOlCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterDingYuanOlCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterDingYuanOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterDingYuanOlCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterDingYuanOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterDingYuanOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterDingYuanOlCoreStrategicProgramsOperations _coreStrategicProgramsOperations;
+    private readonly ICharacterDingYuanOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterDingYuanOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterDingYuanOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICharacterDingYuanOlSynchronizingAdoptedChildGrantsAccess _characterDingYuanOlSynchronizingAdoptedChildGrantsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineStrategicProgramsStrategicEndPlayTurnAccess _coreGameEngineStrategicProgramsStrategicEndPlayTurnAccess;
+    internal CharacterDingYuanOlRuntime(ICharacterDingYuanOlContentRegistryOperations contentRegistryOperations, ICharacterDingYuanOlResolutionStackOperations resolutionStackOperations, ICharacterDingYuanOlCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterDingYuanOlCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterDingYuanOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterDingYuanOlCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterDingYuanOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterDingYuanOlCoreRuntimeOperations coreRuntimeOperations, ICharacterDingYuanOlCoreStrategicProgramsOperations coreStrategicProgramsOperations, ICharacterDingYuanOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterDingYuanOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterDingYuanOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICharacterDingYuanOlSynchronizingAdoptedChildGrantsAccess characterDingYuanOlSynchronizingAdoptedChildGrantsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineStrategicProgramsStrategicEndPlayTurnAccess coreGameEngineStrategicProgramsStrategicEndPlayTurnAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreStrategicProgramsOperations = coreStrategicProgramsOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._characterDingYuanOlSynchronizingAdoptedChildGrantsAccess = characterDingYuanOlSynchronizingAdoptedChildGrantsAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+        this._coreGameEngineStrategicProgramsStrategicEndPlayTurnAccess = coreGameEngineStrategicProgramsStrategicEndPlayTurnAccess;
+    }
+}

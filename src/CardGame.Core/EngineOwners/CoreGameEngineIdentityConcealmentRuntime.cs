@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineIdentityConcealmentRuntime
+{
+    private readonly ICoreIdentityConcealmentCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreIdentityConcealmentContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreIdentityConcealmentResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreIdentityConcealmentCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreIdentityConcealmentCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreIdentityConcealmentCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreIdentityConcealmentCoreEndRefillNextTurnOperations _coreEndRefillNextTurnOperations;
+    private readonly ICoreIdentityConcealmentCoreModeAllegianceOperations _coreModeAllegianceOperations;
+    private readonly ICoreIdentityConcealmentCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreIdentityConcealmentCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreIdentityConcealmentCoreQimeiProgramsOperations _coreQimeiProgramsOperations;
+    private readonly ICoreIdentityConcealmentCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreIdentityConcealmentCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreIdentityConcealmentCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICoreIdentityConcealmentCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreIdentityConcealmentCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreIdentityConcealmentCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreIdentityConcealmentKernelCoreGameEngineProgramAttackAttemptOperations _kernelCoreGameEngineProgramAttackAttemptOperations;
+    private readonly ICoreIdentityConcealmentKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreIdentityConcealmentKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineIdentityConcealmentRuntime(ICoreIdentityConcealmentCharacterLuMengMouOperations characterLuMengMouOperations, ICoreIdentityConcealmentContentRegistryOperations contentRegistryOperations, ICoreIdentityConcealmentResolutionStackOperations resolutionStackOperations, ICoreIdentityConcealmentCoreActualTurnsOperations coreActualTurnsOperations, ICoreIdentityConcealmentCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreIdentityConcealmentCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreIdentityConcealmentCoreEndRefillNextTurnOperations coreEndRefillNextTurnOperations, ICoreIdentityConcealmentCoreModeAllegianceOperations coreModeAllegianceOperations, ICoreIdentityConcealmentCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreIdentityConcealmentCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreIdentityConcealmentCoreQimeiProgramsOperations coreQimeiProgramsOperations, ICoreIdentityConcealmentCoreRuntimeOperations coreRuntimeOperations, ICoreIdentityConcealmentCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreIdentityConcealmentCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICoreIdentityConcealmentCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreIdentityConcealmentCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreIdentityConcealmentCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreIdentityConcealmentKernelCoreGameEngineProgramAttackAttemptOperations kernelCoreGameEngineProgramAttackAttemptOperations, ICoreIdentityConcealmentKernelCoreMainOperations kernelCoreMainOperations, ICoreIdentityConcealmentKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreEndRefillNextTurnOperations = coreEndRefillNextTurnOperations;
+        this._coreModeAllegianceOperations = coreModeAllegianceOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreQimeiProgramsOperations = coreQimeiProgramsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineProgramAttackAttemptOperations = kernelCoreGameEngineProgramAttackAttemptOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

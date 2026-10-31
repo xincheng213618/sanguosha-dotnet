@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheGuangaoRuntime : global::CardGame.Core.IShanheGuangaoHost
+{
+    private readonly ICoreShanheGuangaoContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheGuangaoResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheGuangaoCoreAdjacentRedTargetsOperations _coreAdjacentRedTargetsOperations;
+    private readonly ICoreShanheGuangaoCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreShanheGuangaoCoreCurrentUseTargetCandidateRefreshOperations _coreCurrentUseTargetCandidateRefreshOperations;
+    private readonly ICoreShanheGuangaoCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICoreShanheGuangaoCoreKuangfuReceiptsOperations _coreKuangfuReceiptsOperations;
+    private readonly ICoreShanheGuangaoCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreShanheGuangaoCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICoreShanheGuangaoCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheGuangaoCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICoreShanheGuangaoCoreRecipientCategorySlashTargetsOperations _coreRecipientCategorySlashTargetsOperations;
+    private readonly ICoreShanheGuangaoCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheGuangaoCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheGuangaoCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheGuangaoCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheGuangaoKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheGuangaoRuntime(ICoreShanheGuangaoContentRegistryOperations contentRegistryOperations, ICoreShanheGuangaoResolutionStackOperations resolutionStackOperations, ICoreShanheGuangaoCoreAdjacentRedTargetsOperations coreAdjacentRedTargetsOperations, ICoreShanheGuangaoCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreShanheGuangaoCoreCurrentUseTargetCandidateRefreshOperations coreCurrentUseTargetCandidateRefreshOperations, ICoreShanheGuangaoCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICoreShanheGuangaoCoreKuangfuReceiptsOperations coreKuangfuReceiptsOperations, ICoreShanheGuangaoCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreShanheGuangaoCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICoreShanheGuangaoCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheGuangaoCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICoreShanheGuangaoCoreRecipientCategorySlashTargetsOperations coreRecipientCategorySlashTargetsOperations, ICoreShanheGuangaoCoreRuntimeOperations coreRuntimeOperations, ICoreShanheGuangaoCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheGuangaoCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheGuangaoCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheGuangaoKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdjacentRedTargetsOperations = coreAdjacentRedTargetsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCurrentUseTargetCandidateRefreshOperations = coreCurrentUseTargetCandidateRefreshOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreKuangfuReceiptsOperations = coreKuangfuReceiptsOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRecipientCategorySlashTargetsOperations = coreRecipientCategorySlashTargetsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime : global::CardGame.Core.IActualDiscardRecoveryProgramHost
+{
+    private readonly ICoreActualDiscardRecoveriesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreActualDiscardRecoveriesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreCapturedEquipmentDrawsOperations _coreCapturedEquipmentDrawsOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreActualDiscardRecoveriesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreActualDiscardRecoveriesCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreActualDiscardRecoveriesCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreActualDiscardRecoveriesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineActualDiscardRecoveriesRuntime(ICoreActualDiscardRecoveriesContentRegistryOperations contentRegistryOperations, ICoreActualDiscardRecoveriesResolutionStackOperations resolutionStackOperations, ICoreActualDiscardRecoveriesCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICoreActualDiscardRecoveriesCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreActualDiscardRecoveriesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreActualDiscardRecoveriesCoreCapturedEquipmentDrawsOperations coreCapturedEquipmentDrawsOperations, ICoreActualDiscardRecoveriesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreActualDiscardRecoveriesCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreActualDiscardRecoveriesCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreActualDiscardRecoveriesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreActualDiscardRecoveriesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreActualDiscardRecoveriesCoreRuntimeOperations coreRuntimeOperations, ICoreActualDiscardRecoveriesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreActualDiscardRecoveriesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreActualDiscardRecoveriesCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreActualDiscardRecoveriesCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreActualDiscardRecoveriesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCapturedEquipmentDrawsOperations = coreCapturedEquipmentDrawsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

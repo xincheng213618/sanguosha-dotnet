@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouXuShengComposition
 {
-    internal const string Qinqiang = "mou:qinqiang", Yizhen = "mou:yizhen";
+    internal const string Qinqiang = "mou:qinqiang",Yizhen = "mou:yizhen";
     internal static bool Committed(SkillProgramTrigger t) => t.Id == "true-hand-use" && t.Window == SkillProgramTriggerWindow.CardUseCommitted &&
         t.OwnerRelation == SkillProgramCardActionOwnerRelation.Actor && t.Subject is null && t.Optional && t.IncludeResponseUses && !t.SingleActionInstance &&
         t.Condition.Kind == SkillProgramTriggerConditionKind.Always && t.UsageLimit is null && t.CardKinds.Count == 0 && t.CardCategories.Count == 0 &&

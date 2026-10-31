@@ -4,7 +4,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryZhuRanComposition
 {
-    internal const string Skill = "boundary:danshou-mobile", Draw = "untargeted-ending-draw", Pay = "targeted-ending-payment";
+    internal const string Skill = "boundary:danshou-mobile",Draw = "untargeted-ending-draw",Pay = "targeted-ending-payment";
     [ProgramCatalogValidation(53900)]
     internal static void Validate(string path, SkillProgram p)
     {

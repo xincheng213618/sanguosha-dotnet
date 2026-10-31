@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineMovementEquipmentEffectsRuntime : global::CardGame.Core.IMovementEquipmentFacts, global::CardGame.Core.IMovementEquipmentOperations
+{
+    private readonly ICoreMovementEquipmentEffectsCharacterWeiYanHappyGodOperations _characterWeiYanHappyGodOperations;
+    private readonly ICoreMovementEquipmentEffectsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreMovementEquipmentEffectsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreMovementEquipmentEffectsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreMovementEquipmentEffectsCoreNativeRecoveryFramesOperations _coreNativeRecoveryFramesOperations;
+    private readonly ICoreMovementEquipmentEffectsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreMovementEquipmentEffectsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreMovementEquipmentEffectsKernelCoreGameEngineMovementEquipmentEffectsOperations _kernelCoreGameEngineMovementEquipmentEffectsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess _coreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineMovementEquipmentEffectsRuntime(ICoreMovementEquipmentEffectsCharacterWeiYanHappyGodOperations characterWeiYanHappyGodOperations, ICoreMovementEquipmentEffectsCardZonesOperations cardZonesOperations, ICoreMovementEquipmentEffectsCoreMatchLogOperations coreMatchLogOperations, ICoreMovementEquipmentEffectsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreMovementEquipmentEffectsCoreNativeRecoveryFramesOperations coreNativeRecoveryFramesOperations, ICoreMovementEquipmentEffectsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreMovementEquipmentEffectsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreMovementEquipmentEffectsKernelCoreGameEngineMovementEquipmentEffectsOperations kernelCoreGameEngineMovementEquipmentEffectsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess coreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterWeiYanHappyGodOperations = characterWeiYanHappyGodOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeRecoveryFramesOperations = coreNativeRecoveryFramesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineMovementEquipmentEffectsOperations = kernelCoreGameEngineMovementEquipmentEffectsOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess = coreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineLateFixedTargetDamageCapScopesRuntime
+{
+    private readonly ICoreLateFixedTargetDamageCapScopesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreLateFixedTargetDamageCapScopesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreLateFixedTargetDamageCapScopesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreLateFixedTargetDamageCapScopesCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreLateFixedTargetDamageCapScopesCoreDamageArmorPaymentsOperations _coreDamageArmorPaymentsOperations;
+    private readonly ICoreLateFixedTargetDamageCapScopesCorePassiveDamageCapsOperations _corePassiveDamageCapsOperations;
+    private readonly ICoreLateFixedTargetDamageCapScopesCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreLateFixedTargetDamageCapScopesCoreProgramVirtualDuelOperations _coreProgramVirtualDuelOperations;
+    private readonly ICoreLateFixedTargetDamageCapScopesCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICoreLateFixedTargetDamageCapScopesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreLateFixedTargetDamageCapScopesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineLateFixedTargetDamageCapScopesRuntime(ICoreLateFixedTargetDamageCapScopesContentRegistryOperations contentRegistryOperations, ICoreLateFixedTargetDamageCapScopesResolutionStackOperations resolutionStackOperations, ICoreLateFixedTargetDamageCapScopesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreLateFixedTargetDamageCapScopesCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreLateFixedTargetDamageCapScopesCoreDamageArmorPaymentsOperations coreDamageArmorPaymentsOperations, ICoreLateFixedTargetDamageCapScopesCorePassiveDamageCapsOperations corePassiveDamageCapsOperations, ICoreLateFixedTargetDamageCapScopesCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreLateFixedTargetDamageCapScopesCoreProgramVirtualDuelOperations coreProgramVirtualDuelOperations, ICoreLateFixedTargetDamageCapScopesCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICoreLateFixedTargetDamageCapScopesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreLateFixedTargetDamageCapScopesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreDamageArmorPaymentsOperations = coreDamageArmorPaymentsOperations;
+        this._corePassiveDamageCapsOperations = corePassiveDamageCapsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramVirtualDuelOperations = coreProgramVirtualDuelOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

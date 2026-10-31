@@ -17,7 +17,7 @@ internal sealed class AnniversaryHaoMengHandler(SkillProgramEffectOp op) : ISkil
 { public SkillProgramEffectOp Op => op; public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int target, ISkillProgramEffectHost h) => h.GetCapability<IAnniversaryHaoMengHost>().Begin(f, op); }
 internal static class AnniversaryHaoMengComposition
 {
- internal const string Skill = "anniversary:xiongmang", Activation = "distinct-hand-native-slash", Consequence = "issued-whole-slash-consequence";
+ internal const string Skill = "anniversary:xiongmang",Activation = "distinct-hand-native-slash",Consequence = "issued-whole-slash-consequence";
  [ProgramCatalogValidation(49700)] internal static void Validate(string path, SkillProgram p)
  {
   if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryHaoMengXiongmangUse or SkillProgramEffectOp.ResolveAnniversaryHaoMengXiongmangConsequence)) return;
@@ -28,7 +28,7 @@ internal static class AnniversaryHaoMengComposition
 public enum AnniversaryHaoMengStage { Cards, Targets, Issuing, NativeSlash, NativeTail, HealthChildren, Completed }
 public sealed record AnniversaryHaoMengReceipt(CardConversionSource Source, string Hash, SkillProgramEffectOp Operation, long ParentId, int Turn, AnniversaryHaoMengStage Stage)
 {
- private IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>()), _targets = Array.AsReadOnly(Array.Empty<int>());
+ private IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>()),_targets = Array.AsReadOnly(Array.Empty<int>());
  private IReadOnlyList<long> _batches = Array.AsReadOnly(Array.Empty<long>());
  public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
  public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }

@@ -11,7 +11,7 @@ public sealed partial class SkillProgramEffect
 
 public sealed record DamageTargetBudgetReceipt
 {
-    private IReadOnlyList<int> _before = [], _added = [];
+    private IReadOnlyList<int> _before = [],_added = [];
     private IReadOnlyList<PromptChoice> _choices = [];
     public long ProgramFrameId { get; init; }
     public long WindowFrameId { get; init; }

@@ -1,0 +1,16 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal interface ICharacterTangZiOlCoreProgramSelectionModulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+{
+    global::CardGame.Core.IProgramSelectionQueries ProgramSelectionQueries { get; }
+}
+
+internal interface ICharacterTangZiOlCoreTreatedWoundedOperations : global::CardGame.Core.IProgramRuntimeOperations
+{
+    bool IsRuleWounded(global::CardGame.Core.CharacterState player);
+}

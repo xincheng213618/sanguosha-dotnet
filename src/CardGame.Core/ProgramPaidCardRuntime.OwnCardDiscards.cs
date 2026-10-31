@@ -64,7 +64,7 @@ internal sealed partial class ProgramPaidCardRuntime
                     new ChoiceId($"program-own-card.frame-{frameId}.zone-{zone}.slot-{slot}"),
                     zone == CardZoneKind.Hand
                         ? $"弃置手牌【{cards[slot].DisplayName}】。"
-                        : $"弃置装备区的【{_facts.Snapshot(cards[slot]).DisplayName}】。",
+                        : $"弃置装备区的【{_snapshots.Snapshot(cards[slot]).DisplayName}】。",
                     [cards[slot].Id],
                     [chooserSeat],
                     new Dictionary<string, string>
@@ -128,9 +128,9 @@ internal sealed partial class ProgramPaidCardRuntime
         if (_facts.SelfDiscardForbidden(chooserSeat, card, source, OwnedCardMoveIntent.Discard))
         { _operations.Cancel(frame, "当前手牌不能自行弃置，费用未支付。"); return; }
         var reason = new CardMoveReason($"skill-program.{frame.SkillId}.{effect.Op}");
-        var logicalDiscard = _operations.CaptureLogicalDiscard(frame.OwnerSeat, chooserSeat, [card.Id], reason, frame.Id);
+        var logicalDiscard = _logicalDiscards.Capture(frame.OwnerSeat, chooserSeat, [card.Id], reason, frame.Id);
         _operations.Move(card, source, CardLocation.DiscardPile, reason);
-        _operations.CompleteLogicalDiscard(logicalDiscard);
+        _logicalDiscards.Complete(logicalDiscard);
         _frames.AdvanceProgram(frame.Id);
     }
 }

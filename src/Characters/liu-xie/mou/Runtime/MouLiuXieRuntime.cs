@@ -5,7 +5,7 @@ namespace CardGame.Core;
 internal sealed class MouLiuXieRuntime(IMouLiuXieFacts facts, IMouLiuXieNative native, IProgramRuntimeFrames frames,
     IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouLiuXieRuntime
 {
-    internal const string Action = "mou-liu-xie", DrawReason = "skill-program.mou:zhanban.draw", DiscardReason = "skill-program.mou:zhanban.discard";
+    internal const string Action = "mou-liu-xie",DrawReason = "skill-program.mou:zhanban.draw",DiscardReason = "skill-program.mou:zhanban.discard";
     private static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     private bool ChenshengQualified(int owner)
     {

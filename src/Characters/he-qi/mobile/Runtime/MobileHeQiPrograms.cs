@@ -19,7 +19,7 @@ internal sealed class MobileHeQiViewHandler : ISkillProgramEffectHandler
 }
 internal static class MobileHeQiComposition
 {
- internal const string Skill = "mobile:shanxi", Activation = "red-basic-discard-and-view", DiscardBind = "mobile-shanxi-discard";
+ internal const string Skill = "mobile:shanxi",Activation = "red-basic-discard-and-view",DiscardBind = "mobile-shanxi-discard";
  [ProgramCatalogValidation(50100)] internal static void Validate(string path, SkillProgram p)
  {
   if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op == SkillProgramEffectOp.ResolveMobileHeQiShanxiView)) return;

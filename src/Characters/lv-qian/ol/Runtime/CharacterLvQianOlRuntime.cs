@@ -1,0 +1,80 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLvQianOlRuntime : global::CardGame.Core.ILvQianProgramHost
+{
+    private readonly ICharacterLvQianOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterLvQianOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLvQianOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLvQianOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterLvQianOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterLvQianOlCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterLvQianOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterLvQianOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterLvQianOlCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterLvQianOlCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterLvQianOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLvQianOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLvQianOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterLvQianOlCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICharacterLvQianOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterLvQianOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLvQianOlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterLvQianOlCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterLvQianOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterLvQianOlCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICharacterLvQianOlCharacterLvQianOlOperations _characterLvQianOlOperations;
+    private readonly ICharacterLvQianOlCoreDrawFundedDistinctBasicReturnsOperations _coreDrawFundedDistinctBasicReturnsOperations;
+    private readonly ICharacterLvQianOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICharacterLvQianOlCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterLvQianOlCoreTieredRoundZeroReturnsOperations _coreTieredRoundZeroReturnsOperations;
+    private readonly ICharacterLvQianOlKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterLvQianOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    internal CharacterLvQianOlRuntime(ICharacterLvQianOlCardZonesOperations cardZonesOperations, ICharacterLvQianOlContentRegistryOperations contentRegistryOperations, ICharacterLvQianOlResolutionStackOperations resolutionStackOperations, ICharacterLvQianOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterLvQianOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterLvQianOlCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterLvQianOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterLvQianOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterLvQianOlCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterLvQianOlCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterLvQianOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLvQianOlCoreRuntimeOperations coreRuntimeOperations, ICharacterLvQianOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterLvQianOlCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICharacterLvQianOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterLvQianOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLvQianOlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterLvQianOlCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterLvQianOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterLvQianOlCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICharacterLvQianOlCharacterLvQianOlOperations characterLvQianOlOperations, ICharacterLvQianOlCoreDrawFundedDistinctBasicReturnsOperations coreDrawFundedDistinctBasicReturnsOperations, ICharacterLvQianOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICharacterLvQianOlCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterLvQianOlCoreTieredRoundZeroReturnsOperations coreTieredRoundZeroReturnsOperations, ICharacterLvQianOlKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterLvQianOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess coreGameEnginePublicPileSourcesPublicPersistentPilesAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._characterLvQianOlOperations = characterLvQianOlOperations;
+        this._coreDrawFundedDistinctBasicReturnsOperations = coreDrawFundedDistinctBasicReturnsOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreTieredRoundZeroReturnsOperations = coreTieredRoundZeroReturnsOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+        this._coreGameEnginePublicPileSourcesPublicPersistentPilesAccess = coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    }
+}

@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineGrantedEntityPhasesRuntime : global::CardGame.Core.IGrantedEntityPhaseProgramHost
+{
+    private readonly ICoreGrantedEntityPhasesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreGrantedEntityPhasesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreGrantedEntityPhasesProgramPhaseScheduleOperations _programPhaseScheduleOperations;
+    private readonly ICoreGrantedEntityPhasesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreGrantedEntityPhasesCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreGrantedEntityPhasesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreGrantedEntityPhasesCoreCardDeclarationsOperations _coreCardDeclarationsOperations;
+    private readonly ICoreGrantedEntityPhasesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreGrantedEntityPhasesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreGrantedEntityPhasesCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreGrantedEntityPhasesCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreGrantedEntityPhasesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreGrantedEntityPhasesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreGrantedEntityPhasesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreGrantedEntityPhasesCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreGrantedEntityPhasesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreGrantedEntityPhasesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreGrantedEntityPhasesCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreGrantedEntityPhasesCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreGrantedEntityPhasesKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreGrantedEntityPhasesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerAccess _coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineGrantedEntityPhasesRuntime(ICoreGrantedEntityPhasesCardZonesOperations cardZonesOperations, ICoreGrantedEntityPhasesContentRegistryOperations contentRegistryOperations, ICoreGrantedEntityPhasesProgramPhaseScheduleOperations programPhaseScheduleOperations, ICoreGrantedEntityPhasesResolutionStackOperations resolutionStackOperations, ICoreGrantedEntityPhasesCoreActionQueriesOperations coreActionQueriesOperations, ICoreGrantedEntityPhasesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreGrantedEntityPhasesCoreCardDeclarationsOperations coreCardDeclarationsOperations, ICoreGrantedEntityPhasesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreGrantedEntityPhasesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreGrantedEntityPhasesCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreGrantedEntityPhasesCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreGrantedEntityPhasesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreGrantedEntityPhasesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreGrantedEntityPhasesCoreRuntimeOperations coreRuntimeOperations, ICoreGrantedEntityPhasesCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreGrantedEntityPhasesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreGrantedEntityPhasesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreGrantedEntityPhasesCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreGrantedEntityPhasesCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreGrantedEntityPhasesKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreGrantedEntityPhasesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerAccess coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._programPhaseScheduleOperations = programPhaseScheduleOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerAccess = coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

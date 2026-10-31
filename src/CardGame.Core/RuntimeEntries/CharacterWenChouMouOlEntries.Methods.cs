@@ -1,0 +1,65 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterWenChouMouOlEntries
+{
+    internal bool AdvanceMouWenChouChildren() => _resolve().AdvanceMouWenChouChildren();
+    internal void AnswerMouWenChouOl(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouWenChouOl(choice);
+    internal void AssertMouWenChouOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouWenChouOl(f);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginMouWenChouLunzhan(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouWenChouLunzhan(supplied);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginMouWenChouTrigger(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouWenChouTrigger(supplied, op);
+    internal bool CanActivateMouWenChouLunzhan(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateMouWenChouLunzhan(c);
+    internal bool CanRunIssuedMouWenChou(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanRunIssuedMouWenChou(c, w);
+    internal void CaptureMouWenChouAllHandPayment(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureMouWenChouAllHandPayment(batch);
+    internal bool CaptureMouWenChouDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageId) => _resolve().CaptureMouWenChouDamage(attack, damageId);
+    internal global::CardGame.Core.PromptChoice ChooseMouWenChouOl(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ChooseMouWenChouOl(pending, frame);
+    internal void CollectIssuedMouWenChou(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.ProgramCardTriggerCandidate> result) => _resolve().CollectIssuedMouWenChou(action, window, result);
+    internal void CompleteMouWenChouDuel(long id) => _resolve().CompleteMouWenChouDuel(id);
+    internal void ContinueMouWenChouOl(long id) => _resolve().ContinueMouWenChouOl(id);
+    internal bool ContinuePaidMouWenChou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidMouWenChou(f);
+    internal bool DrainMouWenChouOl(long id) => _resolve().DrainMouWenChouOl(id);
+    internal void FinishMouWenChouOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouWenChouOl(f);
+    internal bool HasMouWenChouBeforeDamage(long id) => _resolve().HasMouWenChouBeforeDamage(id);
+    internal bool HasMouWenChouDamage(long id) => _resolve().HasMouWenChouDamage(id);
+    internal bool IsMouWenChouDuel(long id) => _resolve().IsMouWenChouDuel(id);
+    internal bool IsMouWenChouDuelAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsMouWenChouDuelAttackConsistent(attack, processing);
+    internal bool IsMouWenChouDying() => _resolve().IsMouWenChouDying();
+    internal bool IsMouWenChouMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsMouWenChouMovement(f, effect, movement);
+    internal bool IsMouWenChouNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsMouWenChouNativeSettlementBatch(f, b);
+    internal bool IsMouWenChouRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouWenChouRecoveryParent(f, recovery);
+    internal bool IsMouWenChouZeroDuel(long id) => _resolve().IsMouWenChouZeroDuel(id);
+    internal void IssueMouWenChouDuel(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption option) => _resolve().IssueMouWenChouDuel(f, option);
+    internal bool MouWenChouAllHandUse(global::CardGame.Core.CardUseFrame use) => _resolve().MouWenChouAllHandUse(use);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouWenChouChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouWenChouChoices(f);
+    internal global::CardGame.Core.CardUseFrame? MouWenChouContextUse(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().MouWenChouContextUse(c, w);
+    internal bool MouWenChouCountUsed(int owner, int count) => _resolve().MouWenChouCountUsed(owner, count);
+    internal global::CardGame.Core.Card[] MouWenChouDiscardable(int owner) => _resolve().MouWenChouDiscardable(owner);
+    internal long? MouWenChouDuelProgramParent(long id) => _resolve().MouWenChouDuelProgramParent(id);
+    internal bool MouWenChouFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouWenChouFirstChild(f, child);
+    internal bool MouWenChouLion(global::CardGame.Core.ProgramSkillFrame f, int seat, global::CardGame.Core.CardMoveReason? reason) => _resolve().MouWenChouLion(f, seat, reason);
+    internal global::CardGame.Core.Card[] MouWenChouMaterials(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouWenChouMaterials(f);
+    internal bool MouWenChouNativeEdge(int n) => _resolve().MouWenChouNativeEdge(n);
+    internal bool MouWenChouObserverEdge(int n) => _resolve().MouWenChouObserverEdge(n);
+    internal global::CardGame.Core.ProgramSkillFrame? MouWenChouObserverRoot() => _resolve().MouWenChouObserverRoot();
+    internal bool MouWenChouObserverSuffix(int n) => _resolve().MouWenChouObserverSuffix(n);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> MouWenChouOptions(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouWenChouOptions(f);
+    internal bool MouWenChouTargetBanned(int owner, int target) => _resolve().MouWenChouTargetBanned(owner, target);
+    internal int MouWenChouTargetCount(int owner, int target) => _resolve().MouWenChouTargetCount(owner, target);
+    internal bool NormalizeMouWenChouDrawTwo(global::CardGame.Core.ProgramTargetCardWindowQuery q) => _resolve().NormalizeMouWenChouDrawTwo(q);
+    internal bool ObserveMouWenChouAllUses(global::CardGame.Core.ProgramTargetCardWindowQuery q) => _resolve().ObserveMouWenChouAllUses(q);
+    internal void ObserveMouWenChouDeclaration(global::CardGame.Core.IGameEvent fact) => _resolve().ObserveMouWenChouDeclaration(fact);
+    internal void ObserveMouWenChouTargets(global::CardGame.Core.IGameEvent fact) => _resolve().ObserveMouWenChouTargets(fact);
+    internal global::CardGame.Core.CardActionContext PrepareMouWenChouAction(global::CardGame.Core.CardActionContext action) => _resolve().PrepareMouWenChouAction(action);
+    internal void PublishMouWenChouOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishMouWenChouOl(f);
+    internal bool QualifyMouWenChouUse(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().QualifyMouWenChouUse(c, w);
+    internal global::CardGame.Core.Card ReadMouWenChouUseAppearance(long id, global::CardGame.Core.CardAppearanceReference appearance) => _resolve().ReadMouWenChouUseAppearance(id, appearance);
+    internal void RecordMouWenChouTargets(global::CardGame.Core.CardActionContext action) => _resolve().RecordMouWenChouTargets(action);
+    internal bool ResumeMouWenChouOl(long id) => _resolve().ResumeMouWenChouOl(id);
+    internal void ReturnMouWenChouDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome draw) => _resolve().ReturnMouWenChouDraw(f, draw);
+    internal void ReturnMouWenChouDuel(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnMouWenChouDuel(use);
+    internal bool ReturnMouWenChouDuelAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt c) => _resolve().ReturnMouWenChouDuelAttack(c);
+    internal bool ReturnMouWenChouMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnMouWenChouMovement(f);
+    internal bool ValidMouWenChouOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidMouWenChouOl(f);
+    internal void ValidateMouWenChouDuel(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateMouWenChouDuel(use);
+    internal bool WindowSettlement_IsMouWenChouNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().WindowSettlement_IsMouWenChouNativeSettlementBatch(frame, batch);
+    internal bool HasMouWenChouOl { get => _resolve().HasMouWenChouOl; }
+}

@@ -24,7 +24,7 @@ internal sealed class AnniversaryDuKuiHandler(SkillProgramEffectOp operation) : 
 }
 internal static class AnniversaryDuKuiComposition
 {
-    internal const string Fanyin = "anniversary:fanyin", Peiqi = "anniversary:peiqi";
+    internal const string Fanyin = "anniversary:fanyin",Peiqi = "anniversary:peiqi";
     [ProgramCatalogValidation(43200)]
     internal static void Validate(string path, SkillProgram program)
     {

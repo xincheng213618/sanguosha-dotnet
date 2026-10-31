@@ -40,7 +40,7 @@ internal sealed class BoundaryYuanShuHandler(SkillProgramEffectOp op) : ISkillPr
 }
 internal static class BoundaryYuanShuComposition
 {
-    internal const string Jixi = "boundary:jixi-mobile", Yongsi = "boundary:yongsi-mobile", Wangzun = "boundary:wangzun-mobile";
+    internal const string Jixi = "boundary:jixi-mobile",Yongsi = "boundary:yongsi-mobile",Wangzun = "boundary:wangzun-mobile";
     [ProgramCatalogValidation(55200)]
     internal static void Validate(string path, SkillProgram program)
     {

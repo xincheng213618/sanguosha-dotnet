@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CoreGameEngineProgramSelectionValidationRuntime
+{
+    internal ProgramSelectionValidationRegistry ProgramSelectionValidators => _programSelectionValidatorsOperations._programSelectionValidators ??= new(global::CardGame.Core.EngineOwners.CoreGameEngineProgramSelectionValidationDefinitions.ProgramSelectionValidationMetadata.Value, _coreProgramSelectionModulesOperations.ProgramSelectionQueries);
+
+    bool global::CardGame.Core.IMatchingRecastSelectionQuery.IsValid(int ownerSeat, IReadOnlyList<int> cards) => _coreMatchingRecastsOperations.ValidMatchingRecastSelection(ownerSeat, cards);
+    bool global::CardGame.Core.IOwnedRankSumSelectionQuery.CanStart(int ownerSeat, ProgramExecutionPlan plan) => _coreOwnedHandRankSumProgramsOperations.CanStartOwnedHandRankSum(_coreMatchParticipantsPlayersAccess._players[ownerSeat], plan);
+    bool global::CardGame.Core.IExactOwnedCountSelectionQuery.CanStart(int ownerSeat, ProgramExecutionPlan plan) => _coreOwnedExactCountAndNamedTargetsOperations.CanStartExactOwnedCardCount(_coreMatchParticipantsPlayersAccess._players[ownerSeat], plan);
+    bool global::CardGame.Core.IEquipmentDonationSelectionQuery.CanPay(int ownerSeat, string skillId, string stateId) => _coreEquipmentDonationProgramsOperations.HasPayableAllEquipmentDonation(ownerSeat, skillId, stateId);
+    bool global::CardGame.Core.IPairObtainSelectionQuery.CanSelect(int ownerSeat, string skillId, SkillProgramActivation activation, IReadOnlyList<int> targets) => _corePairObtainShownGiftsOperations.CanActivatePairObtain(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId), activation, targets);
+    bool global::CardGame.Core.IDeferredHandPairSelectionQuery.CanSelect(int ownerSeat, int first, int second) => _coreHalfHandPhaseDebtProgramsOperations.IsPayableDeferredHandPair(ownerSeat, first, second);
+    bool global::CardGame.Core.IForeignSlashSelectionQuery.CanSelect(int ownerSeat, int targetSeat) => _coreForeignSelectedCardSlashOperations.CanStartSelectedForeignCardSlash(_coreMatchParticipantsPlayersAccess._players[ownerSeat], targetSeat);
+    bool global::CardGame.Core.ISelectedActorDuelSelectionQuery.CanSelect(int ownerSeat, int targetSeat) => _coreDamageColorDuelProgramsOperations.CanIssueSelectedActorDuel(ownerSeat, targetSeat);
+    bool global::CardGame.Core.IEquipmentPlacementSelectionQuery.CanPlace(int ownerSeat, int targetSeat, int cardId) => _coreEquipmentPlacementAndHpPairOperations.CanPlaceActivationEquipment(ownerSeat, targetSeat, cardId);
+    bool global::CardGame.Core.ICapturedEquipmentPlacementSelectionQuery.CanPlace(int ownerSeat, int targetSeat, int cardId, string skillId) => _coreCapturedEquipmentDrawsOperations.CanPlaceCapturedEquipmentActivation(ownerSeat, targetSeat, cardId, skillId);
+    bool global::CardGame.Core.IBlackGiftSelectionQuery.WasIssued(int ownerSeat, string skillId) => _coreRecipientConsequencesReceiptsOperations.BlackGiftGameIssued(ownerSeat, skillId);
+    bool global::CardGame.Core.IDynamicDiscardDamageSelectionQuery.CanStart(int ownerSeat, string skillId) => _coreDynamicDiscardDamagePaymentsOperations.CanStartDynamicDiscardDamage(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId);
+    bool global::CardGame.Core.IDynamicDiscardDamageSelectionQuery.CanTarget(int ownerSeat, string skillId, int targetSeat) => _coreDynamicDiscardDamagePaymentsOperations.CanSelectDynamicDiscardDamageTarget(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId, targetSeat);
+    bool global::CardGame.Core.IGameHandHpSelectionQuery.CanTarget(int ownerSeat, string skillId, string stateId, int targetSeat) => _coreGameTargetHandHpChoicesOperations.CanSelectGameHandHpTarget(ownerSeat, skillId, stateId, targetSeat);
+    bool global::CardGame.Core.ICategoryRefundSelectionQuery.CanTarget(int ownerSeat, string skillId, string stateId, int targetSeat) => _coreDrawDiscardCategoryRefundOperations.DrawDiscardCategoryTargetAvailable(ownerSeat, skillId, stateId, targetSeat);
+    bool global::CardGame.Core.INextActualUseSelectionQuery.HasHpLossTargets(int ownerSeat) => _coreHpLossSlashMaterialsOperations.HasHpLossSlashTargets(_coreMatchParticipantsPlayersAccess._players[ownerSeat]);
+    SkillProgramEffect? global::CardGame.Core.INextActualUseSelectionQuery.HpLossProducer(ProgramExecutionPlan plan) => global::CardGame.Core.EngineOwners.CoreGameEngineHpLossSlashMaterialsRuntime.HpLossSlashProgramProducer(plan);
+    int global::CardGame.Core.INextActualUseSelectionQuery.HpLossMaximum(int ownerSeat, CardKind kind) => _coreHpLossSlashMaterialsOperations.HpLossSlashMaximum(_coreMatchParticipantsPlayersAccess._players[ownerSeat], kind);
+    SkillProgramEffect? global::CardGame.Core.INextActualUseSelectionQuery.SelectedProducer(ProgramExecutionPlan plan) => global::CardGame.Core.EngineOwners.CoreGameEngineNextActualUseTargetAdjustmentsRuntime.NextActualUseSelectedProducer(plan);
+    string global::CardGame.Core.INextActualUseSelectionQuery.SkillInstance(int ownerSeat, string skillId) => _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId);
+    ProgramMultiCardViewAsSelection? global::CardGame.Core.INextActualUseSelectionQuery.FindSelection(int ownerSeat, IReadOnlyList<int> cards, CardKind kind, CardConversionSource source) => ProgramSelectionProjection.Freeze(_coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(_coreMatchParticipantsPlayersAccess._players[ownerSeat], cards, kind, false, source));
+    bool global::CardGame.Core.INextActualUseSelectionQuery.HasAdjustment(int ownerSeat) => _coreNextActualUseTargetAdjustmentsOperations.CurrentNextActualUseAdjustment(ownerSeat)is not null;
+    bool global::CardGame.Core.INextActualUseSelectionQuery.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
+    bool global::CardGame.Core.INextActualUseSelectionQuery.CanUseSlash(int ownerSeat, int targetSeat, ProgramMultiCardViewAsSelection selection) => _coreNextActualUseTargetAdjustmentsOperations.CanUseNextActualUseSelectedSlash(_coreMatchParticipantsPlayersAccess._players[ownerSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat], selection);
+    IReadOnlyList<int> global::CardGame.Core.INextActualUseSelectionQuery.Targets(int ownerSeat, ProgramExecutionPlan plan, ProgramMultiCardViewAsSelection selection) => Array.AsReadOnly(AdjustedUseSelection.SelectTargets(ownerSeat, plan, [], [selection], _coreProgramSelectionModulesOperations.ProgramSelectionQueries.Get<IProgramSelectionSourceQuery>()).ToArray());
+    bool global::CardGame.Core.IProvenanceSelectionQuery.TracksProvenance => _coreDiscardedProvenanceOperations.TracksDiscardedEntityProvenance;
+
+    bool global::CardGame.Core.IProvenanceSelectionQuery.IsFaceDown(int ownerSeat) => _coreMatchParticipantsPlayersAccess._players[ownerSeat].IsFaceDown;
+    bool global::CardGame.Core.IProvenanceSelectionQuery.HasClaimedEntityPolicy(int ownerSeat) => _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[ownerSeat], SkillProgramCardPolicyKind.ClaimedEntitiesFaceDownUse).Any();
+    string global::CardGame.Core.IProvenanceSelectionQuery.SkillInstance(int ownerSeat, string skillId) => _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId);
+    ProgramMultiCardViewAsSelection? global::CardGame.Core.IProvenanceSelectionQuery.FindSelection(int ownerSeat, IReadOnlyList<int> cards, CardKind kind, CardConversionSource source) => ProgramSelectionProjection.Freeze(_coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(_coreMatchParticipantsPlayersAccess._players[ownerSeat], cards, kind, false, source));
+    bool global::CardGame.Core.IProvenanceSelectionQuery.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
+    bool global::CardGame.Core.IProvenanceSelectionQuery.CanUseSlash(int ownerSeat, int targetSeat, ProgramMultiCardViewAsSelection selection) => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[ownerSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat], physicalSuit: _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(_coreMatchParticipantsPlayersAccess._players[ownerSeat], selection), effectiveColor: _coreGuanHaiBridgesOperations.ProgramMultiCardColor(_coreMatchParticipantsPlayersAccess._players[ownerSeat], selection), physicalCardIds: selection.Cards.Select(card => card.Id).ToArray());
+    string global::CardGame.Core.IWholeHandSuitSelectionQuery.SkillInstance(int ownerSeat, string skillId) => _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId);
+    bool global::CardGame.Core.IWholeHandSuitSelectionQuery.IsValid(int ownerSeat, IReadOnlyList<int> cards, CardConversionSource source) => _coreFriendTrioOperations.ValidWholeHandSuitConversion(_coreMatchParticipantsPlayersAccess._players[ownerSeat], cards.Select(_coreCardAttackStateOperations.GetAttackCard).ToArray(), source);
+    bool global::CardGame.Core.IDistinctFactionSelectionQuery.CanPay(int ownerSeat, string skillId) => _coreDistinctFactionDiscardsOperations.HasPayableDistinctFactionOwnerHe(ownerSeat, skillId, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId));
+}

@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouGongsunZanComposition
 {
-    internal const string Jiaodi = "mou-ol:jiaodi", Baojing = "mou-ol:baojing";
+    internal const string Jiaodi = "mou-ol:jiaodi",Baojing = "mou-ol:baojing";
     [ProgramCatalogValidation(1490)]
     internal static void ValidateProgram(string path, SkillProgram p)
     {

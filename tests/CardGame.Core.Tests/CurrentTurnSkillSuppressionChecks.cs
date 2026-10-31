@@ -16,14 +16,14 @@ internal static class CurrentTurnSkillSuppressionChecks
         Accept(g, new SelectGeneralCommand(0, "fixture:suppress-owner", g.Revision, g.PendingDecision!.PromptId));
         for (var i = 0; i < 60 && g.PendingDecision?.Kind != DecisionKind.PlayCard; i++)
             Accept(g, new AdvanceOneStepCommand(g.Revision));
-        var players = (IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", Flags)!.GetValue(g)!;
+        var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", Flags)!.GetValue(g)!;
         var owner = players[0]; var target = players[1];
         var source = owner.SkillGrants.Grants.Single(s => s.SkillId == "fixture:suppress-driver");
         var frame = new ProgramSkillFrame(90001, 0, source.SkillId, "audit", registry.GetSkill(source.SkillId).Program!.GameplayHash,
             1, [], [1]) { SkillInstanceId = source.SkillInstanceId };
         Require(Enabled(g, target).Contains("fixture:ordinary"), "Initial ordinary binding.");
-        typeof(GameEngine).GetMethod("PushRuntimeFrame", Flags)!.Invoke(g, [frame]);
-        typeof(GameEngine).GetMethod("IssueCurrentTurnNonLockedSkillSuppression", Flags)!.Invoke(g, [frame, 1]);
+        global::FixtureRuntimeAccess.Engine.GetMethod("PushRuntimeFrame", Flags)!.Invoke(g, [frame]);
+        global::FixtureRuntimeAccess.Engine.GetMethod("IssueCurrentTurnNonLockedSkillSuppression", Flags)!.Invoke(g, [frame, 1]);
         Require(!Enabled(g, target).Contains("fixture:ordinary") && Enabled(g, target).Contains("fixture:locked") &&
             !Enabled(g, target).Contains("fixture:limited"), "Tags preserve only Locked, not Limited.");
         Require(g.CreateSnapshot(0).Players[1].Skills!.All(s => s.ContentId != "fixture:ordinary"), "Public skill snapshot shares qualification.");
@@ -35,16 +35,16 @@ internal static class CurrentTurnSkillSuppressionChecks
         for (var i = 0; i < 4; i++) { Require(!Enabled(g, target).Contains("fixture:ordinary"), "Issued fact survives exact source loss."); g.CreateSnapshot(i); }
         Require(g.Revision == revision && g.Events.Count == count && target.SkillGrants.Revision == grants, "Qualification and snapshots are observational.");
         var turn = g.CreateSnapshot(0).TurnNumber;
-        typeof(GameEngine).GetMethod("ExpireCurrentTurnNonLockedSkillSuppressions", Flags)!.Invoke(g, [turn, 2]);
+        global::FixtureRuntimeAccess.Engine.GetMethod("ExpireCurrentTurnNonLockedSkillSuppressions", Flags)!.Invoke(g, [turn, 2]);
         Require(!Enabled(g, target).Contains("fixture:ordinary"), "Another seat's turn end cannot expire fact.");
-        typeof(GameEngine).GetMethod("ExpireCurrentTurnNonLockedSkillSuppressions", Flags)!.Invoke(g, [turn, 0]);
+        global::FixtureRuntimeAccess.Engine.GetMethod("ExpireCurrentTurnNonLockedSkillSuppressions", Flags)!.Invoke(g, [turn, 0]);
         Require(Enabled(g, target).Contains("fixture:ordinary") && !target.SkillGrants.Grants.Single(s => s.GrantId == "disabled").IsEnabled,
             "Actual owner expiry restores eligibility without changing local disable.");
-        Require(((System.Collections.ICollection)typeof(GameEngine).GetField("_currentTurnSkillSuppressions", Flags)!.GetValue(g)!).Count == 0,
+        Require(((System.Collections.ICollection)global::FixtureRuntimeAccess.Engine.GetField("_currentTurnSkillSuppressions", Flags)!.GetValue(g)!).Count == 0,
             "Exact actual turn removes its issued scalar facts.");
     }
     private static IReadOnlyList<string> Enabled(GameEngine g, CharacterState p) =>
-        (IReadOnlyList<string>)typeof(GameEngine).GetMethod("EnabledContentSkillIds", Flags)!.Invoke(g, [p])!;
+        (IReadOnlyList<string>)global::FixtureRuntimeAccess.Engine.GetMethod("EnabledContentSkillIds", Flags)!.Invoke(g, [p])!;
     private static void Accept(GameEngine g, GameCommand c) { var r = g.Submit(c); Require(r.Accepted, r.Error?.Message ?? "Rejected"); }
     private static void Require(bool b, string text) { if (!b) throw new InvalidOperationException(text); }
     private sealed class Fixture : IGameContentPackage

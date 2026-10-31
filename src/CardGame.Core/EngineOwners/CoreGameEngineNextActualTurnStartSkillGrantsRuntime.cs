@@ -1,0 +1,30 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineNextActualTurnStartSkillGrantsRuntime
+{
+    private readonly ICoreNextActualTurnStartSkillGrantsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNextActualTurnStartSkillGrantsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreNextActualTurnStartSkillGrantsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreNextActualTurnStartSkillGrantsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNextActualTurnStartSkillGrantsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreNextActualTurnStartSkillGrantsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineNextActualTurnStartSkillGrantsRuntime(ICoreNextActualTurnStartSkillGrantsResolutionStackOperations resolutionStackOperations, ICoreNextActualTurnStartSkillGrantsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreNextActualTurnStartSkillGrantsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreNextActualTurnStartSkillGrantsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNextActualTurnStartSkillGrantsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreNextActualTurnStartSkillGrantsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

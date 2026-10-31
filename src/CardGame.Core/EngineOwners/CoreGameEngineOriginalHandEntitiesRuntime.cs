@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime : global::CardGame.Core.IOriginalHandEntitiesProgramHost
+{
+    private readonly ICoreOriginalHandEntitiesCharacterGuoJiaMobileGodOperations _characterGuoJiaMobileGodOperations;
+    private readonly ICoreOriginalHandEntitiesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreOriginalHandEntitiesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreOriginalHandEntitiesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreOriginalHandEntitiesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreOriginalHandEntitiesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreOriginalHandEntitiesCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreOriginalHandEntitiesCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreOriginalHandEntitiesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreOriginalHandEntitiesCoreOriginalHandAwakeningOperations _coreOriginalHandAwakeningOperations;
+    private readonly ICoreOriginalHandEntitiesCoreOriginalHandEntityObserversOperations _coreOriginalHandEntityObserversOperations;
+    private readonly ICoreOriginalHandEntitiesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreOriginalHandEntitiesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreOriginalHandEntitiesCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreOriginalHandEntitiesCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreOriginalHandEntitiesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreOriginalHandEntitiesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreOriginalHandEntitiesCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreOriginalHandEntitiesCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreOriginalHandEntitiesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess _coreActualTurnProgressCurrentSeatAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess _coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess;
+    internal CoreGameEngineOriginalHandEntitiesRuntime(ICoreOriginalHandEntitiesCharacterGuoJiaMobileGodOperations characterGuoJiaMobileGodOperations, ICoreOriginalHandEntitiesCardZonesOperations cardZonesOperations, ICoreOriginalHandEntitiesContentRegistryOperations contentRegistryOperations, ICoreOriginalHandEntitiesResolutionStackOperations resolutionStackOperations, ICoreOriginalHandEntitiesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreOriginalHandEntitiesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreOriginalHandEntitiesCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreOriginalHandEntitiesCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreOriginalHandEntitiesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreOriginalHandEntitiesCoreOriginalHandAwakeningOperations coreOriginalHandAwakeningOperations, ICoreOriginalHandEntitiesCoreOriginalHandEntityObserversOperations coreOriginalHandEntityObserversOperations, ICoreOriginalHandEntitiesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreOriginalHandEntitiesCoreRuntimeOperations coreRuntimeOperations, ICoreOriginalHandEntitiesCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreOriginalHandEntitiesCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreOriginalHandEntitiesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreOriginalHandEntitiesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreOriginalHandEntitiesCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreOriginalHandEntitiesCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreOriginalHandEntitiesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess coreActualTurnProgressCurrentSeatAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess)
+    {
+        this._characterGuoJiaMobileGodOperations = characterGuoJiaMobileGodOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOriginalHandAwakeningOperations = coreOriginalHandAwakeningOperations;
+        this._coreOriginalHandEntityObserversOperations = coreOriginalHandEntityObserversOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatAccess = coreActualTurnProgressCurrentSeatAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess = coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess;
+    }
+}

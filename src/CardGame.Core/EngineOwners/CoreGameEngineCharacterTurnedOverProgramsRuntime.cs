@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineCharacterTurnedOverProgramsRuntime
+{
+    private readonly ICoreCharacterTurnedOverProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCharacterTurnedOverProgramsCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreCharacterTurnedOverProgramsCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICoreCharacterTurnedOverProgramsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreCharacterTurnedOverProgramsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreCharacterTurnedOverProgramsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreCharacterTurnedOverProgramsCoreDiscardedProvenanceOperations _coreDiscardedProvenanceOperations;
+    private readonly ICoreCharacterTurnedOverProgramsCorePublicPileEquipmentSequencesOperations _corePublicPileEquipmentSequencesOperations;
+    private readonly ICoreCharacterTurnedOverProgramsCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineCharacterTurnedOverProgramsRuntime(ICoreCharacterTurnedOverProgramsResolutionStackOperations resolutionStackOperations, ICoreCharacterTurnedOverProgramsCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreCharacterTurnedOverProgramsCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICoreCharacterTurnedOverProgramsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreCharacterTurnedOverProgramsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreCharacterTurnedOverProgramsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreCharacterTurnedOverProgramsCoreDiscardedProvenanceOperations coreDiscardedProvenanceOperations, ICoreCharacterTurnedOverProgramsCorePublicPileEquipmentSequencesOperations corePublicPileEquipmentSequencesOperations, ICoreCharacterTurnedOverProgramsCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreDiscardedProvenanceOperations = coreDiscardedProvenanceOperations;
+        this._corePublicPileEquipmentSequencesOperations = corePublicPileEquipmentSequencesOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

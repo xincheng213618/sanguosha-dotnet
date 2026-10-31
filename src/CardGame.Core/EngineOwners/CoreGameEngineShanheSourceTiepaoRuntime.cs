@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheSourceTiepaoRuntime : global::CardGame.Core.IShanheSourceTiepaoHost
+{
+    private readonly ICoreShanheSourceTiepaoCardZonesOperations _cardZonesOperations;
+    private readonly ICoreShanheSourceTiepaoContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheSourceTiepaoResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceTiepaoCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreShanheSourceTiepaoCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreShanheSourceTiepaoCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheSourceTiepaoCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreShanheSourceTiepaoCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreShanheSourceTiepaoCoreDamageArmorPaymentsOperations _coreDamageArmorPaymentsOperations;
+    private readonly ICoreShanheSourceTiepaoCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreShanheSourceTiepaoCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreShanheSourceTiepaoCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheSourceTiepaoCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheSourceTiepaoCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly ICoreShanheSourceTiepaoCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheSourceTiepaoCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheSourceTiepaoCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreShanheSourceTiepaoCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreShanheSourceTiepaoCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheSourceTiepaoCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheSourceTiepaoCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly ICoreShanheSourceTiepaoCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreShanheSourceTiepaoKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheSourceTiepaoRuntime(ICoreShanheSourceTiepaoCardZonesOperations cardZonesOperations, ICoreShanheSourceTiepaoContentRegistryOperations contentRegistryOperations, ICoreShanheSourceTiepaoResolutionStackOperations resolutionStackOperations, ICoreShanheSourceTiepaoCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreShanheSourceTiepaoCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreShanheSourceTiepaoCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheSourceTiepaoCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreShanheSourceTiepaoCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreShanheSourceTiepaoCoreDamageArmorPaymentsOperations coreDamageArmorPaymentsOperations, ICoreShanheSourceTiepaoCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreShanheSourceTiepaoCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreShanheSourceTiepaoCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheSourceTiepaoCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheSourceTiepaoCoreRuleQueriesOperations coreRuleQueriesOperations, ICoreShanheSourceTiepaoCoreRuntimeOperations coreRuntimeOperations, ICoreShanheSourceTiepaoCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheSourceTiepaoCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreShanheSourceTiepaoCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreShanheSourceTiepaoCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheSourceTiepaoCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheSourceTiepaoCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, ICoreShanheSourceTiepaoCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreShanheSourceTiepaoKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreDamageArmorPaymentsOperations = coreDamageArmorPaymentsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuleQueriesOperations = coreRuleQueriesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

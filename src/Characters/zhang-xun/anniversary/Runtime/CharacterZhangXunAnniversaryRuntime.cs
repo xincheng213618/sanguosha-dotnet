@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZhangXunAnniversaryRuntime : global::CardGame.Core.IAnniversaryZhangXunHost
+{
+    private readonly ICharacterZhangXunAnniversaryContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhangXunAnniversaryResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreParticipantHandProgramsOperations _coreParticipantHandProgramsOperations;
+    private readonly ICharacterZhangXunAnniversaryCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterZhangXunAnniversaryCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterZhangXunAnniversaryKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICharacterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess _characterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CharacterZhangXunAnniversaryRuntime(ICharacterZhangXunAnniversaryContentRegistryOperations contentRegistryOperations, ICharacterZhangXunAnniversaryResolutionStackOperations resolutionStackOperations, ICharacterZhangXunAnniversaryCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICharacterZhangXunAnniversaryCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterZhangXunAnniversaryCoreCardUseModulesOperations coreCardUseModulesOperations, ICharacterZhangXunAnniversaryCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhangXunAnniversaryCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhangXunAnniversaryCoreRuntimeOperations coreRuntimeOperations, ICharacterZhangXunAnniversaryCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterZhangXunAnniversaryCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICharacterZhangXunAnniversaryCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterZhangXunAnniversaryCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICharacterZhangXunAnniversaryCoreParticipantHandProgramsOperations coreParticipantHandProgramsOperations, ICharacterZhangXunAnniversaryCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterZhangXunAnniversaryCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterZhangXunAnniversaryKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICharacterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess characterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._coreParticipantHandProgramsOperations = coreParticipantHandProgramsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._characterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess = characterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

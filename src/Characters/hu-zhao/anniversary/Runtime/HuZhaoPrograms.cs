@@ -30,7 +30,7 @@ public sealed record HuZhaoMiduPaidEvent(long FrameId, CardConversionSource Sour
 public sealed record HuZhaoMiduCompletedEvent(long FrameId, bool Restore, int Recipient, int DrawCount) : IGameEvent;
 internal static class HuZhaoComposition
 {
-    internal const string Midu = "anniversary:midu", Xianwang = "anniversary:xianwang";
+    internal const string Midu = "anniversary:midu",Xianwang = "anniversary:xianwang";
     [ProgramCatalogValidation(43000)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op == SkillProgramEffectOp.ResolveAnniversaryHuZhaoMidu)) return;

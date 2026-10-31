@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineZhaoguMirrorRuntime : global::CardGame.Core.IZhaoguMirrorHost
+{
+    private readonly ICoreZhaoguMirrorCharacterHuaManOlOperations _characterHuaManOlOperations;
+    private readonly ICoreZhaoguMirrorCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreZhaoguMirrorCharacterXunYuMobileGodOperations _characterXunYuMobileGodOperations;
+    private readonly ICoreZhaoguMirrorContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreZhaoguMirrorResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreZhaoguMirrorCoreActualTurnDamageClaimsOperations _coreActualTurnDamageClaimsOperations;
+    private readonly ICoreZhaoguMirrorCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreZhaoguMirrorCoreOverflowTargetCancellationOperations _coreOverflowTargetCancellationOperations;
+    private readonly ICoreZhaoguMirrorCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreZhaoguMirrorCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreZhaoguMirrorCoreProgramOrdinaryTrickUsesOperations _coreProgramOrdinaryTrickUsesOperations;
+    private readonly ICoreZhaoguMirrorCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreZhaoguMirrorCoreVirtualBasicOffersOperations _coreVirtualBasicOffersOperations;
+    private readonly ICoreZhaoguMirrorCoreVirtualOrdinaryTrickUsesOperations _coreVirtualOrdinaryTrickUsesOperations;
+    private readonly ICoreZhaoguMirrorCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreZhaoguMirrorCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreZhaoguMirrorCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreZhaoguMirrorCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreZhaoguMirrorCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreZhaoguMirrorCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreZhaoguMirrorCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreZhaoguMirrorKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess _coreMatchDefinitionModeDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess;
+    internal CoreGameEngineZhaoguMirrorRuntime(ICoreZhaoguMirrorCharacterHuaManOlOperations characterHuaManOlOperations, ICoreZhaoguMirrorCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreZhaoguMirrorCharacterXunYuMobileGodOperations characterXunYuMobileGodOperations, ICoreZhaoguMirrorContentRegistryOperations contentRegistryOperations, ICoreZhaoguMirrorResolutionStackOperations resolutionStackOperations, ICoreZhaoguMirrorCoreActualTurnDamageClaimsOperations coreActualTurnDamageClaimsOperations, ICoreZhaoguMirrorCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreZhaoguMirrorCoreOverflowTargetCancellationOperations coreOverflowTargetCancellationOperations, ICoreZhaoguMirrorCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreZhaoguMirrorCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreZhaoguMirrorCoreProgramOrdinaryTrickUsesOperations coreProgramOrdinaryTrickUsesOperations, ICoreZhaoguMirrorCoreRuntimeOperations coreRuntimeOperations, ICoreZhaoguMirrorCoreVirtualBasicOffersOperations coreVirtualBasicOffersOperations, ICoreZhaoguMirrorCoreVirtualOrdinaryTrickUsesOperations coreVirtualOrdinaryTrickUsesOperations, ICoreZhaoguMirrorCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreZhaoguMirrorCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreZhaoguMirrorCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreZhaoguMirrorCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreZhaoguMirrorCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreZhaoguMirrorCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreZhaoguMirrorCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreZhaoguMirrorKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess coreMatchDefinitionModeDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess)
+    {
+        this._characterHuaManOlOperations = characterHuaManOlOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._characterXunYuMobileGodOperations = characterXunYuMobileGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnDamageClaimsOperations = coreActualTurnDamageClaimsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreOverflowTargetCancellationOperations = coreOverflowTargetCancellationOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramOrdinaryTrickUsesOperations = coreProgramOrdinaryTrickUsesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreVirtualBasicOffersOperations = coreVirtualBasicOffersOperations;
+        this._coreVirtualOrdinaryTrickUsesOperations = coreVirtualOrdinaryTrickUsesOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchDefinitionModeDefinitionOptionsAccess = coreMatchDefinitionModeDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess = coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess;
+    }
+}

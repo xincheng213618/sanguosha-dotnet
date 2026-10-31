@@ -10,8 +10,7 @@ public sealed record RecipientCategoryMarkMaterial(int CardId, CardLocation From
 public sealed record ProgramRecipientCategoryMarkReceipt
 {
     private IReadOnlyList<RecipientCategoryMarkMaterial> _materials = Array.AsReadOnly(Array.Empty<RecipientCategoryMarkMaterial>());
-    private IReadOnlyList<int> _selected = Array.AsReadOnly(Array.Empty<int>()), _candidates = Array.AsReadOnly(Array.Empty<int>()),
-        _baseTargets = Array.AsReadOnly(Array.Empty<int>()), _added = Array.AsReadOnly(Array.Empty<int>());
+    private IReadOnlyList<int> _selected = Array.AsReadOnly(Array.Empty<int>()),_candidates = Array.AsReadOnly(Array.Empty<int>()),        _baseTargets = Array.AsReadOnly(Array.Empty<int>()),_added = Array.AsReadOnly(Array.Empty<int>());
     public required CardConversionSource Source { get; init; }
     public required string GameplayHash { get; init; }
     public required string SourceSkillId { get; init; }
@@ -60,7 +59,7 @@ public sealed record RecipientCategoryMarkDrawIssuedEvent(long FrameId, int Hold
 public sealed record RecipientCategoryMarkCompletedEvent(long FrameId, SkillProgramEffectOp Operation, bool Consumed) : IGameEvent;
 public sealed record RecipientCategorySlashTargetsResolvedEvent : IGameEvent
 {
-    private IReadOnlyList<int> _before = Array.AsReadOnly(Array.Empty<int>()), _added = Array.AsReadOnly(Array.Empty<int>()), _result = Array.AsReadOnly(Array.Empty<int>());
+    private IReadOnlyList<int> _before = Array.AsReadOnly(Array.Empty<int>()),_added = Array.AsReadOnly(Array.Empty<int>()),_result = Array.AsReadOnly(Array.Empty<int>());
     public long FrameId { get; init; }
     public long CardUseFrameId { get; init; }
     public long ActionId { get; init; }

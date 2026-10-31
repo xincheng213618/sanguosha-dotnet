@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheSourceBiriRuntime : global::CardGame.Core.IShanheSourceBiriHost
+{
+    private readonly ICoreShanheSourceBiriResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceBiriCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheSourceBiriCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreShanheSourceBiriCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICoreShanheSourceBiriCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreShanheSourceBiriCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreShanheSourceBiriCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheSourceBiriCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheSourceBiriCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheSourceBiriCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreShanheSourceBiriCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreShanheSourceBiriCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreShanheSourceBiriKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreShanheSourceBiriKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess _coreMatchDefinitionModeDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheSourceBiriRuntime(ICoreShanheSourceBiriResolutionStackOperations resolutionStackOperations, ICoreShanheSourceBiriCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheSourceBiriCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreShanheSourceBiriCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICoreShanheSourceBiriCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreShanheSourceBiriCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreShanheSourceBiriCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheSourceBiriCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheSourceBiriCoreRuntimeOperations coreRuntimeOperations, ICoreShanheSourceBiriCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreShanheSourceBiriCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreShanheSourceBiriCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreShanheSourceBiriKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreShanheSourceBiriKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess coreMatchDefinitionModeDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchDefinitionModeDefinitionOptionsAccess = coreMatchDefinitionModeDefinitionOptionsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

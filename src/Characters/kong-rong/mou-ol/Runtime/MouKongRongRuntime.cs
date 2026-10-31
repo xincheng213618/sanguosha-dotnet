@@ -6,7 +6,7 @@ internal sealed partial class MouKongRongRuntime(IMouKongRongFacts facts, IMouKo
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
     IProgramOperationDraws draws, IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouKongRongHost
 {
-    internal const string Liwen = "mou-ol:liwen", Zhengyi = "mou-ol:zhengyi", DrawReason = "skill-program.mou-ol:liwen.decline-draw";
+    internal const string Liwen = "mou-ol:liwen",Zhengyi = "mou-ol:zhengyi",DrawReason = "skill-program.mou-ol:liwen.decline-draw";
     internal static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 34600)]
     internal bool Qualifies(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)

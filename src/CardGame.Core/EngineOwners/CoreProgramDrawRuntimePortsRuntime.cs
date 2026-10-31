@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramDrawRuntimePortsRuntime : global::CardGame.Core.IProgramDrawFacts, global::CardGame.Core.IProgramDrawOperations
+{
+    private readonly ICoreProgramDrawRuntimePortsCharacterCaoXiOlOperations _characterCaoXiOlOperations;
+    private readonly ICoreProgramDrawRuntimePortsCharacterWangYiBoundaryMobileOperations _characterWangYiBoundaryMobileOperations;
+    private readonly ICoreProgramDrawRuntimePortsCoreActualDiscardPhaseLedgerOperations _coreActualDiscardPhaseLedgerOperations;
+    private readonly ICoreProgramDrawRuntimePortsCoreCurrentTurnUseKindsOperations _coreCurrentTurnUseKindsOperations;
+    private readonly ICoreProgramDrawRuntimePortsCoreForcedPhaseAlcoholOperations _coreForcedPhaseAlcoholOperations;
+    private readonly ICoreProgramDrawRuntimePortsCorePairBenefitObserversOperations _corePairBenefitObserversOperations;
+    private readonly ICoreProgramDrawRuntimePortsCorePairObtainShownGiftsOperations _corePairObtainShownGiftsOperations;
+    private readonly ICoreProgramDrawRuntimePortsCoreProgramCategoryTargetLedgerOperations _coreProgramCategoryTargetLedgerOperations;
+    private readonly ICoreProgramDrawRuntimePortsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramDrawRuntimePortsCoreProgramOwnedCardsOperations _coreProgramOwnedCardsOperations;
+    private readonly ICoreProgramDrawRuntimePortsCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICoreProgramDrawRuntimePortsCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreProgramDrawRuntimePortsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreProgramDrawRuntimePortsRuntime(ICoreProgramDrawRuntimePortsCharacterCaoXiOlOperations characterCaoXiOlOperations, ICoreProgramDrawRuntimePortsCharacterWangYiBoundaryMobileOperations characterWangYiBoundaryMobileOperations, ICoreProgramDrawRuntimePortsCoreActualDiscardPhaseLedgerOperations coreActualDiscardPhaseLedgerOperations, ICoreProgramDrawRuntimePortsCoreCurrentTurnUseKindsOperations coreCurrentTurnUseKindsOperations, ICoreProgramDrawRuntimePortsCoreForcedPhaseAlcoholOperations coreForcedPhaseAlcoholOperations, ICoreProgramDrawRuntimePortsCorePairBenefitObserversOperations corePairBenefitObserversOperations, ICoreProgramDrawRuntimePortsCorePairObtainShownGiftsOperations corePairObtainShownGiftsOperations, ICoreProgramDrawRuntimePortsCoreProgramCategoryTargetLedgerOperations coreProgramCategoryTargetLedgerOperations, ICoreProgramDrawRuntimePortsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramDrawRuntimePortsCoreProgramOwnedCardsOperations coreProgramOwnedCardsOperations, ICoreProgramDrawRuntimePortsCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICoreProgramDrawRuntimePortsCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreProgramDrawRuntimePortsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCaoXiOlOperations = characterCaoXiOlOperations;
+        this._characterWangYiBoundaryMobileOperations = characterWangYiBoundaryMobileOperations;
+        this._coreActualDiscardPhaseLedgerOperations = coreActualDiscardPhaseLedgerOperations;
+        this._coreCurrentTurnUseKindsOperations = coreCurrentTurnUseKindsOperations;
+        this._coreForcedPhaseAlcoholOperations = coreForcedPhaseAlcoholOperations;
+        this._corePairBenefitObserversOperations = corePairBenefitObserversOperations;
+        this._corePairObtainShownGiftsOperations = corePairObtainShownGiftsOperations;
+        this._coreProgramCategoryTargetLedgerOperations = coreProgramCategoryTargetLedgerOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramOwnedCardsOperations = coreProgramOwnedCardsOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

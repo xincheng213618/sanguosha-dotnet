@@ -1,0 +1,92 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineHellSoulCardsRuntime
+{
+    private readonly ICoreHellSoulCardsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreHellSoulCardsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreHellSoulCardsObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICoreHellSoulCardsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHellSoulCardsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreHellSoulCardsCoreAlcoholSlashSkillReplacementsOperations _coreAlcoholSlashSkillReplacementsOperations;
+    private readonly ICoreHellSoulCardsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreHellSoulCardsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreHellSoulCardsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreHellSoulCardsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreHellSoulCardsCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreHellSoulCardsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreHellSoulCardsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreHellSoulCardsCoreNextActualTurnStartSkillGrantsOperations _coreNextActualTurnStartSkillGrantsOperations;
+    private readonly ICoreHellSoulCardsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreHellSoulCardsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreHellSoulCardsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreHellSoulCardsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreHellSoulCardsCoreShenwuEquipmentOperations _coreShenwuEquipmentOperations;
+    private readonly ICoreHellSoulCardsCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreHellSoulCardsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreHellSoulCardsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreHellSoulCardsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreHellSoulCardsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreHellSoulCardsCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreHellSoulCardsCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreHellSoulCardsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreHellSoulCardsCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
+    private readonly ICoreHellSoulCardsCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreHellSoulCardsCoreNativeNullificationFramesOperations _coreNativeNullificationFramesOperations;
+    private readonly ICoreHellSoulCardsCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreHellSoulCardsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreHellSoulCardsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreHellSoulCardsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreHellSoulCardsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess _coreMatchDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineHellSoulCardsRuntime(ICoreHellSoulCardsCardZonesOperations cardZonesOperations, ICoreHellSoulCardsContentRegistryOperations contentRegistryOperations, ICoreHellSoulCardsObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICoreHellSoulCardsResolutionStackOperations resolutionStackOperations, ICoreHellSoulCardsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreHellSoulCardsCoreAlcoholSlashSkillReplacementsOperations coreAlcoholSlashSkillReplacementsOperations, ICoreHellSoulCardsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreHellSoulCardsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreHellSoulCardsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreHellSoulCardsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreHellSoulCardsCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreHellSoulCardsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreHellSoulCardsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreHellSoulCardsCoreNextActualTurnStartSkillGrantsOperations coreNextActualTurnStartSkillGrantsOperations, ICoreHellSoulCardsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreHellSoulCardsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreHellSoulCardsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreHellSoulCardsCoreRuntimeOperations coreRuntimeOperations, ICoreHellSoulCardsCoreShenwuEquipmentOperations coreShenwuEquipmentOperations, ICoreHellSoulCardsCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreHellSoulCardsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreHellSoulCardsCoreTableOrderOperations coreTableOrderOperations, ICoreHellSoulCardsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreHellSoulCardsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreHellSoulCardsCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreHellSoulCardsCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreHellSoulCardsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreHellSoulCardsCoreNativeLegalActionsOperations coreNativeLegalActionsOperations, ICoreHellSoulCardsCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreHellSoulCardsCoreNativeNullificationFramesOperations coreNativeNullificationFramesOperations, ICoreHellSoulCardsCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreHellSoulCardsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreHellSoulCardsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreHellSoulCardsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreHellSoulCardsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess coreMatchDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreAlcoholSlashSkillReplacementsOperations = coreAlcoholSlashSkillReplacementsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNextActualTurnStartSkillGrantsOperations = coreNextActualTurnStartSkillGrantsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShenwuEquipmentOperations = coreShenwuEquipmentOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativeNullificationFramesOperations = coreNativeNullificationFramesOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchDefinitionPlayerCountAccess = coreMatchDefinitionPlayerCountAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

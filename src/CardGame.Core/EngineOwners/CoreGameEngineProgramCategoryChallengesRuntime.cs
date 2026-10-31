@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramCategoryChallengesRuntime
+{
+    private readonly ICoreProgramCategoryChallengesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramCategoryChallengesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramCategoryChallengesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramCategoryChallengesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramCategoryChallengesCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreProgramCategoryChallengesCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreProgramCategoryChallengesCoreProgramJudgmentOutcomesOperations _coreProgramJudgmentOutcomesOperations;
+    private readonly ICoreProgramCategoryChallengesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramCategoryChallengesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramCategoryChallengesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreProgramCategoryChallengesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreProgramCategoryChallengesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramCategoryChallengesCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreProgramCategoryChallengesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramCategoryChallengesRuntime(ICoreProgramCategoryChallengesCardZonesOperations cardZonesOperations, ICoreProgramCategoryChallengesContentRegistryOperations contentRegistryOperations, ICoreProgramCategoryChallengesResolutionStackOperations resolutionStackOperations, ICoreProgramCategoryChallengesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramCategoryChallengesCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreProgramCategoryChallengesCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreProgramCategoryChallengesCoreProgramJudgmentOutcomesOperations coreProgramJudgmentOutcomesOperations, ICoreProgramCategoryChallengesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramCategoryChallengesCoreRuntimeOperations coreRuntimeOperations, ICoreProgramCategoryChallengesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreProgramCategoryChallengesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreProgramCategoryChallengesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramCategoryChallengesCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreProgramCategoryChallengesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramJudgmentOutcomesOperations = coreProgramJudgmentOutcomesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

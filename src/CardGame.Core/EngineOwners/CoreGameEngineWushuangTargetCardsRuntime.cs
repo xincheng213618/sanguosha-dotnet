@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineWushuangTargetCardsRuntime
+{
+    private readonly ICoreWushuangTargetCardsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreWushuangTargetCardsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreWushuangTargetCardsCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreWushuangTargetCardsCoreExtraEffectForeignSelectionOperations _coreExtraEffectForeignSelectionOperations;
+    private readonly ICoreWushuangTargetCardsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreWushuangTargetCardsCoreSequentialTrickTargetsOperations _coreSequentialTrickTargetsOperations;
+    private readonly ICoreWushuangTargetCardsCoreShanheDismantlementStockOperations _coreShanheDismantlementStockOperations;
+    private readonly ICoreWushuangTargetCardsCoreWushuangTacticRulesOperations _coreWushuangTacticRulesOperations;
+    private readonly ICoreWushuangTargetCardsCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreWushuangTargetCardsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreWushuangTargetCardsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreWushuangTargetCardsCoreWushuangModeProjectionOperations _coreWushuangModeProjectionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineWushuangTargetCardsRuntime(ICoreWushuangTargetCardsCardZonesOperations cardZonesOperations, ICoreWushuangTargetCardsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreWushuangTargetCardsCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreWushuangTargetCardsCoreExtraEffectForeignSelectionOperations coreExtraEffectForeignSelectionOperations, ICoreWushuangTargetCardsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreWushuangTargetCardsCoreSequentialTrickTargetsOperations coreSequentialTrickTargetsOperations, ICoreWushuangTargetCardsCoreShanheDismantlementStockOperations coreShanheDismantlementStockOperations, ICoreWushuangTargetCardsCoreWushuangTacticRulesOperations coreWushuangTacticRulesOperations, ICoreWushuangTargetCardsCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreWushuangTargetCardsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreWushuangTargetCardsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreWushuangTargetCardsCoreWushuangModeProjectionOperations coreWushuangModeProjectionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreExtraEffectForeignSelectionOperations = coreExtraEffectForeignSelectionOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreSequentialTrickTargetsOperations = coreSequentialTrickTargetsOperations;
+        this._coreShanheDismantlementStockOperations = coreShanheDismantlementStockOperations;
+        this._coreWushuangTacticRulesOperations = coreWushuangTacticRulesOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreWushuangModeProjectionOperations = coreWushuangModeProjectionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

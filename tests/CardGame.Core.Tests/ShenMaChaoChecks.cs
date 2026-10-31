@@ -18,8 +18,8 @@ internal static class ShenMaChaoChecks
         public PlayerSnapshot V(int seat) => G.CreateSnapshot(seat).Players[seat];
         public int HandLimit(int seat)
         {
-            var players = (System.Collections.IList)typeof(GameEngine).GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!;
-            return (int)typeof(GameEngine).GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G, [players[seat]])!;
+            var players = (System.Collections.IList)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!;
+            return (int)global::FixtureRuntimeAccess.Engine.GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G, [players[seat]])!;
         }
         public IEnumerable<T> E<T>() where T : IGameEvent => G.Events.Select(e => e.Payload).OfType<T>();
         public Scene(bool defense, bool withWine = false)

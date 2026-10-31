@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineTurnDrawDebtPaymentObserversRuntime
+{
+    private readonly ICoreTurnDrawDebtPaymentObserversCardZonesOperations _cardZonesOperations;
+    private readonly ICoreTurnDrawDebtPaymentObserversContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreTurnDrawDebtPaymentObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreTurnDrawDebtPaymentObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreTurnDrawDebtPaymentObserversCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICoreTurnDrawDebtPaymentObserversCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreTurnDrawDebtPaymentObserversCoreTurnDrawDebtsOperations _coreTurnDrawDebtsOperations;
+    private readonly ICoreTurnDrawDebtPaymentObserversCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineTurnDrawDebtPaymentObserversRuntime(ICoreTurnDrawDebtPaymentObserversCardZonesOperations cardZonesOperations, ICoreTurnDrawDebtPaymentObserversContentRegistryOperations contentRegistryOperations, ICoreTurnDrawDebtPaymentObserversResolutionStackOperations resolutionStackOperations, ICoreTurnDrawDebtPaymentObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreTurnDrawDebtPaymentObserversCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICoreTurnDrawDebtPaymentObserversCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreTurnDrawDebtPaymentObserversCoreTurnDrawDebtsOperations coreTurnDrawDebtsOperations, ICoreTurnDrawDebtPaymentObserversCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreTurnDrawDebtsOperations = coreTurnDrawDebtsOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

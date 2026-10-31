@@ -1,0 +1,12 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CoreGameEngineTreatedWoundedEntries
+{
+    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTreatedWoundedRuntime> _resolve;
+    private CoreGameEngineTreatedWoundedEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTreatedWoundedRuntime> resolve)
+    {
+        _resolve = resolve;
+    }
+
+    internal static CoreGameEngineTreatedWoundedEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTreatedWoundedRuntime> resolve) => new(resolve);
+}

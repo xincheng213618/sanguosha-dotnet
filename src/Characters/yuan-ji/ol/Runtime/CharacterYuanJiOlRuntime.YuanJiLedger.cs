@@ -1,0 +1,124 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterYuanJiOlRuntime
+{
+    internal bool HasYuanJiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJinghuaRoundDraw) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShuiyueTurnDraw);
+
+    internal static CardConversionSource YuanJiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yuan_ji_ol_YuanJiLedger.YuanJiSource(f);
+    internal static bool IsYuanJiReturnOp(SkillProgramEffectOp op) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yuan_ji_ol_YuanJiLedger.IsYuanJiReturnOp(op);
+    internal static bool IsYuanJiMarkDraw(SkillProgramEffectOp op) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yuan_ji_ol_YuanJiLedger.IsYuanJiMarkDraw(op);
+    internal void CaptureYuanJiAtomicLoss(CardMovementBatchContext batch)
+    {
+        if (!HasYuanJiCapability || !_coreMatchSetupSetupCompleteAccess._setupComplete || batch.TurnNumber < 1 || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+            return;
+        var losses = batch.Movements.Where(m => m.From is { Zone: CardZoneKind.Hand, OwnerSeat: not null } && m.From != m.To).GroupBy(m => m.From.OwnerSeat!.Value).Where(g => _coreMatchParticipantsPlayersAccess._players[g.Key].IsAlive && g.Select(m => m.CardId).Distinct().Count() == 2).ToArray();
+        if (losses.Length == 0)
+            return;
+        var candidates = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !JieyanDisabled(p.Seat)).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.CardsMoved)).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair }]).ToArray();
+        foreach (var c in candidates)
+            foreach (var loss in losses)
+            {
+                var cards = loss.DistinctBy(m => m.CardId).OrderBy(m => m.Sequence).ToArray();
+                var index = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiLossOpportunityEvent>().Count();
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YuanJiLossOpportunityEvent(index, batch.Id, new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash, loss.Key, batch.TurnNumber, _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber, cards[0].CardId, cards[1].CardId, cards[0].Sequence, cards[1].Sequence));
+            }
+    }
+
+    internal IEnumerable<YuanJiMarkClaim> YuanJiActiveClaims(int owner, string skill)
+    {
+        var started = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && IsYuanJiMarkDraw(e.Op)).ToDictionary(e => e.FrameId);
+        var closed = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiMarkClosedEvent>().Select(e => (e.DrawFrameId, e.Index, e.CardId)).ToHashSet();
+        foreach (var a in _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiAcquiredEvent>().Where(a => started.ContainsKey(a.FrameId) && !closed.Contains((a.FrameId, a.Index, a.CardId))).OrderBy(a => a.MovementSequence))
+        {
+            var s = started[a.FrameId];
+            yield return new(a.FrameId, a.Index, a.CardId, s.Source, s.GameplayHash, a.MovementSequence);
+        }
+    }
+
+    // Registration only; the query still belongs to legacy GameEngine.YuanJiLedger.
+    [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 230)]
+    internal void ProjectYuanJiCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
+    {
+        projection.Append(_coreMatchParticipantsPlayersAccess._players.Select(player => YuanJiCardMarkLabel(player.Seat, cardId)).FirstOrDefault(label => label is not null));
+    }
+
+    internal string? YuanJiCardMarkLabel(int ownerSeat, int cardId)
+    {
+        if (!HasYuanJiCapability || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Any(c => c.Id == cardId))
+            return null;
+        var mirror = YuanJiActiveClaims(ownerSeat, "ol:jinghua").Any(c => c.CardId == cardId);
+        var water = YuanJiActiveClaims(ownerSeat, "ol:shuiyue").Any(c => c.CardId == cardId);
+        return mirror ? (water ? "镜花·水月" : "镜花") : water ? "水月" : null;
+    }
+
+    internal IReadOnlyList<ProgramTriggerCandidate> IncludeYuanJiIssuedReturns(CharacterState owner, SkillProgramTriggerWindow window, IReadOnlyList<ProgramTriggerCandidate> ordinary)
+    {
+        if (!HasYuanJiCapability || !owner.IsAlive || window is not (SkillProgramTriggerWindow.TurnStartBeforeNormalFlow or SkillProgramTriggerWindow.RoundEnding) || window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && owner.Seat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat)
+            return ordinary;
+        var skill = window == SkillProgramTriggerWindow.RoundEnding ? "ol:shuiyue" : "ol:jinghua";
+        var binding = window == SkillProgramTriggerWindow.RoundEnding ? "round-top" : "turn-bottom";
+        var claims = YuanJiActiveClaims(owner.Seat, skill).ToArray();
+        if (claims.Length == 0)
+            return ordinary;
+        var first = claims[0];
+        var index = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().Select((e, i) => (e, i)).Single(x => x.e.FrameId == first.DrawFrameId).i;
+        var candidate = new ProgramTriggerCandidate(owner.Seat, skill, binding, first.Source.SkillInstanceId, first.GameplayHash, 0, index);
+        if (ordinary.Contains(candidate))
+            return ordinary;
+        return Array.AsReadOnly(ordinary.Append(candidate).ToArray());
+    }
+
+    internal bool YuanJiWindowCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, out ResolutionFrame parent)
+    {
+        parent = _resolutionStackOperations._resolutionStack.SingleOrDefault(w => w.Id == context.ParentFrameId)!;
+        if (parent is CardsMovedTriggerWindowFrame moved)
+            return context.Window == SkillProgramTriggerWindow.CardsMoved && moved.CandidateIndex >= 0 && moved.CandidateIndex < moved.Candidates.Count && moved.Candidates[moved.CandidateIndex] == candidate;
+        if (parent is ProgramLifecycleTriggerWindowFrame w)
+            return w.Window == context.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && w.Candidates[w.CandidateIndex] == candidate;
+        return parent is DeferredTurnEndFrame end && context.Window == SkillProgramTriggerWindow.AfterTurnEnded && _coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(end) && _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(end) == candidate;
+    }
+
+    [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 200)]
+    internal bool IsIssuedYuanJiReturn(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
+    {
+        if (!HasYuanJiCapability || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || context.OwnerSeat != c.OwnerSeat || context.OccurrenceIndex != c.OccurrenceIndex || !YuanJiWindowCandidate(c, context, out var parent))
+            return false;
+        if (context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow ? (c.SkillId != "ol:jinghua" || c.BindingId != "turn-bottom" || c.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat) : (context.Window != SkillProgramTriggerWindow.RoundEnding || c.SkillId != "ol:shuiyue" || c.BindingId != "round-top"))
+            return false;
+        if (context.Window == SkillProgramTriggerWindow.RoundEnding && (parent is not ProgramLifecycleTriggerWindowFrame { RoundEndingBoundaryId: { } id } || !_resolutionStackOperations._resolutionStack.Any(f => f is RoundEndingBoundaryFrame && f.Id == id)))
+            return false;
+        var claims = YuanJiActiveClaims(c.OwnerSeat, c.SkillId).ToArray();
+        if (claims.Length == 0)
+            return false;
+        var started = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().ToArray();
+        return c.OccurrenceIndex >= 0 && c.OccurrenceIndex < started.Length && started[c.OccurrenceIndex].FrameId == claims[0].DrawFrameId && claims[0].Source.SkillInstanceId == c.SkillInstanceId && claims[0].GameplayHash == c.GameplayHash;
+    }
+
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 27540, SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair, SkillProgramEffectOp.ResolveJinghuaRoundDraw, SkillProgramEffectOp.ResolveJinghuaTurnReturn, SkillProgramEffectOp.ResolveShuiyueTurnDraw, SkillProgramEffectOp.ResolveShuiyueRoundReturn)]
+    internal bool QualifyYuanJi(ProgramTriggerLegalityContext q)
+    {
+        if (q.WindowContext is not { } context || !q.Owner.IsAlive)
+            return false;
+        var c = q.Candidate;
+        var op = q.Trigger.Effects[0].Op;
+        if (op == SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair)
+            return IsIssuedJieyanCandidate(c, context);
+        if (IsYuanJiReturnOp(op))
+            return IsIssuedYuanJiReturn(c, context);
+        if (!YuanJiWindowCandidate(c, context, out _))
+            return false;
+        return op == SkillProgramEffectOp.ResolveJinghuaRoundDraw ? context.Window == SkillProgramTriggerWindow.RoundStarting && _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Count == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<RoundStartedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber && e.ActorSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat) && !_coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().Any(e => e.Source.OwnerSeat == q.OwnerSeat && e.Op == op && e.Round == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber) : context.Window == SkillProgramTriggerWindow.AfterTurnEnded && q.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().Any(e => e.Source.OwnerSeat == q.OwnerSeat && e.Op == op && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber);
+    }
+
+    [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 3000)]
+    internal CardMovementBatchContext CompleteMovementBatchCaptureYuanJiAtomicLoss(CardMovementBatchBuilder batch, CardMovementBatchContext completed)
+    {
+        CaptureYuanJiAtomicLoss(completed);
+        return completed;
+    }
+}

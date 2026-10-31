@@ -31,17 +31,3 @@ public sealed class GrowMaximumHpAndHpSkillProgramEffectHandler : ISkillProgramE
         return SkillProgramStepOutcome.Continue;
     }
 }
-public sealed partial class GameEngine
-{
-    private void GrowProgramMaximumHpAndHp(ProgramSkillFrame frame, SkillProgramNumberExpression expression)
-    {
-        if (expression != SkillProgramNumberExpression.LivingFactionCount || frame.WindowContext?.Window != SkillProgramTriggerWindow.GameStarting)
-            throw new InvalidOperationException("Population growth requires the game-start window.");
-        var amount = GetLivingFactionCount();
-        ChangeProgramMaximumHp(frame, amount);
-        if (amount == 0) return;
-        var target = _players[frame.OwnerSeat];
-        target.Hp += amount;
-        AdvanceEventRulesAndQueueFact(new PopulationHpIncreasedEvent(frame.OwnerSeat, amount, target.Hp));
-    }
-}

@@ -1,0 +1,32 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRandomAreaAcquisitionProofsRuntime
+{
+    private readonly ICoreRandomAreaAcquisitionProofsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRandomAreaAcquisitionProofsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreRandomAreaAcquisitionProofsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRandomAreaAcquisitionProofsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreRandomAreaAcquisitionProofsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreRandomAreaAcquisitionProofsCoreRandomAreaAcquisitionOperations _coreRandomAreaAcquisitionOperations;
+    private readonly ICoreRandomAreaAcquisitionProofsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRandomAreaAcquisitionProofsRuntime(ICoreRandomAreaAcquisitionProofsContentRegistryOperations contentRegistryOperations, ICoreRandomAreaAcquisitionProofsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreRandomAreaAcquisitionProofsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRandomAreaAcquisitionProofsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreRandomAreaAcquisitionProofsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreRandomAreaAcquisitionProofsCoreRandomAreaAcquisitionOperations coreRandomAreaAcquisitionOperations, ICoreRandomAreaAcquisitionProofsCoreTableOrderOperations coreTableOrderOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRandomAreaAcquisitionOperations = coreRandomAreaAcquisitionOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

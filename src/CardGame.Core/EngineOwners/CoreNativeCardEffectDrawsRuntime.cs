@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeCardEffectDrawsRuntime
+{
+    private readonly ICoreNativeCardEffectDrawsCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreNativeCardEffectDrawsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreIssuedPlayUsePoliciesOperations _coreIssuedPlayUsePoliciesOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreNativeDrawAttemptsOperations _coreNativeDrawAttemptsOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreOutsidePhaseDrawDiscardOperations _coreOutsidePhaseDrawDiscardOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreProgramDrawTwoBonusOperations _coreProgramDrawTwoBonusOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreSequentialTrickTargetsOperations _coreSequentialTrickTargetsOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreUnnullifiableOrdinaryTricksOperations _coreUnnullifiableOrdinaryTricksOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreNativeCardEffectDrawsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeCardEffectDrawsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreNativeCardEffectDrawsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreNativeCardEffectDrawsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeCardEffectDrawsRuntime(ICoreNativeCardEffectDrawsCharacterLuMengMouOperations characterLuMengMouOperations, ICoreNativeCardEffectDrawsResolutionStackOperations resolutionStackOperations, ICoreNativeCardEffectDrawsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreNativeCardEffectDrawsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreNativeCardEffectDrawsCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreNativeCardEffectDrawsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreNativeCardEffectDrawsCoreIssuedPlayUsePoliciesOperations coreIssuedPlayUsePoliciesOperations, ICoreNativeCardEffectDrawsCoreNativeDrawAttemptsOperations coreNativeDrawAttemptsOperations, ICoreNativeCardEffectDrawsCoreOutsidePhaseDrawDiscardOperations coreOutsidePhaseDrawDiscardOperations, ICoreNativeCardEffectDrawsCoreProgramDrawTwoBonusOperations coreProgramDrawTwoBonusOperations, ICoreNativeCardEffectDrawsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreNativeCardEffectDrawsCoreRuntimeOperations coreRuntimeOperations, ICoreNativeCardEffectDrawsCoreSequentialTrickTargetsOperations coreSequentialTrickTargetsOperations, ICoreNativeCardEffectDrawsCoreUnnullifiableOrdinaryTricksOperations coreUnnullifiableOrdinaryTricksOperations, ICoreNativeCardEffectDrawsCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreNativeCardEffectDrawsCoreMatchLogOperations coreMatchLogOperations, ICoreNativeCardEffectDrawsCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreNativeCardEffectDrawsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeCardEffectDrawsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreNativeCardEffectDrawsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreNativeCardEffectDrawsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreNativeCardEffectDrawsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreIssuedPlayUsePoliciesOperations = coreIssuedPlayUsePoliciesOperations;
+        this._coreNativeDrawAttemptsOperations = coreNativeDrawAttemptsOperations;
+        this._coreOutsidePhaseDrawDiscardOperations = coreOutsidePhaseDrawDiscardOperations;
+        this._coreProgramDrawTwoBonusOperations = coreProgramDrawTwoBonusOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialTrickTargetsOperations = coreSequentialTrickTargetsOperations;
+        this._coreUnnullifiableOrdinaryTricksOperations = coreUnnullifiableOrdinaryTricksOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

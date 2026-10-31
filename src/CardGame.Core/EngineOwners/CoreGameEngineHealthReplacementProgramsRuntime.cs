@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineHealthReplacementProgramsRuntime
+{
+    private readonly ICoreHealthReplacementProgramsCharacterDaQiaoXiaoQiaoHappyGodOperations _characterDaQiaoXiaoQiaoHappyGodOperations;
+    private readonly ICoreHealthReplacementProgramsCharacterDongBaiOlOperations _characterDongBaiOlOperations;
+    private readonly ICoreHealthReplacementProgramsCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICoreHealthReplacementProgramsCharacterSunJianMouOlOperations _characterSunJianMouOlOperations;
+    private readonly ICoreHealthReplacementProgramsProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICoreHealthReplacementProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHealthReplacementProgramsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreHealthReplacementProgramsCoreCardDamageMaximumHpReplacementOperations _coreCardDamageMaximumHpReplacementOperations;
+    private readonly ICoreHealthReplacementProgramsCoreDyingEntryProgramsOperations _coreDyingEntryProgramsOperations;
+    private readonly ICoreHealthReplacementProgramsCoreGrantedEntityPhasesOperations _coreGrantedEntityPhasesOperations;
+    private readonly ICoreHealthReplacementProgramsCoreHealthQueriesOperations _coreHealthQueriesOperations;
+    private readonly ICoreHealthReplacementProgramsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreHealthReplacementProgramsCoreIdentityConcealmentOperations _coreIdentityConcealmentOperations;
+    private readonly ICoreHealthReplacementProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreHealthReplacementProgramsCoreQimeiProgramsOperations _coreQimeiProgramsOperations;
+    private readonly ICoreHealthReplacementProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreHealthReplacementProgramsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreHealthReplacementProgramsCoreNativeDyingOperations _coreNativeDyingOperations;
+    private readonly ICoreHealthReplacementProgramsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreHealthReplacementProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess _coreGameEngineHpChangeProgramsPendingHpChangesAccess;
+    internal CoreGameEngineHealthReplacementProgramsRuntime(ICoreHealthReplacementProgramsCharacterDaQiaoXiaoQiaoHappyGodOperations characterDaQiaoXiaoQiaoHappyGodOperations, ICoreHealthReplacementProgramsCharacterDongBaiOlOperations characterDongBaiOlOperations, ICoreHealthReplacementProgramsCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICoreHealthReplacementProgramsCharacterSunJianMouOlOperations characterSunJianMouOlOperations, ICoreHealthReplacementProgramsProgramPipelineHooksOperations programPipelineHooksOperations, ICoreHealthReplacementProgramsResolutionStackOperations resolutionStackOperations, ICoreHealthReplacementProgramsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreHealthReplacementProgramsCoreCardDamageMaximumHpReplacementOperations coreCardDamageMaximumHpReplacementOperations, ICoreHealthReplacementProgramsCoreDyingEntryProgramsOperations coreDyingEntryProgramsOperations, ICoreHealthReplacementProgramsCoreGrantedEntityPhasesOperations coreGrantedEntityPhasesOperations, ICoreHealthReplacementProgramsCoreHealthQueriesOperations coreHealthQueriesOperations, ICoreHealthReplacementProgramsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreHealthReplacementProgramsCoreIdentityConcealmentOperations coreIdentityConcealmentOperations, ICoreHealthReplacementProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreHealthReplacementProgramsCoreQimeiProgramsOperations coreQimeiProgramsOperations, ICoreHealthReplacementProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreHealthReplacementProgramsCoreMatchLogOperations coreMatchLogOperations, ICoreHealthReplacementProgramsCoreNativeDyingOperations coreNativeDyingOperations, ICoreHealthReplacementProgramsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreHealthReplacementProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess coreGameEngineHpChangeProgramsPendingHpChangesAccess)
+    {
+        this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;
+        this._characterDongBaiOlOperations = characterDongBaiOlOperations;
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._characterSunJianMouOlOperations = characterSunJianMouOlOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreCardDamageMaximumHpReplacementOperations = coreCardDamageMaximumHpReplacementOperations;
+        this._coreDyingEntryProgramsOperations = coreDyingEntryProgramsOperations;
+        this._coreGrantedEntityPhasesOperations = coreGrantedEntityPhasesOperations;
+        this._coreHealthQueriesOperations = coreHealthQueriesOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreIdentityConcealmentOperations = coreIdentityConcealmentOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreQimeiProgramsOperations = coreQimeiProgramsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeDyingOperations = coreNativeDyingOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreMatchSetupSetupCompleteAccess = coreMatchSetupSetupCompleteAccess;
+        this._coreGameEngineHpChangeProgramsPendingHpChangesAccess = coreGameEngineHpChangeProgramsPendingHpChangesAccess;
+    }
+}

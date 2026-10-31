@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramShanheSourceWarElephantRuntime : global::CardGame.Core.IShanheWarElephantProgramHost
+{
+    private readonly ICoreProgramShanheSourceWarElephantCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramShanheSourceWarElephantResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreTriggeredCardProgramsOperations _coreTriggeredCardProgramsOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreProgramShanheSourceWarElephantCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreProgramShanheSourceWarElephantKernelCoreGameEngineProgramAttackAttemptOperations _kernelCoreGameEngineProgramAttackAttemptOperations;
+    private readonly ICoreProgramShanheSourceWarElephantKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess _coreMatchDefinitionModeDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreProgramShanheSourceWarElephantRuntime(ICoreProgramShanheSourceWarElephantCardZonesOperations cardZonesOperations, ICoreProgramShanheSourceWarElephantResolutionStackOperations resolutionStackOperations, ICoreProgramShanheSourceWarElephantCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreProgramShanheSourceWarElephantCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICoreProgramShanheSourceWarElephantCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreProgramShanheSourceWarElephantCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramShanheSourceWarElephantCoreRuntimeOperations coreRuntimeOperations, ICoreProgramShanheSourceWarElephantCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreProgramShanheSourceWarElephantCoreTriggeredCardProgramsOperations coreTriggeredCardProgramsOperations, ICoreProgramShanheSourceWarElephantCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreProgramShanheSourceWarElephantCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreProgramShanheSourceWarElephantCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreProgramShanheSourceWarElephantCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreProgramShanheSourceWarElephantCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreProgramShanheSourceWarElephantKernelCoreGameEngineProgramAttackAttemptOperations kernelCoreGameEngineProgramAttackAttemptOperations, ICoreProgramShanheSourceWarElephantKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess coreMatchDefinitionModeDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTriggeredCardProgramsOperations = coreTriggeredCardProgramsOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineProgramAttackAttemptOperations = kernelCoreGameEngineProgramAttackAttemptOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchDefinitionModeDefinitionOptionsAccess = coreMatchDefinitionModeDefinitionOptionsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

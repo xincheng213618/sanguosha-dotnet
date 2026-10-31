@@ -157,9 +157,9 @@ internal static partial class WushuangModeChecks
             var (g, r) = Start(false, seed, aiQuota: original);
             Drive(g, () => Shop(g) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
             Buy(g, Shop(g).Offers.Single(o => o.TacticId == tactic).Id); Play(g);
-            var players = (IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players",
+            var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players",
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(g)!;
-            var evaluation = (RuleQueryEvaluation)typeof(GameEngine).GetMethod(query,
+            var evaluation = (RuleQueryEvaluation)FixtureRuntimeAccess.Engine.GetMethod(query,
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.Invoke(g,
                     query == "EvaluateDrawCount" ? [players[1]] : [players[1], null, null])!;
             Require(evaluation.Value is FiniteRuleQueryValue value && value.Value == expected,

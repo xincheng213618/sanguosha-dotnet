@@ -1,0 +1,28 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineCurrentEnhancementSlashRedirectsRuntime
+{
+    private readonly ICoreCurrentEnhancementSlashRedirectsCharacterLuBuHappyGodOperations _characterLuBuHappyGodOperations;
+    private readonly ICoreCurrentEnhancementSlashRedirectsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCurrentEnhancementSlashRedirectsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCurrentEnhancementSlashRedirectsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreCurrentEnhancementSlashRedirectsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreCurrentEnhancementSlashRedirectsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreCurrentEnhancementSlashRedirectsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    internal CoreGameEngineCurrentEnhancementSlashRedirectsRuntime(ICoreCurrentEnhancementSlashRedirectsCharacterLuBuHappyGodOperations characterLuBuHappyGodOperations, ICoreCurrentEnhancementSlashRedirectsContentRegistryOperations contentRegistryOperations, ICoreCurrentEnhancementSlashRedirectsResolutionStackOperations resolutionStackOperations, ICoreCurrentEnhancementSlashRedirectsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreCurrentEnhancementSlashRedirectsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreCurrentEnhancementSlashRedirectsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreCurrentEnhancementSlashRedirectsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations)
+    {
+        this._characterLuBuHappyGodOperations = characterLuBuHappyGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+    }
+}

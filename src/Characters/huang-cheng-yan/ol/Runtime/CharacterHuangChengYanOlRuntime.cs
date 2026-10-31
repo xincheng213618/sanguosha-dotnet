@@ -1,0 +1,70 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterHuangChengYanOlRuntime : global::CardGame.Core.IHuangChengYanProgramHost
+{
+    private readonly ICharacterHuangChengYanOlCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICharacterHuangChengYanOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterHuangChengYanOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterHuangChengYanOlRandomOperations _randomOperations;
+    private readonly ICharacterHuangChengYanOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterHuangChengYanOlCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICharacterHuangChengYanOlCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterHuangChengYanOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterHuangChengYanOlCoreCharacterHostOperations _coreCharacterHostOperations;
+    private readonly ICharacterHuangChengYanOlCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICharacterHuangChengYanOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterHuangChengYanOlCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterHuangChengYanOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterHuangChengYanOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterHuangChengYanOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterHuangChengYanOlCoreJudgmentCursorRuntimeOperations _coreJudgmentCursorRuntimeOperations;
+    private readonly ICharacterHuangChengYanOlCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICharacterHuangChengYanOlCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICharacterHuangChengYanOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterHuangChengYanOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterHuangChengYanOlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterHuangChengYanOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterHuangChengYanOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICharacterHuangChengYanOlJiezhenConversionsAccess _characterHuangChengYanOlJiezhenConversionsAccess;
+    internal CharacterHuangChengYanOlRuntime(ICharacterHuangChengYanOlCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICharacterHuangChengYanOlCardZonesOperations cardZonesOperations, ICharacterHuangChengYanOlContentRegistryOperations contentRegistryOperations, ICharacterHuangChengYanOlRandomOperations randomOperations, ICharacterHuangChengYanOlResolutionStackOperations resolutionStackOperations, ICharacterHuangChengYanOlCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICharacterHuangChengYanOlCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterHuangChengYanOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterHuangChengYanOlCoreCharacterHostOperations coreCharacterHostOperations, ICharacterHuangChengYanOlCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICharacterHuangChengYanOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterHuangChengYanOlCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterHuangChengYanOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterHuangChengYanOlCoreRuntimeOperations coreRuntimeOperations, ICharacterHuangChengYanOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterHuangChengYanOlCoreJudgmentCursorRuntimeOperations coreJudgmentCursorRuntimeOperations, ICharacterHuangChengYanOlCoreMatchLogOperations coreMatchLogOperations, ICharacterHuangChengYanOlCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICharacterHuangChengYanOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterHuangChengYanOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterHuangChengYanOlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterHuangChengYanOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterHuangChengYanOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICharacterHuangChengYanOlJiezhenConversionsAccess characterHuangChengYanOlJiezhenConversionsAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterHostOperations = coreCharacterHostOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreJudgmentCursorRuntimeOperations = coreJudgmentCursorRuntimeOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._characterHuangChengYanOlJiezhenConversionsAccess = characterHuangChengYanOlJiezhenConversionsAccess;
+    }
+}

@@ -1,0 +1,51 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineTurnHandCategoryRestrictionsRuntime
+{
+    private readonly ICoreTurnHandCategoryRestrictionsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsCoreDeferredCardsOperations _coreDeferredCardsOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsCorePlannedPhaseQuantitiesOperations _corePlannedPhaseQuantitiesOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsCoreProgramCardLegalityOperations _coreProgramCardLegalityOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreTurnHandCategoryRestrictionsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineTurnHandCategoryRestrictionsRuntime(ICoreTurnHandCategoryRestrictionsCardZonesOperations cardZonesOperations, ICoreTurnHandCategoryRestrictionsContentRegistryOperations contentRegistryOperations, ICoreTurnHandCategoryRestrictionsResolutionStackOperations resolutionStackOperations, ICoreTurnHandCategoryRestrictionsTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreTurnHandCategoryRestrictionsCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreTurnHandCategoryRestrictionsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreTurnHandCategoryRestrictionsCoreDeferredCardsOperations coreDeferredCardsOperations, ICoreTurnHandCategoryRestrictionsCorePlannedPhaseQuantitiesOperations corePlannedPhaseQuantitiesOperations, ICoreTurnHandCategoryRestrictionsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreTurnHandCategoryRestrictionsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreTurnHandCategoryRestrictionsCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreTurnHandCategoryRestrictionsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreTurnHandCategoryRestrictionsCoreProgramCardLegalityOperations coreProgramCardLegalityOperations, ICoreTurnHandCategoryRestrictionsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreTurnHandCategoryRestrictionsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.RuntimeAccess.IClosedOwnedCardMoveQueriesSource _closedOwnedCardMoveQueriesSource)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreDeferredCardsOperations = coreDeferredCardsOperations;
+        this._corePlannedPhaseQuantitiesOperations = corePlannedPhaseQuantitiesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramCardLegalityOperations = coreProgramCardLegalityOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._closedOwnedCardMoveQueriesSource = _closedOwnedCardMoveQueriesSource;
+    }
+
+    private readonly global::CardGame.Core.RuntimeAccess.IClosedOwnedCardMoveQueriesSource _closedOwnedCardMoveQueriesSource;
+}

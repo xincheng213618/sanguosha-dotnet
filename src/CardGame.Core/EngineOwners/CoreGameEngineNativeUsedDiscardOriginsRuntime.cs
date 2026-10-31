@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
+{
+    private readonly ICoreNativeUsedDiscardOriginsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNativeUsedDiscardOriginsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNativeUsedDiscardOriginsCoreCardSupplyCompletionOperations _coreCardSupplyCompletionOperations;
+    private readonly ICoreNativeUsedDiscardOriginsCoreDelayedNullificationOperations _coreDelayedNullificationOperations;
+    private readonly ICoreNativeUsedDiscardOriginsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreNativeUsedDiscardOriginsCoreRequestedDeckBasicOwnershipOperations _coreRequestedDeckBasicOwnershipOperations;
+    private readonly ICoreNativeUsedDiscardOriginsCoreResponseCompletionOperations _coreResponseCompletionOperations;
+    private readonly ICoreNativeUsedDiscardOriginsCoreResponseUseCompletionOperations _coreResponseUseCompletionOperations;
+    private readonly ICoreNativeUsedDiscardOriginsCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeUsedDiscardOriginsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineNativeUsedDiscardOriginsRuntime(ICoreNativeUsedDiscardOriginsContentRegistryOperations contentRegistryOperations, ICoreNativeUsedDiscardOriginsResolutionStackOperations resolutionStackOperations, ICoreNativeUsedDiscardOriginsCoreCardSupplyCompletionOperations coreCardSupplyCompletionOperations, ICoreNativeUsedDiscardOriginsCoreDelayedNullificationOperations coreDelayedNullificationOperations, ICoreNativeUsedDiscardOriginsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreNativeUsedDiscardOriginsCoreRequestedDeckBasicOwnershipOperations coreRequestedDeckBasicOwnershipOperations, ICoreNativeUsedDiscardOriginsCoreResponseCompletionOperations coreResponseCompletionOperations, ICoreNativeUsedDiscardOriginsCoreResponseUseCompletionOperations coreResponseUseCompletionOperations, ICoreNativeUsedDiscardOriginsCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeUsedDiscardOriginsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardSupplyCompletionOperations = coreCardSupplyCompletionOperations;
+        this._coreDelayedNullificationOperations = coreDelayedNullificationOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRequestedDeckBasicOwnershipOperations = coreRequestedDeckBasicOwnershipOperations;
+        this._coreResponseCompletionOperations = coreResponseCompletionOperations;
+        this._coreResponseUseCompletionOperations = coreResponseUseCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

@@ -1,0 +1,6 @@
+#nullable enable
+namespace CardGame.Core.NativeOwners;
+internal sealed class AlcoholSlashSkillReplacementProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineAlcoholSlashSkillReplacementsEntries> getCoreGameEngineAlcoholSlashSkillReplacementsRuntime) : IAlcoholSlashSkillReplacementProgramHost
+{
+    public SkillProgramStepOutcome ReplaceOwnSkillsAfterAlcoholSlashDamage(ProgramSkillFrame frame) => getCoreGameEngineAlcoholSlashSkillReplacementsRuntime().ReplaceOwnSkillsAfterAlcoholSlashDamage(frame);
+}

@@ -1,0 +1,78 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineJudgmentProgramsRuntime
+{
+    private readonly ICoreJudgmentProgramsCharacterMaYuanYiOlOperations _characterMaYuanYiOlOperations;
+    private readonly ICoreJudgmentProgramsCharacterXiZhiCaiOlOperations _characterXiZhiCaiOlOperations;
+    private readonly ICoreJudgmentProgramsCharacterZhangFeiAnniversaryGodOperations _characterZhangFeiAnniversaryGodOperations;
+    private readonly ICoreJudgmentProgramsCharacterZhangQiYingOlOperations _characterZhangQiYingOlOperations;
+    private readonly ICoreJudgmentProgramsCharacterZhouQunOlOperations _characterZhouQunOlOperations;
+    private readonly ICoreJudgmentProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreJudgmentProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreJudgmentProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreJudgmentProgramsCoreDamageJudgmentSuitPaymentObserversOperations _coreDamageJudgmentSuitPaymentObserversOperations;
+    private readonly ICoreJudgmentProgramsCoreExactRepeatedJudgmentOperations _coreExactRepeatedJudgmentOperations;
+    private readonly ICoreJudgmentProgramsCoreJudgmentOutcomeDamageEdgesOperations _coreJudgmentOutcomeDamageEdgesOperations;
+    private readonly ICoreJudgmentProgramsCoreOwnedDamagePointJudgmentsOperations _coreOwnedDamagePointJudgmentsOperations;
+    private readonly ICoreJudgmentProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreJudgmentProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreJudgmentProgramsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreJudgmentProgramsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreJudgmentProgramsCoreYaodaoChitongOperations _coreYaodaoChitongOperations;
+    private readonly ICoreJudgmentProgramsCoreZhenyiJudgmentWindowsOperations _coreZhenyiJudgmentWindowsOperations;
+    private readonly ICoreJudgmentProgramsCoreJudgmentCursorRuntimeOperations _coreJudgmentCursorRuntimeOperations;
+    private readonly ICoreJudgmentProgramsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreJudgmentProgramsCoreNativeJudgmentOperations _coreNativeJudgmentOperations;
+    private readonly ICoreJudgmentProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreJudgmentProgramsCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
+    private readonly ICoreJudgmentProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreJudgmentProgramsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreJudgmentProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreJudgmentProgramsKernelCoreGameEngineRuntimeOperations _kernelCoreGameEngineRuntimeOperations;
+    private readonly ICoreJudgmentProgramsKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreJudgmentProgramsProgramWindowCursorOperations _programWindowCursorOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineJudgmentProgramsRuntime(ICoreJudgmentProgramsCharacterMaYuanYiOlOperations characterMaYuanYiOlOperations, ICoreJudgmentProgramsCharacterXiZhiCaiOlOperations characterXiZhiCaiOlOperations, ICoreJudgmentProgramsCharacterZhangFeiAnniversaryGodOperations characterZhangFeiAnniversaryGodOperations, ICoreJudgmentProgramsCharacterZhangQiYingOlOperations characterZhangQiYingOlOperations, ICoreJudgmentProgramsCharacterZhouQunOlOperations characterZhouQunOlOperations, ICoreJudgmentProgramsCardZonesOperations cardZonesOperations, ICoreJudgmentProgramsContentRegistryOperations contentRegistryOperations, ICoreJudgmentProgramsResolutionStackOperations resolutionStackOperations, ICoreJudgmentProgramsCoreDamageJudgmentSuitPaymentObserversOperations coreDamageJudgmentSuitPaymentObserversOperations, ICoreJudgmentProgramsCoreExactRepeatedJudgmentOperations coreExactRepeatedJudgmentOperations, ICoreJudgmentProgramsCoreJudgmentOutcomeDamageEdgesOperations coreJudgmentOutcomeDamageEdgesOperations, ICoreJudgmentProgramsCoreOwnedDamagePointJudgmentsOperations coreOwnedDamagePointJudgmentsOperations, ICoreJudgmentProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreJudgmentProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreJudgmentProgramsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreJudgmentProgramsCoreTableOrderOperations coreTableOrderOperations, ICoreJudgmentProgramsCoreYaodaoChitongOperations coreYaodaoChitongOperations, ICoreJudgmentProgramsCoreZhenyiJudgmentWindowsOperations coreZhenyiJudgmentWindowsOperations, ICoreJudgmentProgramsCoreJudgmentCursorRuntimeOperations coreJudgmentCursorRuntimeOperations, ICoreJudgmentProgramsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreJudgmentProgramsCoreNativeJudgmentOperations coreNativeJudgmentOperations, ICoreJudgmentProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreJudgmentProgramsCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICoreJudgmentProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreJudgmentProgramsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreJudgmentProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreJudgmentProgramsKernelCoreGameEngineRuntimeOperations kernelCoreGameEngineRuntimeOperations, ICoreJudgmentProgramsKernelCoreMainOperations kernelCoreMainOperations, ICoreJudgmentProgramsProgramWindowCursorOperations programWindowCursorOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterMaYuanYiOlOperations = characterMaYuanYiOlOperations;
+        this._characterXiZhiCaiOlOperations = characterXiZhiCaiOlOperations;
+        this._characterZhangFeiAnniversaryGodOperations = characterZhangFeiAnniversaryGodOperations;
+        this._characterZhangQiYingOlOperations = characterZhangQiYingOlOperations;
+        this._characterZhouQunOlOperations = characterZhouQunOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageJudgmentSuitPaymentObserversOperations = coreDamageJudgmentSuitPaymentObserversOperations;
+        this._coreExactRepeatedJudgmentOperations = coreExactRepeatedJudgmentOperations;
+        this._coreJudgmentOutcomeDamageEdgesOperations = coreJudgmentOutcomeDamageEdgesOperations;
+        this._coreOwnedDamagePointJudgmentsOperations = coreOwnedDamagePointJudgmentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreYaodaoChitongOperations = coreYaodaoChitongOperations;
+        this._coreZhenyiJudgmentWindowsOperations = coreZhenyiJudgmentWindowsOperations;
+        this._coreJudgmentCursorRuntimeOperations = coreJudgmentCursorRuntimeOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeJudgmentOperations = coreNativeJudgmentOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreGameEngineRuntimeOperations = kernelCoreGameEngineRuntimeOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._programWindowCursorOperations = programWindowCursorOperations;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

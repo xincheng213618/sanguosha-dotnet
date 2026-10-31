@@ -1,0 +1,21 @@
+#nullable enable
+namespace CardGame.Core.NativeOwners;
+internal sealed class CardsMovedWindowCardUseContinuations(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineGuanduCardsEntries> getCoreGameEngineGuanduCardsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterGuanYuWumiaoEntries> getCharacterGuanYuWumiaoRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineDragonBoatCardsEntries> getCoreGameEngineDragonBoatCardsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineWenheCardsEntries> getCoreGameEngineWenheCardsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineSoleIncomingRangeDrawEntries> getCoreGameEngineSoleIncomingRangeDrawRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeCardEffectDrawsEntries> getCoreNativeCardEffectDrawsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineFriendDuelResponsesEntries> getCoreGameEngineFriendDuelResponsesRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreRecoveryReplacementEntries> getCoreRecoveryReplacementRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterWangCanOlEntries> getCharacterWangCanOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterGuoSiOlEntries> getCharacterGuoSiOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineEndingHistoricalUsesEntries> getCoreGameEngineEndingHistoricalUsesRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineRoundPricedPileAlcoholEntries> getCoreGameEngineRoundPricedPileAlcoholRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineUnrespondableCounterspellsEntries> getCoreGameEngineUnrespondableCounterspellsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZhugeLiangMouEntries> getCharacterZhugeLiangMouRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineColorFireAttacksEntries> getCoreGameEngineColorFireAttacksRuntime) : ICardsMovedWindowCardUseContinuations
+{
+    public void ContinueGuanduCardEffect(long id) => getCoreGameEngineGuanduCardsRuntime().ContinueGuanduCardEffect(id);
+    public void ContinueWumiaoFlood(long id) => getCharacterGuanYuWumiaoRuntime().ContinueWumiaoFlood(id);
+    public void ContinueDragonBoatCardEffect(long id) => getCoreGameEngineDragonBoatCardsRuntime().ContinueDragonBoatCardEffect(id);
+    public void ContinueWenheCardEffect(long id) => getCoreGameEngineWenheCardsRuntime().ContinueWenheCardEffect(id);
+    public void ContinueSoleIncomingRangeDraw(long id) => getCoreGameEngineSoleIncomingRangeDrawRuntime().ContinueSoleIncomingRangeDraw(id);
+    public void ContinueNativeDrawTwo(long id) => getCoreNativeCardEffectDrawsRuntime().ContinueNativeDrawTwo(id);
+    public void ContinueFriendDuelResponse(long id) => getCoreGameEngineFriendDuelResponsesRuntime().ContinueFriendDuelResponse(id);
+    public void ContinueRecoveryPaidCardUse(long useId) => getCoreRecoveryReplacementRuntime().ContinueRecoveryPaidCardUse(useId);
+    public void ContinueDenglouNativePayment(long id) => getCharacterWangCanOlRuntime().ContinueDenglouNativePayment(id);
+    public void ContinueGuoSiNativePayment(long id) => getCharacterGuoSiOlRuntime().ContinueGuoSiNativePayment(id);
+    public void AssertGuoSiNativeUse(CardUseFrame use) => getCharacterGuoSiOlRuntime().AssertGuoSiNativeUse(use);
+    public void ContinueHistoricalEndingPayment(long id) => getCoreGameEngineEndingHistoricalUsesRuntime().ContinueHistoricalEndingPayment(id);
+    public void ContinueRoundPileAlcoholUse(long id) => getCoreGameEngineRoundPricedPileAlcoholRuntime().ContinueRoundPileAlcoholUse(id);
+    public void ContinuePolicyCounterspellPayment(long windowId) => getCoreGameEngineUnrespondableCounterspellsRuntime().ContinuePolicyCounterspellPayment(windowId);
+    public void ContinueMouZhitianFirePayment(long id) => getCharacterZhugeLiangMouRuntime().ContinueMouZhitianFirePayment(id);
+    public void ContinueColorFireAttackPayment(long useId) => getCoreGameEngineColorFireAttacksRuntime().ContinueColorFireAttackPayment(useId);
+}

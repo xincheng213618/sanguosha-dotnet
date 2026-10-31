@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreAlternativePhaseCostProgramsRuntime : global::CardGame.Core.IAlternativePhaseCostProgramHost
+{
+    private readonly ICoreAlternativePhaseCostProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreAlternativePhaseCostProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreAlternativePhaseCostProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreProgramMarkerPaymentsOperations _coreProgramMarkerPaymentsOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreAlternativePhaseCostProgramsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreAlternativePhaseCostProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreDelayedTurnEffectsPendingTurnDelayedEffectsAccess _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreAlternativePhaseCostProgramsRuntime(ICoreAlternativePhaseCostProgramsCardZonesOperations cardZonesOperations, ICoreAlternativePhaseCostProgramsContentRegistryOperations contentRegistryOperations, ICoreAlternativePhaseCostProgramsResolutionStackOperations resolutionStackOperations, ICoreAlternativePhaseCostProgramsCoreActualTurnsOperations coreActualTurnsOperations, ICoreAlternativePhaseCostProgramsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreAlternativePhaseCostProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreAlternativePhaseCostProgramsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreAlternativePhaseCostProgramsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreAlternativePhaseCostProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreAlternativePhaseCostProgramsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreAlternativePhaseCostProgramsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreAlternativePhaseCostProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreAlternativePhaseCostProgramsCoreProgramMarkerPaymentsOperations coreProgramMarkerPaymentsOperations, ICoreAlternativePhaseCostProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreAlternativePhaseCostProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreAlternativePhaseCostProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreAlternativePhaseCostProgramsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreAlternativePhaseCostProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreDelayedTurnEffectsPendingTurnDelayedEffectsAccess coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramMarkerPaymentsOperations = coreProgramMarkerPaymentsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess = coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

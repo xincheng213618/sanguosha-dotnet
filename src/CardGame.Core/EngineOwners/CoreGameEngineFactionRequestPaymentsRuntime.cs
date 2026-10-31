@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineFactionRequestPaymentsRuntime
+{
+    private readonly ICoreFactionRequestPaymentsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreFactionRequestPaymentsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFactionRequestPaymentsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreFactionRequestPaymentsCoreFactionRequestCostRecoveriesOperations _coreFactionRequestCostRecoveriesOperations;
+    private readonly ICoreFactionRequestPaymentsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreFactionRequestPaymentsCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreFactionRequestPaymentsCoreNativeFactionSlashOperations _coreNativeFactionSlashOperations;
+    private readonly ICoreFactionRequestPaymentsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreFactionRequestPaymentsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreFactionRequestPaymentsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreFactionRequestPaymentsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreFactionRequestPaymentsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreFactionRequestPaymentsKernelCoreGameEngineRuntimeOperations _kernelCoreGameEngineRuntimeOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineFactionRequestPaymentsRuntime(ICoreFactionRequestPaymentsCardZonesOperations cardZonesOperations, ICoreFactionRequestPaymentsResolutionStackOperations resolutionStackOperations, ICoreFactionRequestPaymentsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreFactionRequestPaymentsCoreFactionRequestCostRecoveriesOperations coreFactionRequestCostRecoveriesOperations, ICoreFactionRequestPaymentsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreFactionRequestPaymentsCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreFactionRequestPaymentsCoreNativeFactionSlashOperations coreNativeFactionSlashOperations, ICoreFactionRequestPaymentsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreFactionRequestPaymentsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreFactionRequestPaymentsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreFactionRequestPaymentsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreFactionRequestPaymentsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreFactionRequestPaymentsKernelCoreGameEngineRuntimeOperations kernelCoreGameEngineRuntimeOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreFactionRequestCostRecoveriesOperations = coreFactionRequestCostRecoveriesOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeFactionSlashOperations = coreNativeFactionSlashOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreGameEngineRuntimeOperations = kernelCoreGameEngineRuntimeOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

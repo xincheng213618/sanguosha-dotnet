@@ -195,9 +195,7 @@ internal sealed class ProgramTargetRules
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramTargetRuleCatalog> TargetRuleMetadata = new(() =>
-        ProgramTargetRuleCatalog.Discover(RuntimeModuleMethods), true);
     private ProgramTargetRules? _targetRules;
-    private ProgramTargetRules TargetRules => _targetRules ??= new(TargetRuleMetadata.Value,
+    private ProgramTargetRules TargetRules => _targetRules ??= new(global::CardGame.Core.EngineOwners.CoreProgramTargetRulesDefinitions.TargetRuleMetadata.Value,
         BindRuntimeHandler);
 }

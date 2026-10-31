@@ -20,7 +20,7 @@ internal sealed class AnniversaryXiahouJieHandler(SkillProgramEffectOp operation
 }
 internal static class AnniversaryXiahouJieComposition
 {
-    internal const string Liedan="anniversary:liedan", Zhuangdan="anniversary:zhuangdan", Compare="sequential-preparation", Suppress="unique-most-until-own-end";
+    internal const string Liedan="anniversary:liedan",Zhuangdan="anniversary:zhuangdan",Compare="sequential-preparation",Suppress="unique-most-until-own-end";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveAnniversaryXiahouJieLiedan or SkillProgramEffectOp.ResolveAnniversaryXiahouJieZhuangdan;
     [ProgramCatalogValidation(45500)] internal static void Validate(string path, SkillProgram p)
     {

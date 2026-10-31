@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEnginePublicPersistentPilesRuntime : global::CardGame.Core.IPublicPersistentPileProgramHost
+{
+    private readonly ICorePublicPersistentPilesCharacterBaoXinOlOperations _characterBaoXinOlOperations;
+    private readonly ICorePublicPersistentPilesCharacterGanNingMouMobileOperations _characterGanNingMouMobileOperations;
+    private readonly ICorePublicPersistentPilesCharacterGongsunZanMouMobileOperations _characterGongsunZanMouMobileOperations;
+    private readonly ICorePublicPersistentPilesCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICorePublicPersistentPilesCharacterHuangZuMobileShiOperations _characterHuangZuMobileShiOperations;
+    private readonly ICorePublicPersistentPilesCharacterLiFengOlOperations _characterLiFengOlOperations;
+    private readonly ICorePublicPersistentPilesCharacterLvQianOlOperations _characterLvQianOlOperations;
+    private readonly ICorePublicPersistentPilesCharacterSunShangxiangMouMobileOperations _characterSunShangxiangMouMobileOperations;
+    private readonly ICorePublicPersistentPilesCharacterXiahouDunMouMobileOperations _characterXiahouDunMouMobileOperations;
+    private readonly ICorePublicPersistentPilesCardZonesOperations _cardZonesOperations;
+    private readonly ICorePublicPersistentPilesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePublicPersistentPilesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePublicPersistentPilesCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICorePublicPersistentPilesCoreBoundPublicPileProgramsOperations _coreBoundPublicPileProgramsOperations;
+    private readonly ICorePublicPersistentPilesCoreCardDistributionPresentationOperations _coreCardDistributionPresentationOperations;
+    private readonly ICorePublicPersistentPilesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICorePublicPersistentPilesCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICorePublicPersistentPilesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePublicPersistentPilesCorePublicPileSourcesOperations _corePublicPileSourcesOperations;
+    private readonly ICorePublicPersistentPilesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePublicPersistentPilesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICorePublicPersistentPilesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePublicPersistentPilesCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICorePublicPersistentPilesCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICorePublicPersistentPilesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    internal CoreGameEnginePublicPersistentPilesRuntime(ICorePublicPersistentPilesCharacterBaoXinOlOperations characterBaoXinOlOperations, ICorePublicPersistentPilesCharacterGanNingMouMobileOperations characterGanNingMouMobileOperations, ICorePublicPersistentPilesCharacterGongsunZanMouMobileOperations characterGongsunZanMouMobileOperations, ICorePublicPersistentPilesCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICorePublicPersistentPilesCharacterHuangZuMobileShiOperations characterHuangZuMobileShiOperations, ICorePublicPersistentPilesCharacterLiFengOlOperations characterLiFengOlOperations, ICorePublicPersistentPilesCharacterLvQianOlOperations characterLvQianOlOperations, ICorePublicPersistentPilesCharacterSunShangxiangMouMobileOperations characterSunShangxiangMouMobileOperations, ICorePublicPersistentPilesCharacterXiahouDunMouMobileOperations characterXiahouDunMouMobileOperations, ICorePublicPersistentPilesCardZonesOperations cardZonesOperations, ICorePublicPersistentPilesContentRegistryOperations contentRegistryOperations, ICorePublicPersistentPilesResolutionStackOperations resolutionStackOperations, ICorePublicPersistentPilesCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICorePublicPersistentPilesCoreBoundPublicPileProgramsOperations coreBoundPublicPileProgramsOperations, ICorePublicPersistentPilesCoreCardDistributionPresentationOperations coreCardDistributionPresentationOperations, ICorePublicPersistentPilesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICorePublicPersistentPilesCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICorePublicPersistentPilesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePublicPersistentPilesCorePublicPileSourcesOperations corePublicPileSourcesOperations, ICorePublicPersistentPilesCoreRuntimeOperations coreRuntimeOperations, ICorePublicPersistentPilesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICorePublicPersistentPilesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePublicPersistentPilesCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICorePublicPersistentPilesCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICorePublicPersistentPilesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess coreGameEnginePublicPileSourcesPublicPersistentPilesAccess)
+    {
+        this._characterBaoXinOlOperations = characterBaoXinOlOperations;
+        this._characterGanNingMouMobileOperations = characterGanNingMouMobileOperations;
+        this._characterGongsunZanMouMobileOperations = characterGongsunZanMouMobileOperations;
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._characterHuangZuMobileShiOperations = characterHuangZuMobileShiOperations;
+        this._characterLiFengOlOperations = characterLiFengOlOperations;
+        this._characterLvQianOlOperations = characterLvQianOlOperations;
+        this._characterSunShangxiangMouMobileOperations = characterSunShangxiangMouMobileOperations;
+        this._characterXiahouDunMouMobileOperations = characterXiahouDunMouMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreBoundPublicPileProgramsOperations = coreBoundPublicPileProgramsOperations;
+        this._coreCardDistributionPresentationOperations = coreCardDistributionPresentationOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPileSourcesOperations = corePublicPileSourcesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEnginePublicPileSourcesPublicPersistentPilesAccess = coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    }
+}

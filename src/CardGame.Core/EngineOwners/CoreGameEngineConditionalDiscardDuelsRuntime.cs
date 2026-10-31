@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime : global::CardGame.Core.IConditionalDiscardDuelProgramHost
+{
+    private readonly ICoreConditionalDiscardDuelsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreConditionalDiscardDuelsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreConditionalDiscardDuelsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreConditionalDiscardDuelReturnsOperations _coreConditionalDiscardDuelReturnsOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreConditionalDiscardDuelsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreConditionalDiscardDuelsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreConditionalDiscardDuelsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreConditionalDiscardDuelsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineConditionalDiscardDuelsRuntime(ICoreConditionalDiscardDuelsCardZonesOperations cardZonesOperations, ICoreConditionalDiscardDuelsContentRegistryOperations contentRegistryOperations, ICoreConditionalDiscardDuelsResolutionStackOperations resolutionStackOperations, ICoreConditionalDiscardDuelsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreConditionalDiscardDuelsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreConditionalDiscardDuelsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreConditionalDiscardDuelsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreConditionalDiscardDuelsCoreConditionalDiscardDuelReturnsOperations coreConditionalDiscardDuelReturnsOperations, ICoreConditionalDiscardDuelsCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreConditionalDiscardDuelsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreConditionalDiscardDuelsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreConditionalDiscardDuelsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreConditionalDiscardDuelsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreConditionalDiscardDuelsCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICoreConditionalDiscardDuelsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreConditionalDiscardDuelsCoreRuntimeOperations coreRuntimeOperations, ICoreConditionalDiscardDuelsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreConditionalDiscardDuelsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreConditionalDiscardDuelsCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreConditionalDiscardDuelsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreConditionalDiscardDuelsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreConditionalDiscardDuelsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreConditionalDiscardDuelsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreConditionalDiscardDuelsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreConditionalDiscardDuelsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreConditionalDiscardDuelsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreConditionalDiscardDuelReturnsOperations = coreConditionalDiscardDuelReturnsOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

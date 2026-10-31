@@ -1,0 +1,60 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineSequentialDeckKindGrowthRuntime : global::CardGame.Core.ISequentialDeckKindGrowthHost
+{
+    private readonly ICoreSequentialDeckKindGrowthCharacterTaishiCiMouOlOperations _characterTaishiCiMouOlOperations;
+    private readonly ICoreSequentialDeckKindGrowthCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSequentialDeckKindGrowthContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSequentialDeckKindGrowthResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreSequentialDeckKindGrowthCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreSequentialDeckKindGrowthKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSequentialDeckKindGrowthRuntime(ICoreSequentialDeckKindGrowthCharacterTaishiCiMouOlOperations characterTaishiCiMouOlOperations, ICoreSequentialDeckKindGrowthCardZonesOperations cardZonesOperations, ICoreSequentialDeckKindGrowthContentRegistryOperations contentRegistryOperations, ICoreSequentialDeckKindGrowthResolutionStackOperations resolutionStackOperations, ICoreSequentialDeckKindGrowthCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreSequentialDeckKindGrowthCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSequentialDeckKindGrowthCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreSequentialDeckKindGrowthCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreSequentialDeckKindGrowthCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreSequentialDeckKindGrowthCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreSequentialDeckKindGrowthCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreSequentialDeckKindGrowthCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreSequentialDeckKindGrowthCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSequentialDeckKindGrowthCoreRuntimeOperations coreRuntimeOperations, ICoreSequentialDeckKindGrowthCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreSequentialDeckKindGrowthCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreSequentialDeckKindGrowthCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreSequentialDeckKindGrowthCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreSequentialDeckKindGrowthKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterTaishiCiMouOlOperations = characterTaishiCiMouOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

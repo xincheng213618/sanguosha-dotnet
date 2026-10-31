@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheS5HuashenRuntime : global::CardGame.Core.IShanheS5HuashenHost
+{
+    private readonly ICoreShanheS5HuashenContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheS5HuashenResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheS5HuashenCorePrivateGeneralLibrariesOperations _corePrivateGeneralLibrariesOperations;
+    private readonly ICoreShanheS5HuashenCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheS5HuashenCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheS5HuashenCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheS5HuashenCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheS5HuashenKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePrivateGeneralLibrariesPrivateGeneralLibrariesPrivateGeneralLibraryRevisionAccess _coreGameEnginePrivateGeneralLibrariesPrivateGeneralLibrariesPrivateGeneralLibraryRevisionAccess;
+    internal CoreGameEngineShanheS5HuashenRuntime(ICoreShanheS5HuashenContentRegistryOperations contentRegistryOperations, ICoreShanheS5HuashenResolutionStackOperations resolutionStackOperations, ICoreShanheS5HuashenCorePrivateGeneralLibrariesOperations corePrivateGeneralLibrariesOperations, ICoreShanheS5HuashenCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheS5HuashenCoreRuntimeOperations coreRuntimeOperations, ICoreShanheS5HuashenCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheS5HuashenCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheS5HuashenKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePrivateGeneralLibrariesPrivateGeneralLibrariesPrivateGeneralLibraryRevisionAccess coreGameEnginePrivateGeneralLibrariesPrivateGeneralLibrariesPrivateGeneralLibraryRevisionAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._corePrivateGeneralLibrariesOperations = corePrivateGeneralLibrariesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEnginePrivateGeneralLibrariesPrivateGeneralLibrariesPrivateGeneralLibraryRevisionAccess = coreGameEnginePrivateGeneralLibrariesPrivateGeneralLibrariesPrivateGeneralLibraryRevisionAccess;
+    }
+}

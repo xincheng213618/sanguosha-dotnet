@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouLiuChengComposition
 {
-    internal const string Lueying = "mou-mobile:lueying", Yingwu = "mou-mobile:yingwu";
+    internal const string Lueying = "mou-mobile:lueying",Yingwu = "mou-mobile:yingwu";
     internal static bool IsSkill(string id) => id is Lueying or Yingwu;
     private static bool Trigger(SkillProgramTrigger t) => !t.Optional && t.Priority == 0 && t.OwnerRelation == SkillProgramCardActionOwnerRelation.Actor &&
         t.Subject is null && t.SourceZones.Count == 0 && t.DestinationZones.Count == 0 && t.MovementReasons.Count == 0 && t.Suits.Count == 0 &&

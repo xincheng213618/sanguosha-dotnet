@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineRevealedCardHpComparisonRuntime : global::CardGame.Core.IRevealedCardHpComparisonHost
+{
+    private readonly ICoreRevealedCardHpComparisonContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRevealedCardHpComparisonResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRevealedCardHpComparisonCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreRevealedCardHpComparisonCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreRevealedCardHpComparisonCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreRevealedCardHpComparisonCoreNeighborDiscardOpportunitiesOperations _coreNeighborDiscardOpportunitiesOperations;
+    private readonly ICoreRevealedCardHpComparisonCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICoreRevealedCardHpComparisonCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreRevealedCardHpComparisonCoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    private readonly ICoreRevealedCardHpComparisonCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICoreRevealedCardHpComparisonCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreRevealedCardHpComparisonKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreRevealedCardHpComparisonKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRevealedCardHpComparisonRuntime(ICoreRevealedCardHpComparisonContentRegistryOperations contentRegistryOperations, ICoreRevealedCardHpComparisonResolutionStackOperations resolutionStackOperations, ICoreRevealedCardHpComparisonCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreRevealedCardHpComparisonCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreRevealedCardHpComparisonCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreRevealedCardHpComparisonCoreNeighborDiscardOpportunitiesOperations coreNeighborDiscardOpportunitiesOperations, ICoreRevealedCardHpComparisonCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICoreRevealedCardHpComparisonCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreRevealedCardHpComparisonCoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations, ICoreRevealedCardHpComparisonCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICoreRevealedCardHpComparisonCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreRevealedCardHpComparisonKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreRevealedCardHpComparisonKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNeighborDiscardOpportunitiesOperations = coreNeighborDiscardOpportunitiesOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

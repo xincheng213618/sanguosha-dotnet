@@ -1,0 +1,98 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterWangGuanOlRuntime : global::CardGame.Core.IWangGuanHost
+{
+    private readonly ICharacterWangGuanOlCharacterLuoXianOlOperations _characterLuoXianOlOperations;
+    private readonly ICharacterWangGuanOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterWangGuanOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterWangGuanOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterWangGuanOlSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICharacterWangGuanOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterWangGuanOlCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICharacterWangGuanOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterWangGuanOlCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICharacterWangGuanOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterWangGuanOlCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterWangGuanOlCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterWangGuanOlCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterWangGuanOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterWangGuanOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterWangGuanOlCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterWangGuanOlCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterWangGuanOlCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICharacterWangGuanOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterWangGuanOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterWangGuanOlCoreProgramRevealsOperations _coreProgramRevealsOperations;
+    private readonly ICharacterWangGuanOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterWangGuanOlCoreShownEntityTurnPoliciesOperations _coreShownEntityTurnPoliciesOperations;
+    private readonly ICharacterWangGuanOlCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterWangGuanOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterWangGuanOlCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterWangGuanOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterWangGuanOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterWangGuanOlCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICharacterWangGuanOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterWangGuanOlCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICharacterWangGuanOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterWangGuanOlCharacterWangGuanOlOperations _characterWangGuanOlOperations;
+    private readonly ICharacterWangGuanOlCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterWangGuanOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICharacterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess _characterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess;
+    internal CharacterWangGuanOlRuntime(ICharacterWangGuanOlCharacterLuoXianOlOperations characterLuoXianOlOperations, ICharacterWangGuanOlCardZonesOperations cardZonesOperations, ICharacterWangGuanOlContentRegistryOperations contentRegistryOperations, ICharacterWangGuanOlResolutionStackOperations resolutionStackOperations, ICharacterWangGuanOlSkillRuntimeStateOperations skillRuntimeStateOperations, ICharacterWangGuanOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterWangGuanOlCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICharacterWangGuanOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterWangGuanOlCoreCardActionsOperations coreCardActionsOperations, ICharacterWangGuanOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterWangGuanOlCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterWangGuanOlCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterWangGuanOlCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterWangGuanOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterWangGuanOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterWangGuanOlCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterWangGuanOlCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterWangGuanOlCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICharacterWangGuanOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterWangGuanOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterWangGuanOlCoreProgramRevealsOperations coreProgramRevealsOperations, ICharacterWangGuanOlCoreRuntimeOperations coreRuntimeOperations, ICharacterWangGuanOlCoreShownEntityTurnPoliciesOperations coreShownEntityTurnPoliciesOperations, ICharacterWangGuanOlCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterWangGuanOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterWangGuanOlCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterWangGuanOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterWangGuanOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterWangGuanOlCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICharacterWangGuanOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterWangGuanOlCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICharacterWangGuanOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterWangGuanOlCharacterWangGuanOlOperations characterWangGuanOlOperations, ICharacterWangGuanOlCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterWangGuanOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICharacterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess characterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess)
+    {
+        this._characterLuoXianOlOperations = characterLuoXianOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramRevealsOperations = coreProgramRevealsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShownEntityTurnPoliciesOperations = coreShownEntityTurnPoliciesOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterWangGuanOlOperations = characterWangGuanOlOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._characterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess = characterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess;
+    }
+}

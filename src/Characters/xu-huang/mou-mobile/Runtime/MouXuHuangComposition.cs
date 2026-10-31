@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouXuHuangComposition
 {
-    internal const string Duanliang = "mou-mobile:duanliang", Shipo = "mou-mobile:shipo";
+    internal const string Duanliang = "mou-mobile:duanliang",Shipo = "mou-mobile:shipo";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouXuHuangDuanliang or SkillProgramEffectOp.ResolveMouXuHuangShipo;
     private static bool Plain(SkillProgramEffect e, SkillProgramEffectOp op) => e.Op == op && e.Target == SkillProgramEffectTarget.Owner &&
         e.Condition.Kind == SkillProgramConditionKind.Always && e.Amount == 0 && e.ActorReference is null && e.TargetReference is null &&

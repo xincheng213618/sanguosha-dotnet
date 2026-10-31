@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouJiangWeiComposition
 {
-    internal const string Tiaoxin = "mou-mobile:tiaoxin", Zhiji = "mou-mobile:zhiji";
+    internal const string Tiaoxin = "mou-mobile:tiaoxin",Zhiji = "mou-mobile:zhiji";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.InitializeMouJiangWei or SkillProgramEffectOp.ResolveMouJiangWeiTiaoxin or SkillProgramEffectOp.ResolveMouJiangWeiZhiji;
     [ProgramCatalogValidation(1540)]
     internal static void Validate(string path, SkillProgram p)

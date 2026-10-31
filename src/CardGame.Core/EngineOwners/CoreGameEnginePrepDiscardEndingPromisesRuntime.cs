@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePrepDiscardEndingPromisesRuntime
+{
+    private readonly ICorePrepDiscardEndingPromisesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePrepDiscardEndingPromisesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePrepDiscardEndingPromisesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePrepDiscardEndingPromisesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICorePrepDiscardEndingPromisesCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICorePrepDiscardEndingPromisesCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICorePrepDiscardEndingPromisesCorePrepDiscardPaymentsOperations _corePrepDiscardPaymentsOperations;
+    private readonly ICorePrepDiscardEndingPromisesCorePrepDiscardReceiptsOperations _corePrepDiscardReceiptsOperations;
+    private readonly ICorePrepDiscardEndingPromisesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePrepDiscardEndingPromisesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePrepDiscardEndingPromisesCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICorePrepDiscardEndingPromisesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICorePrepDiscardEndingPromisesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEnginePrepDiscardEndingPromisesRuntime(ICorePrepDiscardEndingPromisesContentRegistryOperations contentRegistryOperations, ICorePrepDiscardEndingPromisesResolutionStackOperations resolutionStackOperations, ICorePrepDiscardEndingPromisesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePrepDiscardEndingPromisesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICorePrepDiscardEndingPromisesCoreEquipmentContentOperations coreEquipmentContentOperations, ICorePrepDiscardEndingPromisesCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICorePrepDiscardEndingPromisesCorePrepDiscardPaymentsOperations corePrepDiscardPaymentsOperations, ICorePrepDiscardEndingPromisesCorePrepDiscardReceiptsOperations corePrepDiscardReceiptsOperations, ICorePrepDiscardEndingPromisesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePrepDiscardEndingPromisesCoreRuntimeOperations coreRuntimeOperations, ICorePrepDiscardEndingPromisesCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICorePrepDiscardEndingPromisesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICorePrepDiscardEndingPromisesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._corePrepDiscardPaymentsOperations = corePrepDiscardPaymentsOperations;
+        this._corePrepDiscardReceiptsOperations = corePrepDiscardReceiptsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

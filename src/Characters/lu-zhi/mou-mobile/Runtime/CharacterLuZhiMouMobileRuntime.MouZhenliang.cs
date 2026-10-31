@@ -1,0 +1,29 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+using System.Globalization;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterLuZhiMouMobileRuntime
+{
+    internal int MouLuZhiX(int owner, int target) => _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && _coreMatchParticipantsPlayersAccess._players[target].HasHpValue ? Math.Max(1, Math.Abs(_coreMatchParticipantsPlayersAccess._players[owner].Hp - _coreMatchParticipantsPlayersAccess._players[target].Hp)) : int.MaxValue;
+    internal int MouLuZhiPhaseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiStartedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Op == SkillProgramEffectOp.ResolveMouLuZhiZhenliangYang && e.Phase == phase);
+    [ProgramPhaseUsedProjection(70)]
+    internal int MouLuZhiProjectedUses(int owner, string skill, int fallback) => skill == MouLuZhiZhenliang && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase ? MouLuZhiPhaseUses(owner, phase) : fallback;
+    internal int[] MouLuZhiYangTargets(int owner, MouLuZhiRen ren, string instance) => _coreProgramLifecycleOperations.GetProgramTargetSeats(owner, SkillProgramTargetKind.OtherLivingInAttackRange).Where(target => MouLuZhiCostCards(owner, _coreActionDiscardColorsOperations.CapturePhysicalCardColor(owner, _coreAdvancedLifecycleOperations.GetAdvancedCard(ren.CardId)), instance).Length >= MouLuZhiX(owner, target)).ToArray();
+    [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 31000, SkillProgramEffectOp.ResolveMouLuZhiZhenliangYang)]
+    internal bool CanStartMouLuZhiYang(CharacterState owner) => _coreProgramConversionPolarityOperations.GetProgramConversionPolarity(owner.Seat, MouLuZhiZhenliang) == SkillPolarity.Yang && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == owner.Seat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) && MouLuZhiPhaseUses(owner.Seat, phase) == 0 && _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(i => i.SkillId == MouLuZhiZhenliang).Any(i => MatchingMouLuZhiRen(owner.Seat, i.SkillInstanceId)is { } ren && MouLuZhiYangTargets(owner.Seat, ren, i.SkillInstanceId).Length > 0);
+    internal bool MouLuZhiOutsideTurn(int owner) => _coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn && _coreActualTurnProgressCurrentSeatAccess._currentSeat != owner;
+    internal bool MouLuZhiCompletion(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
+    {
+        if (context.CardUse is not { } card || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.Action.ActionId != card.CardActionId || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != context.Window || !MouLuZhiOutsideTurn(c.OwnerSeat) || _coreProgramConversionPolarityOperations.GetProgramConversionPolarity(c.OwnerSeat, c.SkillId) != SkillPolarity.Yin || MatchingMouLuZhiRen(c.OwnerSeat, c.SkillInstanceId)is not { } ren || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(w.Action.EffectiveKind) != global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(ren.CardId).Kind) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiStartedEvent>().Any(e => e.Op == SkillProgramEffectOp.ResolveMouLuZhiZhenliangYin && e.Source.OwnerSeat == c.OwnerSeat && e.ActionId == card.CardActionId))
+            return false;
+        return context.Window == SkillProgramTriggerWindow.CardUseCompleted ? w.Action.Type == CardActionType.Use || w.CompletedResponseReturn is { IsCommitted: false } && _coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(w) : context.Window == SkillProgramTriggerWindow.CardResponseCompleted && w.ResponseCompletion is { CostsDrained: true } && _coreResponseCompletionOperations.ValidResponseCompletionWindow(w) && !IsMouLuZhiTrueResponseUse(w.Action);
+    }
+
+    internal bool IsMouLuZhiTrueResponseUse(CardActionContext action) => _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCompletedResponseKind.Nullification) || _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCompletedResponseKind.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } kind } attack } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat == action.ActorSeat;
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 31000, SkillProgramEffectOp.ExchangeMouLuZhiMingren, SkillProgramEffectOp.ResolveMouLuZhiZhenliangYin)]
+    internal bool CanOfferMouLuZhi(ProgramTriggerLegalityContext gate) => gate.Candidate.SkillId == MouLuZhiMingren ? MatchingMouLuZhiRen(gate.Owner.Seat, gate.Candidate.SkillInstanceId)is not null && _corePhysicalOwnedCardQueriesOperations.GetHand(gate.Owner).Count > 0 : MouLuZhiCompletion(gate.Candidate, gate.Context);
+}

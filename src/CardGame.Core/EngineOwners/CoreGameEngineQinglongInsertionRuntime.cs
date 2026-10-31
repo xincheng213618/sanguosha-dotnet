@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineQinglongInsertionRuntime
+{
+    private readonly ICoreQinglongInsertionCharacterLiuFengBoundaryOperations _characterLiuFengBoundaryOperations;
+    private readonly ICoreQinglongInsertionResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreQinglongInsertionCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreQinglongInsertionCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreQinglongInsertionCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreQinglongInsertionCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreQinglongInsertionCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreQinglongInsertionCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreQinglongInsertionCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreQinglongInsertionKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreQinglongInsertionKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    internal CoreGameEngineQinglongInsertionRuntime(ICoreQinglongInsertionCharacterLiuFengBoundaryOperations characterLiuFengBoundaryOperations, ICoreQinglongInsertionResolutionStackOperations resolutionStackOperations, ICoreQinglongInsertionCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreQinglongInsertionCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreQinglongInsertionCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreQinglongInsertionCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreQinglongInsertionCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreQinglongInsertionCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreQinglongInsertionCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreQinglongInsertionKernelCoreMainOperations kernelCoreMainOperations, ICoreQinglongInsertionKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess)
+    {
+        this._characterLiuFengBoundaryOperations = characterLiuFengBoundaryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+    }
+}

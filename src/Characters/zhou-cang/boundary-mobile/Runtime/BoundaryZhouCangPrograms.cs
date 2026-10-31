@@ -4,7 +4,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryZhouCangComposition
 {
-    internal const string Skill = "boundary:zhongyong-mobile", Binding = "completed-play-slash";
+    internal const string Skill = "boundary:zhongyong-mobile",Binding = "completed-play-slash";
     [ProgramCatalogValidation(53300)]
     internal static void Validate(string path, SkillProgram p)
     {
@@ -48,7 +48,7 @@ public sealed record BoundaryZhongyongBonusEvent(long FrameId, long UseId, int O
 public sealed record BoundaryZhongyongReceipt(CardConversionSource Source, string Hash, long UseId, long ActionId, long WindowId,
     ActualDiscardRecoveryPhaseKey Phase, bool Responded, BoundaryZhongyongStage Stage)
 {
-    private readonly IReadOnlyList<int> _slash = [], _dodge = [], _excluded = [], _requested = [];
+    private readonly IReadOnlyList<int> _slash = [],_dodge = [],_excluded = [],_requested = [];
     public IReadOnlyList<int> Slash { get => _slash; init => _slash = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Dodge { get => _dodge; init => _dodge = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Excluded { get => _excluded; init => _excluded = Array.AsReadOnly(value.ToArray()); }

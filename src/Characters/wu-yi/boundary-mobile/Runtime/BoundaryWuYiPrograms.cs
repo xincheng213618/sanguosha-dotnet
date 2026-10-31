@@ -4,7 +4,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryWuYiComposition
 {
-    internal const string Skill = "boundary:benxi-mobile", Cost = "benxi-cost", Start = "pay-play-start", Targets = "next-use-targets", Reward = "issued-use-reward";
+    internal const string Skill = "boundary:benxi-mobile",Cost = "benxi-cost",Start = "pay-play-start",Targets = "next-use-targets",Reward = "issued-use-reward";
 
     [ProgramCatalogValidation(53100)]
     internal static void Validate(string path, SkillProgram program)
@@ -69,7 +69,7 @@ public sealed record BoundaryWuYiBenxiConsumedEvent(long GrantFrameId, long Acti
 public sealed record BoundaryWuYiRewardIssuedEvent(long FrameId, long GrantFrameId, long UseId, long ActionId, int Owner) : IGameEvent;
 public sealed record BoundaryWuYiTargetDraft(BoundaryWuYiBenxiGrantedEvent Grant, long UseId, long ActionId, long WindowId)
 {
-    private readonly IReadOnlyList<int> _original = [], _added = [];
+    private readonly IReadOnlyList<int> _original = [],_added = [];
     public IReadOnlyList<int> Original { get => _original; init => _original = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Added { get => _added; init => _added = Array.AsReadOnly(value.ToArray()); }
 }

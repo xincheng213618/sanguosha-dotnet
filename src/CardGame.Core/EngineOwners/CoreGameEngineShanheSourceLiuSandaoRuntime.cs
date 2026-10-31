@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheSourceLiuSandaoRuntime : global::CardGame.Core.IShanheSourceLiuSandaoHost
+{
+    private readonly ICoreShanheSourceLiuSandaoPendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICoreShanheSourceLiuSandaoResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceLiuSandaoCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreShanheSourceLiuSandaoCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreShanheSourceLiuSandaoCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreShanheSourceLiuSandaoCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreShanheSourceLiuSandaoCoreGameActivationAwakeningOperations _coreGameActivationAwakeningOperations;
+    private readonly ICoreShanheSourceLiuSandaoCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheSourceLiuSandaoCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreShanheSourceLiuSandaoCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheSourceLiuSandaoCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreShanheSourceLiuSandaoCoreTeamActivityProgramsOperations _coreTeamActivityProgramsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess _coreActualTurnProgressCurrentSeatAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheSourceLiuSandaoRuntime(ICoreShanheSourceLiuSandaoPendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICoreShanheSourceLiuSandaoResolutionStackOperations resolutionStackOperations, ICoreShanheSourceLiuSandaoCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreShanheSourceLiuSandaoCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreShanheSourceLiuSandaoCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreShanheSourceLiuSandaoCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreShanheSourceLiuSandaoCoreGameActivationAwakeningOperations coreGameActivationAwakeningOperations, ICoreShanheSourceLiuSandaoCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheSourceLiuSandaoCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreShanheSourceLiuSandaoCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheSourceLiuSandaoCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreShanheSourceLiuSandaoCoreTeamActivityProgramsOperations coreTeamActivityProgramsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess coreActualTurnProgressCurrentSeatAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreGameActivationAwakeningOperations = coreGameActivationAwakeningOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreTeamActivityProgramsOperations = coreTeamActivityProgramsOperations;
+        this._coreActualTurnProgressCurrentSeatAccess = coreActualTurnProgressCurrentSeatAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

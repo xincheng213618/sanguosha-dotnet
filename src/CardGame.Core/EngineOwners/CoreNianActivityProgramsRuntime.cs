@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreNianActivityProgramsRuntime : global::CardGame.Core.INianActivityProgramHost
+{
+    private readonly ICoreNianActivityProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreNianActivityProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNianActivityProgramsPendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICoreNianActivityProgramsRandomOperations _randomOperations;
+    private readonly ICoreNianActivityProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNianActivityProgramsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreNianActivityProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreNianActivityProgramsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreNianActivityProgramsCoreOutsidePhaseDrawDiscardOperations _coreOutsidePhaseDrawDiscardOperations;
+    private readonly ICoreNianActivityProgramsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreNianActivityProgramsCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICoreNianActivityProgramsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreNianActivityProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreNianActivityProgramsCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICoreNianActivityProgramsCoreProgramTurnPhaseOperations _coreProgramTurnPhaseOperations;
+    private readonly ICoreNianActivityProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreNianActivityProgramsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreNianActivityProgramsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreNianActivityProgramsCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreNianActivityProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreNianActivityProgramsKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreNianActivityProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNianActivityProgramsRuntime(ICoreNianActivityProgramsCardZonesOperations cardZonesOperations, ICoreNianActivityProgramsContentRegistryOperations contentRegistryOperations, ICoreNianActivityProgramsPendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICoreNianActivityProgramsRandomOperations randomOperations, ICoreNianActivityProgramsResolutionStackOperations resolutionStackOperations, ICoreNianActivityProgramsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreNianActivityProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreNianActivityProgramsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreNianActivityProgramsCoreOutsidePhaseDrawDiscardOperations coreOutsidePhaseDrawDiscardOperations, ICoreNianActivityProgramsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreNianActivityProgramsCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICoreNianActivityProgramsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreNianActivityProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreNianActivityProgramsCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICoreNianActivityProgramsCoreProgramTurnPhaseOperations coreProgramTurnPhaseOperations, ICoreNianActivityProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreNianActivityProgramsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreNianActivityProgramsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreNianActivityProgramsCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreNianActivityProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreNianActivityProgramsKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreNianActivityProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreOutsidePhaseDrawDiscardOperations = coreOutsidePhaseDrawDiscardOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreProgramTurnPhaseOperations = coreProgramTurnPhaseOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

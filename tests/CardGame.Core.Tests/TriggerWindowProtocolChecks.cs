@@ -9,7 +9,14 @@ internal static class TriggerWindowProtocolChecks
 
     public static void OrderedSkipAndTypedReturnsPreserveBoundaries()
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+        CheckWindow(playStarting: false);
+        CheckWindow(playStarting: true);
+    }
+
+    private static void CheckWindow(bool playStarting)
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(),
+            new Fixture(playStarting ? "playPhaseStarting" : "turnStartBeforeNormalFlow"));
         foreach (var skipGroup in new[] { true, false })
         {
             var game = GameEngine.CreateStandard(new GameOptions
@@ -27,15 +34,23 @@ internal static class TriggerWindowProtocolChecks
             var early = Pending(game)!;
             Answer(game, choice => Action(choice) == "skip");
             Reach(game, prompt => prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("choice-group") == "opening"));
-            var parent = game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>()
-                .Single(frame => frame.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow);
-            Require(parent.CandidateIndex == 1 && parent.Candidates.Select(candidate => candidate.BindingId)
+            var parent = game.ResolutionStack.Single(frame => playStarting
+                ? frame is PlayPhaseStartingBoundaryFrame
+                : frame is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow });
+            IEnumerable<ProgramTriggerCandidate> candidates = parent switch
+            {
+                PlayPhaseStartingBoundaryFrame starting => starting.Items.Select(item => item.Candidate!),
+                ProgramLifecycleTriggerWindowFrame lifecycle => lifecycle.Candidates,
+                _ => throw new InvalidOperationException("The protocol fixture lost its typed boundary.")
+            };
+            Require(Cursor(game, parent.Id) == 1 && candidates.Select(candidate => candidate.BindingId)
                     .SequenceEqual(["early", "group-a", "group-paid", "late"]),
                 "Skipping the first candidate must advance exactly once and preserve the frozen priority/group order.");
             var beforeStale = State(game);
             Require(!game.Submit(new AnswerPromptCommand(0, early.PromptId, early.Choices[0].Id, game.Revision)).Accepted &&
                     State(game) == beforeStale,
                 "A retired optional prompt cannot answer the next group or change its cursor.");
+            VerifyPause();
 
             if (skipGroup)
             {
@@ -49,7 +64,7 @@ internal static class TriggerWindowProtocolChecks
                         game.CreateSnapshot(0).Players[0].HandCount == initialHand + 1 &&
                         !game.CardMovements.Any(move => move.Reason.Value == PaymentReason),
                     "Group skip must resolve both original branches once, pay nothing and continue after the entire group.");
-                Replay(game, registry);
+                VerifyPause();
                 continue;
             }
 
@@ -59,16 +74,18 @@ internal static class TriggerWindowProtocolChecks
             var selected = Pending(game)!.Choices.First(choice => Action(choice) == "select-owned-cards");
             var paidCard = selected.Cards.Single();
             var paidFrame = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.TriggerId == "group-paid");
-            Require(paidFrame.WindowContext is { ResumeCandidateIndex: 3 } context && context.ParentFrameId == parent.Id,
-                "The selected branch must retain the exact group return cursor and owning lifecycle frame.");
+            Require(paidFrame.WindowContext is { ResumeCandidateIndex: 3 } context && context.ParentFrameId == parent.Id &&
+                    context.Window == (playStarting ? SkillProgramTriggerWindow.PlayPhaseStarting : SkillProgramTriggerWindow.TurnStartBeforeNormalFlow),
+                "The selected branch must retain the exact group return cursor and owning typed boundary.");
+            VerifyPause();
             Answer(game, choice => choice.Id == selected.Id);
             Reach(game, prompt => IsOption(prompt, "movement-continue"));
             Require(Payments(game, paidCard) == 1 && game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Any() &&
                     game.ResolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.Id == paidFrame.Id) &&
-                    game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == parent.Id).CandidateIndex == 1 &&
+                    Cursor(game, parent.Id) == 1 &&
                     !Resolved(game).Any(item => item.BindingId is "group-paid" or "late"),
                 "The paid movement child must suspend the original branch and group cursor without completing either parent.");
-            Replay(game, registry);
+            VerifyPause();
             var frozenPayment = State(game);
             var movementPrompt = Pending(game)!;
             Require(!game.Submit(new AnswerPromptCommand(0, movementPrompt.PromptId, new ChoiceId("unpublished"), game.Revision)).Accepted &&
@@ -79,29 +96,35 @@ internal static class TriggerWindowProtocolChecks
             Require(Payments(game, paidCard) == 1 && game.CreateSnapshot(0).Players[0].Hp == initialHp - 1 &&
                     game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Any() &&
                     game.ResolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.Id == paidFrame.Id) &&
+                    Cursor(game, parent.Id) == 1 &&
                     !Resolved(game).Any(item => item.BindingId is "group-paid" or "late"),
                 "Returning from movement must resume at the next instruction and suspend again on exactly one real HP-change child.");
-            Replay(game, registry);
+            VerifyPause();
             Answer(game, choice => choice.Parameters.GetValueOrDefault("option-id") == "hp-continue");
             Reach(game, prompt => prompt.Kind == DecisionKind.PlayCard);
-            // Turn-start historically advances one position on return. The paid
-            // branch is then visited as an ineligible window item. That skipped
-            // window fact is separate from the child program's single completion.
+            // Turn-start retains its historical one-position return. Play-start
+            // uses the selected child's resume cursor to retire the entire group.
+            string[] expectedResolved = playStarting
+                ? ["early", "group-a", "payment-seen", "hp-seen", "group-paid", "late"]
+                : ["early", "group-a", "payment-seen", "hp-seen", "group-paid", "group-paid", "late"];
+            string[] expectedSkipped = playStarting ? ["early", "group-a"] : ["early", "group-a", "group-paid"];
             Require(Resolved(game).Select(item => item.BindingId)
-                    .SequenceEqual(["early", "group-a", "payment-seen", "hp-seen", "group-paid", "group-paid", "late"]) &&
+                    .SequenceEqual(expectedResolved) &&
                     Resolved(game).Where(item => item.Activated).All(item => item.Completed) &&
                     Resolved(game).Where(item => !item.Activated).Select(item => item.BindingId)
-                        .SequenceEqual(["early", "group-a", "group-paid"]) &&
+                        .SequenceEqual(expectedSkipped) &&
                     Resolved(game).Where(item => !item.Activated).All(item => !item.Completed) &&
                     Started(game).Select(item => item.BindingId)
                         .SequenceEqual(["group-paid", "payment-seen", "hp-seen", "late"]) &&
                     Resolved(game).Single(item => item.BindingId == "group-paid" && item.Activated).FrameId == paidFrame.Id &&
-                    Resolved(game).Single(item => item.BindingId == "group-paid" && !item.Activated).FrameId == parent.Id &&
+                    (playStarting
+                        ? !Resolved(game).Any(item => item.BindingId == "group-paid" && !item.Activated)
+                        : Resolved(game).Single(item => item.BindingId == "group-paid" && !item.Activated).FrameId == parent.Id) &&
                     Payments(game, paidCard) == 1 && game.CreateSnapshot(0).Players[0].HandCount == initialHand + 1 &&
                     game.CreateSnapshot(0).Players[0].Hp == initialHp - 1 &&
                     !game.ResolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.SkillId == Skill) &&
-                    !game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Any(frame => frame.Id == parent.Id),
-                "Nested returns must complete each activated child once, preserve the historical window-level qualification skip and continue without repeating cost or HP loss. " +
+                    !game.ResolutionStack.Any(frame => frame.Id == parent.Id),
+                "Nested returns must complete each activated child once, preserve the typed boundary's group return cursor and continue without repeating cost or HP loss. " +
                 JsonSerializer.Serialize(new
                 {
                     InitialHand = initialHand, Hand = game.CreateSnapshot(0).Players[0].HandCount,
@@ -111,9 +134,23 @@ internal static class TriggerWindowProtocolChecks
                     Frames = game.ResolutionStack.Select(frame => new { frame.Id, frame.Kind,
                         Binding = (frame as ProgramSkillFrame)?.TriggerId })
                 }));
-            Replay(game, registry);
+            VerifyPause();
+
+            void VerifyPause()
+            {
+                var restored = Replay(game, registry);
+                if (playStarting) game = restored;
+            }
         }
     }
+
+    private static int Cursor(GameEngine game, long parentId) =>
+        game.ResolutionStack.Single(frame => frame.Id == parentId) switch
+        {
+            PlayPhaseStartingBoundaryFrame starting => starting.ItemIndex,
+            ProgramLifecycleTriggerWindowFrame lifecycle => lifecycle.CandidateIndex,
+            _ => throw new InvalidOperationException("The protocol cursor belongs to another frame kind.")
+        };
 
     private static IReadOnlyList<ProgramBindingResolvedEvent> Resolved(GameEngine game) => game.Events
         .Select(item => item.Payload).OfType<ProgramBindingResolvedEvent>().Where(item => item.SkillId == Skill).ToArray();
@@ -157,26 +194,31 @@ internal static class TriggerWindowProtocolChecks
         Events = game.Events.Select(item => JsonSerializer.Serialize(item.Payload, item.Payload.GetType())).ToArray(),
         game.CardMovements, Commands = CommandJson.Serialize(game.AcceptedCommands), Zones = game.CreateCardZoneDiagnostics()
     });
-    private static void Replay(GameEngine game, ContentRegistry registry) => Require(State(game) == State(GameReplay.Restore(
-        GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry)),
-        "Every actual player and spectator view, exact frames, paid movements and committed prefix must survive a cold restore.");
+    private static GameEngine Replay(GameEngine game, ContentRegistry registry)
+    {
+        var restored = GameReplay.Restore(
+            GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+        Require(State(game) == State(restored),
+            "Every actual player and spectator view, exact frames, paid movements and committed prefix must survive a cold restore.");
+        return restored;
+    }
     private static void Require(bool condition, string message)
     { if (!condition) throw new InvalidOperationException(message); }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(string boundaryWindow) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("window-protocol-fixture", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
             var catalog = SkillProgramCatalog.Load($$"""
                 {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{Skill}}","revision":1,"triggers":[
-                {"id":"early","window":"turnStartBeforeNormalFlow","subject":"owner","optional":true,"priority":30,"effects":[{"op":"draw","target":"owner","amount":1}]},
-                {"id":"group-a","window":"turnStartBeforeNormalFlow","subject":"owner","optional":true,"priority":20,"choiceGroup":"opening","usageScope":"game","usageLimit":1,"effects":[{"op":"draw","target":"owner","amount":3}]},
-                {"id":"group-paid","window":"turnStartBeforeNormalFlow","subject":"owner","optional":true,"priority":20,"choiceGroup":"opening","usageScope":"game","usageLimit":1,"effects":[
+                {"id":"early","window":"{{boundaryWindow}}","subject":"owner","optional":true,"priority":30,"effects":[{"op":"draw","target":"owner","amount":1}]},
+                {"id":"group-a","window":"{{boundaryWindow}}","subject":"owner","optional":true,"priority":20,"choiceGroup":"opening","usageScope":"game","usageLimit":1,"effects":[{"op":"draw","target":"owner","amount":3}]},
+                {"id":"group-paid","window":"{{boundaryWindow}}","subject":"owner","optional":true,"priority":20,"choiceGroup":"opening","usageScope":"game","usageLimit":1,"effects":[
                 {"op":"selectOwnedCards","target":"owner","amount":1,"zones":["hand"],"resultBind":"payment"},
                 {"op":"moveBoundCards","target":"owner","sourceBind":"payment","destination":"discardPile","awaitMovementTriggers":true},
                 {"op":"loseHp","target":"owner","amount":1},{"op":"draw","target":"owner","amount":1}]},
-                {"id":"late","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,"priority":10,"effects":[{"op":"draw","target":"owner","amount":1}]},
+                {"id":"late","window":"{{boundaryWindow}}","subject":"owner","optional":false,"priority":10,"effects":[{"op":"draw","target":"owner","amount":1}]},
                 {"id":"payment-seen","window":"cardsMoved","subject":"owner","sourceZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["{{PaymentReason}}"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"movement-return","options":[{"id":"movement-continue"}]}]},
                 {"id":"hp-seen","window":"afterHpLost","subject":"owner","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"hp-return","options":[{"id":"hp-continue"}]}]}]}]}
                 """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,

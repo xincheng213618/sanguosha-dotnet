@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterCaoRenBoundaryRuntime : global::CardGame.Core.ICaoRenProgramHost
+{
+    private readonly ICharacterCaoRenBoundaryCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterCaoRenBoundaryCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterCaoRenBoundaryCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICharacterCaoRenBoundaryCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterCaoRenBoundaryCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICharacterCaoRenBoundaryCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICharacterCaoRenBoundaryCoreFinalizedCardTargetsOperations _coreFinalizedCardTargetsOperations;
+    private readonly ICharacterCaoRenBoundaryCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICharacterCaoRenBoundaryCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterCaoRenBoundaryCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterCaoRenBoundaryCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterCaoRenBoundaryCoreProgramPhaseColorRestrictionsOperations _coreProgramPhaseColorRestrictionsOperations;
+    private readonly ICharacterCaoRenBoundaryCoreResponseEntityExchangeOperations _coreResponseEntityExchangeOperations;
+    private readonly ICharacterCaoRenBoundaryCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterCaoRenBoundaryCoreStrategicProgramsOperations _coreStrategicProgramsOperations;
+    private readonly ICharacterCaoRenBoundaryCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterCaoRenBoundaryCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterCaoRenBoundaryCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICharacterCaoRenBoundaryCoreNativeEquipmentUseOperations _coreNativeEquipmentUseOperations;
+    private readonly ICharacterCaoRenBoundaryCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterCaoRenBoundaryCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterCaoRenBoundaryCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterCaoRenBoundaryCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterCaoRenBoundaryRuntime(ICharacterCaoRenBoundaryCardZonesOperations cardZonesOperations, ICharacterCaoRenBoundaryCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterCaoRenBoundaryCoreCardUseModulesOperations coreCardUseModulesOperations, ICharacterCaoRenBoundaryCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterCaoRenBoundaryCoreEquipmentContentOperations coreEquipmentContentOperations, ICharacterCaoRenBoundaryCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICharacterCaoRenBoundaryCoreFinalizedCardTargetsOperations coreFinalizedCardTargetsOperations, ICharacterCaoRenBoundaryCoreHandComparisonOperations coreHandComparisonOperations, ICharacterCaoRenBoundaryCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterCaoRenBoundaryCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterCaoRenBoundaryCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterCaoRenBoundaryCoreProgramPhaseColorRestrictionsOperations coreProgramPhaseColorRestrictionsOperations, ICharacterCaoRenBoundaryCoreResponseEntityExchangeOperations coreResponseEntityExchangeOperations, ICharacterCaoRenBoundaryCoreRuntimeOperations coreRuntimeOperations, ICharacterCaoRenBoundaryCoreStrategicProgramsOperations coreStrategicProgramsOperations, ICharacterCaoRenBoundaryCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterCaoRenBoundaryCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterCaoRenBoundaryCoreNativeCardUseOperations coreNativeCardUseOperations, ICharacterCaoRenBoundaryCoreNativeEquipmentUseOperations coreNativeEquipmentUseOperations, ICharacterCaoRenBoundaryCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterCaoRenBoundaryCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterCaoRenBoundaryCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterCaoRenBoundaryCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreFinalizedCardTargetsOperations = coreFinalizedCardTargetsOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramPhaseColorRestrictionsOperations = coreProgramPhaseColorRestrictionsOperations;
+        this._coreResponseEntityExchangeOperations = coreResponseEntityExchangeOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreStrategicProgramsOperations = coreStrategicProgramsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeEquipmentUseOperations = coreNativeEquipmentUseOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineShanheMarketRuntime
+{
+    private readonly ICoreShanheMarketContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheMarketResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheMarketShanheMarketOperations _shanheMarketOperations;
+    private readonly ICoreShanheMarketCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreShanheMarketCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheMarketCoreProgramHandLimitKindExemptionsOperations _coreProgramHandLimitKindExemptionsOperations;
+    private readonly ICoreShanheMarketCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheMarketCoreRevealedFireAttackPaymentOperations _coreRevealedFireAttackPaymentOperations;
+    private readonly ICoreShanheMarketCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheMarketCoreShanheAlliedTricksOperations _coreShanheAlliedTricksOperations;
+    private readonly ICoreShanheMarketCoreShanheTrickResponseOperations _coreShanheTrickResponseOperations;
+    private readonly ICoreShanheMarketCoreTargetHandVisibilityOperations _coreTargetHandVisibilityOperations;
+    private readonly ICoreShanheMarketCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreShanheMarketCoreNativeDyingOperations _coreNativeDyingOperations;
+    private readonly ICoreShanheMarketCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreShanheMarketCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheMarketCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreShanheMarketCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheMarketCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreShanheMarketKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreShanheMarketKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseStartedAccess _coreActualTurnProgressCurrentSeatPhaseStartedAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
+    internal CoreGameEngineShanheMarketRuntime(ICoreShanheMarketContentRegistryOperations contentRegistryOperations, ICoreShanheMarketResolutionStackOperations resolutionStackOperations, ICoreShanheMarketShanheMarketOperations shanheMarketOperations, ICoreShanheMarketCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreShanheMarketCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheMarketCoreProgramHandLimitKindExemptionsOperations coreProgramHandLimitKindExemptionsOperations, ICoreShanheMarketCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheMarketCoreRevealedFireAttackPaymentOperations coreRevealedFireAttackPaymentOperations, ICoreShanheMarketCoreRuntimeOperations coreRuntimeOperations, ICoreShanheMarketCoreShanheAlliedTricksOperations coreShanheAlliedTricksOperations, ICoreShanheMarketCoreShanheTrickResponseOperations coreShanheTrickResponseOperations, ICoreShanheMarketCoreTargetHandVisibilityOperations coreTargetHandVisibilityOperations, ICoreShanheMarketCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreShanheMarketCoreNativeDyingOperations coreNativeDyingOperations, ICoreShanheMarketCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreShanheMarketCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheMarketCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreShanheMarketCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheMarketCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreShanheMarketKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreShanheMarketKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseStartedAccess coreActualTurnProgressCurrentSeatPhaseStartedAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._shanheMarketOperations = shanheMarketOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramHandLimitKindExemptionsOperations = coreProgramHandLimitKindExemptionsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRevealedFireAttackPaymentOperations = coreRevealedFireAttackPaymentOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheAlliedTricksOperations = coreShanheAlliedTricksOperations;
+        this._coreShanheTrickResponseOperations = coreShanheTrickResponseOperations;
+        this._coreTargetHandVisibilityOperations = coreTargetHandVisibilityOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDyingOperations = coreNativeDyingOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseStartedAccess = coreActualTurnProgressCurrentSeatPhaseStartedAccess;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreMatchSetupSetupCompleteAccess = coreMatchSetupSetupCompleteAccess;
+    }
+}

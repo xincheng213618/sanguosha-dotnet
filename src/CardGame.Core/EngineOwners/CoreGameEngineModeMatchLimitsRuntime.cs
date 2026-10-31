@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineModeMatchLimitsRuntime
+{
+    private readonly ICoreModeMatchLimitsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreModeMatchLimitsPendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICoreModeMatchLimitsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreModeMatchLimitsCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICoreModeMatchLimitsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreModeMatchLimitsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreModeMatchLimitsCoreMatchOutcomesOperations _coreMatchOutcomesOperations;
+    private readonly ICoreModeMatchLimitsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreModeMatchLimitsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreModeMatchLimitsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerWinnerSeatWinnerTeamIdAccess _coreMatchOutcomeWinnerWinnerSeatWinnerTeamIdAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess _coreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess _coreGameEngineHpChangeProgramsPendingHpChangesAccess;
+    internal CoreGameEngineModeMatchLimitsRuntime(ICoreModeMatchLimitsCardZonesOperations cardZonesOperations, ICoreModeMatchLimitsPendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICoreModeMatchLimitsResolutionStackOperations resolutionStackOperations, ICoreModeMatchLimitsCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICoreModeMatchLimitsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreModeMatchLimitsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreModeMatchLimitsCoreMatchOutcomesOperations coreMatchOutcomesOperations, ICoreModeMatchLimitsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreModeMatchLimitsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreModeMatchLimitsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerWinnerSeatWinnerTeamIdAccess coreMatchOutcomeWinnerWinnerSeatWinnerTeamIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess coreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess coreGameEngineHpChangeProgramsPendingHpChangesAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreMatchOutcomesOperations = coreMatchOutcomesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeWinnerWinnerSeatWinnerTeamIdAccess = coreMatchOutcomeWinnerWinnerSeatWinnerTeamIdAccess;
+        this._coreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess = coreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess;
+        this._coreGameEngineHpChangeProgramsPendingHpChangesAccess = coreGameEngineHpChangeProgramsPendingHpChangesAccess;
+    }
+}

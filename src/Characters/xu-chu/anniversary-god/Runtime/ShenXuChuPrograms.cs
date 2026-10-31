@@ -48,8 +48,8 @@ internal sealed class ShenXuChuHandler(SkillProgramEffectOp op) : ISkillProgramE
 }
 internal static class ShenXuChuComposition
 {
-    internal const string Zhengqing = "anniversary:zhengqing", Zhuangpo = "anniversary:zhuangpo", ViewAs = "printed-sha-duel";
-    internal const string HappyZhengqing = "happy:zhengqing", HappyZhuangpo = "happy:zhuangpo";
+    internal const string Zhengqing = "anniversary:zhengqing",Zhuangpo = "anniversary:zhuangpo",ViewAs = "printed-sha-duel";
+    internal const string HappyZhengqing = "happy:zhengqing",HappyZhuangpo = "happy:zhuangpo";
     internal static bool IsZhengqing(string id) => id is Zhengqing or HappyZhengqing;
     internal static bool IsZhuangpo(string id) => id is Zhuangpo or HappyZhuangpo;
     [ProgramCatalogValidation(38800)] internal static void Validate(string path, SkillProgram p)

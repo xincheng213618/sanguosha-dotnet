@@ -40,11 +40,11 @@ internal static partial class WushuangModeChecks
             Accept(game, new FinishWushuangShopCommand(0, game.Revision));
             Drive(game, () => game.State.CurrentSeat == 1 && E<TurnStartedEvent>(game)
                 .Any(turn => turn.ActorSeat == 1 && turn.TurnNumber > ownerTurn));
-            var owner = ((IEnumerable<CharacterState>)typeof(GameEngine).GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!
+            var owner = ((IEnumerable<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .GetValue(game)!).Single(player => player.Seat == 0);
-            var actualLimit = (int)typeof(GameEngine).GetMethod("GetHandLimit", BindingFlags.Instance | BindingFlags.NonPublic)!
+            var actualLimit = (int)global::FixtureRuntimeAccess.Engine.GetMethod("GetHandLimit", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .Invoke(game, [owner])!;
-            var evaluation = (RuleQueryEvaluation)typeof(GameEngine).GetMethod("EvaluateHandLimit", BindingFlags.Instance | BindingFlags.NonPublic)!
+            var evaluation = (RuleQueryEvaluation)global::FixtureRuntimeAccess.Engine.GetMethod("EvaluateHandLimit", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .Invoke(game, [owner, false])!;
             Require(E<TurnEndedEvent>(game).Count(turn => turn.ActorSeat == 0 && turn.TurnNumber == ownerTurn) == 1 &&
                 game.CreateSnapshot(0).Players[0] is { HandLimit: null, MaxHp: 30 } && actualLimit == 30,

@@ -19,7 +19,7 @@ internal sealed class AnniversaryCheZhouHandler : ISkillProgramEffectHandler
 }
 internal static class AnniversaryCheZhouComposition
 {
-    internal const string Shefu = "anniversary:shefu", Pigua = "anniversary:pigua", Binding = "obtain-damaged-hand";
+    internal const string Shefu = "anniversary:shefu",Pigua = "anniversary:pigua",Binding = "obtain-damaged-hand";
     [ProgramCatalogValidation(46400)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op == SkillProgramEffectOp.ResolveAnniversaryCheZhouPigua)) return;

@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoWineRuntime
+{
+    private readonly ICoreShanheSourceMouDongZhuoWineCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreActualPlayPhaseCardUsesOperations _coreActualPlayPhaseCardUsesOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreShanheSourceMouDongZhuoOperations _coreShanheSourceMouDongZhuoOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreNativeRecoveryCardsOperations _coreNativeRecoveryCardsOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreNativeTrickUseOperations _coreNativeTrickUseOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreProgramTargetRulesOperations _coreProgramTargetRulesOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreShanheSourceMouDongZhuoWineKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CoreGameEngineShanheSourceMouDongZhuoWineRuntime(ICoreShanheSourceMouDongZhuoWineCharacterLuMengMouOperations characterLuMengMouOperations, ICoreShanheSourceMouDongZhuoWineResolutionStackOperations resolutionStackOperations, ICoreShanheSourceMouDongZhuoWineCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreShanheSourceMouDongZhuoWineCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreShanheSourceMouDongZhuoWineCoreActualPlayPhaseCardUsesOperations coreActualPlayPhaseCardUsesOperations, ICoreShanheSourceMouDongZhuoWineCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreShanheSourceMouDongZhuoWineCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreShanheSourceMouDongZhuoWineCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreShanheSourceMouDongZhuoWineCoreHandComparisonOperations coreHandComparisonOperations, ICoreShanheSourceMouDongZhuoWineCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreShanheSourceMouDongZhuoWineCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheSourceMouDongZhuoWineCoreRuntimeOperations coreRuntimeOperations, ICoreShanheSourceMouDongZhuoWineCoreShanheSourceMouDongZhuoOperations coreShanheSourceMouDongZhuoOperations, ICoreShanheSourceMouDongZhuoWineCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreShanheSourceMouDongZhuoWineCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreShanheSourceMouDongZhuoWineCoreNativeRecoveryCardsOperations coreNativeRecoveryCardsOperations, ICoreShanheSourceMouDongZhuoWineCoreNativeTrickUseOperations coreNativeTrickUseOperations, ICoreShanheSourceMouDongZhuoWineCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreShanheSourceMouDongZhuoWineCoreProgramTargetRulesOperations coreProgramTargetRulesOperations, ICoreShanheSourceMouDongZhuoWineCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreShanheSourceMouDongZhuoWineKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess)
+    {
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActualPlayPhaseCardUsesOperations = coreActualPlayPhaseCardUsesOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheSourceMouDongZhuoOperations = coreShanheSourceMouDongZhuoOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeRecoveryCardsOperations = coreNativeRecoveryCardsOperations;
+        this._coreNativeTrickUseOperations = coreNativeTrickUseOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._coreProgramTargetRulesOperations = coreProgramTargetRulesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+    }
+}

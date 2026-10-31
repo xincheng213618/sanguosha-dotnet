@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSequentialDiscardReceiptsRuntime
+{
+    private readonly ICoreSequentialDiscardReceiptsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSequentialDiscardReceiptsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSequentialDiscardReceiptsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSequentialDiscardReceiptsSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICoreSequentialDiscardReceiptsCoreAllHandChallengeReceiptsOperations _coreAllHandChallengeReceiptsOperations;
+    private readonly ICoreSequentialDiscardReceiptsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSequentialDiscardReceiptsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreSequentialDiscardReceiptsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSequentialDiscardReceiptsCoreSequentialDiscardProgramsOperations _coreSequentialDiscardProgramsOperations;
+    private readonly ICoreSequentialDiscardReceiptsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreSequentialDiscardReceiptsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineSequentialDiscardReceiptsRuntime(ICoreSequentialDiscardReceiptsCardZonesOperations cardZonesOperations, ICoreSequentialDiscardReceiptsContentRegistryOperations contentRegistryOperations, ICoreSequentialDiscardReceiptsResolutionStackOperations resolutionStackOperations, ICoreSequentialDiscardReceiptsSkillRuntimeStateOperations skillRuntimeStateOperations, ICoreSequentialDiscardReceiptsCoreAllHandChallengeReceiptsOperations coreAllHandChallengeReceiptsOperations, ICoreSequentialDiscardReceiptsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSequentialDiscardReceiptsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreSequentialDiscardReceiptsCoreRuntimeOperations coreRuntimeOperations, ICoreSequentialDiscardReceiptsCoreSequentialDiscardProgramsOperations coreSequentialDiscardProgramsOperations, ICoreSequentialDiscardReceiptsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreSequentialDiscardReceiptsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreAllHandChallengeReceiptsOperations = coreAllHandChallengeReceiptsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialDiscardProgramsOperations = coreSequentialDiscardProgramsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

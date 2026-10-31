@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRecoveryReplacementDamageRidesRuntime
+{
+    private readonly ICoreRecoveryReplacementDamageRidesCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCoreCardUsePaymentsOperations _coreCardUsePaymentsOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCoreDragonBoatCardsOperations _coreDragonBoatCardsOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCoreGuanduCardsOperations _coreGuanduCardsOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCorePublicPileEquipmentSequencesOperations _corePublicPileEquipmentSequencesOperations;
+    private readonly ICoreRecoveryReplacementDamageRidesCoreTypedRecoveryDamageCursorOperations _coreTypedRecoveryDamageCursorOperations;
+    internal CoreGameEngineRecoveryReplacementDamageRidesRuntime(ICoreRecoveryReplacementDamageRidesCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICoreRecoveryReplacementDamageRidesResolutionStackOperations resolutionStackOperations, ICoreRecoveryReplacementDamageRidesCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreRecoveryReplacementDamageRidesCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreRecoveryReplacementDamageRidesCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICoreRecoveryReplacementDamageRidesCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreRecoveryReplacementDamageRidesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreRecoveryReplacementDamageRidesCoreCardUsePaymentsOperations coreCardUsePaymentsOperations, ICoreRecoveryReplacementDamageRidesCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreRecoveryReplacementDamageRidesCoreDragonBoatCardsOperations coreDragonBoatCardsOperations, ICoreRecoveryReplacementDamageRidesCoreGuanduCardsOperations coreGuanduCardsOperations, ICoreRecoveryReplacementDamageRidesCorePublicPileEquipmentSequencesOperations corePublicPileEquipmentSequencesOperations, ICoreRecoveryReplacementDamageRidesCoreTypedRecoveryDamageCursorOperations coreTypedRecoveryDamageCursorOperations)
+    {
+        this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUsePaymentsOperations = coreCardUsePaymentsOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreDragonBoatCardsOperations = coreDragonBoatCardsOperations;
+        this._coreGuanduCardsOperations = coreGuanduCardsOperations;
+        this._corePublicPileEquipmentSequencesOperations = corePublicPileEquipmentSequencesOperations;
+        this._coreTypedRecoveryDamageCursorOperations = coreTypedRecoveryDamageCursorOperations;
+    }
+}

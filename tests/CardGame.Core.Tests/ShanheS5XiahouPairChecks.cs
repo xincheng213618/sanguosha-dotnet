@@ -97,8 +97,8 @@ internal static class ShanheS5XiahouPairChecks
         public PublicDamagePrediction IncomingPrediction(int viewer)
         {
             const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-            var attack = typeof(GameEngine).GetProperty("ActiveCardAttack", flags)!.GetValue(G);
-            return (PublicDamagePrediction)typeof(GameEngine).GetMethod("PredictPublicIncomingDamage", flags)!
+            var attack = global::FixtureRuntimeAccess.Engine.GetProperty("ActiveCardAttack", flags)!.GetValue(G);
+            return (PublicDamagePrediction)global::FixtureRuntimeAccess.Engine.GetMethod("PredictPublicIncomingDamage", flags)!
                 .Invoke(G, [attack, viewer, null, null, null])!;
         }
         public void Until(Func<bool> ready)

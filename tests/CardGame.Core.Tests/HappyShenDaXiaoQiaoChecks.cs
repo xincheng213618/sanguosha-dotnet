@@ -17,8 +17,7 @@ public static class HappyShenDaXiaoQiaoChecks
         s.Use("damage", [0]); s.PoolBoundary(); s.Pool(HappyQiaoPool.XiaoQiao); s.Play();
         s.Need(s.Health == new HappyQiaoDualHealth(3, 2, 3), "A real native damage receipt creates different sister pools.");
         var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
-        IWushuangModeHost Host() => (IWushuangModeHost)Activator.CreateInstance(
-            typeof(GameEngine).GetNestedType("WushuangModeHost", System.Reflection.BindingFlags.NonPublic)!, flags, null, [s.G], null)!;
+        IWushuangModeHost Host() => (IWushuangModeHost)s.G.ComposeNativeWushuangModeHost()!;
         void CheckFactsAndLimit()
         {
             var host = Host(); var facts = host.Players.ToArray();

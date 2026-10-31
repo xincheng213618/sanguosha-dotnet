@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineEndRefillNextTurnRuntime : global::CardGame.Core.IEndRefillNextTurnProgramHost
+{
+    private readonly ICoreEndRefillNextTurnContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreEndRefillNextTurnResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreEndRefillNextTurnTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreEndRefillNextTurnCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICoreEndRefillNextTurnCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreEndRefillNextTurnCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreEndRefillNextTurnCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreEndRefillNextTurnCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreEndRefillNextTurnCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreEndRefillNextTurnCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreEndRefillNextTurnCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreEndRefillNextTurnCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreEndRefillNextTurnCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreEndRefillNextTurnCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreEndRefillNextTurnCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreEndRefillNextTurnCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreEndRefillNextTurnCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreEndRefillNextTurnCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreEndRefillNextTurnCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreEndRefillNextTurnCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreEndRefillNextTurnKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineEndRefillNextTurnRuntime(ICoreEndRefillNextTurnContentRegistryOperations contentRegistryOperations, ICoreEndRefillNextTurnResolutionStackOperations resolutionStackOperations, ICoreEndRefillNextTurnTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreEndRefillNextTurnCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICoreEndRefillNextTurnCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreEndRefillNextTurnCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreEndRefillNextTurnCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreEndRefillNextTurnCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreEndRefillNextTurnCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreEndRefillNextTurnCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreEndRefillNextTurnCoreRuntimeOperations coreRuntimeOperations, ICoreEndRefillNextTurnCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreEndRefillNextTurnCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreEndRefillNextTurnCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreEndRefillNextTurnCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreEndRefillNextTurnCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreEndRefillNextTurnCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreEndRefillNextTurnCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreEndRefillNextTurnCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreEndRefillNextTurnCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreEndRefillNextTurnKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

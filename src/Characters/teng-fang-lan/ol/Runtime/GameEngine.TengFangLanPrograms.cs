@@ -33,15 +33,4 @@ public sealed record LuochongPendingState(string OptionId, int TargetSeat, int R
 
 public sealed partial class GameEngine
 {
-    internal static readonly string[] LuochongOptionIds = ["recover", "loseHp", "discardTwo", "drawTwo"];
-
-
-    [ProgramCapability]
-    private sealed class TengFangLanProgramCapability(GameEngine engine) : ITengFangLanProgramHost
-    {
-        public SkillProgramStepOutcome LuochongResolve(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.LuochongProgramResolve(frame, effect);
-        public SkillProgramStepOutcome AichenRemoveOption(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.AichenProgramRemoveOption(frame, effect);
-    }
 }

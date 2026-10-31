@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeGroupRecoveryRuntime
+{
+    private readonly ICoreNativeGroupRecoveryCharacterDaQiaoXiaoQiaoHappyGodOperations _characterDaQiaoXiaoQiaoHappyGodOperations;
+    private readonly ICoreNativeGroupRecoveryCharacterLuXunMouMobileOperations _characterLuXunMouMobileOperations;
+    private readonly ICoreNativeGroupRecoveryCoreGroupTargetNullificationOperations _coreGroupTargetNullificationOperations;
+    private readonly ICoreNativeGroupRecoveryCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreNativeGroupRecoveryCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreNativeGroupRecoveryCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreNativeGroupRecoveryCoreShanheAlliedTricksOperations _coreShanheAlliedTricksOperations;
+    private readonly ICoreNativeGroupRecoveryCoreWushuangTacticRulesOperations _coreWushuangTacticRulesOperations;
+    private readonly ICoreNativeGroupRecoveryCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeGroupRecoveryCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeGroupRecoveryCoreNativeGroupCompletionOperations _coreNativeGroupCompletionOperations;
+    private readonly ICoreNativeGroupRecoveryCoreNativeNullificationFramesOperations _coreNativeNullificationFramesOperations;
+    private readonly ICoreNativeGroupRecoveryCoreNativeRecoveryFramesOperations _coreNativeRecoveryFramesOperations;
+    private readonly ICoreNativeGroupRecoveryCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreNativeGroupRecoveryKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeGroupRecoveryRuntime(ICoreNativeGroupRecoveryCharacterDaQiaoXiaoQiaoHappyGodOperations characterDaQiaoXiaoQiaoHappyGodOperations, ICoreNativeGroupRecoveryCharacterLuXunMouMobileOperations characterLuXunMouMobileOperations, ICoreNativeGroupRecoveryCoreGroupTargetNullificationOperations coreGroupTargetNullificationOperations, ICoreNativeGroupRecoveryCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreNativeGroupRecoveryCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreNativeGroupRecoveryCoreRuntimeOperations coreRuntimeOperations, ICoreNativeGroupRecoveryCoreShanheAlliedTricksOperations coreShanheAlliedTricksOperations, ICoreNativeGroupRecoveryCoreWushuangTacticRulesOperations coreWushuangTacticRulesOperations, ICoreNativeGroupRecoveryCoreMatchLogOperations coreMatchLogOperations, ICoreNativeGroupRecoveryCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeGroupRecoveryCoreNativeGroupCompletionOperations coreNativeGroupCompletionOperations, ICoreNativeGroupRecoveryCoreNativeNullificationFramesOperations coreNativeNullificationFramesOperations, ICoreNativeGroupRecoveryCoreNativeRecoveryFramesOperations coreNativeRecoveryFramesOperations, ICoreNativeGroupRecoveryCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreNativeGroupRecoveryKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;
+        this._characterLuXunMouMobileOperations = characterLuXunMouMobileOperations;
+        this._coreGroupTargetNullificationOperations = coreGroupTargetNullificationOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheAlliedTricksOperations = coreShanheAlliedTricksOperations;
+        this._coreWushuangTacticRulesOperations = coreWushuangTacticRulesOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeGroupCompletionOperations = coreNativeGroupCompletionOperations;
+        this._coreNativeNullificationFramesOperations = coreNativeNullificationFramesOperations;
+        this._coreNativeRecoveryFramesOperations = coreNativeRecoveryFramesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

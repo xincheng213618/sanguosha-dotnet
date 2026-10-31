@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheMobilizationRuntime : global::CardGame.Core.IShanheMobilizationHost
+{
+    private readonly ICoreShanheMobilizationResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheMobilizationCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreShanheMobilizationCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheMobilizationCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreShanheMobilizationCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreShanheMobilizationCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheMobilizationCoreProgramLifeRestorationOperations _coreProgramLifeRestorationOperations;
+    private readonly ICoreShanheMobilizationCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheMobilizationCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheMobilizationCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreShanheMobilizationCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreShanheMobilizationCoreTeamActivitiesOperations _coreTeamActivitiesOperations;
+    private readonly ICoreShanheMobilizationCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreShanheMobilizationCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreShanheMobilizationKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberRoundTurnSeatsAccess _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnProgressionAccess _coreActualTurnProgressCurrentSeatTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess _coreMatchDefinitionModeDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheMobilizationRuntime(ICoreShanheMobilizationResolutionStackOperations resolutionStackOperations, ICoreShanheMobilizationCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreShanheMobilizationCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheMobilizationCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreShanheMobilizationCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreShanheMobilizationCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheMobilizationCoreProgramLifeRestorationOperations coreProgramLifeRestorationOperations, ICoreShanheMobilizationCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheMobilizationCoreRuntimeOperations coreRuntimeOperations, ICoreShanheMobilizationCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreShanheMobilizationCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreShanheMobilizationCoreTeamActivitiesOperations coreTeamActivitiesOperations, ICoreShanheMobilizationCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreShanheMobilizationCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreShanheMobilizationKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberRoundTurnSeatsAccess coreActualRoundProgressRoundNumberRoundTurnSeatsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnProgressionAccess coreActualTurnProgressCurrentSeatTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess coreMatchDefinitionModeDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifeRestorationOperations = coreProgramLifeRestorationOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTeamActivitiesOperations = coreTeamActivitiesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberRoundTurnSeatsAccess = coreActualRoundProgressRoundNumberRoundTurnSeatsAccess;
+        this._coreActualTurnProgressCurrentSeatTurnProgressionAccess = coreActualTurnProgressCurrentSeatTurnProgressionAccess;
+        this._coreMatchDefinitionModeDefinitionOptionsAccess = coreMatchDefinitionModeDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

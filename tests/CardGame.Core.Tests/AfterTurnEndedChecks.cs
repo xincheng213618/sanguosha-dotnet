@@ -46,7 +46,7 @@ internal static class AfterTurnEndedChecks
         var child = (CardsMovedTriggerWindowFrame)g.ResolutionStack[1];
         var batch = child.Batch;
         var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
-        bool Matches(DeferredTurnEndFrame p, CardsMovedTriggerWindowFrame c) => (bool)typeof(GameEngine)
+        bool Matches(DeferredTurnEndFrame p, CardsMovedTriggerWindowFrame c) => (bool)global::FixtureRuntimeAccess.Engine
             .GetMethod("MatchesDeferredTurnEndPreludeChild", flags)!.Invoke(g, [p, c])!;
         Require(Matches(parent, child) && Matches(parent, child with { Batch = batch with {
             Movements = Array.AsReadOnly(batch.Movements.ToArray()), SourceCounts = Array.AsReadOnly(batch.SourceCounts.ToArray()),

@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativePromptBoundaryRuntime
+{
+    private readonly ICoreNativePromptBoundaryProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICoreNativePromptBoundaryCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreNativePromptBoundaryCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreNativePromptBoundaryCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreNativePromptBoundaryCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreNativePromptBoundaryCoreExtendedViewAsOperations _coreExtendedViewAsOperations;
+    private readonly ICoreNativePromptBoundaryCoreMultiplayerOperations _coreMultiplayerOperations;
+    private readonly ICoreNativePromptBoundaryCoreNativePublicPileOriginalCardsOperations _coreNativePublicPileOriginalCardsOperations;
+    private readonly ICoreNativePromptBoundaryCoreOwnPublicPileConversionsOperations _coreOwnPublicPileConversionsOperations;
+    private readonly ICoreNativePromptBoundaryCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICoreNativePromptBoundaryCoreProgramFactionPoliciesOperations _coreProgramFactionPoliciesOperations;
+    private readonly ICoreNativePromptBoundaryCoreSlashSuitDiscardOperations _coreSlashSuitDiscardOperations;
+    private readonly ICoreNativePromptBoundaryCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativePromptBoundaryCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreNativePromptBoundaryCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
+    private readonly ICoreNativePromptBoundaryCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreNativePromptBoundaryCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativePromptBoundaryCoreProgramParticipantPromptsOperations _coreProgramParticipantPromptsOperations;
+    private readonly ICoreNativePromptBoundaryCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreNativePromptBoundaryKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatStartedAccess _coreActualTurnProgressCurrentSeatStartedAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICorePlayerDecisionNextPromptIdAccess _corePlayerDecisionNextPromptIdAccess;
+    internal CoreNativePromptBoundaryRuntime(ICoreNativePromptBoundaryProgramPipelineHooksOperations programPipelineHooksOperations, ICoreNativePromptBoundaryCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativePromptBoundaryCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreNativePromptBoundaryCoreActionQueriesOperations coreActionQueriesOperations, ICoreNativePromptBoundaryCoreCardConversionsOperations coreCardConversionsOperations, ICoreNativePromptBoundaryCoreExtendedViewAsOperations coreExtendedViewAsOperations, ICoreNativePromptBoundaryCoreMultiplayerOperations coreMultiplayerOperations, ICoreNativePromptBoundaryCoreNativePublicPileOriginalCardsOperations coreNativePublicPileOriginalCardsOperations, ICoreNativePromptBoundaryCoreOwnPublicPileConversionsOperations coreOwnPublicPileConversionsOperations, ICoreNativePromptBoundaryCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICoreNativePromptBoundaryCoreProgramFactionPoliciesOperations coreProgramFactionPoliciesOperations, ICoreNativePromptBoundaryCoreSlashSuitDiscardOperations coreSlashSuitDiscardOperations, ICoreNativePromptBoundaryCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativePromptBoundaryCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreNativePromptBoundaryCoreNativeLegalActionsOperations coreNativeLegalActionsOperations, ICoreNativePromptBoundaryCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreNativePromptBoundaryCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativePromptBoundaryCoreProgramParticipantPromptsOperations coreProgramParticipantPromptsOperations, ICoreNativePromptBoundaryCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreNativePromptBoundaryKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatStartedAccess coreActualTurnProgressCurrentSeatStartedAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICorePlayerDecisionNextPromptIdAccess corePlayerDecisionNextPromptIdAccess)
+    {
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreExtendedViewAsOperations = coreExtendedViewAsOperations;
+        this._coreMultiplayerOperations = coreMultiplayerOperations;
+        this._coreNativePublicPileOriginalCardsOperations = coreNativePublicPileOriginalCardsOperations;
+        this._coreOwnPublicPileConversionsOperations = coreOwnPublicPileConversionsOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramFactionPoliciesOperations = coreProgramFactionPoliciesOperations;
+        this._coreSlashSuitDiscardOperations = coreSlashSuitDiscardOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreProgramParticipantPromptsOperations = coreProgramParticipantPromptsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatStartedAccess = coreActualTurnProgressCurrentSeatStartedAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._corePlayerDecisionNextPromptIdAccess = corePlayerDecisionNextPromptIdAccess;
+    }
+}

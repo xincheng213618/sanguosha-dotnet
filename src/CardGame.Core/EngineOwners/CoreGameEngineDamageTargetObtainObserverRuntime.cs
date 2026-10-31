@@ -1,0 +1,28 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineDamageTargetObtainObserverRuntime
+{
+    private readonly ICoreDamageTargetObtainObserverResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDamageTargetObtainObserverCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreDamageTargetObtainObserverCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreDamageTargetObtainObserverCoreDamageTargetObtainProgramsOperations _coreDamageTargetObtainProgramsOperations;
+    private readonly ICoreDamageTargetObtainObserverCoreDamageTargetRegionObtainOperations _coreDamageTargetRegionObtainOperations;
+    private readonly ICoreDamageTargetObtainObserverCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineDamageTargetObtainObserverRuntime(ICoreDamageTargetObtainObserverResolutionStackOperations resolutionStackOperations, ICoreDamageTargetObtainObserverCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreDamageTargetObtainObserverCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreDamageTargetObtainObserverCoreDamageTargetObtainProgramsOperations coreDamageTargetObtainProgramsOperations, ICoreDamageTargetObtainObserverCoreDamageTargetRegionObtainOperations coreDamageTargetRegionObtainOperations, ICoreDamageTargetObtainObserverCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreDamageTargetObtainProgramsOperations = coreDamageTargetObtainProgramsOperations;
+        this._coreDamageTargetRegionObtainOperations = coreDamageTargetRegionObtainOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

@@ -189,9 +189,7 @@ internal sealed class ProgramDistanceRules
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramDistanceCatalog> DistanceRuleMetadata = new(() =>
-        ProgramDistanceCatalog.Discover(RuntimeModuleMethods), true);
     private ProgramDistanceRules? _distanceRules;
-    private ProgramDistanceRules DistanceRules => _distanceRules ??= new(DistanceRuleMetadata.Value,
+    private ProgramDistanceRules DistanceRules => _distanceRules ??= new(global::CardGame.Core.EngineOwners.CoreProgramDistanceRulesDefinitions.DistanceRuleMetadata.Value,
         BindRuntimeHandler);
 }

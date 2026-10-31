@@ -1,0 +1,139 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterLuSuHappyGodRuntime
+{
+    internal const string HappyDingzhouReason = "skill-program.happy-shen-lu-su.";
+    SkillProgramStepOutcome global::CardGame.Core.IHappyLuSuHost.BeginHappyDingzhou(ProgramSkillFrame frame) => BeginHappyDingzhou(frame);
+    internal SkillProgramStepOutcome BeginHappyDingzhou(ProgramSkillFrame supplied)
+    {
+        var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        if (frame.HappyDingzhou is not null || frame.InstructionIndex != 1 || frame.SelectedTargetSeats is not [var target] || target == frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
+            throw new InvalidOperationException("Happy Dingzhou requires its original once-per-Play other participant.");
+        var receipt = new HappyDingzhouReceipt(global::CardGame.Core.EngineOwners.CharacterLuSuMobileGodRuntime.ShenLsSource(frame), frame.GameplayHash, target, HappyDingzhouStage.BranchChoice)
+        {
+            Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
+            After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
+        };
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { HappyDingzhou = receipt });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyDingzhouStartedEvent(frame.Id, receipt.Source, receipt.GameplayHash, target));
+        ContinueHappyDingzhou(frame.Id);
+        return SkillProgramStepOutcome.AwaitChoice;
+    }
+
+    internal void ContinueHappyDingzhou(long id)
+    {
+        while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HappyDingzhou: { } receipt } frame && frame.Id == id)
+        {
+            AssertHappyDingzhou(frame);
+            if (_characterLuSuMobileGodOperations.DrainShenLs(id))
+                return;
+            frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
+            receipt = frame.HappyDingzhou!;
+            if (frame.PendingMovementContinuation is not null)
+            {
+                _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { PendingMovementContinuation = null });
+            }
+
+            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].IsAlive)
+            {
+                FinishHappyDingzhou(frame);
+                return;
+            }
+
+            if (receipt.Stage == HappyDingzhouStage.FieldGiftChildren)
+            {
+                var cards = _characterLuSuMobileGodOperations.ShenLsField(receipt.TargetSeat);
+                if (cards.Length == 0)
+                {
+                    FinishHappyDingzhou(frame);
+                    return;
+                }
+
+                _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { HappyDingzhou = receipt with { Obtained = cards } });
+                MoveHappyDingzhou(frame, cards, HappyDingzhouStage.FieldGainChildren, CardLocation.Hand(frame.OwnerSeat));
+                continue;
+            }
+
+            if (receipt.Stage is HappyDingzhouStage.FieldGainChildren or HappyDingzhouStage.HandReturnChildren)
+            {
+                FinishHappyDingzhou(frame);
+                return;
+            }
+
+            if (receipt.Stage == HappyDingzhouStage.HandGainChildren)
+            {
+                var payable = Math.Min(receipt.Amount, _characterLuSuMobileGodOperations.ShenLsGiveable(frame.OwnerSeat).Length);
+                receipt = receipt with
+                {
+                    Stage = HappyDingzhouStage.HandReturnChoice,
+                    RequiredReturnCount = payable
+                };
+                _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { HappyDingzhou = receipt });
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyDingzhouReturnRequiredEvent(frame.Id, receipt.Amount, payable));
+            }
+
+            if (receipt.Stage is HappyDingzhouStage.FieldGiftChoice or HappyDingzhouStage.HandReturnChoice)
+            {
+                var required = receipt.Stage == HappyDingzhouStage.HandReturnChoice ? receipt.RequiredReturnCount!.Value : receipt.Amount;
+                if (receipt.Chosen.Count == required)
+                {
+                    if (required == 0)
+                    {
+                        FinishHappyDingzhou(frame);
+                        return;
+                    }
+
+                    if (receipt.Chosen.Any(card => !_characterLuSuMobileGodOperations.ShenLsGiveable(frame.OwnerSeat).Contains(card)))
+                        throw new InvalidOperationException("Happy Dingzhou lost a currently payable selected physical card.");
+                    MoveHappyDingzhou(frame, receipt.Chosen, receipt.Stage == HappyDingzhouStage.FieldGiftChoice ? HappyDingzhouStage.FieldGiftChildren : HappyDingzhouStage.HandReturnChildren, CardLocation.Hand(receipt.TargetSeat));
+                    continue;
+                }
+            }
+
+            PublishHappyDingzhou(frame);
+            return;
+        }
+    }
+
+    internal void MoveHappyDingzhou(ProgramSkillFrame frame, IReadOnlyList<int> cards, HappyDingzhouStage stage, CardLocation destination)
+    {
+        if (cards.Count == 0)
+            throw new InvalidOperationException("Happy Dingzhou cannot issue an empty paid movement.");
+        var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { HappyDingzhou = frame.HappyDingzhou!with { Stage = stage, Paid = false, Before = before, After = before, BatchId = 0, Invoices = [] }, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
+        void Paid(long batch, IReadOnlyList<CardMovementRecord> moves)
+        {
+            var parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { HappyDingzhou = parent.HappyDingzhou!with { Paid = true, BatchId = batch, After = moves[^1].Sequence, Invoices = moves.Select(m => new ShenLuSuMoveInvoice(m.CardId, m.From, m.To, m.Sequence)).ToArray() } });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyDingzhouMovementPaidEvent(frame.Id, stage, batch, moves.Count, before, moves[^1].Sequence));
+        }
+
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, destination, new(HappyDingzhouReason + stage), stage is HappyDingzhouStage.FieldGiftChildren or HappyDingzhouStage.HandReturnChildren ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, destination.OwnerSeat!.Value, cards, before, Paid) : Paid, disclosure: stage == HappyDingzhouStage.FieldGainChildren ? CardMovementDisclosure.FaceUp : CardMovementDisclosure.FaceDown);
+    }
+
+    internal void FinishHappyDingzhou(ProgramSkillFrame frame)
+    {
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { HappyDingzhou = null, PendingMovementContinuation = null });
+        _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
+    }
+
+    [ProgramContinuation(ProgramContinuationKind.Resume, 41280)]
+    internal bool ResumeHappyDingzhou(long id)
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyDingzhou: not null } frame || frame.Id != id)
+            return false;
+        ContinueHappyDingzhou(id);
+        return true;
+    }
+
+    [ProgramContinuation(ProgramContinuationKind.Movement, 41280)]
+    internal bool ReturnHappyDingzhouMovement(ProgramSkillFrame frame) => frame.HappyDingzhou is not null && ResumeHappyDingzhou(frame.Id);
+    [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 41280)]
+    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 41280)]
+    internal bool KeepHappyDingzhouPaid(ProgramSkillFrame frame) => frame.HappyDingzhou is not null;
+}

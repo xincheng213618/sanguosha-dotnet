@@ -14,19 +14,3 @@ internal static class MobileFuHuangHouComposition
                 Condition.Kind: SkillProgramConditionKind.PindianNotWon, Condition.SourceBind: "zhuikong-result" }
         ];
 }
-
-public sealed partial class GameEngine
-{
-    [ProgramDistanceRule(ProgramDistanceStage.DistanceProjection, 73910)]
-    private RuleQueryEvaluation MobileFuHuangHouZhuikongDistance(CharacterState source, CharacterState target, RuleQueryEvaluation original)
-    {
-        if (source.Seat == target.Seat) return original;
-        var grants = _directedTurnCardPolicies.Where(p => p.Source.SkillId == "mobile:zhuikong" && p.TurnNumber == _turnNumber &&
-            p.TurnSeat == _currentSeat && p.ActorSeat == source.Seat && p.TargetSeat == target.Seat &&
-            p.Effects == DirectedTurnCardPolicyEffect.IgnoreDistance).ToArray();
-        if (grants.Length == 0) return original;
-        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue),
-            [new RuleQueryBaseTerm("distance:before-mobile-zhuikong", ConvertRuleValue(original))],
-            grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"mobile-zhuikong:{g.ParentFrameId}:{g.EffectIndex}", SkillRuleOperation.Set, 1)).ToArray());
-    }
-}

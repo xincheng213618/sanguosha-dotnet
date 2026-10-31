@@ -1,0 +1,88 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeDuelRuntime
+{
+    private readonly ICoreNativeDuelCharacterCaoZhiLeOperations _characterCaoZhiLeOperations;
+    private readonly ICoreNativeDuelCharacterGuoTuOlOperations _characterGuoTuOlOperations;
+    private readonly ICoreNativeDuelCharacterLiuQiOlOperations _characterLiuQiOlOperations;
+    private readonly ICoreNativeDuelCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreNativeDuelCharacterMaChaoAnniversaryGodOperations _characterMaChaoAnniversaryGodOperations;
+    private readonly ICoreNativeDuelCharacterSimaYiMobileGodOperations _characterSimaYiMobileGodOperations;
+    private readonly ICoreNativeDuelCharacterZhangLiaoMobileGodOperations _characterZhangLiaoMobileGodOperations;
+    private readonly ICoreNativeDuelCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreNativeDuelCoreActionDiscardColorsOperations _coreActionDiscardColorsOperations;
+    private readonly ICoreNativeDuelCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreNativeDuelCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreNativeDuelCoreCardDeclarationsOperations _coreCardDeclarationsOperations;
+    private readonly ICoreNativeDuelCoreFriendDuelResponsesOperations _coreFriendDuelResponsesOperations;
+    private readonly ICoreNativeDuelCoreIssuedPlayUsePoliciesOperations _coreIssuedPlayUsePoliciesOperations;
+    private readonly ICoreNativeDuelCoreNativePublicPileOriginalCardsOperations _coreNativePublicPileOriginalCardsOperations;
+    private readonly ICoreNativeDuelCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreNativeDuelCoreRequestedDeckBasicsOperations _coreRequestedDeckBasicsOperations;
+    private readonly ICoreNativeDuelCoreResponseCompletionZhangbaOperations _coreResponseCompletionZhangbaOperations;
+    private readonly ICoreNativeDuelCoreResponseUseCompletionOperations _coreResponseUseCompletionOperations;
+    private readonly ICoreNativeDuelCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeDuelCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreNativeDuelCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeDuelCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreNativeDuelCoreNativeDamageApplicationOperations _coreNativeDamageApplicationOperations;
+    private readonly ICoreNativeDuelCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICoreNativeDuelCoreNativeGroupResponsesOperations _coreNativeGroupResponsesOperations;
+    private readonly ICoreNativeDuelCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
+    private readonly ICoreNativeDuelCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreNativeDuelCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreNativeDuelCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreNativeDuelCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreNativeDuelCoreNativeResponseWindowsOperations _coreNativeResponseWindowsOperations;
+    private readonly ICoreNativeDuelCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeDuelCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNativeDuelKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeDuelRuntime(ICoreNativeDuelCharacterCaoZhiLeOperations characterCaoZhiLeOperations, ICoreNativeDuelCharacterGuoTuOlOperations characterGuoTuOlOperations, ICoreNativeDuelCharacterLiuQiOlOperations characterLiuQiOlOperations, ICoreNativeDuelCharacterLuMengMouOperations characterLuMengMouOperations, ICoreNativeDuelCharacterMaChaoAnniversaryGodOperations characterMaChaoAnniversaryGodOperations, ICoreNativeDuelCharacterSimaYiMobileGodOperations characterSimaYiMobileGodOperations, ICoreNativeDuelCharacterZhangLiaoMobileGodOperations characterZhangLiaoMobileGodOperations, ICoreNativeDuelCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativeDuelCoreActionDiscardColorsOperations coreActionDiscardColorsOperations, ICoreNativeDuelCoreCardActionsOperations coreCardActionsOperations, ICoreNativeDuelCoreCardConversionsOperations coreCardConversionsOperations, ICoreNativeDuelCoreCardDeclarationsOperations coreCardDeclarationsOperations, ICoreNativeDuelCoreFriendDuelResponsesOperations coreFriendDuelResponsesOperations, ICoreNativeDuelCoreIssuedPlayUsePoliciesOperations coreIssuedPlayUsePoliciesOperations, ICoreNativeDuelCoreNativePublicPileOriginalCardsOperations coreNativePublicPileOriginalCardsOperations, ICoreNativeDuelCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreNativeDuelCoreRequestedDeckBasicsOperations coreRequestedDeckBasicsOperations, ICoreNativeDuelCoreResponseCompletionZhangbaOperations coreResponseCompletionZhangbaOperations, ICoreNativeDuelCoreResponseUseCompletionOperations coreResponseUseCompletionOperations, ICoreNativeDuelCoreMatchLogOperations coreMatchLogOperations, ICoreNativeDuelCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreNativeDuelCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeDuelCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreNativeDuelCoreNativeDamageApplicationOperations coreNativeDamageApplicationOperations, ICoreNativeDuelCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICoreNativeDuelCoreNativeGroupResponsesOperations coreNativeGroupResponsesOperations, ICoreNativeDuelCoreNativeLegalActionsOperations coreNativeLegalActionsOperations, ICoreNativeDuelCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreNativeDuelCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreNativeDuelCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreNativeDuelCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreNativeDuelCoreNativeResponseWindowsOperations coreNativeResponseWindowsOperations, ICoreNativeDuelCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeDuelCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeDuelKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCaoZhiLeOperations = characterCaoZhiLeOperations;
+        this._characterGuoTuOlOperations = characterGuoTuOlOperations;
+        this._characterLiuQiOlOperations = characterLiuQiOlOperations;
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._characterMaChaoAnniversaryGodOperations = characterMaChaoAnniversaryGodOperations;
+        this._characterSimaYiMobileGodOperations = characterSimaYiMobileGodOperations;
+        this._characterZhangLiaoMobileGodOperations = characterZhangLiaoMobileGodOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreActionDiscardColorsOperations = coreActionDiscardColorsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;
+        this._coreFriendDuelResponsesOperations = coreFriendDuelResponsesOperations;
+        this._coreIssuedPlayUsePoliciesOperations = coreIssuedPlayUsePoliciesOperations;
+        this._coreNativePublicPileOriginalCardsOperations = coreNativePublicPileOriginalCardsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreRequestedDeckBasicsOperations = coreRequestedDeckBasicsOperations;
+        this._coreResponseCompletionZhangbaOperations = coreResponseCompletionZhangbaOperations;
+        this._coreResponseUseCompletionOperations = coreResponseUseCompletionOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeDamageApplicationOperations = coreNativeDamageApplicationOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._coreNativeGroupResponsesOperations = coreNativeGroupResponsesOperations;
+        this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._coreNativeResponseWindowsOperations = coreNativeResponseWindowsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -5,8 +5,7 @@ namespace CardGame.Core;
 internal sealed class MouXuShengRuntime(IMouXuShengFacts facts, IMouXuShengNative native, IProgramRuntimeFrames frames,
     IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouXuShengRuntime
 {
-    internal const string Action = "mou-xu-sheng", DrawReason = "skill-program.mou:qinqiang.draw",
-        DiscardReason = "skill-program.mou:yizhen.discard", ClaimReason = "skill-program.mou:yizhen.claim";
+    internal const string Action = "mou-xu-sheng",DrawReason = "skill-program.mou:qinqiang.draw",        DiscardReason = "skill-program.mou:yizhen.discard",ClaimReason = "skill-program.mou:yizhen.claim";
     private static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     private bool Available(int owner, bool damage) => !facts.History<MouXuShengBenefitUsedEvent>().Any(e => e.OwnerSeat == owner && e.ActualTurn == facts.Turn && e.TurnOwner == facts.TurnOwner && e.Damage == damage);
     private CurrentTurnCardUseKindsRecordedEvent[] Uses(int owner) => facts.History<CurrentTurnCardUseKindsRecordedEvent>().Where(e =>

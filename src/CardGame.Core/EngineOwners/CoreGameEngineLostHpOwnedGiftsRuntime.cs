@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineLostHpOwnedGiftsRuntime
+{
+    private readonly ICoreLostHpOwnedGiftsCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreLostHpOwnedGiftsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreLostHpOwnedGiftsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreLostHpOwnedGiftsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreCardDistributionPresentationOperations _coreCardDistributionPresentationOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreEarnedActualEndingBenefitsOperations _coreEarnedActualEndingBenefitsOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreUnrespondableCounterspellsOperations _coreUnrespondableCounterspellsOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICoreLostHpOwnedGiftsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreLostHpOwnedGiftsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreLostHpOwnedGiftsCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreLostHpOwnedGiftsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreLostHpOwnedGiftsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineLostHpOwnedGiftsRuntime(ICoreLostHpOwnedGiftsCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreLostHpOwnedGiftsCardZonesOperations cardZonesOperations, ICoreLostHpOwnedGiftsContentRegistryOperations contentRegistryOperations, ICoreLostHpOwnedGiftsResolutionStackOperations resolutionStackOperations, ICoreLostHpOwnedGiftsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreLostHpOwnedGiftsCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreLostHpOwnedGiftsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreLostHpOwnedGiftsCoreCardDistributionPresentationOperations coreCardDistributionPresentationOperations, ICoreLostHpOwnedGiftsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreLostHpOwnedGiftsCoreEarnedActualEndingBenefitsOperations coreEarnedActualEndingBenefitsOperations, ICoreLostHpOwnedGiftsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreLostHpOwnedGiftsCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICoreLostHpOwnedGiftsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreLostHpOwnedGiftsCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreLostHpOwnedGiftsCoreRuntimeOperations coreRuntimeOperations, ICoreLostHpOwnedGiftsCoreUnrespondableCounterspellsOperations coreUnrespondableCounterspellsOperations, ICoreLostHpOwnedGiftsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreLostHpOwnedGiftsCoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations, ICoreLostHpOwnedGiftsCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICoreLostHpOwnedGiftsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreLostHpOwnedGiftsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreLostHpOwnedGiftsCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreLostHpOwnedGiftsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreLostHpOwnedGiftsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreLostHpOwnedGiftsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardDistributionPresentationOperations = coreCardDistributionPresentationOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEarnedActualEndingBenefitsOperations = coreEarnedActualEndingBenefitsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreUnrespondableCounterspellsOperations = coreUnrespondableCounterspellsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

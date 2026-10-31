@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineBoundCardsRecastsRuntime : global::CardGame.Core.IBoundCardsRecastHost
+{
+    private readonly ICoreBoundCardsRecastsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreBoundCardsRecastsObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICoreBoundCardsRecastsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreBoundCardsRecastsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreBoundCardsRecastsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreBoundCardsRecastsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreBoundCardsRecastsCoreDeckProgramsOperations _coreDeckProgramsOperations;
+    private readonly ICoreBoundCardsRecastsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreBoundCardsRecastsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreBoundCardsRecastsCoreNativeRecastInvocationsOperations _coreNativeRecastInvocationsOperations;
+    private readonly ICoreBoundCardsRecastsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreBoundCardsRecastsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreBoundCardsRecastsCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICoreBoundCardsRecastsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreBoundCardsRecastsCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreBoundCardsRecastsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreBoundCardsRecastsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineBoundCardsRecastsRuntime(ICoreBoundCardsRecastsCardZonesOperations cardZonesOperations, ICoreBoundCardsRecastsObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICoreBoundCardsRecastsResolutionStackOperations resolutionStackOperations, ICoreBoundCardsRecastsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreBoundCardsRecastsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreBoundCardsRecastsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreBoundCardsRecastsCoreDeckProgramsOperations coreDeckProgramsOperations, ICoreBoundCardsRecastsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreBoundCardsRecastsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreBoundCardsRecastsCoreNativeRecastInvocationsOperations coreNativeRecastInvocationsOperations, ICoreBoundCardsRecastsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreBoundCardsRecastsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreBoundCardsRecastsCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICoreBoundCardsRecastsCoreRuntimeOperations coreRuntimeOperations, ICoreBoundCardsRecastsCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreBoundCardsRecastsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreBoundCardsRecastsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDeckProgramsOperations = coreDeckProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeRecastInvocationsOperations = coreNativeRecastInvocationsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

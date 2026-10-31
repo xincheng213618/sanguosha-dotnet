@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineProgramSelectionSourcesRuntime : global::CardGame.Core.IProgramSelectionSourceQuery
+{
+    private readonly ICoreProgramSelectionSourcesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramSelectionSourcesCoreAlternatingSuitAndCompletedTopOperations _coreAlternatingSuitAndCompletedTopOperations;
+    private readonly ICoreProgramSelectionSourcesCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreProgramSelectionSourcesCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreProgramSelectionSourcesCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreProgramSelectionSourcesCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreProgramSelectionSourcesCoreHealthQueriesOperations _coreHealthQueriesOperations;
+    private readonly ICoreProgramSelectionSourcesCoreHpLossSlashMaterialsOperations _coreHpLossSlashMaterialsOperations;
+    private readonly ICoreProgramSelectionSourcesCoreNextActualUseTargetAdjustmentsOperations _coreNextActualUseTargetAdjustmentsOperations;
+    private readonly ICoreProgramSelectionSourcesCoreProgramOrdinaryTrickUsesOperations _coreProgramOrdinaryTrickUsesOperations;
+    private readonly ICoreProgramSelectionSourcesCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICoreProgramSelectionSourcesCoreTurnRedSlashBenefitsOperations _coreTurnRedSlashBenefitsOperations;
+    private readonly ICoreProgramSelectionSourcesCoreWenhePoisonOperations _coreWenhePoisonOperations;
+    private readonly ICoreProgramSelectionSourcesCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreProgramSelectionSourcesCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreProgramSelectionSourcesCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICoreProgramSelectionSourcesCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreProgramSelectionSourcesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramSelectionSourcesCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramSelectionSourcesRuntime(ICoreProgramSelectionSourcesCardZonesOperations cardZonesOperations, ICoreProgramSelectionSourcesCoreAlternatingSuitAndCompletedTopOperations coreAlternatingSuitAndCompletedTopOperations, ICoreProgramSelectionSourcesCoreCardConversionsOperations coreCardConversionsOperations, ICoreProgramSelectionSourcesCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreProgramSelectionSourcesCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreProgramSelectionSourcesCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreProgramSelectionSourcesCoreHealthQueriesOperations coreHealthQueriesOperations, ICoreProgramSelectionSourcesCoreHpLossSlashMaterialsOperations coreHpLossSlashMaterialsOperations, ICoreProgramSelectionSourcesCoreNextActualUseTargetAdjustmentsOperations coreNextActualUseTargetAdjustmentsOperations, ICoreProgramSelectionSourcesCoreProgramOrdinaryTrickUsesOperations coreProgramOrdinaryTrickUsesOperations, ICoreProgramSelectionSourcesCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICoreProgramSelectionSourcesCoreTurnRedSlashBenefitsOperations coreTurnRedSlashBenefitsOperations, ICoreProgramSelectionSourcesCoreWenhePoisonOperations coreWenhePoisonOperations, ICoreProgramSelectionSourcesCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreProgramSelectionSourcesCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreProgramSelectionSourcesCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICoreProgramSelectionSourcesCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreProgramSelectionSourcesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramSelectionSourcesCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreAlternatingSuitAndCompletedTopOperations = coreAlternatingSuitAndCompletedTopOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreHealthQueriesOperations = coreHealthQueriesOperations;
+        this._coreHpLossSlashMaterialsOperations = coreHpLossSlashMaterialsOperations;
+        this._coreNextActualUseTargetAdjustmentsOperations = coreNextActualUseTargetAdjustmentsOperations;
+        this._coreProgramOrdinaryTrickUsesOperations = coreProgramOrdinaryTrickUsesOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreTurnRedSlashBenefitsOperations = coreTurnRedSlashBenefitsOperations;
+        this._coreWenhePoisonOperations = coreWenhePoisonOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

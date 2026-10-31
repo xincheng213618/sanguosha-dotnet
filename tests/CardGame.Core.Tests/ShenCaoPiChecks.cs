@@ -114,9 +114,9 @@ internal static class ShenCaoPiChecks
         public PendingDecision? P => Enumerable.Range(0, 4).Select(v => G.CreateSnapshot(v).PendingDecision).FirstOrDefault(p => p is not null);
         public PlayerSnapshot V(int seat) => G.CreateSnapshot(seat).Players[seat];
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
-        private System.Collections.IList Players => (System.Collections.IList)typeof(GameEngine).GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!;
-        public int Limit(int seat) => (int)typeof(GameEngine).GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G, [Players[seat]])!;
-        public IReadOnlyList<LegalAction> Actions(int seat) => (IReadOnlyList<LegalAction>)typeof(GameEngine).GetMethod("BuildLegalActions", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G, [Players[seat], true, null])!;
+        private System.Collections.IList Players => (System.Collections.IList)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!;
+        public int Limit(int seat) => (int)global::FixtureRuntimeAccess.Engine.GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G, [Players[seat]])!;
+        public IReadOnlyList<LegalAction> Actions(int seat) => (IReadOnlyList<LegalAction>)global::FixtureRuntimeAccess.Engine.GetMethod("BuildLegalActions", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G, [Players[seat], true, null])!;
         public void Use(string skill, string activation, IReadOnlyList<int> targets) => Accept(new UseProgramSkillCommand(0, skill, activation, [], targets, G.Revision, P!.PromptId));
         public void End() => Accept(new EndPlayPhaseCommand(0, G.Revision, P!.PromptId));
         public void Play() => Reach(() => P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });

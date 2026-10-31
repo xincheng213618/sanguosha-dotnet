@@ -1,0 +1,82 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZuoCiHappyGodRuntime : global::CardGame.Core.IHappyZuoCiHost
+{
+    private readonly ICharacterZuoCiHappyGodCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterZuoCiHappyGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZuoCiHappyGodRandomOperations _randomOperations;
+    private readonly ICharacterZuoCiHappyGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZuoCiHappyGodCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterZuoCiHappyGodCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterZuoCiHappyGodCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterZuoCiHappyGodCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterZuoCiHappyGodCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterZuoCiHappyGodCoreHealthQueriesOperations _coreHealthQueriesOperations;
+    private readonly ICharacterZuoCiHappyGodCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterZuoCiHappyGodCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterZuoCiHappyGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZuoCiHappyGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZuoCiHappyGodCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterZuoCiHappyGodCoreResponseCompletionOperations _coreResponseCompletionOperations;
+    private readonly ICharacterZuoCiHappyGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZuoCiHappyGodCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterZuoCiHappyGodCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterZuoCiHappyGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterZuoCiHappyGodCoreParticipantHandProgramsOperations _coreParticipantHandProgramsOperations;
+    private readonly ICharacterZuoCiHappyGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterZuoCiHappyGodCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterZuoCiHappyGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterZuoCiHappyGodCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterZuoCiHappyGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterZuoCiHappyGodCoreTrustedCardZoneDiagnosticsOperations _coreTrustedCardZoneDiagnosticsOperations;
+    private readonly ICharacterZuoCiHappyGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterZuoCiHappyGodProgramPhaseBoundaryOperations _programPhaseBoundaryOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    internal CharacterZuoCiHappyGodRuntime(ICharacterZuoCiHappyGodCardZonesOperations cardZonesOperations, ICharacterZuoCiHappyGodContentRegistryOperations contentRegistryOperations, ICharacterZuoCiHappyGodRandomOperations randomOperations, ICharacterZuoCiHappyGodResolutionStackOperations resolutionStackOperations, ICharacterZuoCiHappyGodCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterZuoCiHappyGodCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterZuoCiHappyGodCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterZuoCiHappyGodCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterZuoCiHappyGodCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterZuoCiHappyGodCoreHealthQueriesOperations coreHealthQueriesOperations, ICharacterZuoCiHappyGodCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterZuoCiHappyGodCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterZuoCiHappyGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZuoCiHappyGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZuoCiHappyGodCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterZuoCiHappyGodCoreResponseCompletionOperations coreResponseCompletionOperations, ICharacterZuoCiHappyGodCoreRuntimeOperations coreRuntimeOperations, ICharacterZuoCiHappyGodCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterZuoCiHappyGodCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterZuoCiHappyGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterZuoCiHappyGodCoreParticipantHandProgramsOperations coreParticipantHandProgramsOperations, ICharacterZuoCiHappyGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterZuoCiHappyGodCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterZuoCiHappyGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterZuoCiHappyGodCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterZuoCiHappyGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterZuoCiHappyGodCoreTrustedCardZoneDiagnosticsOperations coreTrustedCardZoneDiagnosticsOperations, ICharacterZuoCiHappyGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterZuoCiHappyGodProgramPhaseBoundaryOperations programPhaseBoundaryOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHealthQueriesOperations = coreHealthQueriesOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreResponseCompletionOperations = coreResponseCompletionOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreParticipantHandProgramsOperations = coreParticipantHandProgramsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreTrustedCardZoneDiagnosticsOperations = coreTrustedCardZoneDiagnosticsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._programPhaseBoundaryOperations = programPhaseBoundaryOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess = coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    }
+}

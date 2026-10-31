@@ -1,0 +1,32 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreProgramAllHandBonusOperationRuntime
+{
+    private readonly ICoreProgramAllHandBonusOperationCharacterLuMengMouMobileOperations _characterLuMengMouMobileOperations;
+    private readonly ICoreProgramAllHandBonusOperationCharacterSimaYiHappyGodOperations _characterSimaYiHappyGodOperations;
+    private readonly ICoreProgramAllHandBonusOperationCoreAlternatingSuitAndCompletedTopOperations _coreAlternatingSuitAndCompletedTopOperations;
+    private readonly ICoreProgramAllHandBonusOperationCoreBoundDiscardSlashBenefitsOperations _coreBoundDiscardSlashBenefitsOperations;
+    private readonly ICoreProgramAllHandBonusOperationCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreProgramAllHandBonusOperationCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreProgramAllHandBonusOperationCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess _coreActualTurnProgressCurrentSeatAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreProgramAllHandBonusOperationRuntime(ICoreProgramAllHandBonusOperationCharacterLuMengMouMobileOperations characterLuMengMouMobileOperations, ICoreProgramAllHandBonusOperationCharacterSimaYiHappyGodOperations characterSimaYiHappyGodOperations, ICoreProgramAllHandBonusOperationCoreAlternatingSuitAndCompletedTopOperations coreAlternatingSuitAndCompletedTopOperations, ICoreProgramAllHandBonusOperationCoreBoundDiscardSlashBenefitsOperations coreBoundDiscardSlashBenefitsOperations, ICoreProgramAllHandBonusOperationCoreHandComparisonOperations coreHandComparisonOperations, ICoreProgramAllHandBonusOperationCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreProgramAllHandBonusOperationCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess coreActualTurnProgressCurrentSeatAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLuMengMouMobileOperations = characterLuMengMouMobileOperations;
+        this._characterSimaYiHappyGodOperations = characterSimaYiHappyGodOperations;
+        this._coreAlternatingSuitAndCompletedTopOperations = coreAlternatingSuitAndCompletedTopOperations;
+        this._coreBoundDiscardSlashBenefitsOperations = coreBoundDiscardSlashBenefitsOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreActualTurnProgressCurrentSeatAccess = coreActualTurnProgressCurrentSeatAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

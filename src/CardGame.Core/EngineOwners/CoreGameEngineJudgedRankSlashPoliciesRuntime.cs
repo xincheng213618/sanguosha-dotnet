@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineJudgedRankSlashPoliciesRuntime : global::CardGame.Core.IJudgedRankSlashProgramHost
+{
+    private readonly ICoreJudgedRankSlashPoliciesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreJudgedRankSlashPoliciesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreJudgedRankSlashPoliciesTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreJudgedRankSlashPoliciesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreJudgedRankSlashPoliciesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreJudgedRankSlashPoliciesCoreFinalTargetSlashOperations _coreFinalTargetSlashOperations;
+    private readonly ICoreJudgedRankSlashPoliciesCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICoreJudgedRankSlashPoliciesCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreJudgedRankSlashPoliciesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreJudgedRankSlashPoliciesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreJudgedRankSlashPoliciesCoreShownEntityTurnPoliciesOperations _coreShownEntityTurnPoliciesOperations;
+    private readonly ICoreJudgedRankSlashPoliciesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreJudgedRankSlashPoliciesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineJudgedRankSlashPoliciesRuntime(ICoreJudgedRankSlashPoliciesContentRegistryOperations contentRegistryOperations, ICoreJudgedRankSlashPoliciesResolutionStackOperations resolutionStackOperations, ICoreJudgedRankSlashPoliciesTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreJudgedRankSlashPoliciesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreJudgedRankSlashPoliciesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreJudgedRankSlashPoliciesCoreFinalTargetSlashOperations coreFinalTargetSlashOperations, ICoreJudgedRankSlashPoliciesCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICoreJudgedRankSlashPoliciesCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreJudgedRankSlashPoliciesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreJudgedRankSlashPoliciesCoreRuntimeOperations coreRuntimeOperations, ICoreJudgedRankSlashPoliciesCoreShownEntityTurnPoliciesOperations coreShownEntityTurnPoliciesOperations, ICoreJudgedRankSlashPoliciesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreJudgedRankSlashPoliciesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreFinalTargetSlashOperations = coreFinalTargetSlashOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShownEntityTurnPoliciesOperations = coreShownEntityTurnPoliciesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

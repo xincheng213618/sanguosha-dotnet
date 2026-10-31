@@ -1,0 +1,80 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineOriginalUseLightningRuntime
+{
+    private readonly ICoreOriginalUseLightningCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICoreOriginalUseLightningContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreOriginalUseLightningResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreOriginalUseLightningCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreOriginalUseLightningCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreOriginalUseLightningCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreOriginalUseLightningCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreOriginalUseLightningCoreCardEffectProgramsOperations _coreCardEffectProgramsOperations;
+    private readonly ICoreOriginalUseLightningCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreOriginalUseLightningCoreDyingWindowSkillPoliciesOperations _coreDyingWindowSkillPoliciesOperations;
+    private readonly ICoreOriginalUseLightningCoreExtraCardEffectRoundsOperations _coreExtraCardEffectRoundsOperations;
+    private readonly ICoreOriginalUseLightningCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreOriginalUseLightningCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreOriginalUseLightningCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreOriginalUseLightningCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreOriginalUseLightningCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreOriginalUseLightningCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreOriginalUseLightningCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreOriginalUseLightningCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreOriginalUseLightningCoreNativeDamageApplicationOperations _coreNativeDamageApplicationOperations;
+    private readonly ICoreOriginalUseLightningCoreNativeJudgmentOperations _coreNativeJudgmentOperations;
+    private readonly ICoreOriginalUseLightningCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreOriginalUseLightningCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreOriginalUseLightningCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreOriginalUseLightningCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreOriginalUseLightningKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreOriginalUseLightningKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreOriginalUseLightningKernelCoreMainOperations2 _kernelCoreMainOperations2;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess _coreMatchDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineOriginalUseLightningRuntime(ICoreOriginalUseLightningCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICoreOriginalUseLightningContentRegistryOperations contentRegistryOperations, ICoreOriginalUseLightningResolutionStackOperations resolutionStackOperations, ICoreOriginalUseLightningCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreOriginalUseLightningCoreActualTurnsOperations coreActualTurnsOperations, ICoreOriginalUseLightningCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreOriginalUseLightningCoreCardActionsOperations coreCardActionsOperations, ICoreOriginalUseLightningCoreCardEffectProgramsOperations coreCardEffectProgramsOperations, ICoreOriginalUseLightningCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreOriginalUseLightningCoreDyingWindowSkillPoliciesOperations coreDyingWindowSkillPoliciesOperations, ICoreOriginalUseLightningCoreExtraCardEffectRoundsOperations coreExtraCardEffectRoundsOperations, ICoreOriginalUseLightningCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreOriginalUseLightningCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreOriginalUseLightningCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreOriginalUseLightningCoreRuntimeOperations coreRuntimeOperations, ICoreOriginalUseLightningCoreTableOrderOperations coreTableOrderOperations, ICoreOriginalUseLightningCoreMatchLogOperations coreMatchLogOperations, ICoreOriginalUseLightningCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreOriginalUseLightningCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreOriginalUseLightningCoreNativeDamageApplicationOperations coreNativeDamageApplicationOperations, ICoreOriginalUseLightningCoreNativeJudgmentOperations coreNativeJudgmentOperations, ICoreOriginalUseLightningCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreOriginalUseLightningCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreOriginalUseLightningCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreOriginalUseLightningCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreOriginalUseLightningKernelCoreMainOperations kernelCoreMainOperations, ICoreOriginalUseLightningKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreOriginalUseLightningKernelCoreMainOperations2 kernelCoreMainOperations2, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess coreMatchDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardEffectProgramsOperations = coreCardEffectProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDyingWindowSkillPoliciesOperations = coreDyingWindowSkillPoliciesOperations;
+        this._coreExtraCardEffectRoundsOperations = coreExtraCardEffectRoundsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeDamageApplicationOperations = coreNativeDamageApplicationOperations;
+        this._coreNativeJudgmentOperations = coreNativeJudgmentOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreMainOperations2 = kernelCoreMainOperations2;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchDefinitionPlayerCountAccess = coreMatchDefinitionPlayerCountAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

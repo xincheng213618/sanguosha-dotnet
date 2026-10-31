@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterGuanYuRuntimeRuntime : global::CardGame.Core.IGuanYuTargetSelectionQuery, global::CardGame.Core.IGuanYuVariantHost
+{
+    private readonly ICharacterGuanYuRuntimeCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterGuanYuRuntimeContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterGuanYuRuntimeResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterGuanYuRuntimeCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterGuanYuRuntimeCoreCardUseDebitsOperations _coreCardUseDebitsOperations;
+    private readonly ICharacterGuanYuRuntimeCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterGuanYuRuntimeCoreCharacterHostOperations _coreCharacterHostOperations;
+    private readonly ICharacterGuanYuRuntimeCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICharacterGuanYuRuntimeCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterGuanYuRuntimeCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICharacterGuanYuRuntimeCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterGuanYuRuntimeCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterGuanYuRuntimeCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterGuanYuRuntimeCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterGuanYuRuntimeCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterGuanYuRuntimeCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICharacterGuanYuRuntimeCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICharacterGuanYuRuntimeCoreNativePlayerDeathOperations _coreNativePlayerDeathOperations;
+    private readonly ICharacterGuanYuRuntimeCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterGuanYuRuntimeCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterGuanYuRuntimeKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberRoundTurnSeatsAccess _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CharacterGuanYuRuntimeRuntime(ICharacterGuanYuRuntimeCardZonesOperations cardZonesOperations, ICharacterGuanYuRuntimeContentRegistryOperations contentRegistryOperations, ICharacterGuanYuRuntimeResolutionStackOperations resolutionStackOperations, ICharacterGuanYuRuntimeCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterGuanYuRuntimeCoreCardUseDebitsOperations coreCardUseDebitsOperations, ICharacterGuanYuRuntimeCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterGuanYuRuntimeCoreCharacterHostOperations coreCharacterHostOperations, ICharacterGuanYuRuntimeCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICharacterGuanYuRuntimeCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterGuanYuRuntimeCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICharacterGuanYuRuntimeCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterGuanYuRuntimeCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterGuanYuRuntimeCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterGuanYuRuntimeCoreRuntimeOperations coreRuntimeOperations, ICharacterGuanYuRuntimeCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterGuanYuRuntimeCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICharacterGuanYuRuntimeCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICharacterGuanYuRuntimeCoreNativePlayerDeathOperations coreNativePlayerDeathOperations, ICharacterGuanYuRuntimeCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterGuanYuRuntimeCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterGuanYuRuntimeKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberRoundTurnSeatsAccess coreActualRoundProgressRoundNumberRoundTurnSeatsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseDebitsOperations = coreCardUseDebitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterHostOperations = coreCharacterHostOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._coreNativePlayerDeathOperations = coreNativePlayerDeathOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberRoundTurnSeatsAccess = coreActualRoundProgressRoundNumberRoundTurnSeatsAccess;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

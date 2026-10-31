@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineOrderedSelectedActorDuelsRuntime
+{
+    private readonly ICoreOrderedSelectedActorDuelsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreOrderedSelectedActorDuelsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreOrderedSelectedActorDuelsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreOrderedSelectedActorDuelsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    internal CoreGameEngineOrderedSelectedActorDuelsRuntime(ICoreOrderedSelectedActorDuelsContentRegistryOperations contentRegistryOperations, ICoreOrderedSelectedActorDuelsResolutionStackOperations resolutionStackOperations, ICoreOrderedSelectedActorDuelsCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreOrderedSelectedActorDuelsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreOrderedSelectedActorDuelsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreOrderedSelectedActorDuelsCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreOrderedSelectedActorDuelsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreOrderedSelectedActorDuelsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreOrderedSelectedActorDuelsCoreRuntimeOperations coreRuntimeOperations, ICoreOrderedSelectedActorDuelsCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreOrderedSelectedActorDuelsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreOrderedSelectedActorDuelsCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreOrderedSelectedActorDuelsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreOrderedSelectedActorDuelsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+    }
+}

@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterPanZhangMaZhongBoundaryMobileRuntime : global::CardGame.Core.IBoundaryAnjianHost
+{
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterPanZhangMaZhongBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterPanZhangMaZhongBoundaryMobileRuntime(ICharacterPanZhangMaZhongBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterPanZhangMaZhongBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterPanZhangMaZhongBoundaryMobileCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterPanZhangMaZhongBoundaryMobileCoreEquipmentContentOperations coreEquipmentContentOperations, ICharacterPanZhangMaZhongBoundaryMobileCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICharacterPanZhangMaZhongBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterPanZhangMaZhongBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterPanZhangMaZhongBoundaryMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterPanZhangMaZhongBoundaryMobileCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterPanZhangMaZhongBoundaryMobileCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICharacterPanZhangMaZhongBoundaryMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterPanZhangMaZhongBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

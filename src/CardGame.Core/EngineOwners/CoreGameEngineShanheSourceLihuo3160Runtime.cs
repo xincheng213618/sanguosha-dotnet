@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheSourceLihuo3160Runtime : global::CardGame.Core.IShanheSourceJiangdongTrioHost
+{
+    private readonly ICoreShanheSourceLihuo3160CardZonesOperations _cardZonesOperations;
+    private readonly ICoreShanheSourceLihuo3160ContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheSourceLihuo3160ResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreProgramPersistentStateOperations _coreProgramPersistentStateOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreShanheSourceChunlao3161Operations _coreShanheSourceChunlao3161Operations;
+    private readonly ICoreShanheSourceLihuo3160CoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheSourceLihuo3160CorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheSourceLihuo3160CoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreShanheSourceLihuo3160KernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreShanheSourceLihuo3160KernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheSourceLihuo3160Runtime(ICoreShanheSourceLihuo3160CardZonesOperations cardZonesOperations, ICoreShanheSourceLihuo3160ContentRegistryOperations contentRegistryOperations, ICoreShanheSourceLihuo3160ResolutionStackOperations resolutionStackOperations, ICoreShanheSourceLihuo3160CoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreShanheSourceLihuo3160CoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheSourceLihuo3160CoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreShanheSourceLihuo3160CoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreShanheSourceLihuo3160CoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreShanheSourceLihuo3160CoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreShanheSourceLihuo3160CoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreShanheSourceLihuo3160CoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheSourceLihuo3160CoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheSourceLihuo3160CoreProgramPersistentStateOperations coreProgramPersistentStateOperations, ICoreShanheSourceLihuo3160CoreRuntimeOperations coreRuntimeOperations, ICoreShanheSourceLihuo3160CoreShanheSourceChunlao3161Operations coreShanheSourceChunlao3161Operations, ICoreShanheSourceLihuo3160CoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreShanheSourceLihuo3160CoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheSourceLihuo3160CorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheSourceLihuo3160CoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreShanheSourceLihuo3160KernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreShanheSourceLihuo3160KernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramPersistentStateOperations = coreProgramPersistentStateOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheSourceChunlao3161Operations = coreShanheSourceChunlao3161Operations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

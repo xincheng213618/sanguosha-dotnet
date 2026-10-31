@@ -1,0 +1,28 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineZhangbaSelectionsRuntime
+{
+    private readonly ICoreZhangbaSelectionsCoreAlternatingSuitAndCompletedTopOperations _coreAlternatingSuitAndCompletedTopOperations;
+    private readonly ICoreZhangbaSelectionsCoreFinalTargetSlashOperations _coreFinalTargetSlashOperations;
+    private readonly ICoreZhangbaSelectionsCoreTurnRedSlashBenefitsOperations _coreTurnRedSlashBenefitsOperations;
+    private readonly ICoreZhangbaSelectionsCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreZhangbaSelectionsCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreZhangbaSelectionsCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineZhangbaSelectionsRuntime(ICoreZhangbaSelectionsCoreAlternatingSuitAndCompletedTopOperations coreAlternatingSuitAndCompletedTopOperations, ICoreZhangbaSelectionsCoreFinalTargetSlashOperations coreFinalTargetSlashOperations, ICoreZhangbaSelectionsCoreTurnRedSlashBenefitsOperations coreTurnRedSlashBenefitsOperations, ICoreZhangbaSelectionsCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreZhangbaSelectionsCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreZhangbaSelectionsCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._coreAlternatingSuitAndCompletedTopOperations = coreAlternatingSuitAndCompletedTopOperations;
+        this._coreFinalTargetSlashOperations = coreFinalTargetSlashOperations;
+        this._coreTurnRedSlashBenefitsOperations = coreTurnRedSlashBenefitsOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

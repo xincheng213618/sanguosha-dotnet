@@ -1,0 +1,75 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineForeignTurnContestsRuntime : global::CardGame.Core.IForeignTurnContestAidProgramHost
+{
+    private readonly ICoreForeignTurnContestsCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreForeignTurnContestsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreForeignTurnContestsCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreForeignTurnContestsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreForeignTurnContestsCoreActualPlayPhaseCardUsesOperations _coreActualPlayPhaseCardUsesOperations;
+    private readonly ICoreForeignTurnContestsCoreAlcoholSlashSuppressionsOperations _coreAlcoholSlashSuppressionsOperations;
+    private readonly ICoreForeignTurnContestsCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreForeignTurnContestsCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreForeignTurnContestsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreForeignTurnContestsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreForeignTurnContestsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreForeignTurnContestsCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreForeignTurnContestsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreForeignTurnContestsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreForeignTurnContestsCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly ICoreForeignTurnContestsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreForeignTurnContestsCoreSameTypeActualUseAidOperations _coreSameTypeActualUseAidOperations;
+    private readonly ICoreForeignTurnContestsCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreForeignTurnContestsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreForeignTurnContestsCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreForeignTurnContestsCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreForeignTurnContestsCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreForeignTurnContestsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreForeignTurnContestsKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreForeignTurnContestsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreForeignTurnContestsForeignActualTurnWindowOperations _foreignActualTurnWindowOperations;
+    private readonly ICoreForeignTurnContestsForeignTurnContestOperations _foreignTurnContestOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CoreGameEngineForeignTurnContestsRuntime(ICoreForeignTurnContestsCharacterLuMengMouOperations characterLuMengMouOperations, ICoreForeignTurnContestsResolutionStackOperations resolutionStackOperations, ICoreForeignTurnContestsCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreForeignTurnContestsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreForeignTurnContestsCoreActualPlayPhaseCardUsesOperations coreActualPlayPhaseCardUsesOperations, ICoreForeignTurnContestsCoreAlcoholSlashSuppressionsOperations coreAlcoholSlashSuppressionsOperations, ICoreForeignTurnContestsCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreForeignTurnContestsCoreCardActionsOperations coreCardActionsOperations, ICoreForeignTurnContestsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreForeignTurnContestsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreForeignTurnContestsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreForeignTurnContestsCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreForeignTurnContestsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreForeignTurnContestsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreForeignTurnContestsCoreRuleQueriesOperations coreRuleQueriesOperations, ICoreForeignTurnContestsCoreRuntimeOperations coreRuntimeOperations, ICoreForeignTurnContestsCoreSameTypeActualUseAidOperations coreSameTypeActualUseAidOperations, ICoreForeignTurnContestsCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreForeignTurnContestsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreForeignTurnContestsCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreForeignTurnContestsCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreForeignTurnContestsCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreForeignTurnContestsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreForeignTurnContestsKernelCoreMainOperations kernelCoreMainOperations, ICoreForeignTurnContestsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreForeignTurnContestsForeignActualTurnWindowOperations foreignActualTurnWindowOperations, ICoreForeignTurnContestsForeignTurnContestOperations foreignTurnContestOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess, global::CardGame.Core.RuntimeAccess.IClosedProgramPhaseFrameQueriesSource _closedProgramPhaseFrameQueriesSource)
+    {
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreActualPlayPhaseCardUsesOperations = coreActualPlayPhaseCardUsesOperations;
+        this._coreAlcoholSlashSuppressionsOperations = coreAlcoholSlashSuppressionsOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuleQueriesOperations = coreRuleQueriesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSameTypeActualUseAidOperations = coreSameTypeActualUseAidOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._foreignActualTurnWindowOperations = foreignActualTurnWindowOperations;
+        this._foreignTurnContestOperations = foreignTurnContestOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+        this._closedProgramPhaseFrameQueriesSource = _closedProgramPhaseFrameQueriesSource;
+    }
+
+    private readonly global::CardGame.Core.RuntimeAccess.IClosedProgramPhaseFrameQueriesSource _closedProgramPhaseFrameQueriesSource;
+}

@@ -1,0 +1,70 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterWuTuGuOlRuntime : global::CardGame.Core.IWuTuGuHost
+{
+    private readonly ICharacterWuTuGuOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterWuTuGuOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterWuTuGuOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterWuTuGuOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterWuTuGuOlCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterWuTuGuOlCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterWuTuGuOlCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterWuTuGuOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterWuTuGuOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterWuTuGuOlCoreParticipantAndReserveProgramsOperations _coreParticipantAndReserveProgramsOperations;
+    private readonly ICharacterWuTuGuOlCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterWuTuGuOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterWuTuGuOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterWuTuGuOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterWuTuGuOlCoreShownEntityTurnPoliciesOperations _coreShownEntityTurnPoliciesOperations;
+    private readonly ICharacterWuTuGuOlCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterWuTuGuOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterWuTuGuOlCoreStrategicProgramsOperations _coreStrategicProgramsOperations;
+    private readonly ICharacterWuTuGuOlCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICharacterWuTuGuOlCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICharacterWuTuGuOlCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICharacterWuTuGuOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterWuTuGuOlCharacterWuTuGuOlOperations _characterWuTuGuOlOperations;
+    private readonly ICharacterWuTuGuOlCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterWuTuGuOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterWuTuGuOlRuntime(ICharacterWuTuGuOlContentRegistryOperations contentRegistryOperations, ICharacterWuTuGuOlResolutionStackOperations resolutionStackOperations, ICharacterWuTuGuOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterWuTuGuOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterWuTuGuOlCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterWuTuGuOlCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterWuTuGuOlCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterWuTuGuOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterWuTuGuOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterWuTuGuOlCoreParticipantAndReserveProgramsOperations coreParticipantAndReserveProgramsOperations, ICharacterWuTuGuOlCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterWuTuGuOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterWuTuGuOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterWuTuGuOlCoreRuntimeOperations coreRuntimeOperations, ICharacterWuTuGuOlCoreShownEntityTurnPoliciesOperations coreShownEntityTurnPoliciesOperations, ICharacterWuTuGuOlCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterWuTuGuOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterWuTuGuOlCoreStrategicProgramsOperations coreStrategicProgramsOperations, ICharacterWuTuGuOlCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICharacterWuTuGuOlCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICharacterWuTuGuOlCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICharacterWuTuGuOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterWuTuGuOlCharacterWuTuGuOlOperations characterWuTuGuOlOperations, ICharacterWuTuGuOlCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterWuTuGuOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreParticipantAndReserveProgramsOperations = coreParticipantAndReserveProgramsOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShownEntityTurnPoliciesOperations = coreShownEntityTurnPoliciesOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreStrategicProgramsOperations = coreStrategicProgramsOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._characterWuTuGuOlOperations = characterWuTuGuOlOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

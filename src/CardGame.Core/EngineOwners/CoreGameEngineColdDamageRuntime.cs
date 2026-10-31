@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineColdDamageRuntime
+{
+    private readonly ICoreColdDamageCardZonesOperations _cardZonesOperations;
+    private readonly ICoreColdDamageResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreColdDamageCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreColdDamageCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreColdDamageCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreColdDamageCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreColdDamageCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreColdDamageCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreColdDamageCorePublicDamagePredictionOperations _corePublicDamagePredictionOperations;
+    private readonly ICoreColdDamageCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreColdDamageCoreNativeAiDecisionsOperations _coreNativeAiDecisionsOperations;
+    private readonly ICoreColdDamageCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICoreColdDamageCoreNativeDamageApplicationOperations _coreNativeDamageApplicationOperations;
+    private readonly ICoreColdDamageCoreNativeDamageCompletionOperations _coreNativeDamageCompletionOperations;
+    private readonly ICoreColdDamageCoreNativeIceSwordOperations _coreNativeIceSwordOperations;
+    private readonly ICoreColdDamageCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreColdDamageCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreColdDamageCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreColdDamageCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreColdDamageCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreColdDamageCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreColdDamageKernelCoreGameEngineProgramAttackAttemptOperations _kernelCoreGameEngineProgramAttackAttemptOperations;
+    private readonly ICoreColdDamageKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreColdDamageKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess _coreAiDiagnosticsThoughtSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineColdDamageRuntime(ICoreColdDamageCardZonesOperations cardZonesOperations, ICoreColdDamageResolutionStackOperations resolutionStackOperations, ICoreColdDamageCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreColdDamageCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreColdDamageCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreColdDamageCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreColdDamageCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreColdDamageCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreColdDamageCorePublicDamagePredictionOperations corePublicDamagePredictionOperations, ICoreColdDamageCoreRuntimeOperations coreRuntimeOperations, ICoreColdDamageCoreNativeAiDecisionsOperations coreNativeAiDecisionsOperations, ICoreColdDamageCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICoreColdDamageCoreNativeDamageApplicationOperations coreNativeDamageApplicationOperations, ICoreColdDamageCoreNativeDamageCompletionOperations coreNativeDamageCompletionOperations, ICoreColdDamageCoreNativeIceSwordOperations coreNativeIceSwordOperations, ICoreColdDamageCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreColdDamageCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreColdDamageCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreColdDamageCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreColdDamageCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreColdDamageCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreColdDamageKernelCoreGameEngineProgramAttackAttemptOperations kernelCoreGameEngineProgramAttackAttemptOperations, ICoreColdDamageKernelCoreMainOperations kernelCoreMainOperations, ICoreColdDamageKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess coreAiDiagnosticsThoughtSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._corePublicDamagePredictionOperations = corePublicDamagePredictionOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeAiDecisionsOperations = coreNativeAiDecisionsOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreNativeDamageApplicationOperations = coreNativeDamageApplicationOperations;
+        this._coreNativeDamageCompletionOperations = coreNativeDamageCompletionOperations;
+        this._coreNativeIceSwordOperations = coreNativeIceSwordOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineProgramAttackAttemptOperations = kernelCoreGameEngineProgramAttackAttemptOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreAiDiagnosticsThoughtSequenceAccess = coreAiDiagnosticsThoughtSequenceAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

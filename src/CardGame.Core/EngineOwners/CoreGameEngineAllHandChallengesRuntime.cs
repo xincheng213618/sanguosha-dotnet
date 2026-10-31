@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineAllHandChallengesRuntime
+{
+    private readonly ICoreAllHandChallengesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreAllHandChallengesCoreAllHandChallengeReceiptsOperations _coreAllHandChallengeReceiptsOperations;
+    private readonly ICoreAllHandChallengesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreAllHandChallengesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreAllHandChallengesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreAllHandChallengesCoreSequentialDiscardProgramsOperations _coreSequentialDiscardProgramsOperations;
+    private readonly ICoreAllHandChallengesCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreAllHandChallengesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreAllHandChallengesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreAllHandChallengesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreAllHandChallengesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineAllHandChallengesRuntime(ICoreAllHandChallengesContentRegistryOperations contentRegistryOperations, ICoreAllHandChallengesCoreAllHandChallengeReceiptsOperations coreAllHandChallengeReceiptsOperations, ICoreAllHandChallengesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreAllHandChallengesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreAllHandChallengesCoreRuntimeOperations coreRuntimeOperations, ICoreAllHandChallengesCoreSequentialDiscardProgramsOperations coreSequentialDiscardProgramsOperations, ICoreAllHandChallengesCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreAllHandChallengesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreAllHandChallengesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreAllHandChallengesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreAllHandChallengesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAllHandChallengeReceiptsOperations = coreAllHandChallengeReceiptsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialDiscardProgramsOperations = coreSequentialDiscardProgramsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

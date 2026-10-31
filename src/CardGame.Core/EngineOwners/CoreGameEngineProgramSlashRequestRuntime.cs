@@ -1,0 +1,76 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
+{
+    private readonly ICoreProgramSlashRequestCharacterChengJiChengCuiOlOperations _characterChengJiChengCuiOlOperations;
+    private readonly ICoreProgramSlashRequestCharacterGuoTuOlOperations _characterGuoTuOlOperations;
+    private readonly ICoreProgramSlashRequestCharacterHuCheErAnniversaryOperations _characterHuCheErAnniversaryOperations;
+    private readonly ICoreProgramSlashRequestCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICoreProgramSlashRequestCharacterLiuFengBoundaryOperations _characterLiuFengBoundaryOperations;
+    private readonly ICoreProgramSlashRequestCharacterLiuZhangOlOperations _characterLiuZhangOlOperations;
+    private readonly ICoreProgramSlashRequestCharacterMaXiuMaTieOlOperations _characterMaXiuMaTieOlOperations;
+    private readonly ICoreProgramSlashRequestCharacterPangJiOlOperations _characterPangJiOlOperations;
+    private readonly ICoreProgramSlashRequestCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramSlashRequestContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramSlashRequestResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramSlashRequestCoreChainedStateBasicConversionsOperations _coreChainedStateBasicConversionsOperations;
+    private readonly ICoreProgramSlashRequestCoreDrawFundedDistinctBasicOffersOperations _coreDrawFundedDistinctBasicOffersOperations;
+    private readonly ICoreProgramSlashRequestCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramSlashRequestCoreNativePublicPileOriginalCardsOperations _coreNativePublicPileOriginalCardsOperations;
+    private readonly ICoreProgramSlashRequestCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramSlashRequestCoreRequestedDeckBasicsOperations _coreRequestedDeckBasicsOperations;
+    private readonly ICoreProgramSlashRequestCoreRoundDistinctBasicRequestsOperations _coreRoundDistinctBasicRequestsOperations;
+    private readonly ICoreProgramSlashRequestCoreRoundOnceCardlessProgramRequestsOperations _coreRoundOnceCardlessProgramRequestsOperations;
+    private readonly ICoreProgramSlashRequestCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramSlashRequestCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreProgramSlashRequestCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreProgramSlashRequestCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreProgramSlashRequestCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreProgramSlashRequestCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreProgramSlashRequestCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramSlashRequestCoreProgramCardLegalityOperations _coreProgramCardLegalityOperations;
+    private readonly ICoreProgramSlashRequestKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreProgramSlashRequestKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramSlashRequestRuntime(ICoreProgramSlashRequestCharacterChengJiChengCuiOlOperations characterChengJiChengCuiOlOperations, ICoreProgramSlashRequestCharacterGuoTuOlOperations characterGuoTuOlOperations, ICoreProgramSlashRequestCharacterHuCheErAnniversaryOperations characterHuCheErAnniversaryOperations, ICoreProgramSlashRequestCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICoreProgramSlashRequestCharacterLiuFengBoundaryOperations characterLiuFengBoundaryOperations, ICoreProgramSlashRequestCharacterLiuZhangOlOperations characterLiuZhangOlOperations, ICoreProgramSlashRequestCharacterMaXiuMaTieOlOperations characterMaXiuMaTieOlOperations, ICoreProgramSlashRequestCharacterPangJiOlOperations characterPangJiOlOperations, ICoreProgramSlashRequestCardZonesOperations cardZonesOperations, ICoreProgramSlashRequestContentRegistryOperations contentRegistryOperations, ICoreProgramSlashRequestResolutionStackOperations resolutionStackOperations, ICoreProgramSlashRequestCoreChainedStateBasicConversionsOperations coreChainedStateBasicConversionsOperations, ICoreProgramSlashRequestCoreDrawFundedDistinctBasicOffersOperations coreDrawFundedDistinctBasicOffersOperations, ICoreProgramSlashRequestCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramSlashRequestCoreNativePublicPileOriginalCardsOperations coreNativePublicPileOriginalCardsOperations, ICoreProgramSlashRequestCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramSlashRequestCoreRequestedDeckBasicsOperations coreRequestedDeckBasicsOperations, ICoreProgramSlashRequestCoreRoundDistinctBasicRequestsOperations coreRoundDistinctBasicRequestsOperations, ICoreProgramSlashRequestCoreRoundOnceCardlessProgramRequestsOperations coreRoundOnceCardlessProgramRequestsOperations, ICoreProgramSlashRequestCoreRuntimeOperations coreRuntimeOperations, ICoreProgramSlashRequestCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreProgramSlashRequestCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreProgramSlashRequestCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreProgramSlashRequestCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreProgramSlashRequestCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreProgramSlashRequestCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramSlashRequestCoreProgramCardLegalityOperations coreProgramCardLegalityOperations, ICoreProgramSlashRequestKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreProgramSlashRequestKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterChengJiChengCuiOlOperations = characterChengJiChengCuiOlOperations;
+        this._characterGuoTuOlOperations = characterGuoTuOlOperations;
+        this._characterHuCheErAnniversaryOperations = characterHuCheErAnniversaryOperations;
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._characterLiuFengBoundaryOperations = characterLiuFengBoundaryOperations;
+        this._characterLiuZhangOlOperations = characterLiuZhangOlOperations;
+        this._characterMaXiuMaTieOlOperations = characterMaXiuMaTieOlOperations;
+        this._characterPangJiOlOperations = characterPangJiOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreChainedStateBasicConversionsOperations = coreChainedStateBasicConversionsOperations;
+        this._coreDrawFundedDistinctBasicOffersOperations = coreDrawFundedDistinctBasicOffersOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativePublicPileOriginalCardsOperations = coreNativePublicPileOriginalCardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRequestedDeckBasicsOperations = coreRequestedDeckBasicsOperations;
+        this._coreRoundDistinctBasicRequestsOperations = coreRoundDistinctBasicRequestsOperations;
+        this._coreRoundOnceCardlessProgramRequestsOperations = coreRoundOnceCardlessProgramRequestsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramCardLegalityOperations = coreProgramCardLegalityOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

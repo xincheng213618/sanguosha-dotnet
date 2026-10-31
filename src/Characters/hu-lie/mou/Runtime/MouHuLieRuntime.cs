@@ -2,7 +2,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class MouHuLieRuntime(IMouHuLieFacts facts, IMouHuLieNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouHuLieRuntime
 {
-    internal const string Chuanyu = "mou:chuanyu", Yitou = "mou:yitou", Action = "mou-hu-lie-anniversary";
+    internal const string Chuanyu = "mou:chuanyu",Yitou = "mou:yitou",Action = "mou-hu-lie-anniversary";
     internal static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     private int[] Recipients(MouHuLieYu yu) => facts.History<MouHuLieObtainedEvent>().Where(e => e.MarkId == yu.MarkId).Select(e => e.Recipient).Distinct().ToArray();
     private int[] GiftTargets(MouHuLieReceipt r) => facts.Living().Where(s => r.Yu is null || !Recipients(r.Yu).Contains(s)).ToArray();

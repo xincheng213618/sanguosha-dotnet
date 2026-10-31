@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePhaseStartControlPoliciesRuntime
+{
+    private readonly ICorePhaseStartControlPoliciesCharacterZhongHuiAnniversaryGodOperations _characterZhongHuiAnniversaryGodOperations;
+    private readonly ICorePhaseStartControlPoliciesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePhaseStartControlPoliciesTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICorePhaseStartControlPoliciesCoreActualPlayPhaseCardUsesOperations _coreActualPlayPhaseCardUsesOperations;
+    private readonly ICorePhaseStartControlPoliciesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePhaseStartControlPoliciesCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICorePhaseStartControlPoliciesCoreCompletedCategoryUseProofOperations _coreCompletedCategoryUseProofOperations;
+    private readonly ICorePhaseStartControlPoliciesCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICorePhaseStartControlPoliciesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICorePhaseStartControlPoliciesCorePhaseStartCardControlOperations _corePhaseStartCardControlOperations;
+    private readonly ICorePhaseStartControlPoliciesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICorePhaseStartControlPoliciesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICorePhaseStartControlPoliciesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEnginePhaseStartControlPoliciesRuntime(ICorePhaseStartControlPoliciesCharacterZhongHuiAnniversaryGodOperations characterZhongHuiAnniversaryGodOperations, ICorePhaseStartControlPoliciesContentRegistryOperations contentRegistryOperations, ICorePhaseStartControlPoliciesTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICorePhaseStartControlPoliciesCoreActualPlayPhaseCardUsesOperations coreActualPlayPhaseCardUsesOperations, ICorePhaseStartControlPoliciesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePhaseStartControlPoliciesCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICorePhaseStartControlPoliciesCoreCompletedCategoryUseProofOperations coreCompletedCategoryUseProofOperations, ICorePhaseStartControlPoliciesCoreEquipmentContentOperations coreEquipmentContentOperations, ICorePhaseStartControlPoliciesCoreNationalSkillsOperations coreNationalSkillsOperations, ICorePhaseStartControlPoliciesCorePhaseStartCardControlOperations corePhaseStartCardControlOperations, ICorePhaseStartControlPoliciesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICorePhaseStartControlPoliciesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICorePhaseStartControlPoliciesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._characterZhongHuiAnniversaryGodOperations = characterZhongHuiAnniversaryGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreActualPlayPhaseCardUsesOperations = coreActualPlayPhaseCardUsesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCompletedCategoryUseProofOperations = coreCompletedCategoryUseProofOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePhaseStartCardControlOperations = corePhaseStartCardControlOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

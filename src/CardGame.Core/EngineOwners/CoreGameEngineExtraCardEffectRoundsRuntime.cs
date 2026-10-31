@@ -1,0 +1,76 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
+{
+    private readonly ICoreExtraCardEffectRoundsCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICoreExtraCardEffectRoundsCharacterFeiYiOlOperations _characterFeiYiOlOperations;
+    private readonly ICoreExtraCardEffectRoundsCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreExtraCardEffectRoundsCharacterHuangYueyingOlMouOperations _characterHuangYueyingOlMouOperations;
+    private readonly ICoreExtraCardEffectRoundsCharacterJiangJiMouOperations _characterJiangJiMouOperations;
+    private readonly ICoreExtraCardEffectRoundsCharacterSunQuanOlMagicOperations _characterSunQuanOlMagicOperations;
+    private readonly ICoreExtraCardEffectRoundsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreExtraCardEffectRoundsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreGuanduExtraEffectsOperations _coreGuanduExtraEffectsOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreNamedAmbushInvalidationOperations _coreNamedAmbushInvalidationOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreNextCardTargetAdjustmentsOperations _coreNextCardTargetAdjustmentsOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreSequentialTrickTargetsOperations _coreSequentialTrickTargetsOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreShanheSchoolTrickOperations _coreShanheSchoolTrickOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreSoleIncomingEffectRepeatOperations _coreSoleIncomingEffectRepeatOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreSoleIncomingRangeDrawOperations _coreSoleIncomingRangeDrawOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreExtraCardEffectRoundsCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreExtraCardEffectRoundsKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreExtraCardEffectRoundsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineExtraCardEffectRoundsRuntime(ICoreExtraCardEffectRoundsCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICoreExtraCardEffectRoundsCharacterFeiYiOlOperations characterFeiYiOlOperations, ICoreExtraCardEffectRoundsCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreExtraCardEffectRoundsCharacterHuangYueyingOlMouOperations characterHuangYueyingOlMouOperations, ICoreExtraCardEffectRoundsCharacterJiangJiMouOperations characterJiangJiMouOperations, ICoreExtraCardEffectRoundsCharacterSunQuanOlMagicOperations characterSunQuanOlMagicOperations, ICoreExtraCardEffectRoundsContentRegistryOperations contentRegistryOperations, ICoreExtraCardEffectRoundsResolutionStackOperations resolutionStackOperations, ICoreExtraCardEffectRoundsCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreExtraCardEffectRoundsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreExtraCardEffectRoundsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreExtraCardEffectRoundsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreExtraCardEffectRoundsCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreExtraCardEffectRoundsCoreGuanduExtraEffectsOperations coreGuanduExtraEffectsOperations, ICoreExtraCardEffectRoundsCoreNamedAmbushInvalidationOperations coreNamedAmbushInvalidationOperations, ICoreExtraCardEffectRoundsCoreNextCardTargetAdjustmentsOperations coreNextCardTargetAdjustmentsOperations, ICoreExtraCardEffectRoundsCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreExtraCardEffectRoundsCoreRuntimeOperations coreRuntimeOperations, ICoreExtraCardEffectRoundsCoreSequentialTrickTargetsOperations coreSequentialTrickTargetsOperations, ICoreExtraCardEffectRoundsCoreShanheSchoolTrickOperations coreShanheSchoolTrickOperations, ICoreExtraCardEffectRoundsCoreSoleIncomingEffectRepeatOperations coreSoleIncomingEffectRepeatOperations, ICoreExtraCardEffectRoundsCoreSoleIncomingRangeDrawOperations coreSoleIncomingRangeDrawOperations, ICoreExtraCardEffectRoundsCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreExtraCardEffectRoundsCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreExtraCardEffectRoundsCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreExtraCardEffectRoundsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreExtraCardEffectRoundsCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreExtraCardEffectRoundsKernelCoreMainOperations kernelCoreMainOperations, ICoreExtraCardEffectRoundsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._characterFeiYiOlOperations = characterFeiYiOlOperations;
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._characterHuangYueyingOlMouOperations = characterHuangYueyingOlMouOperations;
+        this._characterJiangJiMouOperations = characterJiangJiMouOperations;
+        this._characterSunQuanOlMagicOperations = characterSunQuanOlMagicOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreGuanduExtraEffectsOperations = coreGuanduExtraEffectsOperations;
+        this._coreNamedAmbushInvalidationOperations = coreNamedAmbushInvalidationOperations;
+        this._coreNextCardTargetAdjustmentsOperations = coreNextCardTargetAdjustmentsOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialTrickTargetsOperations = coreSequentialTrickTargetsOperations;
+        this._coreShanheSchoolTrickOperations = coreShanheSchoolTrickOperations;
+        this._coreSoleIncomingEffectRepeatOperations = coreSoleIncomingEffectRepeatOperations;
+        this._coreSoleIncomingRangeDrawOperations = coreSoleIncomingRangeDrawOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

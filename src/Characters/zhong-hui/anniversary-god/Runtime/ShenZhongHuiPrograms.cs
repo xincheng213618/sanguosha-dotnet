@@ -53,8 +53,8 @@ internal sealed class ShenZhongHuiHandler(SkillProgramEffectOp op) : ISkillProgr
 { public SkillProgramEffectOp Op => op; public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int seat, ISkillProgramEffectHost h) => h.GetCapability<IShenZhongHuiHost>().Resolve(f, op); }
 internal static class ShenZhongHuiComposition
 {
-    internal const string Linjie = "anniversary:linjie", Duzhang = "anniversary:duzhang", Jianghuo = "anniversary:jianghuo", Lishi = "anniversary:lishi", Curse = "anniversary:lishi-curse";
-    internal const string HappyLinjie = "happy:linjie", HappyDuzhang = "happy:duzhang", HappyJianghuo = "happy:jianghuo", HappyLishi = "happy:lishi", HappyCurse = "happy:lishi-curse";
+    internal const string Linjie = "anniversary:linjie",Duzhang = "anniversary:duzhang",Jianghuo = "anniversary:jianghuo",Lishi = "anniversary:lishi",Curse = "anniversary:lishi-curse";
+    internal const string HappyLinjie = "happy:linjie",HappyDuzhang = "happy:duzhang",HappyJianghuo = "happy:jianghuo",HappyLishi = "happy:lishi",HappyCurse = "happy:lishi-curse";
     internal static bool IsHappy(string id) => id is HappyLinjie or HappyDuzhang or HappyJianghuo or HappyLishi or HappyCurse;
     private static string Canonical(string id) => id switch
     { HappyLinjie => Linjie, HappyDuzhang => Duzhang, HappyJianghuo => Jianghuo, HappyLishi => Lishi, HappyCurse => Curse, _ => id };

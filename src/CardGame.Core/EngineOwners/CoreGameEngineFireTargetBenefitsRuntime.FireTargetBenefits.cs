@@ -1,0 +1,90 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CoreGameEngineFireTargetBenefitsRuntime
+{
+    internal const string FireTargetDrawReason = "program.fire-target-benefit.draw";
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 690)]
+    internal bool CanRunFireTargetBenefit(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
+    {
+        if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.DrawFireTargetAndGrantTurnUseQuota))
+            return true;
+        if (context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.SourceSeat != candidate.OwnerSeat || context.TargetSeat is not { } target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || damage.Id != context.ParentFrameId || damage.ParentFrameId != context.DamageFrameId)
+            return false;
+        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
+        return attack.DamageWasApplied && attack.DamageAmount > 0 && !attack.IsSourceLess && attack.SourceSeat == candidate.OwnerSeat && attack.TargetSeat == target && _coreNativeCardClassificationsOperations.GetDamageNature(attack) == DamageNature.Fire;
+    }
+
+    internal SkillProgramStepOutcome BeginFireTargetBenefit(ProgramSkillFrame supplied)
+    {
+        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        if (f.FireTargetBenefit is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.TargetSeat is not { } target || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || damage.Id != c.ParentFrameId || damage.ParentFrameId != c.DamageFrameId || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || !CanRunFireTargetBenefit(damage.Candidates[damage.CandidateIndex].ToProgramCandidate(), _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
+            throw new InvalidOperationException("The fire-target benefit lost its exact actual applied-damage candidate.");
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            return SkillProgramStepOutcome.Continue;
+        var before = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FireTargetBenefit = new(f.InstructionIndex, damage.Id, damage.ParentFrameId, f.OwnerSeat, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, before, before, 0, 0, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f)), PendingMovementContinuation = new(target, 0, null) });
+        // Freeze only the promise; the quota does not exist during draw children.
+        var drawn = _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[target], 1, true, new(FireTargetDrawReason));
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        var after = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? before;
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FireTargetBenefit = f.FireTargetBenefit!with { SequenceAfter = after, DrawCount = drawn.Count } });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramFireTargetDrawIssuedEvent(f.Id, damage.Id, f.OwnerSeat, target, drawn.Count, before, after));
+        if (!TryDrainFireTargetMovement(f))
+            _coreRuntimeOperations.ReturnRuntimeProgramMovement(f.Id);
+        return SkillProgramStepOutcome.AwaitChild;
+    }
+
+    internal bool TryDrainFireTargetMovement(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
+    [ProgramContinuation(ProgramContinuationKind.Resume, 350)]
+    internal bool ResumeFireTargetBenefit(long id)
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FireTargetBenefit: { } r } f || f.Id != id)
+            return false;
+        _coreFireTargetBenefitObserversOperations.AssertFireTargetBenefit(f);
+        if (f.PendingMovementContinuation is not null)
+        {
+            if (!TryDrainFireTargetMovement(f))
+                ReturnFireTargetBenefitMovement(f);
+            return true;
+        }
+
+        // Draw and every original child have returned. Fulfil the frozen promise
+        // once without rechecking a skill instance lost inside those children.
+        if (r.GrantSequence == 0 && _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
+        {
+            var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantTargetCardQuotaAllowance(r.ActualTurnNumber, r.ActualTurnOwnerSeat, f.Id, r.InstructionIndex - 1, r.Source, r.TargetSeat, r.DamageWindowId);
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FireTargetBenefit = r with { GrantSequence = grant.GrantSequence } });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnTargetCardQuotaAllowanceGrantedEvent(grant));
+        }
+
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { FireTargetBenefit = null });
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), "火焰伤害收益已结清，原技能来源已失效。");
+        else
+            _coreRuntimeOperations.AdvanceRuntimeProgram(id);
+        return true;
+    }
+
+    [ProgramContinuation(ProgramContinuationKind.Movement, 350)]
+    internal bool ReturnFireTargetBenefitMovement(ProgramSkillFrame f)
+    {
+        if (f.FireTargetBenefit is null)
+            return false;
+        _coreFireTargetBenefitObserversOperations.AssertFireTargetBenefit(f);
+        if (TryDrainFireTargetMovement(f))
+            return true;
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = null });
+        ResumeFireTargetBenefit(f.Id);
+        return true;
+    }
+
+    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 310)]
+    internal bool IsFireTargetBenefitMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.FireTargetBenefit is { } r && effect?.Op == SkillProgramEffectOp.DrawFireTargetAndGrantTurnUseQuota && r.InstructionIndex == f.InstructionIndex && pending.SubjectSeat == r.TargetSeat && pending.CoverageResultBind is null;
+    SkillProgramStepOutcome global::CardGame.Core.IFireTargetBenefitProgramHost.DrawFireTargetAndGrantTurnUseQuota(ProgramSkillFrame f) => BeginFireTargetBenefit(f);
+    SkillProgramStepOutcome global::CardGame.Core.IFireTargetBenefitProgramHost.LoseSkillsAndObtainNamedCard(ProgramSkillFrame f, SkillProgramEffect e) => _coreNamedCardAcquisitionsOperations.BeginNamedCardAcquisition(f, e);
+}

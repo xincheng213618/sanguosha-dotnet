@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineResponseUseCompletionRuntime
+{
+    private readonly ICoreResponseUseCompletionCharacterCaoXiOlOperations _characterCaoXiOlOperations;
+    private readonly ICoreResponseUseCompletionCharacterCuiYanOlOperations _characterCuiYanOlOperations;
+    private readonly ICoreResponseUseCompletionCharacterHuangGaiMouMobileOperations _characterHuangGaiMouMobileOperations;
+    private readonly ICoreResponseUseCompletionCharacterLiFengOlOperations _characterLiFengOlOperations;
+    private readonly ICoreResponseUseCompletionCharacterLiuChengMouMobileOperations _characterLiuChengMouMobileOperations;
+    private readonly ICoreResponseUseCompletionCharacterLuSuMobileShiOperations _characterLuSuMobileShiOperations;
+    private readonly ICoreResponseUseCompletionCharacterMaChaoAnniversaryGodOperations _characterMaChaoAnniversaryGodOperations;
+    private readonly ICoreResponseUseCompletionCharacterMaMiDiOlOperations _characterMaMiDiOlOperations;
+    private readonly ICoreResponseUseCompletionCharacterMiHengLeOperations _characterMiHengLeOperations;
+    private readonly ICoreResponseUseCompletionCharacterWuAnGuoOlOperations _characterWuAnGuoOlOperations;
+    private readonly ICoreResponseUseCompletionCharacterZouShiLeOperations _characterZouShiLeOperations;
+    private readonly ICoreResponseUseCompletionCardZonesOperations _cardZonesOperations;
+    private readonly ICoreResponseUseCompletionContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreResponseUseCompletionProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICoreResponseUseCompletionResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreResponseUseCompletionCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreResponseUseCompletionCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreResponseUseCompletionCoreCurrentTurnUseKindsOperations _coreCurrentTurnUseKindsOperations;
+    private readonly ICoreResponseUseCompletionCoreDelayedNullificationOperations _coreDelayedNullificationOperations;
+    private readonly ICoreResponseUseCompletionCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreResponseUseCompletionCoreResponseCompletionOperations _coreResponseCompletionOperations;
+    private readonly ICoreResponseUseCompletionCoreTieredRoundZeroResponsesOperations _coreTieredRoundZeroResponsesOperations;
+    private readonly ICoreResponseUseCompletionCoreWholeActualTurnUsesOperations _coreWholeActualTurnUsesOperations;
+    private readonly ICoreResponseUseCompletionCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreResponseUseCompletionCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreResponseUseCompletionCoreNativeDodgeOperations _coreNativeDodgeOperations;
+    private readonly ICoreResponseUseCompletionCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineResponseUseCompletionRuntime(ICoreResponseUseCompletionCharacterCaoXiOlOperations characterCaoXiOlOperations, ICoreResponseUseCompletionCharacterCuiYanOlOperations characterCuiYanOlOperations, ICoreResponseUseCompletionCharacterHuangGaiMouMobileOperations characterHuangGaiMouMobileOperations, ICoreResponseUseCompletionCharacterLiFengOlOperations characterLiFengOlOperations, ICoreResponseUseCompletionCharacterLiuChengMouMobileOperations characterLiuChengMouMobileOperations, ICoreResponseUseCompletionCharacterLuSuMobileShiOperations characterLuSuMobileShiOperations, ICoreResponseUseCompletionCharacterMaChaoAnniversaryGodOperations characterMaChaoAnniversaryGodOperations, ICoreResponseUseCompletionCharacterMaMiDiOlOperations characterMaMiDiOlOperations, ICoreResponseUseCompletionCharacterMiHengLeOperations characterMiHengLeOperations, ICoreResponseUseCompletionCharacterWuAnGuoOlOperations characterWuAnGuoOlOperations, ICoreResponseUseCompletionCharacterZouShiLeOperations characterZouShiLeOperations, ICoreResponseUseCompletionCardZonesOperations cardZonesOperations, ICoreResponseUseCompletionContentRegistryOperations contentRegistryOperations, ICoreResponseUseCompletionProgramPipelineHooksOperations programPipelineHooksOperations, ICoreResponseUseCompletionResolutionStackOperations resolutionStackOperations, ICoreResponseUseCompletionCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreResponseUseCompletionCoreCardActionsOperations coreCardActionsOperations, ICoreResponseUseCompletionCoreCurrentTurnUseKindsOperations coreCurrentTurnUseKindsOperations, ICoreResponseUseCompletionCoreDelayedNullificationOperations coreDelayedNullificationOperations, ICoreResponseUseCompletionCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreResponseUseCompletionCoreResponseCompletionOperations coreResponseCompletionOperations, ICoreResponseUseCompletionCoreTieredRoundZeroResponsesOperations coreTieredRoundZeroResponsesOperations, ICoreResponseUseCompletionCoreWholeActualTurnUsesOperations coreWholeActualTurnUsesOperations, ICoreResponseUseCompletionCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreResponseUseCompletionCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreResponseUseCompletionCoreNativeDodgeOperations coreNativeDodgeOperations, ICoreResponseUseCompletionCoreNativeNullificationOperations coreNativeNullificationOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCaoXiOlOperations = characterCaoXiOlOperations;
+        this._characterCuiYanOlOperations = characterCuiYanOlOperations;
+        this._characterHuangGaiMouMobileOperations = characterHuangGaiMouMobileOperations;
+        this._characterLiFengOlOperations = characterLiFengOlOperations;
+        this._characterLiuChengMouMobileOperations = characterLiuChengMouMobileOperations;
+        this._characterLuSuMobileShiOperations = characterLuSuMobileShiOperations;
+        this._characterMaChaoAnniversaryGodOperations = characterMaChaoAnniversaryGodOperations;
+        this._characterMaMiDiOlOperations = characterMaMiDiOlOperations;
+        this._characterMiHengLeOperations = characterMiHengLeOperations;
+        this._characterWuAnGuoOlOperations = characterWuAnGuoOlOperations;
+        this._characterZouShiLeOperations = characterZouShiLeOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCurrentTurnUseKindsOperations = coreCurrentTurnUseKindsOperations;
+        this._coreDelayedNullificationOperations = coreDelayedNullificationOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreResponseCompletionOperations = coreResponseCompletionOperations;
+        this._coreTieredRoundZeroResponsesOperations = coreTieredRoundZeroResponsesOperations;
+        this._coreWholeActualTurnUsesOperations = coreWholeActualTurnUsesOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDodgeOperations = coreNativeDodgeOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

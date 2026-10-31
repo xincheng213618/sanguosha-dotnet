@@ -1,0 +1,96 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLiuXieMouRuntime : global::CardGame.Core.IMouLiuXieFacts, global::CardGame.Core.IMouLiuXieNative
+{
+    private readonly ICharacterLiuXieMouCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICharacterLiuXieMouContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLiuXieMouResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLiuXieMouCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICharacterLiuXieMouCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterLiuXieMouCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICharacterLiuXieMouCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterLiuXieMouCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICharacterLiuXieMouCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterLiuXieMouCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterLiuXieMouCoreDyingSuitsAndHistoricalUseObserversOperations _coreDyingSuitsAndHistoricalUseObserversOperations;
+    private readonly ICharacterLiuXieMouCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterLiuXieMouCoreLordSkillProjectionsOperations _coreLordSkillProjectionsOperations;
+    private readonly ICharacterLiuXieMouCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterLiuXieMouCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterLiuXieMouCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICharacterLiuXieMouCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterLiuXieMouCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterLiuXieMouCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterLiuXieMouCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLiuXieMouCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterLiuXieMouCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterLiuXieMouCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterLiuXieMouCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterLiuXieMouCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterLiuXieMouCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICharacterLiuXieMouCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLiuXieMouCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterLiuXieMouCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICharacterLiuXieMouCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterLiuXieMouCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterLiuXieMouCharacterLiuXieMouOperations _characterLiuXieMouOperations;
+    private readonly ICharacterLiuXieMouCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICharacterLiuXieMouKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterLiuXieMouMouLiuXieOperations _mouLiuXieOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess _coreMatchDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterLiuXieMouRuntime(ICharacterLiuXieMouCharacterYanPuOlOperations characterYanPuOlOperations, ICharacterLiuXieMouContentRegistryOperations contentRegistryOperations, ICharacterLiuXieMouResolutionStackOperations resolutionStackOperations, ICharacterLiuXieMouCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICharacterLiuXieMouCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterLiuXieMouCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICharacterLiuXieMouCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterLiuXieMouCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICharacterLiuXieMouCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterLiuXieMouCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterLiuXieMouCoreDyingSuitsAndHistoricalUseObserversOperations coreDyingSuitsAndHistoricalUseObserversOperations, ICharacterLiuXieMouCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterLiuXieMouCoreLordSkillProjectionsOperations coreLordSkillProjectionsOperations, ICharacterLiuXieMouCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterLiuXieMouCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterLiuXieMouCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICharacterLiuXieMouCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterLiuXieMouCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLiuXieMouCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterLiuXieMouCoreRuntimeOperations coreRuntimeOperations, ICharacterLiuXieMouCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterLiuXieMouCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterLiuXieMouCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterLiuXieMouCoreTableOrderOperations coreTableOrderOperations, ICharacterLiuXieMouCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterLiuXieMouCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICharacterLiuXieMouCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLiuXieMouCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterLiuXieMouCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICharacterLiuXieMouCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterLiuXieMouCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterLiuXieMouCharacterLiuXieMouOperations characterLiuXieMouOperations, ICharacterLiuXieMouCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICharacterLiuXieMouKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterLiuXieMouMouLiuXieOperations mouLiuXieOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess coreMatchDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDyingSuitsAndHistoricalUseObserversOperations = coreDyingSuitsAndHistoricalUseObserversOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreLordSkillProjectionsOperations = coreLordSkillProjectionsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterLiuXieMouOperations = characterLiuXieMouOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._mouLiuXieOperations = mouLiuXieOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchDefinitionPlayerCountAccess = coreMatchDefinitionPlayerCountAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

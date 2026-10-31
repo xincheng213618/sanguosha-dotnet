@@ -132,7 +132,7 @@ internal static class ProgramOwnedCardsChecks
             }
             else
             {
-                var players = (IReadOnlyList<CharacterState>)typeof(GameEngine)
+                var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine
                     .GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
                 foreach (var grant in players[0].SkillGrants.Grants.Where(grant => grant.SkillId == SkillId).ToArray())
                     players[0].SkillGrants.SetEnabled(grant.GrantId, false);

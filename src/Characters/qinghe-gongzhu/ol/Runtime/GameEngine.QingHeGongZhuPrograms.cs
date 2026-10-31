@@ -28,36 +28,4 @@ public sealed record ChangjiDiscardState(int EndingSeat, int OwnerSeat, int Rema
 
 public sealed partial class GameEngine
 {
-
-    private Card? LatestSettledDodgeEntity()
-    {
-        foreach (var movement in _cardMovements.AsEnumerable().Reverse())
-        {
-            if (movement.To != CardLocation.DiscardPile ||
-                movement.Reason.Value != CardMoveReasons.ResponseFinished.Value)
-                continue;
-            var card = _cardZones.CardsAt(CardLocation.DiscardPile)
-                .FirstOrDefault(item => item.Id == movement.CardId);
-            if (card is null) continue;
-            return GetAdvancedCard(card.Id).Kind == CardKind.Dodge ? card : null;
-        }
-        return null;
-    }
-
-    private IReadOnlyList<Card> NonBasicOwnedCards(int ownerSeat) =>
-        _cardZones.CardsAt(CardLocation.Hand(ownerSeat))
-            .Concat(_cardZones.CardsAt(CardLocation.Equipment(ownerSeat)))
-            .Where(card => CardCatalog.Get(card.Kind).CategoryName != "基本牌")
-            .ToArray();
-
-
-
-    [ProgramCapability]
-    private sealed class QingHeGongZhuProgramCapability(GameEngine engine) : IQingHeGongZhuProgramHost
-    {
-        public SkillProgramStepOutcome ChangjiEndingDamageChoice(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.ChangjiProgramEndingDamageChoice(frame, effect);
-        public SkillProgramStepOutcome ZengouNullifyDodge(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.ZengouProgramNullifyDodge(frame, effect);
-    }
 }

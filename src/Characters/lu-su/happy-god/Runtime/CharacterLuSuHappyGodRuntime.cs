@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLuSuHappyGodRuntime : global::CardGame.Core.IHappyLuSuHost
+{
+    private readonly ICharacterLuSuHappyGodCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICharacterLuSuHappyGodCharacterLuSuMobileGodOperations _characterLuSuMobileGodOperations;
+    private readonly ICharacterLuSuHappyGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLuSuHappyGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLuSuHappyGodCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterLuSuHappyGodCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterLuSuHappyGodCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterLuSuHappyGodCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterLuSuHappyGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterLuSuHappyGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLuSuHappyGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLuSuHappyGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterLuSuHappyGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLuSuHappyGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterLuSuHappyGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterLuSuHappyGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterLuSuHappyGodRuntime(ICharacterLuSuHappyGodCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICharacterLuSuHappyGodCharacterLuSuMobileGodOperations characterLuSuMobileGodOperations, ICharacterLuSuHappyGodContentRegistryOperations contentRegistryOperations, ICharacterLuSuHappyGodResolutionStackOperations resolutionStackOperations, ICharacterLuSuHappyGodCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterLuSuHappyGodCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterLuSuHappyGodCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterLuSuHappyGodCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterLuSuHappyGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLuSuHappyGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLuSuHappyGodCoreRuntimeOperations coreRuntimeOperations, ICharacterLuSuHappyGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterLuSuHappyGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLuSuHappyGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterLuSuHappyGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterLuSuHappyGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._characterLuSuMobileGodOperations = characterLuSuMobileGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

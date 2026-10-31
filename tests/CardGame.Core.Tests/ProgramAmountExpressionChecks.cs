@@ -295,7 +295,7 @@ internal static class ProgramAmountExpressionChecks
             var dying = branch.ResolutionStack.OfType<DyingFrame>().Last();
             // Exercise the typed proof with the real paid frames and history; this
             // read-only bridge does not manufacture or replace any runtime state.
-            var proof = typeof(GameEngine).GetMethod("TypedRecoveryProgramDyingMatches",
+            var proof = global::FixtureRuntimeAccess.Engine.GetMethod("TypedRecoveryProgramDyingMatches",
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
             Need(proof.Invoke(branch, [producer, dying, Events<IGameEvent>(branch)]) is true,
                 "The typed dying invoice must match the issued expression amount, including after cold replay.");

@@ -1,0 +1,78 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime : global::CardGame.Core.IOutsidePhaseDrawDiscardProgramHost
+{
+    private readonly ICoreOutsidePhaseDrawDiscardCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCardZonesOperations _cardZonesOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreOutsidePhaseDrawDiscardObserversOperations _coreOutsidePhaseDrawDiscardObserversOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreNativeAiDecisionsOperations _coreNativeAiDecisionsOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreOutsidePhaseDrawDiscardNativeDrawInvoiceOperations _nativeDrawInvoiceOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess _coreAiDiagnosticsThoughtSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineOutsidePhaseDrawDiscardRuntime(ICoreOutsidePhaseDrawDiscardCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICoreOutsidePhaseDrawDiscardCardZonesOperations cardZonesOperations, ICoreOutsidePhaseDrawDiscardContentRegistryOperations contentRegistryOperations, ICoreOutsidePhaseDrawDiscardResolutionStackOperations resolutionStackOperations, ICoreOutsidePhaseDrawDiscardCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreOutsidePhaseDrawDiscardCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICoreOutsidePhaseDrawDiscardCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreOutsidePhaseDrawDiscardCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreOutsidePhaseDrawDiscardCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreOutsidePhaseDrawDiscardCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreOutsidePhaseDrawDiscardCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreOutsidePhaseDrawDiscardCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreOutsidePhaseDrawDiscardCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreOutsidePhaseDrawDiscardCoreOutsidePhaseDrawDiscardObserversOperations coreOutsidePhaseDrawDiscardObserversOperations, ICoreOutsidePhaseDrawDiscardCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICoreOutsidePhaseDrawDiscardCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreOutsidePhaseDrawDiscardCoreRuntimeOperations coreRuntimeOperations, ICoreOutsidePhaseDrawDiscardCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreOutsidePhaseDrawDiscardCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreOutsidePhaseDrawDiscardCoreNativeAiDecisionsOperations coreNativeAiDecisionsOperations, ICoreOutsidePhaseDrawDiscardCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreOutsidePhaseDrawDiscardCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreOutsidePhaseDrawDiscardCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreOutsidePhaseDrawDiscardCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreOutsidePhaseDrawDiscardCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreOutsidePhaseDrawDiscardKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreOutsidePhaseDrawDiscardNativeDrawInvoiceOperations nativeDrawInvoiceOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess coreAiDiagnosticsThoughtSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreOutsidePhaseDrawDiscardObserversOperations = coreOutsidePhaseDrawDiscardObserversOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeAiDecisionsOperations = coreNativeAiDecisionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._nativeDrawInvoiceOperations = nativeDrawInvoiceOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreAiDiagnosticsThoughtSequenceAccess = coreAiDiagnosticsThoughtSequenceAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

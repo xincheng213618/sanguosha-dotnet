@@ -2,8 +2,8 @@ namespace CardGame.Core;
 
 internal static class BoundaryCaoZhiComposition
 {
-    internal const string Luoying = "boundary:luoying-mobile", Jiushi = "boundary:jiushi-mobile", Upgraded = "boundary:jiushi-mobile-upgraded", Chengzhang = "boundary:chengzhang-mobile";
-    internal const string Damage = "face-up-after-original-face-down-damage", Turnover = "trick-after-any-turnover", Awakening = "seven-damage-awakening";
+    internal const string Luoying = "boundary:luoying-mobile",Jiushi = "boundary:jiushi-mobile",Upgraded = "boundary:jiushi-mobile-upgraded",Chengzhang = "boundary:chengzhang-mobile";
+    internal const string Damage = "face-up-after-original-face-down-damage",Turnover = "trick-after-any-turnover",Awakening = "seven-damage-awakening";
     [ProgramCatalogValidation(56700)]
     internal static void Validate(string path, SkillProgram p)
     {

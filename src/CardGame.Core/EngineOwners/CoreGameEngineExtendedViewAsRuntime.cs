@@ -1,0 +1,102 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineExtendedViewAsRuntime
+{
+    private readonly ICoreExtendedViewAsCharacterCaoXiOlOperations _characterCaoXiOlOperations;
+    private readonly ICoreExtendedViewAsCharacterChengYuMouOperations _characterChengYuMouOperations;
+    private readonly ICoreExtendedViewAsCharacterGuanHaiOlOperations _characterGuanHaiOlOperations;
+    private readonly ICoreExtendedViewAsCharacterHuangZhongAnniversaryGodOperations _characterHuangZhongAnniversaryGodOperations;
+    private readonly ICoreExtendedViewAsCharacterKongShuOlOperations _characterKongShuOlOperations;
+    private readonly ICoreExtendedViewAsCharacterLuBuMobileGodOperations _characterLuBuMobileGodOperations;
+    private readonly ICoreExtendedViewAsCharacterXunXuAnniversaryOperations _characterXunXuAnniversaryOperations;
+    private readonly ICoreExtendedViewAsCharacterZhaoTongZhaoGuangAnniversaryOperations _characterZhaoTongZhaoGuangAnniversaryOperations;
+    private readonly ICoreExtendedViewAsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreExtendedViewAsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreExtendedViewAsTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreExtendedViewAsCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreExtendedViewAsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreExtendedViewAsCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreExtendedViewAsCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreExtendedViewAsCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreExtendedViewAsCoreCommittedResponseUsesOperations _coreCommittedResponseUsesOperations;
+    private readonly ICoreExtendedViewAsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreExtendedViewAsCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreExtendedViewAsCoreNamedAmbushInvalidationOperations _coreNamedAmbushInvalidationOperations;
+    private readonly ICoreExtendedViewAsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreExtendedViewAsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreExtendedViewAsCoreResponseUseCompletionOperations _coreResponseUseCompletionOperations;
+    private readonly ICoreExtendedViewAsCoreRoundDistinctBasicPlayOperations _coreRoundDistinctBasicPlayOperations;
+    private readonly ICoreExtendedViewAsCoreShenwuExpandedPoliciesOperations _coreShenwuExpandedPoliciesOperations;
+    private readonly ICoreExtendedViewAsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreExtendedViewAsCoreUnrespondableCounterspellsOperations _coreUnrespondableCounterspellsOperations;
+    private readonly ICoreExtendedViewAsCoreWushuangJinzhiOperations _coreWushuangJinzhiOperations;
+    private readonly ICoreExtendedViewAsCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICoreExtendedViewAsCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreExtendedViewAsCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreExtendedViewAsCoreNativeDodgeOperations _coreNativeDodgeOperations;
+    private readonly ICoreExtendedViewAsCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreExtendedViewAsCoreNativeNullificationFramesOperations _coreNativeNullificationFramesOperations;
+    private readonly ICoreExtendedViewAsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreExtendedViewAsCoreNativeRecoveryCardsOperations _coreNativeRecoveryCardsOperations;
+    private readonly ICoreExtendedViewAsCoreNativeResponseWindowsOperations _coreNativeResponseWindowsOperations;
+    private readonly ICoreExtendedViewAsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreExtendedViewAsCoreProgramAllHandBonusOperationOperations _coreProgramAllHandBonusOperationOperations;
+    private readonly ICoreExtendedViewAsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreExtendedViewAsKernelCoreGameEngineRuntimeOperations _kernelCoreGameEngineRuntimeOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineExtendedViewAsRuntime(ICoreExtendedViewAsCharacterCaoXiOlOperations characterCaoXiOlOperations, ICoreExtendedViewAsCharacterChengYuMouOperations characterChengYuMouOperations, ICoreExtendedViewAsCharacterGuanHaiOlOperations characterGuanHaiOlOperations, ICoreExtendedViewAsCharacterHuangZhongAnniversaryGodOperations characterHuangZhongAnniversaryGodOperations, ICoreExtendedViewAsCharacterKongShuOlOperations characterKongShuOlOperations, ICoreExtendedViewAsCharacterLuBuMobileGodOperations characterLuBuMobileGodOperations, ICoreExtendedViewAsCharacterXunXuAnniversaryOperations characterXunXuAnniversaryOperations, ICoreExtendedViewAsCharacterZhaoTongZhaoGuangAnniversaryOperations characterZhaoTongZhaoGuangAnniversaryOperations, ICoreExtendedViewAsContentRegistryOperations contentRegistryOperations, ICoreExtendedViewAsResolutionStackOperations resolutionStackOperations, ICoreExtendedViewAsTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreExtendedViewAsCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreExtendedViewAsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreExtendedViewAsCoreActionQueriesOperations coreActionQueriesOperations, ICoreExtendedViewAsCoreCardActionsOperations coreCardActionsOperations, ICoreExtendedViewAsCoreCardConversionsOperations coreCardConversionsOperations, ICoreExtendedViewAsCoreCommittedResponseUsesOperations coreCommittedResponseUsesOperations, ICoreExtendedViewAsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreExtendedViewAsCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreExtendedViewAsCoreNamedAmbushInvalidationOperations coreNamedAmbushInvalidationOperations, ICoreExtendedViewAsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreExtendedViewAsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreExtendedViewAsCoreResponseUseCompletionOperations coreResponseUseCompletionOperations, ICoreExtendedViewAsCoreRoundDistinctBasicPlayOperations coreRoundDistinctBasicPlayOperations, ICoreExtendedViewAsCoreShenwuExpandedPoliciesOperations coreShenwuExpandedPoliciesOperations, ICoreExtendedViewAsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreExtendedViewAsCoreUnrespondableCounterspellsOperations coreUnrespondableCounterspellsOperations, ICoreExtendedViewAsCoreWushuangJinzhiOperations coreWushuangJinzhiOperations, ICoreExtendedViewAsCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICoreExtendedViewAsCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreExtendedViewAsCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreExtendedViewAsCoreNativeDodgeOperations coreNativeDodgeOperations, ICoreExtendedViewAsCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreExtendedViewAsCoreNativeNullificationFramesOperations coreNativeNullificationFramesOperations, ICoreExtendedViewAsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreExtendedViewAsCoreNativeRecoveryCardsOperations coreNativeRecoveryCardsOperations, ICoreExtendedViewAsCoreNativeResponseWindowsOperations coreNativeResponseWindowsOperations, ICoreExtendedViewAsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreExtendedViewAsCoreProgramAllHandBonusOperationOperations coreProgramAllHandBonusOperationOperations, ICoreExtendedViewAsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreExtendedViewAsKernelCoreGameEngineRuntimeOperations kernelCoreGameEngineRuntimeOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCaoXiOlOperations = characterCaoXiOlOperations;
+        this._characterChengYuMouOperations = characterChengYuMouOperations;
+        this._characterGuanHaiOlOperations = characterGuanHaiOlOperations;
+        this._characterHuangZhongAnniversaryGodOperations = characterHuangZhongAnniversaryGodOperations;
+        this._characterKongShuOlOperations = characterKongShuOlOperations;
+        this._characterLuBuMobileGodOperations = characterLuBuMobileGodOperations;
+        this._characterXunXuAnniversaryOperations = characterXunXuAnniversaryOperations;
+        this._characterZhaoTongZhaoGuangAnniversaryOperations = characterZhaoTongZhaoGuangAnniversaryOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCommittedResponseUsesOperations = coreCommittedResponseUsesOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreNamedAmbushInvalidationOperations = coreNamedAmbushInvalidationOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreResponseUseCompletionOperations = coreResponseUseCompletionOperations;
+        this._coreRoundDistinctBasicPlayOperations = coreRoundDistinctBasicPlayOperations;
+        this._coreShenwuExpandedPoliciesOperations = coreShenwuExpandedPoliciesOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreUnrespondableCounterspellsOperations = coreUnrespondableCounterspellsOperations;
+        this._coreWushuangJinzhiOperations = coreWushuangJinzhiOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeDodgeOperations = coreNativeDodgeOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativeNullificationFramesOperations = coreNativeNullificationFramesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRecoveryCardsOperations = coreNativeRecoveryCardsOperations;
+        this._coreNativeResponseWindowsOperations = coreNativeResponseWindowsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreProgramAllHandBonusOperationOperations = coreProgramAllHandBonusOperationOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreGameEngineRuntimeOperations = kernelCoreGameEngineRuntimeOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

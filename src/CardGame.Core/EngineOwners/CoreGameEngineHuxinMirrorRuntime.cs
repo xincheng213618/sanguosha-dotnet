@@ -1,0 +1,70 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineHuxinMirrorRuntime : global::CardGame.Core.IHuxinMirrorHost
+{
+    private readonly ICoreHuxinMirrorCharacterHuCheErMouOperations _characterHuCheErMouOperations;
+    private readonly ICoreHuxinMirrorCardZonesOperations _cardZonesOperations;
+    private readonly ICoreHuxinMirrorResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHuxinMirrorCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreHuxinMirrorCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreHuxinMirrorCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreHuxinMirrorCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICoreHuxinMirrorCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreHuxinMirrorCoreEquipmentPlacementAndHpPairOperations _coreEquipmentPlacementAndHpPairOperations;
+    private readonly ICoreHuxinMirrorCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreHuxinMirrorCoreExtendedViewAsOperations _coreExtendedViewAsOperations;
+    private readonly ICoreHuxinMirrorCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreHuxinMirrorCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreHuxinMirrorCoreNativeDamageArmorPoliciesOperations _coreNativeDamageArmorPoliciesOperations;
+    private readonly ICoreHuxinMirrorCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreHuxinMirrorCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreHuxinMirrorCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreHuxinMirrorCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreHuxinMirrorCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreHuxinMirrorCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreHuxinMirrorCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreHuxinMirrorCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreHuxinMirrorCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreHuxinMirrorCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreHuxinMirrorKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineHuxinMirrorRuntime(ICoreHuxinMirrorCharacterHuCheErMouOperations characterHuCheErMouOperations, ICoreHuxinMirrorCardZonesOperations cardZonesOperations, ICoreHuxinMirrorResolutionStackOperations resolutionStackOperations, ICoreHuxinMirrorCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreHuxinMirrorCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreHuxinMirrorCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreHuxinMirrorCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICoreHuxinMirrorCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreHuxinMirrorCoreEquipmentPlacementAndHpPairOperations coreEquipmentPlacementAndHpPairOperations, ICoreHuxinMirrorCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreHuxinMirrorCoreExtendedViewAsOperations coreExtendedViewAsOperations, ICoreHuxinMirrorCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreHuxinMirrorCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreHuxinMirrorCoreNativeDamageArmorPoliciesOperations coreNativeDamageArmorPoliciesOperations, ICoreHuxinMirrorCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreHuxinMirrorCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreHuxinMirrorCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreHuxinMirrorCoreRuntimeOperations coreRuntimeOperations, ICoreHuxinMirrorCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreHuxinMirrorCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreHuxinMirrorCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreHuxinMirrorCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreHuxinMirrorCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreHuxinMirrorCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreHuxinMirrorKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuCheErMouOperations = characterHuCheErMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreEquipmentPlacementAndHpPairOperations = coreEquipmentPlacementAndHpPairOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreExtendedViewAsOperations = coreExtendedViewAsOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeDamageArmorPoliciesOperations = coreNativeDamageArmorPoliciesOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterPangTongOlSpRuntime : global::CardGame.Core.ISpPangTongNativeEntries, global::CardGame.Core.ISpPangTongNativeFacts
+{
+    private readonly ICharacterPangTongOlSpCharacterDiaoChanLeOperations _characterDiaoChanLeOperations;
+    private readonly ICharacterPangTongOlSpCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICharacterPangTongOlSpResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterPangTongOlSpCoreAlcoholIdentityPoliciesOperations _coreAlcoholIdentityPoliciesOperations;
+    private readonly ICharacterPangTongOlSpCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterPangTongOlSpCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICharacterPangTongOlSpCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterPangTongOlSpCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterPangTongOlSpCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterPangTongOlSpCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterPangTongOlSpCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICharacterPangTongOlSpCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICharacterPangTongOlSpKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterPangTongOlSpKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    internal CharacterPangTongOlSpRuntime(ICharacterPangTongOlSpCharacterDiaoChanLeOperations characterDiaoChanLeOperations, ICharacterPangTongOlSpCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICharacterPangTongOlSpResolutionStackOperations resolutionStackOperations, ICharacterPangTongOlSpCoreAlcoholIdentityPoliciesOperations coreAlcoholIdentityPoliciesOperations, ICharacterPangTongOlSpCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterPangTongOlSpCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICharacterPangTongOlSpCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterPangTongOlSpCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterPangTongOlSpCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterPangTongOlSpCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterPangTongOlSpCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICharacterPangTongOlSpCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICharacterPangTongOlSpKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterPangTongOlSpKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess)
+    {
+        this._characterDiaoChanLeOperations = characterDiaoChanLeOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlcoholIdentityPoliciesOperations = coreAlcoholIdentityPoliciesOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+    }
+}

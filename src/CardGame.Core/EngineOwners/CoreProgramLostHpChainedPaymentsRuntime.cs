@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreProgramLostHpChainedPaymentsRuntime
+{
+    private readonly ICoreProgramLostHpChainedPaymentsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsCoreFireTargetBenefitsOperations _coreFireTargetBenefitsOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsCoreNamedAcquisitionObserversOperations _coreNamedAcquisitionObserversOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreProgramLostHpChainedPaymentsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreProgramLostHpChainedPaymentsRuntime(ICoreProgramLostHpChainedPaymentsCardZonesOperations cardZonesOperations, ICoreProgramLostHpChainedPaymentsContentRegistryOperations contentRegistryOperations, ICoreProgramLostHpChainedPaymentsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreProgramLostHpChainedPaymentsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreProgramLostHpChainedPaymentsCoreFireTargetBenefitsOperations coreFireTargetBenefitsOperations, ICoreProgramLostHpChainedPaymentsCoreNamedAcquisitionObserversOperations coreNamedAcquisitionObserversOperations, ICoreProgramLostHpChainedPaymentsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramLostHpChainedPaymentsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreProgramLostHpChainedPaymentsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramLostHpChainedPaymentsCoreRuntimeOperations coreRuntimeOperations, ICoreProgramLostHpChainedPaymentsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreProgramLostHpChainedPaymentsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreFireTargetBenefitsOperations = coreFireTargetBenefitsOperations;
+        this._coreNamedAcquisitionObserversOperations = coreNamedAcquisitionObserversOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

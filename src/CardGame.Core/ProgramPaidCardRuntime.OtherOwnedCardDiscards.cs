@@ -166,9 +166,9 @@ internal sealed partial class ProgramPaidCardRuntime
             return;
         }
         var reason = new CardMoveReason($"skill-program.{frame.SkillId}.{effect.Op}");
-        var logicalDiscard = _operations.CaptureLogicalDiscard(frame.OwnerSeat, chooserSeat, [card.Id], reason, frame.Id);
+        var logicalDiscard = _logicalDiscards.Capture(frame.OwnerSeat, chooserSeat, [card.Id], reason, frame.Id);
         _operations.Move(card, source, CardLocation.DiscardPile, reason);
-        _operations.CompleteLogicalDiscard(logicalDiscard);
+        _logicalDiscards.Complete(logicalDiscard);
         _frames.AdvanceProgram(frame.Id);
     }
 }

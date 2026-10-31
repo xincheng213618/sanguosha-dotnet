@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePaidVirtualSlashTargetsRuntime
+{
+    private readonly ICorePaidVirtualSlashTargetsCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICorePaidVirtualSlashTargetsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePaidVirtualSlashTargetsCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICorePaidVirtualSlashTargetsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICorePaidVirtualSlashTargetsCoreCurrentSlashFireOffersOperations _coreCurrentSlashFireOffersOperations;
+    private readonly ICorePaidVirtualSlashTargetsCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICorePaidVirtualSlashTargetsCoreForeignPublicPileSlashesOperations _coreForeignPublicPileSlashesOperations;
+    private readonly ICorePaidVirtualSlashTargetsCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICorePaidVirtualSlashTargetsCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICorePaidVirtualSlashTargetsCoreNativeNullificationFramesOperations _coreNativeNullificationFramesOperations;
+    private readonly ICorePaidVirtualSlashTargetsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICorePaidVirtualSlashTargetsCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICorePaidVirtualSlashTargetsKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEnginePaidVirtualSlashTargetsRuntime(ICorePaidVirtualSlashTargetsCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICorePaidVirtualSlashTargetsResolutionStackOperations resolutionStackOperations, ICorePaidVirtualSlashTargetsCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICorePaidVirtualSlashTargetsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICorePaidVirtualSlashTargetsCoreCurrentSlashFireOffersOperations coreCurrentSlashFireOffersOperations, ICorePaidVirtualSlashTargetsCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICorePaidVirtualSlashTargetsCoreForeignPublicPileSlashesOperations coreForeignPublicPileSlashesOperations, ICorePaidVirtualSlashTargetsCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICorePaidVirtualSlashTargetsCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICorePaidVirtualSlashTargetsCoreNativeNullificationFramesOperations coreNativeNullificationFramesOperations, ICorePaidVirtualSlashTargetsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICorePaidVirtualSlashTargetsCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICorePaidVirtualSlashTargetsKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentSlashFireOffersOperations = coreCurrentSlashFireOffersOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreForeignPublicPileSlashesOperations = coreForeignPublicPileSlashesOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeNullificationFramesOperations = coreNativeNullificationFramesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

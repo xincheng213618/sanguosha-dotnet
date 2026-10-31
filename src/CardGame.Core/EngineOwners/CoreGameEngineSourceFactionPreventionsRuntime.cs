@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineSourceFactionPreventionsRuntime : global::CardGame.Core.ISourceFactionPreventionProgramHost
+{
+    private readonly ICoreSourceFactionPreventionsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSourceFactionPreventionsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSourceFactionPreventionsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSourceFactionPreventionsSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICoreSourceFactionPreventionsCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreSourceFactionPreventionsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreSourceFactionPreventionsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSourceFactionPreventionsCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICoreSourceFactionPreventionsCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICoreSourceFactionPreventionsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSourceFactionPreventionsCorePublicFactionCountsOperations _corePublicFactionCountsOperations;
+    private readonly ICoreSourceFactionPreventionsCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreSourceFactionPreventionsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSourceFactionPreventionsCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICoreSourceFactionPreventionsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreSourceFactionPreventionsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSourceFactionPreventionsRuntime(ICoreSourceFactionPreventionsCardZonesOperations cardZonesOperations, ICoreSourceFactionPreventionsContentRegistryOperations contentRegistryOperations, ICoreSourceFactionPreventionsResolutionStackOperations resolutionStackOperations, ICoreSourceFactionPreventionsSkillRuntimeStateOperations skillRuntimeStateOperations, ICoreSourceFactionPreventionsCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreSourceFactionPreventionsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreSourceFactionPreventionsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSourceFactionPreventionsCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICoreSourceFactionPreventionsCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICoreSourceFactionPreventionsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSourceFactionPreventionsCorePublicFactionCountsOperations corePublicFactionCountsOperations, ICoreSourceFactionPreventionsCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreSourceFactionPreventionsCoreRuntimeOperations coreRuntimeOperations, ICoreSourceFactionPreventionsCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICoreSourceFactionPreventionsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreSourceFactionPreventionsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicFactionCountsOperations = corePublicFactionCountsOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

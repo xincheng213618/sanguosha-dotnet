@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineAdvancedLifecycleChoicesRuntime
+{
+    private readonly ICoreAdvancedLifecycleChoicesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreAdvancedLifecycleChoicesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreAdvancedLifecycleChoicesRandomOperations _randomOperations;
+    private readonly ICoreAdvancedLifecycleChoicesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreAdvancedLifecycleChoicesSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreConversionStatesOperations _coreConversionStatesOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreAdvancedLifecycleChoicesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineAdvancedLifecycleChoicesRuntime(ICoreAdvancedLifecycleChoicesCardZonesOperations cardZonesOperations, ICoreAdvancedLifecycleChoicesContentRegistryOperations contentRegistryOperations, ICoreAdvancedLifecycleChoicesRandomOperations randomOperations, ICoreAdvancedLifecycleChoicesResolutionStackOperations resolutionStackOperations, ICoreAdvancedLifecycleChoicesSkillRuntimeStateOperations skillRuntimeStateOperations, ICoreAdvancedLifecycleChoicesCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreAdvancedLifecycleChoicesCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreAdvancedLifecycleChoicesCoreConversionStatesOperations coreConversionStatesOperations, ICoreAdvancedLifecycleChoicesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreAdvancedLifecycleChoicesCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreAdvancedLifecycleChoicesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreAdvancedLifecycleChoicesCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICoreAdvancedLifecycleChoicesCoreRuntimeOperations coreRuntimeOperations, ICoreAdvancedLifecycleChoicesCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreAdvancedLifecycleChoicesCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreAdvancedLifecycleChoicesCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreAdvancedLifecycleChoicesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreAdvancedLifecycleChoicesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreAdvancedLifecycleChoicesCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreAdvancedLifecycleChoicesCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreAdvancedLifecycleChoicesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreConversionStatesOperations = coreConversionStatesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

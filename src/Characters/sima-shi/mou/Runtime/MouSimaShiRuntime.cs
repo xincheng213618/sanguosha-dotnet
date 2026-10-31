@@ -3,7 +3,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class MouSimaShiRuntime(IMouSimaShiFacts facts, IMouSimaShiNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMouSimaShiRuntime
 {
-    internal const string Sanshi = "mou:sanshi", Zhenrao = "mou:zhenrao", Chenlve = "mou:chenlve", Action = "mou-sima-shi-anniversary";
+    internal const string Sanshi = "mou:sanshi",Zhenrao = "mou:zhenrao",Chenlve = "mou:chenlve",Action = "mou-sima-shi-anniversary";
     internal static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     internal static bool Reachable(CardLocation p) => p.Zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment or CardZoneKind.DrawPile or CardZoneKind.DiscardPile;
     internal IEnumerable<int> Marked(int owner) => facts.History<MouSimaShiMarkedEvent>().Where(e => e.Source.OwnerSeat == owner).Select(e => e.CardId).Distinct();

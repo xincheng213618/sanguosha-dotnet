@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterHanSongAnniversaryRuntime : global::CardGame.Core.IAnniversaryHanSongHost
+{
+    private readonly ICharacterHanSongAnniversaryCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICharacterHanSongAnniversaryCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterHanSongAnniversaryContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterHanSongAnniversaryResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterHanSongAnniversaryCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterHanSongAnniversaryCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterHanSongAnniversaryCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterHanSongAnniversaryCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterHanSongAnniversaryCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterHanSongAnniversaryCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterHanSongAnniversaryCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterHanSongAnniversaryCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterHanSongAnniversaryCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterHanSongAnniversaryCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterHanSongAnniversaryCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly ICharacterHanSongAnniversaryCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterHanSongAnniversaryCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterHanSongAnniversaryCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterHanSongAnniversaryCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterHanSongAnniversaryCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterHanSongAnniversaryCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterHanSongAnniversaryCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterHanSongAnniversaryCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterHanSongAnniversaryCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterHanSongAnniversaryCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterHanSongAnniversaryKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterHanSongAnniversaryRuntime(ICharacterHanSongAnniversaryCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICharacterHanSongAnniversaryCardZonesOperations cardZonesOperations, ICharacterHanSongAnniversaryContentRegistryOperations contentRegistryOperations, ICharacterHanSongAnniversaryResolutionStackOperations resolutionStackOperations, ICharacterHanSongAnniversaryCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterHanSongAnniversaryCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterHanSongAnniversaryCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterHanSongAnniversaryCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterHanSongAnniversaryCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterHanSongAnniversaryCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterHanSongAnniversaryCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterHanSongAnniversaryCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterHanSongAnniversaryCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterHanSongAnniversaryCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterHanSongAnniversaryCoreRuleQueriesOperations coreRuleQueriesOperations, ICharacterHanSongAnniversaryCoreRuntimeOperations coreRuntimeOperations, ICharacterHanSongAnniversaryCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterHanSongAnniversaryCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterHanSongAnniversaryCoreTableOrderOperations coreTableOrderOperations, ICharacterHanSongAnniversaryCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterHanSongAnniversaryCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterHanSongAnniversaryCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterHanSongAnniversaryCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterHanSongAnniversaryCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterHanSongAnniversaryCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterHanSongAnniversaryKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuleQueriesOperations = coreRuleQueriesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

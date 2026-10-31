@@ -1,0 +1,26 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineDyingWindowSkillPoliciesRuntime
+{
+    private readonly ICoreDyingWindowSkillPoliciesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDyingWindowSkillPoliciesCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreDyingWindowSkillPoliciesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDyingWindowSkillPoliciesDyingQualificationDependenciesDyingQualificationStampAccess _coreGameEngineDyingWindowSkillPoliciesDyingQualificationDependenciesDyingQualificationStampAccess;
+    internal CoreGameEngineDyingWindowSkillPoliciesRuntime(ICoreDyingWindowSkillPoliciesContentRegistryOperations contentRegistryOperations, ICoreDyingWindowSkillPoliciesCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreDyingWindowSkillPoliciesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDyingWindowSkillPoliciesDyingQualificationDependenciesDyingQualificationStampAccess coreGameEngineDyingWindowSkillPoliciesDyingQualificationDependenciesDyingQualificationStampAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineDyingWindowSkillPoliciesDyingQualificationDependenciesDyingQualificationStampAccess = coreGameEngineDyingWindowSkillPoliciesDyingQualificationDependenciesDyingQualificationStampAccess;
+    }
+}

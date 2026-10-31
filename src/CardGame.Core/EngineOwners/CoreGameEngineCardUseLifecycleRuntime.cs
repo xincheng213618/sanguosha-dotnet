@@ -1,0 +1,94 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineCardUseLifecycleRuntime
+{
+    private readonly ICoreCardUseLifecycleCharacterAHuiNanOlOperations _characterAHuiNanOlOperations;
+    private readonly ICoreCardUseLifecycleCharacterCaoChunOlOperations _characterCaoChunOlOperations;
+    private readonly ICoreCardUseLifecycleCharacterCaoZhenBoundaryMobileOperations _characterCaoZhenBoundaryMobileOperations;
+    private readonly ICoreCardUseLifecycleCharacterChengYuMouOperations _characterChengYuMouOperations;
+    private readonly ICoreCardUseLifecycleCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICoreCardUseLifecycleCharacterDiaoChanLeOperations _characterDiaoChanLeOperations;
+    private readonly ICoreCardUseLifecycleCharacterDongZhuoMouOlOperations _characterDongZhuoMouOlOperations;
+    private readonly ICoreCardUseLifecycleCharacterGuoTuOlOperations _characterGuoTuOlOperations;
+    private readonly ICoreCardUseLifecycleCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICoreCardUseLifecycleCharacterHuangQuanOlOperations _characterHuangQuanOlOperations;
+    private readonly ICoreCardUseLifecycleCharacterHuangZhongAnniversaryGodOperations _characterHuangZhongAnniversaryGodOperations;
+    private readonly ICoreCardUseLifecycleCharacterLiuYouAnniversaryOperations _characterLiuYouAnniversaryOperations;
+    private readonly ICoreCardUseLifecycleCharacterQinLangOlOperations _characterQinLangOlOperations;
+    private readonly ICoreCardUseLifecycleCharacterWeiYanHappyGodOperations _characterWeiYanHappyGodOperations;
+    private readonly ICoreCardUseLifecycleCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreCardUseLifecycleCharacterZhouYuOlMouOperations _characterZhouYuOlMouOperations;
+    private readonly ICoreCardUseLifecycleCharacterZhugeLiangMouOperations _characterZhugeLiangMouOperations;
+    private readonly ICoreCardUseLifecycleCardZonesOperations _cardZonesOperations;
+    private readonly ICoreCardUseLifecycleResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCardUseLifecycleCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreCardUseLifecycleCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreCardUseLifecycleCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICoreCardUseLifecycleCoreDrawFundedDistinctBasicUsesOperations _coreDrawFundedDistinctBasicUsesOperations;
+    private readonly ICoreCardUseLifecycleCoreDyingSuitsPeachProgramsOperations _coreDyingSuitsPeachProgramsOperations;
+    private readonly ICoreCardUseLifecycleCoreFinalizedCardTargetsOperations _coreFinalizedCardTargetsOperations;
+    private readonly ICoreCardUseLifecycleCoreGuanduCardsOperations _coreGuanduCardsOperations;
+    private readonly ICoreCardUseLifecycleCoreProgramCardUseNullificationOperations _coreProgramCardUseNullificationOperations;
+    private readonly ICoreCardUseLifecycleCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCardUseLifecycleCoreShanheSourceMouDongZhuoWineOperations _coreShanheSourceMouDongZhuoWineOperations;
+    private readonly ICoreCardUseLifecycleCoreSoleIncomingEffectRepeatOperations _coreSoleIncomingEffectRepeatOperations;
+    private readonly ICoreCardUseLifecycleCoreTieredRoundZeroUsesOperations _coreTieredRoundZeroUsesOperations;
+    private readonly ICoreCardUseLifecycleCoreVirtualBasicOffersOperations _coreVirtualBasicOffersOperations;
+    private readonly ICoreCardUseLifecycleCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreCardUseLifecycleCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreCardUseLifecycleCoreNativeEquipmentUseOperations _coreNativeEquipmentUseOperations;
+    private readonly ICoreCardUseLifecycleCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreCardUseLifecycleCoreNativeRecoveryCardsOperations _coreNativeRecoveryCardsOperations;
+    private readonly ICoreCardUseLifecycleCoreNativeTrickUseOperations _coreNativeTrickUseOperations;
+    private readonly ICoreCardUseLifecycleCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineCardUseLifecycleRuntime(ICoreCardUseLifecycleCharacterAHuiNanOlOperations characterAHuiNanOlOperations, ICoreCardUseLifecycleCharacterCaoChunOlOperations characterCaoChunOlOperations, ICoreCardUseLifecycleCharacterCaoZhenBoundaryMobileOperations characterCaoZhenBoundaryMobileOperations, ICoreCardUseLifecycleCharacterChengYuMouOperations characterChengYuMouOperations, ICoreCardUseLifecycleCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICoreCardUseLifecycleCharacterDiaoChanLeOperations characterDiaoChanLeOperations, ICoreCardUseLifecycleCharacterDongZhuoMouOlOperations characterDongZhuoMouOlOperations, ICoreCardUseLifecycleCharacterGuoTuOlOperations characterGuoTuOlOperations, ICoreCardUseLifecycleCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICoreCardUseLifecycleCharacterHuangQuanOlOperations characterHuangQuanOlOperations, ICoreCardUseLifecycleCharacterHuangZhongAnniversaryGodOperations characterHuangZhongAnniversaryGodOperations, ICoreCardUseLifecycleCharacterLiuYouAnniversaryOperations characterLiuYouAnniversaryOperations, ICoreCardUseLifecycleCharacterQinLangOlOperations characterQinLangOlOperations, ICoreCardUseLifecycleCharacterWeiYanHappyGodOperations characterWeiYanHappyGodOperations, ICoreCardUseLifecycleCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreCardUseLifecycleCharacterZhouYuOlMouOperations characterZhouYuOlMouOperations, ICoreCardUseLifecycleCharacterZhugeLiangMouOperations characterZhugeLiangMouOperations, ICoreCardUseLifecycleCardZonesOperations cardZonesOperations, ICoreCardUseLifecycleResolutionStackOperations resolutionStackOperations, ICoreCardUseLifecycleCoreCardActionsOperations coreCardActionsOperations, ICoreCardUseLifecycleCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreCardUseLifecycleCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICoreCardUseLifecycleCoreDrawFundedDistinctBasicUsesOperations coreDrawFundedDistinctBasicUsesOperations, ICoreCardUseLifecycleCoreDyingSuitsPeachProgramsOperations coreDyingSuitsPeachProgramsOperations, ICoreCardUseLifecycleCoreFinalizedCardTargetsOperations coreFinalizedCardTargetsOperations, ICoreCardUseLifecycleCoreGuanduCardsOperations coreGuanduCardsOperations, ICoreCardUseLifecycleCoreProgramCardUseNullificationOperations coreProgramCardUseNullificationOperations, ICoreCardUseLifecycleCoreRuntimeOperations coreRuntimeOperations, ICoreCardUseLifecycleCoreShanheSourceMouDongZhuoWineOperations coreShanheSourceMouDongZhuoWineOperations, ICoreCardUseLifecycleCoreSoleIncomingEffectRepeatOperations coreSoleIncomingEffectRepeatOperations, ICoreCardUseLifecycleCoreTieredRoundZeroUsesOperations coreTieredRoundZeroUsesOperations, ICoreCardUseLifecycleCoreVirtualBasicOffersOperations coreVirtualBasicOffersOperations, ICoreCardUseLifecycleCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreCardUseLifecycleCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreCardUseLifecycleCoreNativeEquipmentUseOperations coreNativeEquipmentUseOperations, ICoreCardUseLifecycleCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreCardUseLifecycleCoreNativeRecoveryCardsOperations coreNativeRecoveryCardsOperations, ICoreCardUseLifecycleCoreNativeTrickUseOperations coreNativeTrickUseOperations, ICoreCardUseLifecycleCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterAHuiNanOlOperations = characterAHuiNanOlOperations;
+        this._characterCaoChunOlOperations = characterCaoChunOlOperations;
+        this._characterCaoZhenBoundaryMobileOperations = characterCaoZhenBoundaryMobileOperations;
+        this._characterChengYuMouOperations = characterChengYuMouOperations;
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._characterDiaoChanLeOperations = characterDiaoChanLeOperations;
+        this._characterDongZhuoMouOlOperations = characterDongZhuoMouOlOperations;
+        this._characterGuoTuOlOperations = characterGuoTuOlOperations;
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._characterHuangQuanOlOperations = characterHuangQuanOlOperations;
+        this._characterHuangZhongAnniversaryGodOperations = characterHuangZhongAnniversaryGodOperations;
+        this._characterLiuYouAnniversaryOperations = characterLiuYouAnniversaryOperations;
+        this._characterQinLangOlOperations = characterQinLangOlOperations;
+        this._characterWeiYanHappyGodOperations = characterWeiYanHappyGodOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._characterZhouYuOlMouOperations = characterZhouYuOlMouOperations;
+        this._characterZhugeLiangMouOperations = characterZhugeLiangMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreDrawFundedDistinctBasicUsesOperations = coreDrawFundedDistinctBasicUsesOperations;
+        this._coreDyingSuitsPeachProgramsOperations = coreDyingSuitsPeachProgramsOperations;
+        this._coreFinalizedCardTargetsOperations = coreFinalizedCardTargetsOperations;
+        this._coreGuanduCardsOperations = coreGuanduCardsOperations;
+        this._coreProgramCardUseNullificationOperations = coreProgramCardUseNullificationOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheSourceMouDongZhuoWineOperations = coreShanheSourceMouDongZhuoWineOperations;
+        this._coreSoleIncomingEffectRepeatOperations = coreSoleIncomingEffectRepeatOperations;
+        this._coreTieredRoundZeroUsesOperations = coreTieredRoundZeroUsesOperations;
+        this._coreVirtualBasicOffersOperations = coreVirtualBasicOffersOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeEquipmentUseOperations = coreNativeEquipmentUseOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativeRecoveryCardsOperations = coreNativeRecoveryCardsOperations;
+        this._coreNativeTrickUseOperations = coreNativeTrickUseOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

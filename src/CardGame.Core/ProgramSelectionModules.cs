@@ -207,12 +207,8 @@ internal sealed class ProgramSelectionRegistry(ProgramSelectionCatalog catalog, 
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramSelectionCatalog> ProgramSelectionMetadata = new(() =>
-        new(typeof(GameEngine).Assembly.GetTypes()), true);
     private ProgramSelectionRegistry? _programSelections;
-    private ProgramSelectionRegistry ProgramSelections => _programSelections ??= new(ProgramSelectionMetadata.Value, ProgramSelectionQueries);
+    private ProgramSelectionRegistry ProgramSelections => _programSelections ??= new(global::CardGame.Core.EngineOwners.CoreProgramSelectionModulesDefinitions.ProgramSelectionMetadata.Value, ProgramSelectionQueries);
     private IProgramSelectionQueries? _programSelectionQueries;
-    private IProgramSelectionQueries ProgramSelectionQueries => _programSelectionQueries ??= new SelectionQueries(this);
-    private sealed class SelectionQueries(GameEngine engine) : IProgramSelectionQueries
-    { public T Get<T>() where T : class, IProgramSelectionQuery => engine.ProgramCapabilities.Get<T>(); }
+    private IProgramSelectionQueries ProgramSelectionQueries => _programSelectionQueries ??= this.ComposeNativeSelectionQueries();
 }

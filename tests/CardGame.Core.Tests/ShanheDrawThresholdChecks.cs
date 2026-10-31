@@ -178,7 +178,7 @@ internal static class ShanheDrawThresholdChecks
                     .Select(item => new NativeDrawThresholdProgress(item.Source, item.GameplayHash, item.Threshold,
                         item.RemainderBefore, item.ActualCount, item.Crossings, item.RemainderAfter)).ToArray()
             };
-            var validate = typeof(GameEngine).GetMethod("ValidNativeDrawInvocation",
+            var validate = global::FixtureRuntimeAccess.Engine.GetMethod("ValidNativeDrawInvocation",
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
             bool Valid(NativeDrawInvocationProof value) => (bool)validate.Invoke(Game, [value])!;
             var origin = proof.ProgramOrigin!;

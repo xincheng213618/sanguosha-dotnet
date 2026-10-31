@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSourceBeigongChildrenRuntime
+{
+    private readonly ICoreSourceBeigongChildrenCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICoreSourceBeigongChildrenResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSourceBeigongChildrenCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICoreSourceBeigongChildrenCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreSourceBeigongChildrenCoreDyingSuitsAndHistoricalUseObserversOperations _coreDyingSuitsAndHistoricalUseObserversOperations;
+    private readonly ICoreSourceBeigongChildrenCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreSourceBeigongChildrenCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreSourceBeigongChildrenCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreSourceBeigongChildrenCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreSourceBeigongChildrenCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICoreSourceBeigongChildrenCoreSourceBeigongOperations _coreSourceBeigongOperations;
+    private readonly ICoreSourceBeigongChildrenCoreSourceDingxiNativeOperations _coreSourceDingxiNativeOperations;
+    private readonly ICoreSourceBeigongChildrenCoreSourceHuojieOperations _coreSourceHuojieOperations;
+    private readonly ICoreSourceBeigongChildrenCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSourceBeigongChildrenCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICoreSourceBeigongChildrenCoreSourceBeigongChildrenOperations _coreSourceBeigongChildrenOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineSourceBeigongChildrenRuntime(ICoreSourceBeigongChildrenCharacterYanPuOlOperations characterYanPuOlOperations, ICoreSourceBeigongChildrenResolutionStackOperations resolutionStackOperations, ICoreSourceBeigongChildrenCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICoreSourceBeigongChildrenCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreSourceBeigongChildrenCoreDyingSuitsAndHistoricalUseObserversOperations coreDyingSuitsAndHistoricalUseObserversOperations, ICoreSourceBeigongChildrenCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreSourceBeigongChildrenCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreSourceBeigongChildrenCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreSourceBeigongChildrenCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreSourceBeigongChildrenCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICoreSourceBeigongChildrenCoreSourceBeigongOperations coreSourceBeigongOperations, ICoreSourceBeigongChildrenCoreSourceDingxiNativeOperations coreSourceDingxiNativeOperations, ICoreSourceBeigongChildrenCoreSourceHuojieOperations coreSourceHuojieOperations, ICoreSourceBeigongChildrenCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSourceBeigongChildrenCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICoreSourceBeigongChildrenCoreSourceBeigongChildrenOperations coreSourceBeigongChildrenOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreDyingSuitsAndHistoricalUseObserversOperations = coreDyingSuitsAndHistoricalUseObserversOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreSourceBeigongOperations = coreSourceBeigongOperations;
+        this._coreSourceDingxiNativeOperations = coreSourceDingxiNativeOperations;
+        this._coreSourceHuojieOperations = coreSourceHuojieOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreSourceBeigongChildrenOperations = coreSourceBeigongChildrenOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

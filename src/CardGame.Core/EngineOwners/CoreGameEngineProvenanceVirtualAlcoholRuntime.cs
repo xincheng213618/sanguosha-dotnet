@@ -1,0 +1,60 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProvenanceVirtualAlcoholRuntime
+{
+    private readonly ICoreProvenanceVirtualAlcoholCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreProvenanceVirtualAlcoholContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProvenanceVirtualAlcoholResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreActualPlayPhaseCardUsesOperations _coreActualPlayPhaseCardUsesOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreIssuedPlayUsePoliciesOperations _coreIssuedPlayUsePoliciesOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreVirtualBasicOffersOperations _coreVirtualBasicOffersOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreProvenanceVirtualAlcoholCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreProvenanceVirtualAlcoholKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CoreGameEngineProvenanceVirtualAlcoholRuntime(ICoreProvenanceVirtualAlcoholCharacterLuMengMouOperations characterLuMengMouOperations, ICoreProvenanceVirtualAlcoholContentRegistryOperations contentRegistryOperations, ICoreProvenanceVirtualAlcoholResolutionStackOperations resolutionStackOperations, ICoreProvenanceVirtualAlcoholCoreActualPlayPhaseCardUsesOperations coreActualPlayPhaseCardUsesOperations, ICoreProvenanceVirtualAlcoholCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreProvenanceVirtualAlcoholCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreProvenanceVirtualAlcoholCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreProvenanceVirtualAlcoholCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreProvenanceVirtualAlcoholCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreProvenanceVirtualAlcoholCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreProvenanceVirtualAlcoholCoreIssuedPlayUsePoliciesOperations coreIssuedPlayUsePoliciesOperations, ICoreProvenanceVirtualAlcoholCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProvenanceVirtualAlcoholCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreProvenanceVirtualAlcoholCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProvenanceVirtualAlcoholCoreRuntimeOperations coreRuntimeOperations, ICoreProvenanceVirtualAlcoholCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreProvenanceVirtualAlcoholCoreVirtualBasicOffersOperations coreVirtualBasicOffersOperations, ICoreProvenanceVirtualAlcoholCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreProvenanceVirtualAlcoholCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreProvenanceVirtualAlcoholCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreProvenanceVirtualAlcoholKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess)
+    {
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualPlayPhaseCardUsesOperations = coreActualPlayPhaseCardUsesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreIssuedPlayUsePoliciesOperations = coreIssuedPlayUsePoliciesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreVirtualBasicOffersOperations = coreVirtualBasicOffersOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+    }
+}

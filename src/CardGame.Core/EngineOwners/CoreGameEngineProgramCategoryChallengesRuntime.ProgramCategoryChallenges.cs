@@ -1,0 +1,230 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CoreGameEngineProgramCategoryChallengesRuntime
+{
+    internal static void AssertFrozenSelectedCardSuits(ProgramSkillFrame frame, ProgramExecutionPlan plan) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCategoryChallenges.AssertFrozenSelectedCardSuits(frame, plan);
+    internal bool AreProgramBoundCardsSameColor(ProgramSkillFrame frame, string sourceBind)
+    {
+        var binding = _coreProgramLifecycleOperations.GetProgramCardSet(frame, sourceBind);
+        var colors = binding.CardIds.Select(cardId =>
+        {
+            var location = _cardZonesOperations._cardZones.GetLocation(cardId);
+            var card = _cardZonesOperations._cardZones.CardsAt(location).Single(candidate => candidate.Id == cardId);
+            return global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit);
+        }).Distinct().ToArray();
+        return binding.CardIds.Count > 0 && colors.Length == 1;
+    }
+
+    internal bool DoProgramBoundCardsMatchCategories(ProgramSkillFrame frame, string sourceBind, IReadOnlyList<SkillProgramCardCategory> categories)
+    {
+        var binding = _coreProgramLifecycleOperations.GetProgramCardSet(frame, sourceBind);
+        return binding.CardIds.Count > 0 && binding.CardIds.All(cardId =>
+        {
+            var location = _cardZonesOperations._cardZones.GetLocation(cardId);
+            var card = _cardZonesOperations._cardZones.CardsAt(location).Single(candidate => candidate.Id == cardId);
+            return categories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, category));
+        });
+    }
+
+    internal bool DoProgramBoundCardCategoryMatchAction(ProgramSkillFrame frame, string sourceBind)
+    {
+        var actionCategory = frame.WindowContext?.Facts?.CardActionCategory;
+        if (actionCategory is null)
+            return false;
+        var binding = _coreProgramLifecycleOperations.GetProgramCardSet(frame, sourceBind);
+        return binding.CardIds.Count > 0 && binding.CardIds.All(cardId =>
+        {
+            var location = _cardZonesOperations._cardZones.GetLocation(cardId);
+            var card = _cardZonesOperations._cardZones.CardsAt(location).Single(candidate => candidate.Id == cardId);
+            return global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) == actionCategory;
+        });
+    }
+
+    internal bool DoProgramBoundCardsMatchKinds(ProgramSkillFrame frame, string sourceBind, IReadOnlyList<CardKind> kinds)
+    {
+        var binding = _coreProgramLifecycleOperations.GetProgramCardSet(frame, sourceBind);
+        return binding.CardIds.Count > 0 && binding.CardIds.All(cardId =>
+        {
+            var location = _cardZonesOperations._cardZones.GetLocation(cardId);
+            var card = _cardZonesOperations._cardZones.CardsAt(location).Single(candidate => candidate.Id == cardId);
+            return kinds.Contains(card.Kind);
+        });
+    }
+
+    internal bool DoProgramBoundCardsMatchSuits(ProgramSkillFrame frame, string sourceBind, IReadOnlyList<Suit> suits)
+    {
+        if (frame.JudgmentOutcomeBindings?.SingleOrDefault(outcome => outcome.Name == sourceBind)is { } outcome)
+        {
+            if (!_coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(frame, outcome))
+                throw new InvalidOperationException("A judgment condition requires its exact issued final value.");
+            return outcome.Suit is { } resultSuit && suits.Contains(resultSuit);
+        }
+
+        var binding = _coreProgramLifecycleOperations.GetProgramCardSet(frame, sourceBind);
+        if (binding.Visibility == SkillProgramCardSetVisibility.Public && binding.FrozenSelectedSuits is { } selectedSuits)
+        {
+            if (selectedSuits.Count != binding.CardIds.Count)
+                throw new InvalidOperationException("Frozen selected suits lost their aligned physical cards.");
+            return binding.CardIds.Count > 0 && selectedSuits.All(suits.Contains);
+        }
+
+        if (binding.Visibility == SkillProgramCardSetVisibility.Public && binding.CardIds.Count == 1 && binding.FrozenRevealedSuit is { } effectiveSuit)
+            return suits.Contains(effectiveSuit);
+        return binding.Visibility == SkillProgramCardSetVisibility.Public && binding.CardIds.Count > 0 && binding.CardIds.All(cardId =>
+        {
+            var location = _cardZonesOperations._cardZones.GetLocation(cardId);
+            var card = _cardZonesOperations._cardZones.CardsAt(location).Single(candidate => candidate.Id == cardId);
+            return suits.Contains(card.Suit);
+        });
+    }
+
+    internal void CaptureProgramSelectedCards(ProgramSkillFrame frame, string resultBind)
+    {
+        var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+        if (active.TriggerId is not null)
+            throw new InvalidOperationException("Only an active play binding can capture its initial cards.");
+        var program = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Program!;
+        var activation = ProgramInstructionResolver.Default.Resolve(program, ProgramInstructionSourceKind.Activation, active.ActivationId).Activation!;
+        if (active.SelectedCardIds.Count < activation.MinCards || active.SelectedCardIds.Count > activation.MaxCards || active.SelectedCardIds.Count == 0)
+            throw new InvalidOperationException("The activation-card selection is outside its declared bounds.");
+        var selected = active.SelectedCardIds.Select(cardId =>
+        {
+            var locations = activation.SourceZones.Select(zone => new CardLocation(zone, active.OwnerSeat)).Where(location => _cardZonesOperations._cardZones.CardsAt(location).Any(card => card.Id == cardId)).ToArray();
+            if (locations.Length != 1)
+                throw new InvalidOperationException("A captured activation card no longer has one valid owner location.");
+            return (CardId: cardId, Location: locations[0]);
+        }).ToArray();
+        _coreProgramLifecycleOperations.SetProgramCardSet(active.Id, resultBind, selected.Select(item => item.CardId).ToArray(), SkillProgramCardSetVisibility.Private, selected.Select(item => item.Location).ToArray());
+    }
+
+    internal void RevealProgramBoundCards(ProgramSkillFrame frame, string sourceBind)
+    {
+        var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+        var binding = _coreProgramLifecycleOperations.GetProgramCardSet(active, sourceBind);
+        var cards = binding.CardIds.Select(cardId =>
+        {
+            var location = _cardZonesOperations._cardZones.GetLocation(cardId);
+            return _cardZonesOperations._cardZones.CardsAt(location).Single(card => card.Id == cardId);
+        }).ToArray();
+        _coreRuntimeOperations.ReplaceRuntimeTop(active with { CardSetBindings = Array.AsReadOnly(active.CardSetBindings.Select(item => item.Name == sourceBind ? item with { Visibility = SkillProgramCardSetVisibility.Public } : item).ToArray()) });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, sourceBind, Array.AsReadOnly(cards.Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray())));
+    }
+
+    internal SkillProgramStepOutcome ChooseProgramDifferentCategoryDiscard(ProgramSkillFrame frame, ProgramParticipantReference chooser, ProgramParticipantReference cardOwner, IReadOnlyList<CardZoneKind> zones, string sourceBind, string resultBind, CardMoveReason reason)
+    {
+        var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+        if (active.ChoiceBindings.Any(binding => binding.Name == resultBind))
+            throw new InvalidOperationException("A category challenge cannot be answered twice.");
+        var chooserSeat = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(active, chooser);
+        var cardOwnerSeat = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(active, cardOwner);
+        if (chooserSeat != cardOwnerSeat)
+            throw new InvalidOperationException("A category challenge may expose only the chooser's own private cards.");
+        var categories = _coreProgramLifecycleOperations.GetProgramCardSet(active, sourceBind).CardIds.Select(cardId => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(cardId)).Single(card => card.Id == cardId).Kind)).Distinct().Order().ToArray();
+        var choices = BuildDifferentCategoryDiscardChoices(active.Id, chooserSeat, cardOwnerSeat, zones, sourceBind, resultBind, reason, categories).ToList();
+        if (!_coreMatchParticipantsPlayersAccess._players[chooserSeat].IsAlive || choices.Count == 0)
+        {
+            CommitProgramCategoryDiscard(active, chooserSeat, sourceBind, resultBind, null);
+            return SkillProgramStepOutcome.Continue;
+        }
+
+        choices.Add(new PromptChoice(new ChoiceId($"program-category-discard.frame-{(active.Id)}.{(resultBind)}.decline"), "不弃置。", [], [], new Dictionary<string, string> { ["program-action"] = "different-category-decline", ["frame-id"] = active.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["source-bind"] = sourceBind, ["result-bind"] = resultBind, ["move-reason"] = reason.Value }));
+        var skill = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, chooserSeat, $"【{(skill.Name)}】请选择弃置一张与展示牌类别不同的牌，或不弃置。", choices.SelectMany(choice => choice.Cards).Distinct().Order().ToArray(), [], active.OwnerSeat)
+        {
+            PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
+            IsPrivate = true,
+            TargetSeat = cardOwnerSeat,
+            SkillPrompt = new SkillPromptPresentation(active.SkillId, skill.Name, $"{(skill.Name)} · 类别响应", skill.Description),
+            Choices = Array.AsReadOnly(choices.ToArray())
+        };
+        _coreMatchOutcomeStatusAccess._status = _coreMatchParticipantsPlayersAccess._players[chooserSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
+        return SkillProgramStepOutcome.AwaitChoice;
+    }
+
+    internal IReadOnlyList<PromptChoice> BuildDifferentCategoryDiscardChoices(long frameId, int chooserSeat, int cardOwnerSeat, IReadOnlyList<CardZoneKind> zones, string sourceBind, string resultBind, CardMoveReason reason, IReadOnlyCollection<SkillProgramCardCategory> excludedCategories)
+    {
+        var result = new List<PromptChoice>();
+        foreach (var zone in zones)
+        {
+            var cards = zone switch
+            {
+                CardZoneKind.Hand => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[cardOwnerSeat]),
+                CardZoneKind.Equipment => _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[cardOwnerSeat]),
+                CardZoneKind.Judgment => _corePhysicalOwnedCardQueriesOperations.GetJudgment(_coreMatchParticipantsPlayersAccess._players[cardOwnerSeat]),
+                _ => throw new InvalidOperationException("Unsupported category-challenge zone.")};
+            foreach (var card in cards.Where(card => !excludedCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, category))))
+            {
+                result.Add(new PromptChoice(new ChoiceId($"program-category-discard.frame-{(frameId)}.{(resultBind)}.card-{(card.Id)}"), $"弃置【{(card.DisplayName)}】。", [card.Id], [], new Dictionary<string, string> { ["program-action"] = "different-category-discard", ["frame-id"] = frameId.ToString(System.Globalization.CultureInfo.InvariantCulture), ["card-owner-seat"] = cardOwnerSeat.ToString(System.Globalization.CultureInfo.InvariantCulture), ["source-zone"] = zone.ToString(), ["source-bind"] = sourceBind, ["result-bind"] = resultBind, ["move-reason"] = reason.Value }));
+            }
+        }
+
+        return Array.AsReadOnly(result.OrderBy(choice => choice.Cards.Single()).ToArray());
+    }
+
+    [ProgramAnswer("different-category-discard", "different-category-decline")]
+    internal void ResolveProgramDifferentCategoryDiscardChoice(PromptChoice selected)
+    {
+        var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The category challenge lost its program frame.");
+        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry!.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
+        if (effect.Op != SkillProgramEffectOp.ChooseDifferentCategoryDiscard || selected.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || selected.Parameters.GetValueOrDefault("source-bind") != effect.SourceBind || selected.Parameters.GetValueOrDefault("result-bind") != effect.ResultBind || frame.ChoiceBindings.Any(binding => binding.Name == effect.ResultBind))
+            throw new InvalidOperationException("The category-discard choice does not match its suspended instruction.");
+        var chooserSeat = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, effect.ChooserRef!);
+        var ownerSeat = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, effect.CardOwnerRef!);
+        if (chooserSeat != ownerSeat || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != chooserSeat)
+            throw new InvalidOperationException("The category-discard participants changed while suspended.");
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[chooserSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        {
+            _coreNativePromptBoundaryOperations.ClearPendingDecision();
+            _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "类别响应参与者或技能实例已失效，技能剩余步骤取消。");
+            return;
+        }
+
+        var action = selected.Parameters.GetValueOrDefault("program-action");
+        int? discardedCardId = null;
+        if (action == "different-category-discard")
+        {
+            if (selected.Cards.Count != 1 || !Enum.TryParse<CardZoneKind>(selected.Parameters.GetValueOrDefault("source-zone"), out var zone) || !effect.Zones.Contains(zone))
+                throw new InvalidOperationException("The category-discard card selection is malformed.");
+            var source = new CardLocation(zone, ownerSeat);
+            var card = _cardZonesOperations._cardZones.CardsAt(source).SingleOrDefault(item => item.Id == selected.Cards.Single()) ?? throw new InvalidOperationException("The category-discard card is no longer available.");
+            var excluded = _coreProgramLifecycleOperations.GetProgramCardSet(frame, effect.SourceBind!).CardIds.Select(cardId => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(cardId)).Single(item => item.Id == cardId).Kind)).ToHashSet();
+            if (excluded.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, category)))
+                throw new InvalidOperationException("The selected response card now matches a forbidden category.");
+            _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(frame.OwnerSeat, ownerSeat, card, source, new CardMoveReason($"skill-program.{(frame.SkillId)}.{(effect.Op)}"));
+            discardedCardId = card.Id;
+        }
+        else if (action != "different-category-decline" || selected.Cards.Count != 0)
+        {
+            throw new InvalidOperationException("The category-discard branch is unsupported.");
+        }
+
+        _coreNativePromptBoundaryOperations.ClearPendingDecision();
+        CommitProgramCategoryDiscard(frame, chooserSeat, effect.SourceBind!, effect.ResultBind!, discardedCardId);
+        _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
+    }
+
+    internal void CommitProgramCategoryDiscard(ProgramSkillFrame frame, int chooserSeat, string sourceBind, string resultBind, int? discardedCardId)
+    {
+        var option = discardedCardId is null ? ChooseDifferentCategoryDiscardProgramOperationDescriptor.DeclinedOption : ChooseDifferentCategoryDiscardProgramOperationDescriptor.DiscardedOption;
+        var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+        _coreRuntimeOperations.ReplaceRuntimeTop(active with { ChoiceBindings = Array.AsReadOnly(active.ChoiceBindings.Append(new ProgramChoiceResultBinding(resultBind, option, chooserSeat)).ToArray()) });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCategoryDiscardResolvedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, chooserSeat, sourceBind, resultBind, discardedCardId));
+    }
+
+    [ProgramAiChoice(SkillProgramEffectOp.ChooseDifferentCategoryDiscard)]
+    internal PromptChoice SelectAiProgramCategoryDiscard(PendingDecision decision, ProgramSkillFrame frame)
+    {
+        var decline = decision.Choices.Single(choice => choice.Parameters.GetValueOrDefault("program-action") == "different-category-decline");
+        var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry!.GetSkill(frame.SkillId).Program!);
+        var paused = plan.GetPausedInstruction(frame.InstructionIndex).Effect;
+        var shouldRestoreFace = _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat].IsFaceDown && plan.Instructions.Skip(frame.InstructionIndex).Any(effect => effect.Op == SkillProgramEffectOp.TurnOver && effect.Target == SkillProgramEffectTarget.SelectedTarget && effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs && effect.Condition.SourceBind == paused.ResultBind && effect.Condition.OptionId == ChooseDifferentCategoryDiscardProgramOperationDescriptor.DeclinedOption);
+        if (shouldRestoreFace)
+            return decline;
+        return decision.Choices.Where(choice => choice.Parameters.GetValueOrDefault("program-action") == "different-category-discard").OrderBy(choice => CardCatalog.Get(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(choice.Cards.Single())).Single(card => card.Id == choice.Cards[0]).Kind).HandKeepValue).ThenBy(choice => choice.Cards[0]).FirstOrDefault() ?? decline;
+    }
+}

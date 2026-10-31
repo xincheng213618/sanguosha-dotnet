@@ -38,7 +38,7 @@ public sealed record ShenJiangWeiReceipt(CardConversionSource Source, string Gam
     public int TargetSeat { get; init; } = -1;
     public long UseId { get; init; }
     public bool NativeReturned { get; init; }
-    private IReadOnlyList<int> _revealed = Array.AsReadOnly(Array.Empty<int>()), _selected = Array.AsReadOnly(Array.Empty<int>()), _ranks = Array.AsReadOnly(Array.Empty<int>());
+    private IReadOnlyList<int> _revealed = Array.AsReadOnly(Array.Empty<int>()),_selected = Array.AsReadOnly(Array.Empty<int>()),_ranks = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Revealed { get => _revealed; init => _revealed = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Selected { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Ranks { get => _ranks; init => _ranks = Array.AsReadOnly(value.ToArray()); }
@@ -67,7 +67,7 @@ internal sealed class ShenJiangWeiSelection : IProgramSelectionCandidateFilter
 
 internal static class ShenJiangWeiComposition
 {
-    internal const string Tianren = "anniversary:tianren", Jiufa = "anniversary:jiufa", Pingxiang = "anniversary:pingxiang";
+    internal const string Tianren = "anniversary:tianren",Jiufa = "anniversary:jiufa",Pingxiang = "anniversary:pingxiang";
     [ProgramCatalogValidation(38400)] internal static void Validate(string path, SkillProgram p)
     {
         static bool Owned(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveShenJiangWeiTianren or SkillProgramEffectOp.ResolveShenJiangWeiJiufa or SkillProgramEffectOp.ResolveShenJiangWeiPingxiang;

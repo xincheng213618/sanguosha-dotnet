@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineNamedCardAcquisitionsRuntime
+{
+    private readonly ICoreNamedCardAcquisitionsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreNamedCardAcquisitionsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNamedCardAcquisitionsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNamedCardAcquisitionsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreNamedCardAcquisitionsCoreFireTargetBenefitsOperations _coreFireTargetBenefitsOperations;
+    private readonly ICoreNamedCardAcquisitionsCoreNamedAcquisitionObserversOperations _coreNamedAcquisitionObserversOperations;
+    private readonly ICoreNamedCardAcquisitionsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreNamedCardAcquisitionsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreNamedCardAcquisitionsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreNamedCardAcquisitionsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreNamedCardAcquisitionsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNamedCardAcquisitionsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNamedCardAcquisitionsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineNamedCardAcquisitionsRuntime(ICoreNamedCardAcquisitionsCardZonesOperations cardZonesOperations, ICoreNamedCardAcquisitionsContentRegistryOperations contentRegistryOperations, ICoreNamedCardAcquisitionsResolutionStackOperations resolutionStackOperations, ICoreNamedCardAcquisitionsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreNamedCardAcquisitionsCoreFireTargetBenefitsOperations coreFireTargetBenefitsOperations, ICoreNamedCardAcquisitionsCoreNamedAcquisitionObserversOperations coreNamedAcquisitionObserversOperations, ICoreNamedCardAcquisitionsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreNamedCardAcquisitionsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreNamedCardAcquisitionsCoreRuntimeOperations coreRuntimeOperations, ICoreNamedCardAcquisitionsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreNamedCardAcquisitionsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNamedCardAcquisitionsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNamedCardAcquisitionsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreFireTargetBenefitsOperations = coreFireTargetBenefitsOperations;
+        this._coreNamedAcquisitionObserversOperations = coreNamedAcquisitionObserversOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

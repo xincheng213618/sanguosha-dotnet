@@ -1,0 +1,70 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineMantianGuohaiRuntime
+{
+    private readonly ICoreMantianGuohaiCardZonesOperations _cardZonesOperations;
+    private readonly ICoreMantianGuohaiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreMantianGuohaiResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreMantianGuohaiCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreMantianGuohaiCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreMantianGuohaiCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreMantianGuohaiCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreMantianGuohaiCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreMantianGuohaiCoreExtraCardEffectRoundsOperations _coreExtraCardEffectRoundsOperations;
+    private readonly ICoreMantianGuohaiCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreMantianGuohaiCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreMantianGuohaiCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreMantianGuohaiCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreMantianGuohaiCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreMantianGuohaiCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
+    private readonly ICoreMantianGuohaiCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreMantianGuohaiCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreMantianGuohaiCoreNativeTrickEffectsOperations _coreNativeTrickEffectsOperations;
+    private readonly ICoreMantianGuohaiCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreMantianGuohaiCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreMantianGuohaiCoreProgramTargetRulesOperations _coreProgramTargetRulesOperations;
+    private readonly ICoreMantianGuohaiCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreMantianGuohaiCoreTrustedCardZoneDiagnosticsOperations _coreTrustedCardZoneDiagnosticsOperations;
+    private readonly ICoreMantianGuohaiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    internal CoreGameEngineMantianGuohaiRuntime(ICoreMantianGuohaiCardZonesOperations cardZonesOperations, ICoreMantianGuohaiContentRegistryOperations contentRegistryOperations, ICoreMantianGuohaiResolutionStackOperations resolutionStackOperations, ICoreMantianGuohaiCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreMantianGuohaiCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreMantianGuohaiCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreMantianGuohaiCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreMantianGuohaiCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreMantianGuohaiCoreExtraCardEffectRoundsOperations coreExtraCardEffectRoundsOperations, ICoreMantianGuohaiCoreRuntimeOperations coreRuntimeOperations, ICoreMantianGuohaiCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreMantianGuohaiCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreMantianGuohaiCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreMantianGuohaiCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreMantianGuohaiCoreNativeLegalActionsOperations coreNativeLegalActionsOperations, ICoreMantianGuohaiCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreMantianGuohaiCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreMantianGuohaiCoreNativeTrickEffectsOperations coreNativeTrickEffectsOperations, ICoreMantianGuohaiCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreMantianGuohaiCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreMantianGuohaiCoreProgramTargetRulesOperations coreProgramTargetRulesOperations, ICoreMantianGuohaiCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreMantianGuohaiCoreTrustedCardZoneDiagnosticsOperations coreTrustedCardZoneDiagnosticsOperations, ICoreMantianGuohaiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreExtraCardEffectRoundsOperations = coreExtraCardEffectRoundsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativeTrickEffectsOperations = coreNativeTrickEffectsOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramTargetRulesOperations = coreProgramTargetRulesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTrustedCardZoneDiagnosticsOperations = coreTrustedCardZoneDiagnosticsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess = coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    }
+}

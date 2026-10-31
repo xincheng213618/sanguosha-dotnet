@@ -1,0 +1,100 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeQinglongRuntime
+{
+    private readonly ICoreNativeQinglongCharacterCaoZhiLeOperations _characterCaoZhiLeOperations;
+    private readonly ICoreNativeQinglongCharacterChengJiChengCuiOlOperations _characterChengJiChengCuiOlOperations;
+    private readonly ICoreNativeQinglongCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
+    private readonly ICoreNativeQinglongCharacterGuoTuOlOperations _characterGuoTuOlOperations;
+    private readonly ICoreNativeQinglongCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICoreNativeQinglongCharacterLiuFengBoundaryOperations _characterLiuFengBoundaryOperations;
+    private readonly ICoreNativeQinglongCharacterLiuZhangOlOperations _characterLiuZhangOlOperations;
+    private readonly ICoreNativeQinglongCharacterMaXiuMaTieOlOperations _characterMaXiuMaTieOlOperations;
+    private readonly ICoreNativeQinglongCharacterMiHengLeOperations _characterMiHengLeOperations;
+    private readonly ICoreNativeQinglongCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreNativeQinglongCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreNativeQinglongCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreNativeQinglongCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreNativeQinglongCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreNativeQinglongCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreNativeQinglongCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreNativeQinglongCoreChainedStateBasicConversionsOperations _coreChainedStateBasicConversionsOperations;
+    private readonly ICoreNativeQinglongCoreDrawFundedDistinctBasicOffersOperations _coreDrawFundedDistinctBasicOffersOperations;
+    private readonly ICoreNativeQinglongCoreFinalTargetSlashOperations _coreFinalTargetSlashOperations;
+    private readonly ICoreNativeQinglongCoreOwnPublicPileConversionsOperations _coreOwnPublicPileConversionsOperations;
+    private readonly ICoreNativeQinglongCoreProgramCardUseRulesOperations _coreProgramCardUseRulesOperations;
+    private readonly ICoreNativeQinglongCoreProgramFactionPoliciesOperations _coreProgramFactionPoliciesOperations;
+    private readonly ICoreNativeQinglongCoreQinglongInsertionOperations _coreQinglongInsertionOperations;
+    private readonly ICoreNativeQinglongCoreRequestedDeckBasicsOperations _coreRequestedDeckBasicsOperations;
+    private readonly ICoreNativeQinglongCoreRoundOnceCardlessNativeUsesOperations _coreRoundOnceCardlessNativeUsesOperations;
+    private readonly ICoreNativeQinglongCoreTieredRoundZeroUsesOperations _coreTieredRoundZeroUsesOperations;
+    private readonly ICoreNativeQinglongCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeQinglongCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreNativeQinglongCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreNativeQinglongCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeQinglongCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreNativeQinglongCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreNativeQinglongCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreNativeQinglongCoreNativeEquipmentInvocationsOperations _coreNativeEquipmentInvocationsOperations;
+    private readonly ICoreNativeQinglongCoreNativeFactionSlashOperations _coreNativeFactionSlashOperations;
+    private readonly ICoreNativeQinglongCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreNativeQinglongCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreNativeQinglongCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeQinglongCoreProgramCardLegalityOperations _coreProgramCardLegalityOperations;
+    private readonly ICoreNativeQinglongKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreNativeQinglongKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeQinglongRuntime(ICoreNativeQinglongCharacterCaoZhiLeOperations characterCaoZhiLeOperations, ICoreNativeQinglongCharacterChengJiChengCuiOlOperations characterChengJiChengCuiOlOperations, ICoreNativeQinglongCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICoreNativeQinglongCharacterGuoTuOlOperations characterGuoTuOlOperations, ICoreNativeQinglongCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICoreNativeQinglongCharacterLiuFengBoundaryOperations characterLiuFengBoundaryOperations, ICoreNativeQinglongCharacterLiuZhangOlOperations characterLiuZhangOlOperations, ICoreNativeQinglongCharacterMaXiuMaTieOlOperations characterMaXiuMaTieOlOperations, ICoreNativeQinglongCharacterMiHengLeOperations characterMiHengLeOperations, ICoreNativeQinglongCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreNativeQinglongCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativeQinglongCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreNativeQinglongCoreActionQueriesOperations coreActionQueriesOperations, ICoreNativeQinglongCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreNativeQinglongCoreCardConversionsOperations coreCardConversionsOperations, ICoreNativeQinglongCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreNativeQinglongCoreChainedStateBasicConversionsOperations coreChainedStateBasicConversionsOperations, ICoreNativeQinglongCoreDrawFundedDistinctBasicOffersOperations coreDrawFundedDistinctBasicOffersOperations, ICoreNativeQinglongCoreFinalTargetSlashOperations coreFinalTargetSlashOperations, ICoreNativeQinglongCoreOwnPublicPileConversionsOperations coreOwnPublicPileConversionsOperations, ICoreNativeQinglongCoreProgramCardUseRulesOperations coreProgramCardUseRulesOperations, ICoreNativeQinglongCoreProgramFactionPoliciesOperations coreProgramFactionPoliciesOperations, ICoreNativeQinglongCoreQinglongInsertionOperations coreQinglongInsertionOperations, ICoreNativeQinglongCoreRequestedDeckBasicsOperations coreRequestedDeckBasicsOperations, ICoreNativeQinglongCoreRoundOnceCardlessNativeUsesOperations coreRoundOnceCardlessNativeUsesOperations, ICoreNativeQinglongCoreTieredRoundZeroUsesOperations coreTieredRoundZeroUsesOperations, ICoreNativeQinglongCoreMatchLogOperations coreMatchLogOperations, ICoreNativeQinglongCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreNativeQinglongCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreNativeQinglongCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeQinglongCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreNativeQinglongCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreNativeQinglongCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreNativeQinglongCoreNativeEquipmentInvocationsOperations coreNativeEquipmentInvocationsOperations, ICoreNativeQinglongCoreNativeFactionSlashOperations coreNativeFactionSlashOperations, ICoreNativeQinglongCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreNativeQinglongCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreNativeQinglongCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeQinglongCoreProgramCardLegalityOperations coreProgramCardLegalityOperations, ICoreNativeQinglongKernelCoreMainOperations kernelCoreMainOperations, ICoreNativeQinglongKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCaoZhiLeOperations = characterCaoZhiLeOperations;
+        this._characterChengJiChengCuiOlOperations = characterChengJiChengCuiOlOperations;
+        this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
+        this._characterGuoTuOlOperations = characterGuoTuOlOperations;
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._characterLiuFengBoundaryOperations = characterLiuFengBoundaryOperations;
+        this._characterLiuZhangOlOperations = characterLiuZhangOlOperations;
+        this._characterMaXiuMaTieOlOperations = characterMaXiuMaTieOlOperations;
+        this._characterMiHengLeOperations = characterMiHengLeOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreChainedStateBasicConversionsOperations = coreChainedStateBasicConversionsOperations;
+        this._coreDrawFundedDistinctBasicOffersOperations = coreDrawFundedDistinctBasicOffersOperations;
+        this._coreFinalTargetSlashOperations = coreFinalTargetSlashOperations;
+        this._coreOwnPublicPileConversionsOperations = coreOwnPublicPileConversionsOperations;
+        this._coreProgramCardUseRulesOperations = coreProgramCardUseRulesOperations;
+        this._coreProgramFactionPoliciesOperations = coreProgramFactionPoliciesOperations;
+        this._coreQinglongInsertionOperations = coreQinglongInsertionOperations;
+        this._coreRequestedDeckBasicsOperations = coreRequestedDeckBasicsOperations;
+        this._coreRoundOnceCardlessNativeUsesOperations = coreRoundOnceCardlessNativeUsesOperations;
+        this._coreTieredRoundZeroUsesOperations = coreTieredRoundZeroUsesOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeEquipmentInvocationsOperations = coreNativeEquipmentInvocationsOperations;
+        this._coreNativeFactionSlashOperations = coreNativeFactionSlashOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreProgramCardLegalityOperations = coreProgramCardLegalityOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

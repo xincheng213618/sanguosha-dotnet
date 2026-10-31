@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineUniqueLeaderTrickTargetsRuntime : global::CardGame.Core.IUniqueLeaderTrickTargetHost
+{
+    private readonly ICoreUniqueLeaderTrickTargetsCharacterMiHengLeOperations _characterMiHengLeOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreGrantedEntityPhasesOperations _coreGrantedEntityPhasesOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreJoinedTrickDamageRewardsOperations _coreJoinedTrickDamageRewardsOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreProvenanceCardPoliciesOperations _coreProvenanceCardPoliciesOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreNativeBorrowedSwordOperations _coreNativeBorrowedSwordOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreUniqueLeaderTrickTargetsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineUniqueLeaderTrickTargetsRuntime(ICoreUniqueLeaderTrickTargetsCharacterMiHengLeOperations characterMiHengLeOperations, ICoreUniqueLeaderTrickTargetsContentRegistryOperations contentRegistryOperations, ICoreUniqueLeaderTrickTargetsResolutionStackOperations resolutionStackOperations, ICoreUniqueLeaderTrickTargetsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreUniqueLeaderTrickTargetsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreUniqueLeaderTrickTargetsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreUniqueLeaderTrickTargetsCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICoreUniqueLeaderTrickTargetsCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreUniqueLeaderTrickTargetsCoreGrantedEntityPhasesOperations coreGrantedEntityPhasesOperations, ICoreUniqueLeaderTrickTargetsCoreHandComparisonOperations coreHandComparisonOperations, ICoreUniqueLeaderTrickTargetsCoreJoinedTrickDamageRewardsOperations coreJoinedTrickDamageRewardsOperations, ICoreUniqueLeaderTrickTargetsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreUniqueLeaderTrickTargetsCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICoreUniqueLeaderTrickTargetsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreUniqueLeaderTrickTargetsCoreProvenanceCardPoliciesOperations coreProvenanceCardPoliciesOperations, ICoreUniqueLeaderTrickTargetsCoreRuntimeOperations coreRuntimeOperations, ICoreUniqueLeaderTrickTargetsCoreNativeBorrowedSwordOperations coreNativeBorrowedSwordOperations, ICoreUniqueLeaderTrickTargetsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreUniqueLeaderTrickTargetsCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreUniqueLeaderTrickTargetsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreUniqueLeaderTrickTargetsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreUniqueLeaderTrickTargetsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreUniqueLeaderTrickTargetsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterMiHengLeOperations = characterMiHengLeOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreGrantedEntityPhasesOperations = coreGrantedEntityPhasesOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._coreJoinedTrickDamageRewardsOperations = coreJoinedTrickDamageRewardsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProvenanceCardPoliciesOperations = coreProvenanceCardPoliciesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeBorrowedSwordOperations = coreNativeBorrowedSwordOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

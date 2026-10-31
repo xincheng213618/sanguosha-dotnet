@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramRepeatedJudgmentRuntime
+{
+    private readonly ICoreProgramRepeatedJudgmentCharacterZhangQiYingOlOperations _characterZhangQiYingOlOperations;
+    private readonly ICoreProgramRepeatedJudgmentCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramRepeatedJudgmentResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramRepeatedJudgmentCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreProgramRepeatedJudgmentCoreExactRepeatedJudgmentOperations _coreExactRepeatedJudgmentOperations;
+    private readonly ICoreProgramRepeatedJudgmentCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramRepeatedJudgmentCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramRepeatedJudgmentCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreProgramRepeatedJudgmentCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreProgramRepeatedJudgmentCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreProgramRepeatedJudgmentCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreProgramRepeatedJudgmentCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreProgramRepeatedJudgmentKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreProgramRepeatedJudgmentKernelCoreGameEngineRuntimeOperations _kernelCoreGameEngineRuntimeOperations;
+    private readonly ICoreProgramRepeatedJudgmentKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramRepeatedJudgmentRuntime(ICoreProgramRepeatedJudgmentCharacterZhangQiYingOlOperations characterZhangQiYingOlOperations, ICoreProgramRepeatedJudgmentCardZonesOperations cardZonesOperations, ICoreProgramRepeatedJudgmentResolutionStackOperations resolutionStackOperations, ICoreProgramRepeatedJudgmentCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreProgramRepeatedJudgmentCoreExactRepeatedJudgmentOperations coreExactRepeatedJudgmentOperations, ICoreProgramRepeatedJudgmentCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramRepeatedJudgmentCoreRuntimeOperations coreRuntimeOperations, ICoreProgramRepeatedJudgmentCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreProgramRepeatedJudgmentCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreProgramRepeatedJudgmentCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreProgramRepeatedJudgmentCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreProgramRepeatedJudgmentCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreProgramRepeatedJudgmentKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreProgramRepeatedJudgmentKernelCoreGameEngineRuntimeOperations kernelCoreGameEngineRuntimeOperations, ICoreProgramRepeatedJudgmentKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterZhangQiYingOlOperations = characterZhangQiYingOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreExactRepeatedJudgmentOperations = coreExactRepeatedJudgmentOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreGameEngineRuntimeOperations = kernelCoreGameEngineRuntimeOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

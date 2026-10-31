@@ -1,0 +1,10 @@
+#nullable enable
+using System.Globalization;
+
+namespace CardGame.Core.NativeOwners;
+internal sealed class UniqueLeaderTrickTargetCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineUniqueLeaderTrickTargetsEntries> getCoreGameEngineUniqueLeaderTrickTargetsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineJoinedTrickDamageRewardsEntries> getCoreGameEngineJoinedTrickDamageRewardsRuntime) : IUniqueLeaderTrickTargetHost
+{
+    public SkillProgramStepOutcome OfferUniqueLargestHandTrickTargetAddition(ProgramSkillFrame frame) => getCoreGameEngineUniqueLeaderTrickTargetsRuntime().OfferUniqueLeaderTrickTarget(frame, SkillProgramEffectOp.OfferUniqueLargestHandTrickTargetAddition);
+    public SkillProgramStepOutcome JoinUniqueLargestHpTrickTargetAndDrawAfterDamage(ProgramSkillFrame frame) => getCoreGameEngineUniqueLeaderTrickTargetsRuntime().OfferUniqueLeaderTrickTarget(frame, SkillProgramEffectOp.JoinUniqueLargestHpTrickTargetAndDrawAfterDamage);
+    public SkillProgramStepOutcome DrawAfterJoinedTrickDamage(ProgramSkillFrame frame) => getCoreGameEngineJoinedTrickDamageRewardsRuntime().BeginJoinedTrickDamageReward(frame);
+}

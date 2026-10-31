@@ -1,0 +1,12 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterCaoHongMouEntries
+{
+    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterCaoHongMouRuntime> _resolve;
+    private CharacterCaoHongMouEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterCaoHongMouRuntime> resolve)
+    {
+        _resolve = resolve;
+    }
+
+    internal static CharacterCaoHongMouEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterCaoHongMouRuntime> resolve) => new(resolve);
+}

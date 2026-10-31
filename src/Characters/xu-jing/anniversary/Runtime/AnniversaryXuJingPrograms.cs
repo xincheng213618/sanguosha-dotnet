@@ -45,7 +45,7 @@ public sealed partial record ProgramSkillFrame
 
 internal static class AnniversaryXuJingComposition
 {
-    internal const string Shangyu = "anniversary:shangyu", Caixia = "anniversary:caixia";
+    internal const string Shangyu = "anniversary:shangyu",Caixia = "anniversary:caixia";
     [ProgramCatalogValidation(43100)] internal static void Validate(string path, SkillProgram program)
     {
         if (!program.Triggers.SelectMany(t => t.Effects).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryXuJingShangyu or SkillProgramEffectOp.ResolveAnniversaryXuJingCaixia)) return;

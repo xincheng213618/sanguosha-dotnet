@@ -45,7 +45,7 @@ internal static class SunYuanChecks
     private static ProgramSkillFrame? Own(GameEngine g)=>g.ResolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f=>f.SunYuan is not null);
     private static bool At(GameEngine g,string skill)=>P(g)?.SkillPrompt?.SkillId==skill;
     private static void Need(bool ok,string why){if(!ok)throw new InvalidOperationException("scene="+Scene+" "+why);}
-    private static T Query<T>(GameEngine g,string method,params object[] args)=>(T)(typeof(GameEngine).GetMethod(method,BindingFlags.Instance|BindingFlags.NonPublic)?.Invoke(g,args)??throw new InvalidOperationException("Missing exact native query "+method));
+    private static T Query<T>(GameEngine g,string method,params object[] args)=>(T)(global::FixtureRuntimeAccess.Engine.GetMethod(method,BindingFlags.Instance|BindingFlags.NonPublic)?.Invoke(g,args)??throw new InvalidOperationException("Missing exact native query "+method));
     private static void Accept(GameEngine g,GameCommand command){var result=g.Submit(CommandJson.Deserialize(CommandJson.Serialize([command])).Single());Need(result.Accepted,result.Error?.Message??"Rejected native Sun Yuan command.");}
     private static void Answer(GameEngine g,Func<PromptChoice,bool> predicate){var p=P(g)!;var choice=p.Choices.FirstOrDefault(predicate);Need(choice is not null,"No genuine choice matched: "+Diagnostic(g));Accept(g,new AnswerPromptCommand(p.PlayerSeat,p.PromptId,choice!.Id,g.Revision));}
     private static void Continue(GameEngine g)=>Answer(g,c=>c.Parameters.GetValueOrDefault("option-id")=="continue");

@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 
 internal interface IMobileDianWeiProgramHost { void ConsumeTarget(ProgramSkillFrame frame); }
-internal static class MobileDianWeiQiangxi { internal const string Skill = "boundary:qiangxi-mobile", Ledger = "mobile-qiangxi"; }
+internal static class MobileDianWeiQiangxi { internal const string Skill = "boundary:qiangxi-mobile",Ledger = "mobile-qiangxi"; }
 internal sealed class ConsumeMobileQiangxiTargetDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ConsumeMobileQiangxiTarget;

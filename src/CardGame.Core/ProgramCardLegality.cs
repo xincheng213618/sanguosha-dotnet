@@ -269,27 +269,7 @@ internal sealed class ProgramCardLegality
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramCardLegalityCatalog> CardLegalityMetadata = new(() =>
-        ProgramCardLegalityCatalog.Discover(RuntimeModuleMethods), true);
     private ProgramCardLegality? _cardLegality;
-    private ProgramCardLegality CardLegality => _cardLegality ??= new(CardLegalityMetadata.Value,
+    private ProgramCardLegality CardLegality => _cardLegality ??= new(global::CardGame.Core.EngineOwners.CoreProgramCardLegalityDefinitions.CardLegalityMetadata.Value,
         BindRuntimeHandler);
-
-    private bool IsProgramMaterialUseForbidden(int actorSeat, CardKind kind, IEnumerable<int> cardIds, bool response = false) =>
-        CardLegality.IsMaterialForbidden(new(actorSeat, kind, cardIds, response));
-
-    private bool IsProgramViewAsAllowed(CharacterState owner, CardKind kind, IReadOnlyList<int> cardIds,
-        CardConversionSource source, bool forResponse, bool dyingUse = false, int? requestedUseTarget = null) =>
-        IsMobileYuanShaoViewAsAllowed(owner, cardIds, source) &&
-        !CardLegality.IsViewAsForbidden(new(owner, kind, cardIds, source, forResponse, dyingUse, requestedUseTarget));
-
-    private bool IsProgramHandPhysicalRestricted(int actorSeat, int cardId) =>
-        CardLegality.IsPhysicalForbidden(ProgramCardLegalityStage.HandPhysicalBan, actorSeat, cardId);
-
-    private bool IsProgramEntityPhysicalRestricted(int actorSeat, int cardId) =>
-        CardLegality.IsPhysicalForbidden(ProgramCardLegalityStage.EntityPhysicalBan, actorSeat, cardId);
-
-    private bool IsProgramNativeResponseAllowed(CharacterState provider, CardKind kind, IReadOnlyList<int> cardIds,
-        CardConversionSource? source = null, bool dyingUse = false) =>
-        !CardLegality.IsNativeResponseForbidden(new(provider, kind, cardIds, source, dyingUse));
 }

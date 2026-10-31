@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineFinalTargetGiftsRuntime : global::CardGame.Core.IFinalTargetGiftHost
+{
+    private readonly ICoreFinalTargetGiftsCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreFinalTargetGiftsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreFinalTargetGiftsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreFinalTargetGiftsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFinalTargetGiftsCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreFinalTargetGiftsCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreFinalTargetGiftsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreFinalTargetGiftsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreFinalTargetGiftsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreFinalTargetGiftsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreFinalTargetGiftsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreFinalTargetGiftsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreFinalTargetGiftsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreFinalTargetGiftsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreFinalTargetGiftsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineFinalTargetGiftsRuntime(ICoreFinalTargetGiftsCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreFinalTargetGiftsCardZonesOperations cardZonesOperations, ICoreFinalTargetGiftsContentRegistryOperations contentRegistryOperations, ICoreFinalTargetGiftsResolutionStackOperations resolutionStackOperations, ICoreFinalTargetGiftsCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreFinalTargetGiftsCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreFinalTargetGiftsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreFinalTargetGiftsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreFinalTargetGiftsCoreRuntimeOperations coreRuntimeOperations, ICoreFinalTargetGiftsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreFinalTargetGiftsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreFinalTargetGiftsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreFinalTargetGiftsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreFinalTargetGiftsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreFinalTargetGiftsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

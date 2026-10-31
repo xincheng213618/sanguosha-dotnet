@@ -1,0 +1,70 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineCurrentUsePhysicalClaimsRuntime : global::CardGame.Core.ICurrentUsePhysicalClaimProgramHost
+{
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterChengJiChengCuiOlOperations _characterChengJiChengCuiOlOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterCuiLieAnniversaryOperations _characterCuiLieAnniversaryOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterDongChengMouOperations _characterDongChengMouOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterHuCheErAnniversaryOperations _characterHuCheErAnniversaryOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterHuaManOlOperations _characterHuaManOlOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterPangDeBoundaryMobileOperations _characterPangDeBoundaryMobileOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterXiangChongOlOperations _characterXiangChongOlOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterXinPiOlOperations _characterXinPiOlOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterXuRongOlOperations _characterXuRongOlOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterYanYanBoundaryMobileOperations _characterYanYanBoundaryMobileOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCharacterZhouCangBoundaryMobileOperations _characterZhouCangBoundaryMobileOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCoreExtraEffectMaterialClaimsOperations _coreExtraEffectMaterialClaimsOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCoreOverflowTargetCancellationOperations _coreOverflowTargetCancellationOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCoreResponseEntityExchangeOperations _coreResponseEntityExchangeOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCoreShanheNullifiedTrickClaimsOperations _coreShanheNullifiedTrickClaimsOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCoreSourceDingxiNativeOperations _coreSourceDingxiNativeOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreCurrentUsePhysicalClaimsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess _coreCommandJournalStorageEventsPendingEventsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineCurrentUsePhysicalClaimsRuntime(ICoreCurrentUsePhysicalClaimsCharacterChengJiChengCuiOlOperations characterChengJiChengCuiOlOperations, ICoreCurrentUsePhysicalClaimsCharacterCuiLieAnniversaryOperations characterCuiLieAnniversaryOperations, ICoreCurrentUsePhysicalClaimsCharacterDongChengMouOperations characterDongChengMouOperations, ICoreCurrentUsePhysicalClaimsCharacterHuCheErAnniversaryOperations characterHuCheErAnniversaryOperations, ICoreCurrentUsePhysicalClaimsCharacterHuaManOlOperations characterHuaManOlOperations, ICoreCurrentUsePhysicalClaimsCharacterPangDeBoundaryMobileOperations characterPangDeBoundaryMobileOperations, ICoreCurrentUsePhysicalClaimsCharacterXiangChongOlOperations characterXiangChongOlOperations, ICoreCurrentUsePhysicalClaimsCharacterXinPiOlOperations characterXinPiOlOperations, ICoreCurrentUsePhysicalClaimsCharacterXuRongOlOperations characterXuRongOlOperations, ICoreCurrentUsePhysicalClaimsCharacterYanYanBoundaryMobileOperations characterYanYanBoundaryMobileOperations, ICoreCurrentUsePhysicalClaimsCharacterZhouCangBoundaryMobileOperations characterZhouCangBoundaryMobileOperations, ICoreCurrentUsePhysicalClaimsCardZonesOperations cardZonesOperations, ICoreCurrentUsePhysicalClaimsContentRegistryOperations contentRegistryOperations, ICoreCurrentUsePhysicalClaimsResolutionStackOperations resolutionStackOperations, ICoreCurrentUsePhysicalClaimsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreCurrentUsePhysicalClaimsCoreExtraEffectMaterialClaimsOperations coreExtraEffectMaterialClaimsOperations, ICoreCurrentUsePhysicalClaimsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreCurrentUsePhysicalClaimsCoreOverflowTargetCancellationOperations coreOverflowTargetCancellationOperations, ICoreCurrentUsePhysicalClaimsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreCurrentUsePhysicalClaimsCoreResponseEntityExchangeOperations coreResponseEntityExchangeOperations, ICoreCurrentUsePhysicalClaimsCoreRuntimeOperations coreRuntimeOperations, ICoreCurrentUsePhysicalClaimsCoreShanheNullifiedTrickClaimsOperations coreShanheNullifiedTrickClaimsOperations, ICoreCurrentUsePhysicalClaimsCoreSourceDingxiNativeOperations coreSourceDingxiNativeOperations, ICoreCurrentUsePhysicalClaimsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreCurrentUsePhysicalClaimsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess coreCommandJournalStorageEventsPendingEventsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterChengJiChengCuiOlOperations = characterChengJiChengCuiOlOperations;
+        this._characterCuiLieAnniversaryOperations = characterCuiLieAnniversaryOperations;
+        this._characterDongChengMouOperations = characterDongChengMouOperations;
+        this._characterHuCheErAnniversaryOperations = characterHuCheErAnniversaryOperations;
+        this._characterHuaManOlOperations = characterHuaManOlOperations;
+        this._characterPangDeBoundaryMobileOperations = characterPangDeBoundaryMobileOperations;
+        this._characterXiangChongOlOperations = characterXiangChongOlOperations;
+        this._characterXinPiOlOperations = characterXinPiOlOperations;
+        this._characterXuRongOlOperations = characterXuRongOlOperations;
+        this._characterYanYanBoundaryMobileOperations = characterYanYanBoundaryMobileOperations;
+        this._characterZhouCangBoundaryMobileOperations = characterZhouCangBoundaryMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreExtraEffectMaterialClaimsOperations = coreExtraEffectMaterialClaimsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOverflowTargetCancellationOperations = coreOverflowTargetCancellationOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreResponseEntityExchangeOperations = coreResponseEntityExchangeOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheNullifiedTrickClaimsOperations = coreShanheNullifiedTrickClaimsOperations;
+        this._coreSourceDingxiNativeOperations = coreSourceDingxiNativeOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCommandJournalStorageEventsPendingEventsAccess = coreCommandJournalStorageEventsPendingEventsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

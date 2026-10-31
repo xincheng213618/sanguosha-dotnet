@@ -29,34 +29,4 @@ public sealed class DrawAllHandSelectedBonusProgramHandler : ISkillProgramEffect
 
 public sealed partial class GameEngine
 {
-    private bool BypassesSlashLimitBySuit(CharacterState owner, Card card, CardKind effectiveKind) =>
-        IsSlashCard(effectiveKind) && HasTurnSlashSuitAllowance(owner.Seat, EffectiveSuit(owner, card)) ||
-        HasPhaseSuitAllowance(owner,card) || CardPolicies(owner, SkillProgramCardPolicyKind.BypassSlashLimitBySuit, effectiveKind)
-            .Any(item => item.Policy.InputSuit == EffectiveSuit(owner, card));
-    private bool CanUsePeachToRescue(int responderSeat, int victimSeat) =>
-        IsMouLuMengPeachRescueAllowed(responderSeat) && AllowsHappySimaPeach(responderSeat) &&
-        !(responderSeat == victimSeat && HasSelfCardTargetProhibition(responderSeat)) &&
-        !(responderSeat != victimSeat &&
-          HasCardPolicy(_players[victimSeat], SkillProgramCardPolicyKind.DyingSelfRescueOnly, CardKind.Peach)) &&
-        (responderSeat == _currentSeat || responderSeat == victimSeat ||
-        !_players[_currentSeat].IsAlive ||
-        !HasCardPolicy(_players[_currentSeat], SkillProgramCardPolicyKind.ExclusiveDyingPeachRescue, CardKind.Peach));
-
-    private sealed partial class ProgramSkillHost
-    {
-        public void DrawAllHandSelectedBonus(ProgramSkillFrame frame, int amount)
-        {
-            if (frame.SelectedAllOwnerHandCards is not true) return;
-            engine.DrawProgramCards(frame.Id, frame.OwnerSeat, amount, null, null,
-                SkillProgramCardSetVisibility.Private,
-                new CardMoveReason($"skill-program.{frame.SkillId}.{frame.ActivationId}.all-hand-bonus"));
-        }
-    }
-}
-
-public sealed partial class GameEngine
-{
-    [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaAfterLimit, 90)]
-    private bool SuitSlashQuotaAfterLimit(ProgramSlashQuotaQuery query) =>
-        query.PhysicalCard is not null && BypassesSlashLimitBySuit(query.Actor, query.PhysicalCard, query.Kind);
 }

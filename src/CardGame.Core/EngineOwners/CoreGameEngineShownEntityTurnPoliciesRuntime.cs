@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShownEntityTurnPoliciesRuntime : global::CardGame.Core.IShownEntityTurnPolicyHost
+{
+    private readonly ICoreShownEntityTurnPoliciesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreShownEntityTurnPoliciesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShownEntityTurnPoliciesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShownEntityTurnPoliciesTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreShownEntityTurnPoliciesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreShownEntityTurnPoliciesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreShownEntityTurnPoliciesCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreShownEntityTurnPoliciesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreShownEntityTurnPoliciesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShownEntityTurnPoliciesCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreShownEntityTurnPoliciesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShownEntityTurnPoliciesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreShownEntityTurnPoliciesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShownEntityTurnPoliciesRuntime(ICoreShownEntityTurnPoliciesCardZonesOperations cardZonesOperations, ICoreShownEntityTurnPoliciesContentRegistryOperations contentRegistryOperations, ICoreShownEntityTurnPoliciesResolutionStackOperations resolutionStackOperations, ICoreShownEntityTurnPoliciesTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreShownEntityTurnPoliciesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreShownEntityTurnPoliciesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreShownEntityTurnPoliciesCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreShownEntityTurnPoliciesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreShownEntityTurnPoliciesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShownEntityTurnPoliciesCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreShownEntityTurnPoliciesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShownEntityTurnPoliciesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreShownEntityTurnPoliciesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

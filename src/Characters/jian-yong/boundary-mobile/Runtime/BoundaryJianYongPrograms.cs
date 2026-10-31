@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 internal static class BoundaryJianYongComposition
 {
-    internal const string Qiaoshui="boundary:qiaoshui-mobile", Zongshi="boundary:zongshih-mobile";
+    internal const string Qiaoshui="boundary:qiaoshui-mobile",Zongshi="boundary:zongshih-mobile";
     [ProgramCatalogValidation(56500)] internal static void Validate(string path,SkillProgram p)
     {
         if(p.Id==Qiaoshui && (p.Activations is not [{UsesPerPhase:1,Effects:[{Op:SkillProgramEffectOp.Pindian},{Op:SkillProgramEffectOp.GrantNextActualUseTargetAdjustment},{Op:SkillProgramEffectOp.SetBooleanState},{Op:SkillProgramEffectOp.RecordBoundaryJianYongQiaoshuiFailure}]}] ||

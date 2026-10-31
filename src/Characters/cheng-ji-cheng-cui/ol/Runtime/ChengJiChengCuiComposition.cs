@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class ChengJiChengCuiComposition
 {
-    internal const string Tousui = "ol:tousui", Xuming = "ol:xuming";
+    internal const string Tousui = "ol:tousui",Xuming = "ol:xuming";
     internal static bool IsBottomCostSlash(SkillProgramViewAs r) =>
         r.CostDestination == SkillProgramCardDestination.DrawPileBottom && r.VariableInputCount && r.InputCount == 1 &&
         r.SourceZones.SequenceEqual([CardZoneKind.Hand, CardZoneKind.Equipment]) && r.OutputKind == CardKind.Slash &&

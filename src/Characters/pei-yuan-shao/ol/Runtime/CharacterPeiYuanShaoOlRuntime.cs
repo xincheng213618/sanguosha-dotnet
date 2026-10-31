@@ -1,0 +1,90 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterPeiYuanShaoOlRuntime : global::CardGame.Core.IPeiYuanShaoHost
+{
+    private readonly ICharacterPeiYuanShaoOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterPeiYuanShaoOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterPeiYuanShaoOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreAssistedPhysicalCardsOperations _coreAssistedPhysicalCardsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreCompletedCategoryUseProofOperations _coreCompletedCategoryUseProofOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterPeiYuanShaoOlCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreProgramSlashRequestOperations _coreProgramSlashRequestOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreShownEntityTurnPoliciesOperations _coreShownEntityTurnPoliciesOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterPeiYuanShaoOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterPeiYuanShaoOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterPeiYuanShaoOlCharacterPeiYuanShaoOlOperations _characterPeiYuanShaoOlOperations;
+    private readonly ICharacterPeiYuanShaoOlCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterPeiYuanShaoOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterPeiYuanShaoOlRuntime(ICharacterPeiYuanShaoOlCardZonesOperations cardZonesOperations, ICharacterPeiYuanShaoOlContentRegistryOperations contentRegistryOperations, ICharacterPeiYuanShaoOlResolutionStackOperations resolutionStackOperations, ICharacterPeiYuanShaoOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterPeiYuanShaoOlCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterPeiYuanShaoOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterPeiYuanShaoOlCoreAssistedPhysicalCardsOperations coreAssistedPhysicalCardsOperations, ICharacterPeiYuanShaoOlCoreCardActionsOperations coreCardActionsOperations, ICharacterPeiYuanShaoOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterPeiYuanShaoOlCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterPeiYuanShaoOlCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterPeiYuanShaoOlCoreCompletedCategoryUseProofOperations coreCompletedCategoryUseProofOperations, ICharacterPeiYuanShaoOlCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterPeiYuanShaoOlCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterPeiYuanShaoOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterPeiYuanShaoOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterPeiYuanShaoOlCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterPeiYuanShaoOlCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterPeiYuanShaoOlCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterPeiYuanShaoOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterPeiYuanShaoOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterPeiYuanShaoOlCoreProgramSlashRequestOperations coreProgramSlashRequestOperations, ICharacterPeiYuanShaoOlCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterPeiYuanShaoOlCoreRuntimeOperations coreRuntimeOperations, ICharacterPeiYuanShaoOlCoreShownEntityTurnPoliciesOperations coreShownEntityTurnPoliciesOperations, ICharacterPeiYuanShaoOlCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterPeiYuanShaoOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterPeiYuanShaoOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterPeiYuanShaoOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterPeiYuanShaoOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterPeiYuanShaoOlCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterPeiYuanShaoOlCharacterPeiYuanShaoOlOperations characterPeiYuanShaoOlOperations, ICharacterPeiYuanShaoOlCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterPeiYuanShaoOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAssistedPhysicalCardsOperations = coreAssistedPhysicalCardsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreCompletedCategoryUseProofOperations = coreCompletedCategoryUseProofOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramSlashRequestOperations = coreProgramSlashRequestOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShownEntityTurnPoliciesOperations = coreShownEntityTurnPoliciesOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._characterPeiYuanShaoOlOperations = characterPeiYuanShaoOlOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,80 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeHarvestRuntime
+{
+    private readonly ICoreNativeHarvestCharacterDiaoChanLeOperations _characterDiaoChanLeOperations;
+    private readonly ICoreNativeHarvestCharacterLuXunMouMobileOperations _characterLuXunMouMobileOperations;
+    private readonly ICoreNativeHarvestCharacterMiHengLeOperations _characterMiHengLeOperations;
+    private readonly ICoreNativeHarvestCharacterQinLangOlOperations _characterQinLangOlOperations;
+    private readonly ICoreNativeHarvestCharacterTianChouOlOperations _characterTianChouOlOperations;
+    private readonly ICoreNativeHarvestCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreNativeHarvestCharacterXunXuAnniversaryOperations _characterXunXuAnniversaryOperations;
+    private readonly ICoreNativeHarvestCharacterYangBiaoAnniversaryOperations _characterYangBiaoAnniversaryOperations;
+    private readonly ICoreNativeHarvestCharacterZhugeGuoLeOperations _characterZhugeGuoLeOperations;
+    private readonly ICoreNativeHarvestCardZonesOperations _cardZonesOperations;
+    private readonly ICoreNativeHarvestCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreNativeHarvestCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreNativeHarvestCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreNativeHarvestCoreCurrentUsePhysicalClaimsOperations _coreCurrentUsePhysicalClaimsOperations;
+    private readonly ICoreNativeHarvestCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreNativeHarvestCoreExtraCardEffectRoundsOperations _coreExtraCardEffectRoundsOperations;
+    private readonly ICoreNativeHarvestCoreGroupTargetNullificationOperations _coreGroupTargetNullificationOperations;
+    private readonly ICoreNativeHarvestCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreNativeHarvestCoreShanheAlliedTricksOperations _coreShanheAlliedTricksOperations;
+    private readonly ICoreNativeHarvestCoreTieredRoundZeroReturnsOperations _coreTieredRoundZeroReturnsOperations;
+    private readonly ICoreNativeHarvestCoreVirtualOrdinaryTrickUsesOperations _coreVirtualOrdinaryTrickUsesOperations;
+    private readonly ICoreNativeHarvestCoreWushuangTacticRulesOperations _coreWushuangTacticRulesOperations;
+    private readonly ICoreNativeHarvestCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeHarvestCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeHarvestCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreNativeHarvestCoreNativeNullificationFramesOperations _coreNativeNullificationFramesOperations;
+    private readonly ICoreNativeHarvestCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreNativeHarvestCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeHarvestCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNativeHarvestKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreNativeHarvestKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeHarvestRuntime(ICoreNativeHarvestCharacterDiaoChanLeOperations characterDiaoChanLeOperations, ICoreNativeHarvestCharacterLuXunMouMobileOperations characterLuXunMouMobileOperations, ICoreNativeHarvestCharacterMiHengLeOperations characterMiHengLeOperations, ICoreNativeHarvestCharacterQinLangOlOperations characterQinLangOlOperations, ICoreNativeHarvestCharacterTianChouOlOperations characterTianChouOlOperations, ICoreNativeHarvestCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreNativeHarvestCharacterXunXuAnniversaryOperations characterXunXuAnniversaryOperations, ICoreNativeHarvestCharacterYangBiaoAnniversaryOperations characterYangBiaoAnniversaryOperations, ICoreNativeHarvestCharacterZhugeGuoLeOperations characterZhugeGuoLeOperations, ICoreNativeHarvestCardZonesOperations cardZonesOperations, ICoreNativeHarvestCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativeHarvestCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreNativeHarvestCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreNativeHarvestCoreCurrentUsePhysicalClaimsOperations coreCurrentUsePhysicalClaimsOperations, ICoreNativeHarvestCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreNativeHarvestCoreExtraCardEffectRoundsOperations coreExtraCardEffectRoundsOperations, ICoreNativeHarvestCoreGroupTargetNullificationOperations coreGroupTargetNullificationOperations, ICoreNativeHarvestCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreNativeHarvestCoreShanheAlliedTricksOperations coreShanheAlliedTricksOperations, ICoreNativeHarvestCoreTieredRoundZeroReturnsOperations coreTieredRoundZeroReturnsOperations, ICoreNativeHarvestCoreVirtualOrdinaryTrickUsesOperations coreVirtualOrdinaryTrickUsesOperations, ICoreNativeHarvestCoreWushuangTacticRulesOperations coreWushuangTacticRulesOperations, ICoreNativeHarvestCoreMatchLogOperations coreMatchLogOperations, ICoreNativeHarvestCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeHarvestCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreNativeHarvestCoreNativeNullificationFramesOperations coreNativeNullificationFramesOperations, ICoreNativeHarvestCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreNativeHarvestCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeHarvestCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeHarvestKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreNativeHarvestKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDiaoChanLeOperations = characterDiaoChanLeOperations;
+        this._characterLuXunMouMobileOperations = characterLuXunMouMobileOperations;
+        this._characterMiHengLeOperations = characterMiHengLeOperations;
+        this._characterQinLangOlOperations = characterQinLangOlOperations;
+        this._characterTianChouOlOperations = characterTianChouOlOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._characterXunXuAnniversaryOperations = characterXunXuAnniversaryOperations;
+        this._characterYangBiaoAnniversaryOperations = characterYangBiaoAnniversaryOperations;
+        this._characterZhugeGuoLeOperations = characterZhugeGuoLeOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentUsePhysicalClaimsOperations = coreCurrentUsePhysicalClaimsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreExtraCardEffectRoundsOperations = coreExtraCardEffectRoundsOperations;
+        this._coreGroupTargetNullificationOperations = coreGroupTargetNullificationOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreShanheAlliedTricksOperations = coreShanheAlliedTricksOperations;
+        this._coreTieredRoundZeroReturnsOperations = coreTieredRoundZeroReturnsOperations;
+        this._coreVirtualOrdinaryTrickUsesOperations = coreVirtualOrdinaryTrickUsesOperations;
+        this._coreWushuangTacticRulesOperations = coreWushuangTacticRulesOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeNullificationFramesOperations = coreNativeNullificationFramesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -25,8 +25,8 @@ public sealed record TangTangReceipt(CardConversionSource Source, string Gamepla
     public int ActualCount { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ActualDiscardRecoveryPhaseKey? PlayPhase { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public TangTangEntity? Shown { get; init; }
-    private IReadOnlyList<int> _selected = [], _viewed = [], _grain = [];
-    private IReadOnlyList<TangTangEntity> _materials = [], _candidates = [];
+    private IReadOnlyList<int> _selected = [],_viewed = [],_grain = [];
+    private IReadOnlyList<TangTangEntity> _materials = [],_candidates = [];
     private IReadOnlyList<TangTangGain> _gains = [];
     public IReadOnlyList<int> Selected { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Viewed { get => _viewed; init => _viewed = Array.AsReadOnly(value.ToArray()); }

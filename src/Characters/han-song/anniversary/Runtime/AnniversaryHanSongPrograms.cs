@@ -17,7 +17,7 @@ internal sealed class AnniversaryHanSongHandler : ISkillProgramEffectHandler
 }
 internal static class AnniversaryHanSongComposition
 {
- internal const string Yinbi="anniversary:yinbi", Shuaiyan="anniversary:shuaiyan";
+ internal const string Yinbi="anniversary:yinbi",Shuaiyan="anniversary:shuaiyan";
  [ProgramCatalogValidation(45900)] internal static void Validate(string path,SkillProgram p)
  {
   if(!p.Triggers.SelectMany(t=>t.Effects).Concat(p.Activations.SelectMany(a=>a.Effects)).Any(e=>e.Op==SkillProgramEffectOp.ResolveAnniversaryHanSongShuaiyan))return;

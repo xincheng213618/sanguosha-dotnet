@@ -4,7 +4,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryCaoZhangComposition
 {
-    internal const string Skill = "boundary:jiangchi-mobile", Cost = "jiangchi-cost";
+    internal const string Skill = "boundary:jiangchi-mobile",Cost = "jiangchi-cost";
     [ProgramCatalogValidation(55500)]
     internal static void Validate(string path, SkillProgram p)
     {

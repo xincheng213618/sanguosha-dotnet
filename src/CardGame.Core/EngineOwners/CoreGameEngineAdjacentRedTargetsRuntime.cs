@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineAdjacentRedTargetsRuntime
+{
+    private readonly ICoreAdjacentRedTargetsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreAdjacentRedTargetsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreAdjacentRedTargetsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreAdjacentRedTargetsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreAdjacentRedTargetsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreAdjacentRedTargetsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreAdjacentRedTargetsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreAdjacentRedTargetsCoreCurrentUsePhysicalClaimsOperations _coreCurrentUsePhysicalClaimsOperations;
+    private readonly ICoreAdjacentRedTargetsCoreCurrentUseTargetCandidateRefreshOperations _coreCurrentUseTargetCandidateRefreshOperations;
+    private readonly ICoreAdjacentRedTargetsCoreDamageZoneAcquisitionOperations _coreDamageZoneAcquisitionOperations;
+    private readonly ICoreAdjacentRedTargetsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreAdjacentRedTargetsCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICoreAdjacentRedTargetsCoreDragonBoatCardsOperations _coreDragonBoatCardsOperations;
+    private readonly ICoreAdjacentRedTargetsCoreGuanduCardsOperations _coreGuanduCardsOperations;
+    private readonly ICoreAdjacentRedTargetsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreAdjacentRedTargetsCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICoreAdjacentRedTargetsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreAdjacentRedTargetsCoreResponseEntityExchangeOperations _coreResponseEntityExchangeOperations;
+    private readonly ICoreAdjacentRedTargetsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreAdjacentRedTargetsCoreWenheCardsOperations _coreWenheCardsOperations;
+    private readonly ICoreAdjacentRedTargetsCoreNativeBorrowedSwordOperations _coreNativeBorrowedSwordOperations;
+    private readonly ICoreAdjacentRedTargetsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreAdjacentRedTargetsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreAdjacentRedTargetsCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreAdjacentRedTargetsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreAdjacentRedTargetsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreAdjacentRedTargetsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreAdjacentRedTargetsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineAdjacentRedTargetsRuntime(ICoreAdjacentRedTargetsCardZonesOperations cardZonesOperations, ICoreAdjacentRedTargetsContentRegistryOperations contentRegistryOperations, ICoreAdjacentRedTargetsResolutionStackOperations resolutionStackOperations, ICoreAdjacentRedTargetsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreAdjacentRedTargetsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreAdjacentRedTargetsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreAdjacentRedTargetsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreAdjacentRedTargetsCoreCurrentUsePhysicalClaimsOperations coreCurrentUsePhysicalClaimsOperations, ICoreAdjacentRedTargetsCoreCurrentUseTargetCandidateRefreshOperations coreCurrentUseTargetCandidateRefreshOperations, ICoreAdjacentRedTargetsCoreDamageZoneAcquisitionOperations coreDamageZoneAcquisitionOperations, ICoreAdjacentRedTargetsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreAdjacentRedTargetsCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICoreAdjacentRedTargetsCoreDragonBoatCardsOperations coreDragonBoatCardsOperations, ICoreAdjacentRedTargetsCoreGuanduCardsOperations coreGuanduCardsOperations, ICoreAdjacentRedTargetsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreAdjacentRedTargetsCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICoreAdjacentRedTargetsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreAdjacentRedTargetsCoreResponseEntityExchangeOperations coreResponseEntityExchangeOperations, ICoreAdjacentRedTargetsCoreRuntimeOperations coreRuntimeOperations, ICoreAdjacentRedTargetsCoreWenheCardsOperations coreWenheCardsOperations, ICoreAdjacentRedTargetsCoreNativeBorrowedSwordOperations coreNativeBorrowedSwordOperations, ICoreAdjacentRedTargetsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreAdjacentRedTargetsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreAdjacentRedTargetsCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreAdjacentRedTargetsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreAdjacentRedTargetsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreAdjacentRedTargetsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreAdjacentRedTargetsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCurrentUsePhysicalClaimsOperations = coreCurrentUsePhysicalClaimsOperations;
+        this._coreCurrentUseTargetCandidateRefreshOperations = coreCurrentUseTargetCandidateRefreshOperations;
+        this._coreDamageZoneAcquisitionOperations = coreDamageZoneAcquisitionOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreDragonBoatCardsOperations = coreDragonBoatCardsOperations;
+        this._coreGuanduCardsOperations = coreGuanduCardsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreResponseEntityExchangeOperations = coreResponseEntityExchangeOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreWenheCardsOperations = coreWenheCardsOperations;
+        this._coreNativeBorrowedSwordOperations = coreNativeBorrowedSwordOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

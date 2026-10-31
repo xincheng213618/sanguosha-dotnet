@@ -35,24 +35,4 @@ public sealed partial record ProgramSkillFrame
 
 public sealed partial class GameEngine
 {
-
-    private const int ProgramKanggeTurnDrawCap = 3;
-
-    private static string SuitName(Suit suit) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_tang_ji_ol_TangJiPrograms.SuitName(suit);
-
-    [ProgramCapability]
-    private sealed class TangJiProgramCapability(GameEngine engine) : ITangJiProgramHost
-    {
-        public SkillProgramStepOutcome KanggeChooseTarget(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.KanggeProgramChooseTarget(frame, effect);
-        public SkillProgramStepOutcome KanggeGainDraw(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.KanggeProgramGainDraw(frame, effect);
-        public SkillProgramStepOutcome KanggeHealVictim(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.KanggeProgramHealVictim(frame, effect);
-        public SkillProgramStepOutcome KanggeDeathPrice(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.KanggeProgramDeathPrice(frame, effect);
-        public SkillProgramStepOutcome JieliePreventAndGift(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.JielieProgramPreventAndGift(frame, effect);
-    }
 }

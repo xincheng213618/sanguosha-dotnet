@@ -7,7 +7,4 @@ public sealed partial class GameEngine
     private IMatchModeAllegiancePolicy ModeAllegiancePolicy => _allegiancePolicy ??=
         _modeRuntime.Find<IMatchModeAllegiancePolicy>() ??
             throw new InvalidOperationException("The mode requires its installed allegiance policy.");
-
-    private static ModeAllegianceSeatFacts CaptureAllegianceSeat(CharacterState player) =>
-        new(player.Seat, player.IsAlive, player.TeamId);
 }

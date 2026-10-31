@@ -1,0 +1,60 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineAdvancedWeaponsRuntime
+{
+    private readonly ICoreAdvancedWeaponsCharacterDiaoChanLeOperations _characterDiaoChanLeOperations;
+    private readonly ICoreAdvancedWeaponsCharacterHuCheErMouOperations _characterHuCheErMouOperations;
+    private readonly ICoreAdvancedWeaponsCharacterLiYiOlOperations _characterLiYiOlOperations;
+    private readonly ICoreAdvancedWeaponsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreAdvancedWeaponsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreAdvancedWeaponsRandomOperations _randomOperations;
+    private readonly ICoreAdvancedWeaponsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreAdvancedWeaponsCoreCharacterHostOperations _coreCharacterHostOperations;
+    private readonly ICoreAdvancedWeaponsCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreAdvancedWeaponsCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreAdvancedWeaponsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreAdvancedWeaponsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreAdvancedWeaponsCoreShanheStartingResourcesOperations _coreShanheStartingResourcesOperations;
+    private readonly ICoreAdvancedWeaponsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreAdvancedWeaponsCoreWushuangShopCardsOperations _coreWushuangShopCardsOperations;
+    private readonly ICoreAdvancedWeaponsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreAdvancedWeaponsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreAdvancedWeaponsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreAdvancedWeaponsCoreProgramPipelineHooksOperations _coreProgramPipelineHooksOperations;
+    private readonly ICoreAdvancedWeaponsCoreTrustedCardZoneDiagnosticsOperations _coreTrustedCardZoneDiagnosticsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess _coreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsCopiedWeaponSkillsGeneratedPhysicalCardIdsPermanentlyRemovedWeaponsUsedGeneralWeaponSourcesAccess _coreGameEngineAdvancedWeaponsCopiedWeaponSkillsGeneratedPhysicalCardIdsPermanentlyRemovedWeaponsUsedGeneralWeaponSourcesAccess;
+    internal CoreGameEngineAdvancedWeaponsRuntime(ICoreAdvancedWeaponsCharacterDiaoChanLeOperations characterDiaoChanLeOperations, ICoreAdvancedWeaponsCharacterHuCheErMouOperations characterHuCheErMouOperations, ICoreAdvancedWeaponsCharacterLiYiOlOperations characterLiYiOlOperations, ICoreAdvancedWeaponsCardZonesOperations cardZonesOperations, ICoreAdvancedWeaponsContentRegistryOperations contentRegistryOperations, ICoreAdvancedWeaponsRandomOperations randomOperations, ICoreAdvancedWeaponsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreAdvancedWeaponsCoreCharacterHostOperations coreCharacterHostOperations, ICoreAdvancedWeaponsCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreAdvancedWeaponsCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreAdvancedWeaponsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreAdvancedWeaponsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreAdvancedWeaponsCoreShanheStartingResourcesOperations coreShanheStartingResourcesOperations, ICoreAdvancedWeaponsCoreTableOrderOperations coreTableOrderOperations, ICoreAdvancedWeaponsCoreWushuangShopCardsOperations coreWushuangShopCardsOperations, ICoreAdvancedWeaponsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreAdvancedWeaponsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreAdvancedWeaponsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreAdvancedWeaponsCoreProgramPipelineHooksOperations coreProgramPipelineHooksOperations, ICoreAdvancedWeaponsCoreTrustedCardZoneDiagnosticsOperations coreTrustedCardZoneDiagnosticsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess coreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsCopiedWeaponSkillsGeneratedPhysicalCardIdsPermanentlyRemovedWeaponsUsedGeneralWeaponSourcesAccess coreGameEngineAdvancedWeaponsCopiedWeaponSkillsGeneratedPhysicalCardIdsPermanentlyRemovedWeaponsUsedGeneralWeaponSourcesAccess)
+    {
+        this._characterDiaoChanLeOperations = characterDiaoChanLeOperations;
+        this._characterHuCheErMouOperations = characterHuCheErMouOperations;
+        this._characterLiYiOlOperations = characterLiYiOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCharacterHostOperations = coreCharacterHostOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreShanheStartingResourcesOperations = coreShanheStartingResourcesOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreWushuangShopCardsOperations = coreWushuangShopCardsOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramPipelineHooksOperations = coreProgramPipelineHooksOperations;
+        this._coreTrustedCardZoneDiagnosticsOperations = coreTrustedCardZoneDiagnosticsOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess = coreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess;
+        this._coreGameEngineAdvancedWeaponsCopiedWeaponSkillsGeneratedPhysicalCardIdsPermanentlyRemovedWeaponsUsedGeneralWeaponSourcesAccess = coreGameEngineAdvancedWeaponsCopiedWeaponSkillsGeneratedPhysicalCardIdsPermanentlyRemovedWeaponsUsedGeneralWeaponSourcesAccess;
+    }
+}

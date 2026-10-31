@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouTaishiCiOlComposition
 {
-    internal const string Dulie = "mou-ol:dulie", Douchan = "mou-ol:douchan";
+    internal const string Dulie = "mou-ol:dulie",Douchan = "mou-ol:douchan";
 
     [ProgramCatalogValidation(1480)]
     internal static void ValidateProgram(string path, SkillProgram program)

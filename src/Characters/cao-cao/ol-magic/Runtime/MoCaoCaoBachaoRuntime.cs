@@ -5,7 +5,7 @@ namespace CardGame.Core;
 internal sealed partial class MoCaoCaoBachaoRuntime(IMoCaoCaoFacts facts, IMoCaoCaoOperations operations,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMoCaoCaoBachaoHost
 {
-    internal const string Action = "mo-cao-cao", GiftReason = "skill-program.ol:mo-bachao.gift", BaibiReason = "equipment.baibi-dao.obtain";
+    internal const string Action = "mo-cao-cao",GiftReason = "skill-program.ol:mo-bachao.gift",BaibiReason = "equipment.baibi-dao.obtain";
     private static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
     public SkillProgramStepOutcome Start(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {

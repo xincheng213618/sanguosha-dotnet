@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeEquipmentUseRuntime
+{
+    private readonly ICoreNativeEquipmentUseCharacterHuCheErAnniversaryOperations _characterHuCheErAnniversaryOperations;
+    private readonly ICoreNativeEquipmentUseCharacterWeiYanHappyGodOperations _characterWeiYanHappyGodOperations;
+    private readonly ICoreNativeEquipmentUseCharacterXiangChongOlOperations _characterXiangChongOlOperations;
+    private readonly ICoreNativeEquipmentUseCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreNativeEquipmentUseCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreNativeEquipmentUseCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreNativeEquipmentUseCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreNativeEquipmentUseCoreFinalizedCardTargetsOperations _coreFinalizedCardTargetsOperations;
+    private readonly ICoreNativeEquipmentUseCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeEquipmentUseCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreNativeEquipmentUseCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
+    private readonly ICoreNativeEquipmentUseCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreNativeEquipmentUseCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNativeEquipmentUseCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreNativeEquipmentUseCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreNativeEquipmentUseKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    internal CoreNativeEquipmentUseRuntime(ICoreNativeEquipmentUseCharacterHuCheErAnniversaryOperations characterHuCheErAnniversaryOperations, ICoreNativeEquipmentUseCharacterWeiYanHappyGodOperations characterWeiYanHappyGodOperations, ICoreNativeEquipmentUseCharacterXiangChongOlOperations characterXiangChongOlOperations, ICoreNativeEquipmentUseCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreNativeEquipmentUseCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreNativeEquipmentUseCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreNativeEquipmentUseCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreNativeEquipmentUseCoreFinalizedCardTargetsOperations coreFinalizedCardTargetsOperations, ICoreNativeEquipmentUseCoreMatchLogOperations coreMatchLogOperations, ICoreNativeEquipmentUseCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreNativeEquipmentUseCoreNativeLegalActionsOperations coreNativeLegalActionsOperations, ICoreNativeEquipmentUseCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreNativeEquipmentUseCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeEquipmentUseCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreNativeEquipmentUseCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreNativeEquipmentUseKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations)
+    {
+        this._characterHuCheErAnniversaryOperations = characterHuCheErAnniversaryOperations;
+        this._characterWeiYanHappyGodOperations = characterWeiYanHappyGodOperations;
+        this._characterXiangChongOlOperations = characterXiangChongOlOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreFinalizedCardTargetsOperations = coreFinalizedCardTargetsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+    }
+}

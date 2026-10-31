@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePrepDiscardImmediateDrawRuntime
+{
+    private readonly ICorePrepDiscardImmediateDrawCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePrepDiscardImmediateDrawCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICorePrepDiscardImmediateDrawCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICorePrepDiscardImmediateDrawCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICorePrepDiscardImmediateDrawCorePrepDiscardPaymentsOperations _corePrepDiscardPaymentsOperations;
+    private readonly ICorePrepDiscardImmediateDrawCorePrepDiscardReceiptsOperations _corePrepDiscardReceiptsOperations;
+    private readonly ICorePrepDiscardImmediateDrawCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePrepDiscardImmediateDrawCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICorePrepDiscardImmediateDrawCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePrepDiscardImmediateDrawCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICorePrepDiscardImmediateDrawCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICorePrepDiscardImmediateDrawKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEnginePrepDiscardImmediateDrawRuntime(ICorePrepDiscardImmediateDrawCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePrepDiscardImmediateDrawCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICorePrepDiscardImmediateDrawCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICorePrepDiscardImmediateDrawCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICorePrepDiscardImmediateDrawCorePrepDiscardPaymentsOperations corePrepDiscardPaymentsOperations, ICorePrepDiscardImmediateDrawCorePrepDiscardReceiptsOperations corePrepDiscardReceiptsOperations, ICorePrepDiscardImmediateDrawCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePrepDiscardImmediateDrawCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICorePrepDiscardImmediateDrawCoreRuntimeOperations coreRuntimeOperations, ICorePrepDiscardImmediateDrawCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICorePrepDiscardImmediateDrawCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICorePrepDiscardImmediateDrawKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._corePrepDiscardPaymentsOperations = corePrepDiscardPaymentsOperations;
+        this._corePrepDiscardReceiptsOperations = corePrepDiscardReceiptsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

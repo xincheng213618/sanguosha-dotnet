@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineOwnTrickDrawTargetsRuntime : global::CardGame.Core.IOwnTrickAndHandCategoryProgramHost
+{
+    private readonly ICoreOwnTrickDrawTargetsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreOwnTrickDrawTargetsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreActualUseTargetProgramsOperations _coreActualUseTargetProgramsOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreLostHpOwnedGiftsOperations _coreLostHpOwnedGiftsOperations;
+    private readonly ICoreOwnTrickDrawTargetsCorePaidOwnTargetObserversOperations _corePaidOwnTargetObserversOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreOwnTrickDrawTargetsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreOwnTrickDrawTargetsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreOwnTrickDrawTargetsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineOwnTrickDrawTargetsRuntime(ICoreOwnTrickDrawTargetsContentRegistryOperations contentRegistryOperations, ICoreOwnTrickDrawTargetsResolutionStackOperations resolutionStackOperations, ICoreOwnTrickDrawTargetsCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreOwnTrickDrawTargetsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreOwnTrickDrawTargetsCoreActualUseTargetProgramsOperations coreActualUseTargetProgramsOperations, ICoreOwnTrickDrawTargetsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreOwnTrickDrawTargetsCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreOwnTrickDrawTargetsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreOwnTrickDrawTargetsCoreLostHpOwnedGiftsOperations coreLostHpOwnedGiftsOperations, ICoreOwnTrickDrawTargetsCorePaidOwnTargetObserversOperations corePaidOwnTargetObserversOperations, ICoreOwnTrickDrawTargetsCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreOwnTrickDrawTargetsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreOwnTrickDrawTargetsCoreRuntimeOperations coreRuntimeOperations, ICoreOwnTrickDrawTargetsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreOwnTrickDrawTargetsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreOwnTrickDrawTargetsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreOwnTrickDrawTargetsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreOwnTrickDrawTargetsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreOwnTrickDrawTargetsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActualUseTargetProgramsOperations = coreActualUseTargetProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreLostHpOwnedGiftsOperations = coreLostHpOwnedGiftsOperations;
+        this._corePaidOwnTargetObserversOperations = corePaidOwnTargetObserversOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,70 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterQingheGongzhuOlRuntime : global::CardGame.Core.IQingHeGongZhuProgramHost
+{
+    private readonly ICharacterQingheGongzhuOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterQingheGongzhuOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterQingheGongzhuOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterQingheGongzhuOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterQingheGongzhuOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterQingheGongzhuOlCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterQingheGongzhuOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterQingheGongzhuOlCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterQingheGongzhuOlCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICharacterQingheGongzhuOlCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICharacterQingheGongzhuOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterQingheGongzhuOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterQingheGongzhuOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterQingheGongzhuOlCoreWushuangZengouOperations _coreWushuangZengouOperations;
+    private readonly ICharacterQingheGongzhuOlCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICharacterQingheGongzhuOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterQingheGongzhuOlCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
+    private readonly ICharacterQingheGongzhuOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterQingheGongzhuOlCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICharacterQingheGongzhuOlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterQingheGongzhuOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterQingheGongzhuOlCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICharacterQingheGongzhuOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterQingheGongzhuOlRuntime(ICharacterQingheGongzhuOlCardZonesOperations cardZonesOperations, ICharacterQingheGongzhuOlContentRegistryOperations contentRegistryOperations, ICharacterQingheGongzhuOlResolutionStackOperations resolutionStackOperations, ICharacterQingheGongzhuOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterQingheGongzhuOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterQingheGongzhuOlCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterQingheGongzhuOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterQingheGongzhuOlCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterQingheGongzhuOlCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICharacterQingheGongzhuOlCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICharacterQingheGongzhuOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterQingheGongzhuOlCoreRuntimeOperations coreRuntimeOperations, ICharacterQingheGongzhuOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterQingheGongzhuOlCoreWushuangZengouOperations coreWushuangZengouOperations, ICharacterQingheGongzhuOlCoreMatchLogOperations coreMatchLogOperations, ICharacterQingheGongzhuOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterQingheGongzhuOlCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICharacterQingheGongzhuOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterQingheGongzhuOlCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICharacterQingheGongzhuOlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterQingheGongzhuOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterQingheGongzhuOlCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICharacterQingheGongzhuOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreWushuangZengouOperations = coreWushuangZengouOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

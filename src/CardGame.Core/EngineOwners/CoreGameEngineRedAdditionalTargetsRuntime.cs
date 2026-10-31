@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRedAdditionalTargetsRuntime
+{
+    private readonly ICoreRedAdditionalTargetsCharacterZhangFeiAnniversaryGodOperations _characterZhangFeiAnniversaryGodOperations;
+    private readonly ICoreRedAdditionalTargetsCharacterZhouYuMouOperations _characterZhouYuMouOperations;
+    private readonly ICoreRedAdditionalTargetsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreRedAdditionalTargetsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreRedAdditionalTargetsCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreRedAdditionalTargetsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreRedAdditionalTargetsCoreNextActualUseTargetAdjustmentsOperations _coreNextActualUseTargetAdjustmentsOperations;
+    private readonly ICoreRedAdditionalTargetsCoreNextCardTargetAdjustmentsOperations _coreNextCardTargetAdjustmentsOperations;
+    private readonly ICoreRedAdditionalTargetsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreRedAdditionalTargetsCoreNativeBorrowedSwordOperations _coreNativeBorrowedSwordOperations;
+    private readonly ICoreRedAdditionalTargetsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreRedAdditionalTargetsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineRedAdditionalTargetsRedAdditionalTargetGrantsAccess _coreGameEngineRedAdditionalTargetsRedAdditionalTargetGrantsAccess;
+    internal CoreGameEngineRedAdditionalTargetsRuntime(ICoreRedAdditionalTargetsCharacterZhangFeiAnniversaryGodOperations characterZhangFeiAnniversaryGodOperations, ICoreRedAdditionalTargetsCharacterZhouYuMouOperations characterZhouYuMouOperations, ICoreRedAdditionalTargetsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreRedAdditionalTargetsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreRedAdditionalTargetsCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreRedAdditionalTargetsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreRedAdditionalTargetsCoreNextActualUseTargetAdjustmentsOperations coreNextActualUseTargetAdjustmentsOperations, ICoreRedAdditionalTargetsCoreNextCardTargetAdjustmentsOperations coreNextCardTargetAdjustmentsOperations, ICoreRedAdditionalTargetsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreRedAdditionalTargetsCoreNativeBorrowedSwordOperations coreNativeBorrowedSwordOperations, ICoreRedAdditionalTargetsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreRedAdditionalTargetsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineRedAdditionalTargetsRedAdditionalTargetGrantsAccess coreGameEngineRedAdditionalTargetsRedAdditionalTargetGrantsAccess)
+    {
+        this._characterZhangFeiAnniversaryGodOperations = characterZhangFeiAnniversaryGodOperations;
+        this._characterZhouYuMouOperations = characterZhouYuMouOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNextActualUseTargetAdjustmentsOperations = coreNextActualUseTargetAdjustmentsOperations;
+        this._coreNextCardTargetAdjustmentsOperations = coreNextCardTargetAdjustmentsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreNativeBorrowedSwordOperations = coreNativeBorrowedSwordOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineRedAdditionalTargetsRedAdditionalTargetGrantsAccess = coreGameEngineRedAdditionalTargetsRedAdditionalTargetGrantsAccess;
+    }
+}

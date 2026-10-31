@@ -21,7 +21,7 @@ public sealed record ZhouQunReceipt(CardConversionSource Source, string Gameplay
     public int? JudgmentRank { get; init; }
     public int ChosenCard { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ZhouQunShownCard? Shown { get; init; }
-    private IReadOnlyList<int> _revealed = Array.AsReadOnly(Array.Empty<int>()), _viewed = Array.AsReadOnly(Array.Empty<int>()), _hand = Array.AsReadOnly(Array.Empty<int>()), _top = Array.AsReadOnly(Array.Empty<int>()), _targets = Array.AsReadOnly(Array.Empty<int>());
+    private IReadOnlyList<int> _revealed = Array.AsReadOnly(Array.Empty<int>()),_viewed = Array.AsReadOnly(Array.Empty<int>()),_hand = Array.AsReadOnly(Array.Empty<int>()),_top = Array.AsReadOnly(Array.Empty<int>()),_targets = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Revealed { get => _revealed; init => _revealed = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Viewed { get => _viewed; init => _viewed = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> SelectedHand { get => _hand; init => _hand = Array.AsReadOnly(value.ToArray()); }

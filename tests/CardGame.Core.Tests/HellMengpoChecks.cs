@@ -206,7 +206,7 @@ internal static class HellMengpoChecks
     private static string Category(CardKind kind) => CardCatalog.Get(kind).CategoryName switch
     { "基本牌" => "basic", "装备牌" => "equipment", _ => "trick" };
     private static bool Forbidden(GameEngine g, int seat, CardKind kind, CardActionType type) =>
-        (bool)typeof(GameEngine).GetMethod("IsCardUseForbidden", BindingFlags.Instance | BindingFlags.NonPublic,
+        (bool)global::FixtureRuntimeAccess.Engine.GetMethod("IsCardUseForbidden", BindingFlags.Instance | BindingFlags.NonPublic,
             [typeof(int), typeof(CardKind), typeof(CardActionType), typeof(bool), typeof(long?)])!
             .Invoke(g, [seat, kind, type, false, null])!;
     private static (GameEngine, ContentRegistry) Start(string scene)

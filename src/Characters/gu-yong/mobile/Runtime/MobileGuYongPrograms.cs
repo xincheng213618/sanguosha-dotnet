@@ -43,19 +43,4 @@ internal static class MobileGuYongComposition
 }
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class MobileGuYongHost(GameEngine engine) : IMobileGuYongHost
-    {
-        public SkillProgramStepOutcome CompleteMixedHand(ProgramSkillFrame supplied, string binding)
-        {
-            var frame = engine.GetActiveProgramFrame(supplied.Id);
-            if (frame.SkillId != "mobile:bingyi" || frame.TriggerId != "ending-reveal-and-share" ||
-                frame.InstructionIndex != 3 || binding != "shown-hand" ||
-                engine.GetProgramCardSet(frame, binding).Visibility != SkillProgramCardSetVisibility.Public)
-                throw new InvalidOperationException("Bingyi requires its original already-revealed whole-hand binding.");
-            if (engine.AreProgramBoundCardsSameColor(frame, binding)) return SkillProgramStepOutcome.Continue;
-            engine.FinishProgramSkill(frame, completed: true);
-            return SkillProgramStepOutcome.AwaitChild;
-        }
-    }
 }

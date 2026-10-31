@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineShanheGuanpingMoyanRuntime
+{
+    private readonly ICoreShanheGuanpingMoyanResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheGuanpingMoyanCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreShanheGuanpingMoyanCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreShanheGuanpingMoyanCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreShanheGuanpingMoyanCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreShanheGuanpingMoyanCoreHalfHandPhaseDebtDamageObserversOperations _coreHalfHandPhaseDebtDamageObserversOperations;
+    private readonly ICoreShanheGuanpingMoyanCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreShanheGuanpingMoyanCoreUnrespondableCounterspellsOperations _coreUnrespondableCounterspellsOperations;
+    private readonly ICoreShanheGuanpingMoyanCoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    private readonly ICoreShanheGuanpingMoyanCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICoreShanheGuanpingMoyanCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineShanheGuanpingMoyanRuntime(ICoreShanheGuanpingMoyanResolutionStackOperations resolutionStackOperations, ICoreShanheGuanpingMoyanCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreShanheGuanpingMoyanCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreShanheGuanpingMoyanCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreShanheGuanpingMoyanCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreShanheGuanpingMoyanCoreHalfHandPhaseDebtDamageObserversOperations coreHalfHandPhaseDebtDamageObserversOperations, ICoreShanheGuanpingMoyanCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreShanheGuanpingMoyanCoreUnrespondableCounterspellsOperations coreUnrespondableCounterspellsOperations, ICoreShanheGuanpingMoyanCoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations, ICoreShanheGuanpingMoyanCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICoreShanheGuanpingMoyanCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreHalfHandPhaseDebtDamageObserversOperations = coreHalfHandPhaseDebtDamageObserversOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreUnrespondableCounterspellsOperations = coreUnrespondableCounterspellsOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

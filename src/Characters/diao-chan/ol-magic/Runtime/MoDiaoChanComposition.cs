@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MoDiaoChanComposition
 {
-    internal const string Huanhuo = "ol:mo-huanhuo", Qingshi = "ol:mo-qingshi";
+    internal const string Huanhuo = "ol:mo-huanhuo",Qingshi = "ol:mo-qingshi";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMoDiaoChanHuanhuoRound or SkillProgramEffectOp.ResolveMoDiaoChanHuanhuoUse or
         SkillProgramEffectOp.ResolveMoDiaoChanQingshiPrep or SkillProgramEffectOp.ResolveMoDiaoChanQingshiRedirect or SkillProgramEffectOp.ResolveMoDiaoChanQingshiDamage or SkillProgramEffectOp.ResolveMoDiaoChanQingshiDiscard;
     internal static bool HuanhuoCompleted(SkillProgramTrigger t) => t.Id == "affected-use-completed" && t.Window == SkillProgramTriggerWindow.CardUseCompleted &&

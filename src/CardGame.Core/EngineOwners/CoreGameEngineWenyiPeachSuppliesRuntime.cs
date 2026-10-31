@@ -1,0 +1,80 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineWenyiPeachSuppliesRuntime
+{
+    private readonly ICoreWenyiPeachSuppliesCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
+    private readonly ICoreWenyiPeachSuppliesCharacterGuoTuOlOperations _characterGuoTuOlOperations;
+    private readonly ICoreWenyiPeachSuppliesCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICoreWenyiPeachSuppliesCharacterWoLongFengChuOlOperations _characterWoLongFengChuOlOperations;
+    private readonly ICoreWenyiPeachSuppliesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreWenyiPeachSuppliesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreAlternatingSuitAndCompletedTopOperations _coreAlternatingSuitAndCompletedTopOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreDrawFundedDistinctBasicPaymentOperations _coreDrawFundedDistinctBasicPaymentOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreNativePublicPileOriginalCardsOperations _coreNativePublicPileOriginalCardsOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreOwnPublicPileConversionsOperations _coreOwnPublicPileConversionsOperations;
+    private readonly ICoreWenyiPeachSuppliesCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreRequestedDeckBasicOwnershipOperations _coreRequestedDeckBasicOwnershipOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreTieredRoundZeroUsesOperations _coreTieredRoundZeroUsesOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreTurnRedSlashBenefitsOperations _coreTurnRedSlashBenefitsOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreNativeRecoveryCardsOperations _coreNativeRecoveryCardsOperations;
+    private readonly ICoreWenyiPeachSuppliesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreWenyiPeachSuppliesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly ICoreWenyiPeachSuppliesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreWenyiPeachSuppliesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineWenyiPeachSuppliesRuntime(ICoreWenyiPeachSuppliesCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICoreWenyiPeachSuppliesCharacterGuoTuOlOperations characterGuoTuOlOperations, ICoreWenyiPeachSuppliesCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICoreWenyiPeachSuppliesCharacterWoLongFengChuOlOperations characterWoLongFengChuOlOperations, ICoreWenyiPeachSuppliesCardZonesOperations cardZonesOperations, ICoreWenyiPeachSuppliesResolutionStackOperations resolutionStackOperations, ICoreWenyiPeachSuppliesCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreWenyiPeachSuppliesCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreWenyiPeachSuppliesCoreAlternatingSuitAndCompletedTopOperations coreAlternatingSuitAndCompletedTopOperations, ICoreWenyiPeachSuppliesCoreCardConversionsOperations coreCardConversionsOperations, ICoreWenyiPeachSuppliesCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreWenyiPeachSuppliesCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreWenyiPeachSuppliesCoreDrawFundedDistinctBasicPaymentOperations coreDrawFundedDistinctBasicPaymentOperations, ICoreWenyiPeachSuppliesCoreHandComparisonOperations coreHandComparisonOperations, ICoreWenyiPeachSuppliesCoreNativePublicPileOriginalCardsOperations coreNativePublicPileOriginalCardsOperations, ICoreWenyiPeachSuppliesCoreOwnPublicPileConversionsOperations coreOwnPublicPileConversionsOperations, ICoreWenyiPeachSuppliesCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreWenyiPeachSuppliesCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreWenyiPeachSuppliesCoreRequestedDeckBasicOwnershipOperations coreRequestedDeckBasicOwnershipOperations, ICoreWenyiPeachSuppliesCoreTieredRoundZeroUsesOperations coreTieredRoundZeroUsesOperations, ICoreWenyiPeachSuppliesCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICoreWenyiPeachSuppliesCoreTurnRedSlashBenefitsOperations coreTurnRedSlashBenefitsOperations, ICoreWenyiPeachSuppliesCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreWenyiPeachSuppliesCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreWenyiPeachSuppliesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreWenyiPeachSuppliesCoreNativeRecoveryCardsOperations coreNativeRecoveryCardsOperations, ICoreWenyiPeachSuppliesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreWenyiPeachSuppliesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreWenyiPeachSuppliesCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, ICoreWenyiPeachSuppliesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreWenyiPeachSuppliesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
+        this._characterGuoTuOlOperations = characterGuoTuOlOperations;
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._characterWoLongFengChuOlOperations = characterWoLongFengChuOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingSuitAndCompletedTopOperations = coreAlternatingSuitAndCompletedTopOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreDrawFundedDistinctBasicPaymentOperations = coreDrawFundedDistinctBasicPaymentOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._coreNativePublicPileOriginalCardsOperations = coreNativePublicPileOriginalCardsOperations;
+        this._coreOwnPublicPileConversionsOperations = coreOwnPublicPileConversionsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRequestedDeckBasicOwnershipOperations = coreRequestedDeckBasicOwnershipOperations;
+        this._coreTieredRoundZeroUsesOperations = coreTieredRoundZeroUsesOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreTurnRedSlashBenefitsOperations = coreTurnRedSlashBenefitsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRecoveryCardsOperations = coreNativeRecoveryCardsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

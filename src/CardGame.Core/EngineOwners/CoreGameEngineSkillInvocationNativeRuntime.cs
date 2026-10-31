@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSkillInvocationNativeRuntime
+{
+    private readonly ICoreSkillInvocationNativeResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSkillInvocationNativeCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreSkillInvocationNativeCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreSkillInvocationNativeCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreSkillInvocationNativeCoreQinglongInsertionOperations _coreQinglongInsertionOperations;
+    private readonly ICoreSkillInvocationNativeCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSkillInvocationNativeCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreSkillInvocationNativeCoreNativeBorrowedSwordOperations _coreNativeBorrowedSwordOperations;
+    private readonly ICoreSkillInvocationNativeCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreSkillInvocationNativeCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreSkillInvocationNativeCoreNativeEquipmentInvocationsOperations _coreNativeEquipmentInvocationsOperations;
+    private readonly ICoreSkillInvocationNativeCoreNativeFactionDefenseOperations _coreNativeFactionDefenseOperations;
+    private readonly ICoreSkillInvocationNativeCoreNativeFactionSlashOperations _coreNativeFactionSlashOperations;
+    private readonly ICoreSkillInvocationNativeCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreSkillInvocationNativeCoreNativeResponseWindowsOperations _coreNativeResponseWindowsOperations;
+    private readonly ICoreSkillInvocationNativeCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSkillInvocationNativeKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSkillInvocationNativeRuntime(ICoreSkillInvocationNativeResolutionStackOperations resolutionStackOperations, ICoreSkillInvocationNativeCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreSkillInvocationNativeCoreActualTurnsOperations coreActualTurnsOperations, ICoreSkillInvocationNativeCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreSkillInvocationNativeCoreQinglongInsertionOperations coreQinglongInsertionOperations, ICoreSkillInvocationNativeCoreRuntimeOperations coreRuntimeOperations, ICoreSkillInvocationNativeCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreSkillInvocationNativeCoreNativeBorrowedSwordOperations coreNativeBorrowedSwordOperations, ICoreSkillInvocationNativeCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreSkillInvocationNativeCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreSkillInvocationNativeCoreNativeEquipmentInvocationsOperations coreNativeEquipmentInvocationsOperations, ICoreSkillInvocationNativeCoreNativeFactionDefenseOperations coreNativeFactionDefenseOperations, ICoreSkillInvocationNativeCoreNativeFactionSlashOperations coreNativeFactionSlashOperations, ICoreSkillInvocationNativeCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreSkillInvocationNativeCoreNativeResponseWindowsOperations coreNativeResponseWindowsOperations, ICoreSkillInvocationNativeCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSkillInvocationNativeKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreQinglongInsertionOperations = coreQinglongInsertionOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeBorrowedSwordOperations = coreNativeBorrowedSwordOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeEquipmentInvocationsOperations = coreNativeEquipmentInvocationsOperations;
+        this._coreNativeFactionDefenseOperations = coreNativeFactionDefenseOperations;
+        this._coreNativeFactionSlashOperations = coreNativeFactionSlashOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeResponseWindowsOperations = coreNativeResponseWindowsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

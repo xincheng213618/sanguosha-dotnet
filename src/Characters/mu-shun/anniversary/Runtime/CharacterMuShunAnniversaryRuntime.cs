@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterMuShunAnniversaryRuntime : global::CardGame.Core.IAnniversaryMuShunHost
+{
+    private readonly ICharacterMuShunAnniversaryCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
+    private readonly ICharacterMuShunAnniversaryContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterMuShunAnniversaryResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterMuShunAnniversaryCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICharacterMuShunAnniversaryCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterMuShunAnniversaryCoreEquipmentSlotGroupProgramsOperations _coreEquipmentSlotGroupProgramsOperations;
+    private readonly ICharacterMuShunAnniversaryCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterMuShunAnniversaryCoreOrderedPrintedSkillLossObserversOperations _coreOrderedPrintedSkillLossObserversOperations;
+    private readonly ICharacterMuShunAnniversaryCorePindianOperations _corePindianOperations;
+    private readonly ICharacterMuShunAnniversaryCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterMuShunAnniversaryCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterMuShunAnniversaryCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterMuShunAnniversaryCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterMuShunAnniversaryCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterMuShunAnniversaryCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterMuShunAnniversaryCoreParticipantHandProgramsOperations _coreParticipantHandProgramsOperations;
+    private readonly ICharacterMuShunAnniversaryCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterMuShunAnniversaryCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterMuShunAnniversaryCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterMuShunAnniversaryKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterMuShunAnniversaryRuntime(ICharacterMuShunAnniversaryCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICharacterMuShunAnniversaryContentRegistryOperations contentRegistryOperations, ICharacterMuShunAnniversaryResolutionStackOperations resolutionStackOperations, ICharacterMuShunAnniversaryCoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterMuShunAnniversaryCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterMuShunAnniversaryCoreEquipmentSlotGroupProgramsOperations coreEquipmentSlotGroupProgramsOperations, ICharacterMuShunAnniversaryCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterMuShunAnniversaryCoreOrderedPrintedSkillLossObserversOperations coreOrderedPrintedSkillLossObserversOperations, ICharacterMuShunAnniversaryCorePindianOperations corePindianOperations, ICharacterMuShunAnniversaryCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterMuShunAnniversaryCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterMuShunAnniversaryCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterMuShunAnniversaryCoreRuntimeOperations coreRuntimeOperations, ICharacterMuShunAnniversaryCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterMuShunAnniversaryCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterMuShunAnniversaryCoreParticipantHandProgramsOperations coreParticipantHandProgramsOperations, ICharacterMuShunAnniversaryCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterMuShunAnniversaryCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterMuShunAnniversaryCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterMuShunAnniversaryKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEquipmentSlotGroupProgramsOperations = coreEquipmentSlotGroupProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOrderedPrintedSkillLossObserversOperations = coreOrderedPrintedSkillLossObserversOperations;
+        this._corePindianOperations = corePindianOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreParticipantHandProgramsOperations = coreParticipantHandProgramsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

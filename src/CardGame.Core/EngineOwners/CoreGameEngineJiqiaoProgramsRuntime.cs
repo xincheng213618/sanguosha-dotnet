@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineJiqiaoProgramsRuntime
+{
+    private readonly ICoreJiqiaoProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreJiqiaoProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreJiqiaoProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreJiqiaoProgramsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreJiqiaoProgramsCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreJiqiaoProgramsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreJiqiaoProgramsCoreJiqiaoObserversOperations _coreJiqiaoObserversOperations;
+    private readonly ICoreJiqiaoProgramsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreJiqiaoProgramsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreJiqiaoProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreJiqiaoProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreJiqiaoProgramsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreJiqiaoProgramsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreJiqiaoProgramsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreJiqiaoProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineJiqiaoProgramsRuntime(ICoreJiqiaoProgramsCardZonesOperations cardZonesOperations, ICoreJiqiaoProgramsResolutionStackOperations resolutionStackOperations, ICoreJiqiaoProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreJiqiaoProgramsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreJiqiaoProgramsCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreJiqiaoProgramsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreJiqiaoProgramsCoreJiqiaoObserversOperations coreJiqiaoObserversOperations, ICoreJiqiaoProgramsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreJiqiaoProgramsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreJiqiaoProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreJiqiaoProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreJiqiaoProgramsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreJiqiaoProgramsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreJiqiaoProgramsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreJiqiaoProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreJiqiaoObserversOperations = coreJiqiaoObserversOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

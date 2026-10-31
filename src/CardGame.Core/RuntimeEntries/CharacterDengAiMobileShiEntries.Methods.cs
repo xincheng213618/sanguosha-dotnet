@@ -1,0 +1,56 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterDengAiMobileShiEntries
+{
+    internal bool AdvanceShiDaChildren() => _resolve().AdvanceShiDaChildren();
+    internal void AnswerShiDa(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerShiDa(selected);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginShiDa(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShiDa(input, op);
+    internal bool CanOfferShiDa(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShiDa(candidate, trigger, context);
+    internal void CaptureShiDaEquipmentLoss(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureShiDaEquipmentLoss(batch);
+    internal void CaptureShiDaTargetUnion(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.ProgramCardTriggerCandidate> result) => _resolve().CaptureShiDaTargetUnion(action, window, result);
+    internal void ChangeShiDaCharge(global::CardGame.Core.ProgramSkillFrame f, int amount, int capacity, long batch = 0L) => _resolve().ChangeShiDaCharge(f, amount, capacity, batch);
+    internal void ChangeShiDaCharge2(long frameId, global::CardGame.Core.CardConversionSource source, string hash, int amount, int capacity, long batch) => _resolve().ChangeShiDaCharge(frameId, source, hash, amount, capacity, batch);
+    internal global::CardGame.Core.PromptChoice ChooseShiDa(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseShiDa(p, f);
+    internal void ContinueShiDa(long id) => _resolve().ContinueShiDa(id);
+    internal void CreditShiDaEquipmentLoss(long useId) => _resolve().CreditShiDaEquipmentLoss(useId);
+    internal bool DrainShiDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainShiDa(f);
+    internal void FinishShiDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShiDa(f);
+    internal bool IsShiDaDeferredEquipmentEntry(global::CardGame.Core.CardMovementBatchContext batch, global::CardGame.Core.CardMovementRecord movement) => _resolve().IsShiDaDeferredEquipmentEntry(batch, movement);
+    internal void IssueShiDaSnatch(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueShiDaSnatch(f);
+    internal bool KeepPaidShiDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidShiDa(f);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiDengAiPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().MobileShiDengAiPublicStates(owner, skillId);
+    internal void PublishShiDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShiDa(f);
+    internal void RecordShiDaTargets(long useId, global::CardGame.Core.CardActionContext action) => _resolve().RecordShiDaTargets(useId, action);
+    internal void RequireShiDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShiDa(f);
+    internal bool ResumeShiDa(long id) => _resolve().ResumeShiDa(id);
+    internal void ReturnShiDaDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiDaDraw(f, outcome);
+    internal bool ReturnShiDaMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiDaMovement(f);
+    internal void SealShiDaMove(long id, global::CardGame.Core.CardMovementRecord move) => _resolve().SealShiDaMove(id, move);
+    internal void SettleShiDaEquipmentLoss(global::CardGame.Core.IGameEvent payload) => _resolve().SettleShiDaEquipmentLoss(payload);
+    internal bool ShiDaBeforeDamageObserver(long id) => _resolve().ShiDaBeforeDamageObserver(id);
+    internal (int Current, int Capacity) ShiDaCharge(int owner) => _resolve().ShiDaCharge(owner);
+    internal bool ShiDaChildEdge(int i) => _resolve().ShiDaChildEdge(i);
+    internal bool ShiDaChildSuffix(int i) => _resolve().ShiDaChildSuffix(i);
+    internal global::CardGame.Core.PromptChoice ShiDaChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string label, int number = -1, int? target = default, int? card = default) => _resolve().ShiDaChoice(f, branch, label, number, target, card);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiDaChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiDaChoices(f);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiDaCostChoices(long id, int owner, int payer) => _resolve().ShiDaCostChoices(id, owner, payer);
+    internal bool ShiDaDamageObserver(long id) => _resolve().ShiDaDamageObserver(id);
+    internal bool ShiDaDyingObserver() => _resolve().ShiDaDyingObserver();
+    internal bool ShiDaFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiDaFirstChild(f, child);
+    internal bool ShiDaHasJixiDiscard(global::CardGame.Core.ProgramTriggerCandidate candidate, int payer) => _resolve().ShiDaHasJixiDiscard(candidate, payer);
+    internal bool ShiDaHasJixiTarget(int owner) => _resolve().ShiDaHasJixiTarget(owner);
+    internal global::System.Collections.Generic.IReadOnlyList<int> ShiDaHistoricalTargets(int owner) => _resolve().ShiDaHistoricalTargets(owner);
+    internal bool ShiDaJixiDistance(global::CardGame.Core.ProgramCardDistanceQuery query) => _resolve().ShiDaJixiDistance(query);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord> ShiDaLosses(int owner, global::CardGame.Core.CardMovementBatchContext? batch) => _resolve().ShiDaLosses(owner, batch);
+    internal bool ShiDaMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().ShiDaMovementProof(f, effect, pending);
+    internal bool ShiDaNativeEdge(int i) => _resolve().ShiDaNativeEdge(i);
+    internal global::CardGame.Core.ProgramSkillFrame? ShiDaObserverRoot() => _resolve().ShiDaObserverRoot();
+    internal bool ShiDaRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().ShiDaRecoveryParent(f, recovery);
+    internal global::System.Collections.Generic.IReadOnlyList<int> ShiDaSnatchTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiDaSnatchTargets(f);
+    internal bool ShiDaWindowMatches(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramTriggerWindow expected) => _resolve().ShiDaWindowMatches(f, expected);
+    internal bool TryReturnShiDaVirtualSnatch(global::CardGame.Core.CardUseFrame use) => _resolve().TryReturnShiDaVirtualSnatch(use);
+    internal bool ValidShiDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidShiDa(f);
+    internal bool ValidShiDaEquipmentLoss(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ShiDaEquipmentLossReceipt receipt) => _resolve().ValidShiDaEquipmentLoss(use, receipt);
+    internal bool ValidShiDaVirtualSnatchUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidShiDaVirtualSnatchUse(use);
+    internal void ValidateShiDaEquipmentLossReturn(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateShiDaEquipmentLossReturn(use);
+}

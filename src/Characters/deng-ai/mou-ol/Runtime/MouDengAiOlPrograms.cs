@@ -12,7 +12,7 @@ public sealed record MouDengAiOlReceipt(CardConversionSource Source, string Game
     public long ActionId { get; init; }
     public bool Paid { get; init; }
     public bool NativeReturned { get; init; }
-    private IReadOnlyList<int> _hand = Array.AsReadOnly(Array.Empty<int>()), _gu = Array.AsReadOnly(Array.Empty<int>());
+    private IReadOnlyList<int> _hand = Array.AsReadOnly(Array.Empty<int>()),_gu = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> HandCards { get => _hand; init => _hand = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> GuCards { get => _gu; init => _gu = Array.AsReadOnly(value.ToArray()); }
     private IReadOnlyList<long> _batches = Array.AsReadOnly(Array.Empty<long>());

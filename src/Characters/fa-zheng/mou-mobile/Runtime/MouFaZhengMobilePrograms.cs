@@ -55,7 +55,7 @@ internal sealed class MouFaZhengHandler(SkillProgramEffectOp op) : ISkillProgram
 }
 internal static class MouFaZhengComposition
 {
-    internal const string Xuanhuo = "mou-mobile:xuanhuo", Enyuan = "mou-mobile:enyuan";
+    internal const string Xuanhuo = "mou-mobile:xuanhuo",Enyuan = "mou-mobile:enyuan";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.IssueMouFaZhengXuanhuo or SkillProgramEffectOp.TakeMouFaZhengXuanhuoGain or SkillProgramEffectOp.ResolveMouFaZhengEnyuan;
     private static bool Own(IReadOnlyList<SkillProgramEffect> effects, SkillProgramEffectOp op) => effects is [{ Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always } e] && e.Op == op;
     [ProgramCatalogValidation(1400)]

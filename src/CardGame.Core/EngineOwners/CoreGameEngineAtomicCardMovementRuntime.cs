@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineAtomicCardMovementRuntime : global::CardGame.Core.IAtomicCardMovementEffects, global::CardGame.Core.IAtomicCardMovementFacts, global::CardGame.Core.IAtomicCardMovementPolicies
+{
+    private readonly ICoreAtomicCardMovementCharacterDiaoChanLeOperations _characterDiaoChanLeOperations;
+    private readonly ICoreAtomicCardMovementCharacterWeiYanHappyGodOperations _characterWeiYanHappyGodOperations;
+    private readonly ICoreAtomicCardMovementCharacterZhongHuiAnniversaryGodOperations _characterZhongHuiAnniversaryGodOperations;
+    private readonly ICoreAtomicCardMovementCharacterZhugeLiangWumiaoOperations _characterZhugeLiangWumiaoOperations;
+    private readonly ICoreAtomicCardMovementCharacterZuoCiHappyGodOperations _characterZuoCiHappyGodOperations;
+    private readonly ICoreAtomicCardMovementCoreActualDiscardPhaseLedgerOperations _coreActualDiscardPhaseLedgerOperations;
+    private readonly ICoreAtomicCardMovementCoreAdjacentDiscardStorageOperations _coreAdjacentDiscardStorageOperations;
+    private readonly ICoreAtomicCardMovementCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreAtomicCardMovementCoreCardDeclarationsOperations _coreCardDeclarationsOperations;
+    private readonly ICoreAtomicCardMovementCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreAtomicCardMovementCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreAtomicCardMovementCoreHellActivitiesOperations _coreHellActivitiesOperations;
+    private readonly ICoreAtomicCardMovementCoreHellSoulCardsOperations _coreHellSoulCardsOperations;
+    private readonly ICoreAtomicCardMovementCoreShanheStartingResourcesOperations _coreShanheStartingResourcesOperations;
+    private readonly ICoreAtomicCardMovementCoreWushuangShopCardsOperations _coreWushuangShopCardsOperations;
+    private readonly ICoreAtomicCardMovementCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreAtomicCardMovementCoreHellMengpoProgramsOperations _coreHellMengpoProgramsOperations;
+    private readonly ICoreAtomicCardMovementCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreAtomicCardMovementAtomicCardMovementOperations _atomicCardMovementOperations;
+    internal CoreGameEngineAtomicCardMovementRuntime(ICoreAtomicCardMovementCharacterDiaoChanLeOperations characterDiaoChanLeOperations, ICoreAtomicCardMovementCharacterWeiYanHappyGodOperations characterWeiYanHappyGodOperations, ICoreAtomicCardMovementCharacterZhongHuiAnniversaryGodOperations characterZhongHuiAnniversaryGodOperations, ICoreAtomicCardMovementCharacterZhugeLiangWumiaoOperations characterZhugeLiangWumiaoOperations, ICoreAtomicCardMovementCharacterZuoCiHappyGodOperations characterZuoCiHappyGodOperations, ICoreAtomicCardMovementCoreActualDiscardPhaseLedgerOperations coreActualDiscardPhaseLedgerOperations, ICoreAtomicCardMovementCoreAdjacentDiscardStorageOperations coreAdjacentDiscardStorageOperations, ICoreAtomicCardMovementCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreAtomicCardMovementCoreCardDeclarationsOperations coreCardDeclarationsOperations, ICoreAtomicCardMovementCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreAtomicCardMovementCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreAtomicCardMovementCoreHellActivitiesOperations coreHellActivitiesOperations, ICoreAtomicCardMovementCoreHellSoulCardsOperations coreHellSoulCardsOperations, ICoreAtomicCardMovementCoreShanheStartingResourcesOperations coreShanheStartingResourcesOperations, ICoreAtomicCardMovementCoreWushuangShopCardsOperations coreWushuangShopCardsOperations, ICoreAtomicCardMovementCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreAtomicCardMovementCoreHellMengpoProgramsOperations coreHellMengpoProgramsOperations, ICoreAtomicCardMovementCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreAtomicCardMovementAtomicCardMovementOperations atomicCardMovementOperations)
+    {
+        this._characterDiaoChanLeOperations = characterDiaoChanLeOperations;
+        this._characterWeiYanHappyGodOperations = characterWeiYanHappyGodOperations;
+        this._characterZhongHuiAnniversaryGodOperations = characterZhongHuiAnniversaryGodOperations;
+        this._characterZhugeLiangWumiaoOperations = characterZhugeLiangWumiaoOperations;
+        this._characterZuoCiHappyGodOperations = characterZuoCiHappyGodOperations;
+        this._coreActualDiscardPhaseLedgerOperations = coreActualDiscardPhaseLedgerOperations;
+        this._coreAdjacentDiscardStorageOperations = coreAdjacentDiscardStorageOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreHellActivitiesOperations = coreHellActivitiesOperations;
+        this._coreHellSoulCardsOperations = coreHellSoulCardsOperations;
+        this._coreShanheStartingResourcesOperations = coreShanheStartingResourcesOperations;
+        this._coreWushuangShopCardsOperations = coreWushuangShopCardsOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._coreHellMengpoProgramsOperations = coreHellMengpoProgramsOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._atomicCardMovementOperations = atomicCardMovementOperations;
+    }
+}

@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineShenwuExpandedPoliciesRuntime
+{
+    private readonly ICoreShenwuExpandedPoliciesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShenwuExpandedPoliciesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShenwuExpandedPoliciesCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICoreShenwuExpandedPoliciesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreShenwuExpandedPoliciesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreShenwuExpandedPoliciesCoreShenwuActivitiesOperations _coreShenwuActivitiesOperations;
+    private readonly ICoreShenwuExpandedPoliciesCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreShenwuExpandedPoliciesCoreShenwuNpcProgramsOperations _coreShenwuNpcProgramsOperations;
+    private readonly ICoreShenwuExpandedPoliciesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess _coreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess;
+    internal CoreGameEngineShenwuExpandedPoliciesRuntime(ICoreShenwuExpandedPoliciesContentRegistryOperations contentRegistryOperations, ICoreShenwuExpandedPoliciesResolutionStackOperations resolutionStackOperations, ICoreShenwuExpandedPoliciesCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICoreShenwuExpandedPoliciesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreShenwuExpandedPoliciesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreShenwuExpandedPoliciesCoreShenwuActivitiesOperations coreShenwuActivitiesOperations, ICoreShenwuExpandedPoliciesCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreShenwuExpandedPoliciesCoreShenwuNpcProgramsOperations coreShenwuNpcProgramsOperations, ICoreShenwuExpandedPoliciesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess coreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreShenwuActivitiesOperations = coreShenwuActivitiesOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreShenwuNpcProgramsOperations = coreShenwuNpcProgramsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess = coreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess;
+    }
+}

@@ -31,7 +31,7 @@ internal sealed class BoundaryQuanCongYaomingHandler : ISkillProgramEffectHandle
 internal static class BoundaryQuanCongComposition
 {
     internal const string Skill = "boundary:yaoming-mobile";
-    internal const string Activation = "charged-intervention", Trigger = "recharge-and-intervene";
+    internal const string Activation = "charged-intervention",Trigger = "recharge-and-intervene";
 
     [ProgramCatalogValidation(51200)]
     internal static void Validate(string path, SkillProgram program)

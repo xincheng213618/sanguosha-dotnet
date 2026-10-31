@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZangHongMobileShiRuntime : global::CardGame.Core.IShiZangHongHost
+{
+    private readonly ICharacterZangHongMobileShiCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterZangHongMobileShiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZangHongMobileShiResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZangHongMobileShiCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterZangHongMobileShiCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterZangHongMobileShiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZangHongMobileShiCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZangHongMobileShiCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZangHongMobileShiCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterZangHongMobileShiCoreVirtualBasicOffersOperations _coreVirtualBasicOffersOperations;
+    private readonly ICharacterZangHongMobileShiCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterZangHongMobileShiCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterZangHongMobileShiCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICharacterZangHongMobileShiCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterZangHongMobileShiCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterZangHongMobileShiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterZangHongMobileShiRuntime(ICharacterZangHongMobileShiCardZonesOperations cardZonesOperations, ICharacterZangHongMobileShiContentRegistryOperations contentRegistryOperations, ICharacterZangHongMobileShiResolutionStackOperations resolutionStackOperations, ICharacterZangHongMobileShiCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterZangHongMobileShiCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterZangHongMobileShiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZangHongMobileShiCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZangHongMobileShiCoreRuntimeOperations coreRuntimeOperations, ICharacterZangHongMobileShiCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterZangHongMobileShiCoreVirtualBasicOffersOperations coreVirtualBasicOffersOperations, ICharacterZangHongMobileShiCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterZangHongMobileShiCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterZangHongMobileShiCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICharacterZangHongMobileShiCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterZangHongMobileShiCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterZangHongMobileShiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreVirtualBasicOffersOperations = coreVirtualBasicOffersOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

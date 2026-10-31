@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineShanheSourceXiyingEndingRuntime
+{
+    private readonly ICoreShanheSourceXiyingEndingCardZonesOperations _cardZonesOperations;
+    private readonly ICoreShanheSourceXiyingEndingContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheSourceXiyingEndingRandomOperations _randomOperations;
+    private readonly ICoreShanheSourceXiyingEndingResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceXiyingEndingCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreShanheSourceXiyingEndingCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheSourceXiyingEndingCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheSourceXiyingEndingCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheSourceXiyingEndingCoreShanheSourceXiyingOperations _coreShanheSourceXiyingOperations;
+    private readonly ICoreShanheSourceXiyingEndingCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreShanheSourceXiyingEndingCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreShanheSourceXiyingEndingCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheSourceXiyingEndingCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreShanheSourceXiyingEndingKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineShanheSourceXiyingEndingRuntime(ICoreShanheSourceXiyingEndingCardZonesOperations cardZonesOperations, ICoreShanheSourceXiyingEndingContentRegistryOperations contentRegistryOperations, ICoreShanheSourceXiyingEndingRandomOperations randomOperations, ICoreShanheSourceXiyingEndingResolutionStackOperations resolutionStackOperations, ICoreShanheSourceXiyingEndingCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreShanheSourceXiyingEndingCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheSourceXiyingEndingCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheSourceXiyingEndingCoreRuntimeOperations coreRuntimeOperations, ICoreShanheSourceXiyingEndingCoreShanheSourceXiyingOperations coreShanheSourceXiyingOperations, ICoreShanheSourceXiyingEndingCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreShanheSourceXiyingEndingCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreShanheSourceXiyingEndingCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheSourceXiyingEndingCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreShanheSourceXiyingEndingKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheSourceXiyingOperations = coreShanheSourceXiyingOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

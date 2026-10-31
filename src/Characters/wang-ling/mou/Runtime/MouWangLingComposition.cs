@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouWangLingComposition
 {
-    internal const string Jichou = "mou:jichou", Mouli = "mou:mouli", Zifu = "mou:zifu";
+    internal const string Jichou = "mou:jichou",Mouli = "mou:mouli",Zifu = "mou:zifu";
     [ProgramCatalogValidation(1670)]
     internal static void Validate(string path, SkillProgram p)
     {

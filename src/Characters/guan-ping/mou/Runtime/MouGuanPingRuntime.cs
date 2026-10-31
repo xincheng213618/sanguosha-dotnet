@@ -5,7 +5,7 @@ namespace CardGame.Core;
 internal sealed class MouGuanPingRuntime(IMouGuanPingFacts facts, IMouGuanPingNative native, IProgramRuntimeFrames frames,
     IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouGuanPingRuntime
 {
-    internal const string Action = "mou-guan-ping", DrawReason = "skill-program.mou:wuwei.draw";
+    internal const string Action = "mou-guan-ping",DrawReason = "skill-program.mou:wuwei.draw";
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 35000, SkillProgramEffectOp.ResolveMouGuanPingWuwei)]
     private bool Qualifies(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => facts.Use(c, w)?.MouGuanPing is { TypeCount: > 0 };
     public SkillProgramStepOutcome Resolve(ProgramSkillFrame supplied)

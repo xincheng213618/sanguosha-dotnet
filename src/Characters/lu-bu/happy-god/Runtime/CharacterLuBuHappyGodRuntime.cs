@@ -1,0 +1,98 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLuBuHappyGodRuntime : global::CardGame.Core.IHappyLuBuHost
+{
+    private readonly ICharacterLuBuHappyGodCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterLuBuHappyGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLuBuHappyGodRandomOperations _randomOperations;
+    private readonly ICharacterLuBuHappyGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLuBuHappyGodSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICharacterLuBuHappyGodCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterLuBuHappyGodCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICharacterLuBuHappyGodCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterLuBuHappyGodCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICharacterLuBuHappyGodCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICharacterLuBuHappyGodCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterLuBuHappyGodCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterLuBuHappyGodCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterLuBuHappyGodCoreCurrentTurnUseKindsOperations _coreCurrentTurnUseKindsOperations;
+    private readonly ICharacterLuBuHappyGodCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICharacterLuBuHappyGodCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterLuBuHappyGodCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterLuBuHappyGodCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICharacterLuBuHappyGodCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterLuBuHappyGodCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterLuBuHappyGodCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICharacterLuBuHappyGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterLuBuHappyGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLuBuHappyGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLuBuHappyGodCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterLuBuHappyGodCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterLuBuHappyGodCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterLuBuHappyGodCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICharacterLuBuHappyGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterLuBuHappyGodCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
+    private readonly ICharacterLuBuHappyGodCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICharacterLuBuHappyGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLuBuHappyGodCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterLuBuHappyGodCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterLuBuHappyGodCharacterLuBuHappyGodOperations _characterLuBuHappyGodOperations;
+    private readonly ICharacterLuBuHappyGodCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterLuBuHappyGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterLuBuHappyGodKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterLuBuHappyGodRuntime(ICharacterLuBuHappyGodCardZonesOperations cardZonesOperations, ICharacterLuBuHappyGodContentRegistryOperations contentRegistryOperations, ICharacterLuBuHappyGodRandomOperations randomOperations, ICharacterLuBuHappyGodResolutionStackOperations resolutionStackOperations, ICharacterLuBuHappyGodSkillRuntimeStateOperations skillRuntimeStateOperations, ICharacterLuBuHappyGodCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterLuBuHappyGodCoreActualTurnsOperations coreActualTurnsOperations, ICharacterLuBuHappyGodCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterLuBuHappyGodCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICharacterLuBuHappyGodCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICharacterLuBuHappyGodCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterLuBuHappyGodCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterLuBuHappyGodCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterLuBuHappyGodCoreCurrentTurnUseKindsOperations coreCurrentTurnUseKindsOperations, ICharacterLuBuHappyGodCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICharacterLuBuHappyGodCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterLuBuHappyGodCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterLuBuHappyGodCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICharacterLuBuHappyGodCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterLuBuHappyGodCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterLuBuHappyGodCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICharacterLuBuHappyGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLuBuHappyGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLuBuHappyGodCoreRuntimeOperations coreRuntimeOperations, ICharacterLuBuHappyGodCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterLuBuHappyGodCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterLuBuHappyGodCoreTableOrderOperations coreTableOrderOperations, ICharacterLuBuHappyGodCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICharacterLuBuHappyGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterLuBuHappyGodCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICharacterLuBuHappyGodCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICharacterLuBuHappyGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLuBuHappyGodCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterLuBuHappyGodCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterLuBuHappyGodCharacterLuBuHappyGodOperations characterLuBuHappyGodOperations, ICharacterLuBuHappyGodCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterLuBuHappyGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterLuBuHappyGodKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreCurrentTurnUseKindsOperations = coreCurrentTurnUseKindsOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._characterLuBuHappyGodOperations = characterLuBuHappyGodOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

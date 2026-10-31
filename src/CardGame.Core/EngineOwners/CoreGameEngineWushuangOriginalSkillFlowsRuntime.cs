@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineWushuangOriginalSkillFlowsRuntime
+{
+    private readonly ICoreWushuangOriginalSkillFlowsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCoreWushuangOriginalSkillsOperations _coreWushuangOriginalSkillsOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreWushuangOriginalSkillFlowsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineWushuangOriginalSkillFlowsRuntime(ICoreWushuangOriginalSkillFlowsCardZonesOperations cardZonesOperations, ICoreWushuangOriginalSkillFlowsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreWushuangOriginalSkillFlowsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreWushuangOriginalSkillFlowsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreWushuangOriginalSkillFlowsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreWushuangOriginalSkillFlowsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreWushuangOriginalSkillFlowsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreWushuangOriginalSkillFlowsCoreWushuangOriginalSkillsOperations coreWushuangOriginalSkillsOperations, ICoreWushuangOriginalSkillFlowsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreWushuangOriginalSkillFlowsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreWushuangOriginalSkillFlowsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreWushuangOriginalSkillFlowsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreWushuangOriginalSkillFlowsKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreWushuangOriginalSkillFlowsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreWushuangOriginalSkillsOperations = coreWushuangOriginalSkillsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

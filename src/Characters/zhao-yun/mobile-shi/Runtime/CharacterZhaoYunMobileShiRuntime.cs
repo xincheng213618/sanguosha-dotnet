@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CharacterZhaoYunMobileShiRuntime
+{
+    private readonly ICharacterZhaoYunMobileShiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhaoYunMobileShiResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhaoYunMobileShiCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterZhaoYunMobileShiCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICharacterZhaoYunMobileShiCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterZhaoYunMobileShiCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICharacterZhaoYunMobileShiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZhaoYunMobileShiCoreProgramPersistentStateOperations _coreProgramPersistentStateOperations;
+    private readonly ICharacterZhaoYunMobileShiCoreVirtualOrdinaryTrickUsesOperations _coreVirtualOrdinaryTrickUsesOperations;
+    private readonly ICharacterZhaoYunMobileShiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterZhaoYunMobileShiRuntime(ICharacterZhaoYunMobileShiContentRegistryOperations contentRegistryOperations, ICharacterZhaoYunMobileShiResolutionStackOperations resolutionStackOperations, ICharacterZhaoYunMobileShiCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterZhaoYunMobileShiCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICharacterZhaoYunMobileShiCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterZhaoYunMobileShiCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICharacterZhaoYunMobileShiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhaoYunMobileShiCoreProgramPersistentStateOperations coreProgramPersistentStateOperations, ICharacterZhaoYunMobileShiCoreVirtualOrdinaryTrickUsesOperations coreVirtualOrdinaryTrickUsesOperations, ICharacterZhaoYunMobileShiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramPersistentStateOperations = coreProgramPersistentStateOperations;
+        this._coreVirtualOrdinaryTrickUsesOperations = coreVirtualOrdinaryTrickUsesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineDeathGrowthSkillObserversRuntime
+{
+    private readonly ICoreDeathGrowthSkillObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDeathGrowthSkillObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreDeathGrowthSkillObserversCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDeathGrowthSkillObserversCoreDeathGrowthSkillsOperations _coreDeathGrowthSkillsOperations;
+    private readonly ICoreDeathGrowthSkillObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreDeathGrowthSkillObserversCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreDeathGrowthSkillObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDeathGrowthSkillObserversCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreDeathGrowthSkillObserversCoreDeathGrowthSkillObserversOperations _coreDeathGrowthSkillObserversOperations;
+    private readonly ICoreDeathGrowthSkillObserversCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineDeathGrowthSkillObserversRuntime(ICoreDeathGrowthSkillObserversResolutionStackOperations resolutionStackOperations, ICoreDeathGrowthSkillObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreDeathGrowthSkillObserversCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDeathGrowthSkillObserversCoreDeathGrowthSkillsOperations coreDeathGrowthSkillsOperations, ICoreDeathGrowthSkillObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreDeathGrowthSkillObserversCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreDeathGrowthSkillObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDeathGrowthSkillObserversCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreDeathGrowthSkillObserversCoreDeathGrowthSkillObserversOperations coreDeathGrowthSkillObserversOperations, ICoreDeathGrowthSkillObserversCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreDeathGrowthSkillsOperations = coreDeathGrowthSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreDeathGrowthSkillObserversOperations = coreDeathGrowthSkillObserversOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

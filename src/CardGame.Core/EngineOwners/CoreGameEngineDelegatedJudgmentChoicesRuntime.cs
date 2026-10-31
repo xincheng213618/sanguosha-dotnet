@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineDelegatedJudgmentChoicesRuntime
+{
+    private readonly ICoreDelegatedJudgmentChoicesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCoreJudgmentReplacementProgramsOperations _coreJudgmentReplacementProgramsOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCoreJudgmentCursorRuntimeOperations _coreJudgmentCursorRuntimeOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCoreNativeJudgmentOperations _coreNativeJudgmentOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreDelegatedJudgmentChoicesCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreDelegatedJudgmentChoicesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineDelegatedJudgmentChoicesRuntime(ICoreDelegatedJudgmentChoicesContentRegistryOperations contentRegistryOperations, ICoreDelegatedJudgmentChoicesCoreJudgmentReplacementProgramsOperations coreJudgmentReplacementProgramsOperations, ICoreDelegatedJudgmentChoicesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDelegatedJudgmentChoicesCoreJudgmentCursorRuntimeOperations coreJudgmentCursorRuntimeOperations, ICoreDelegatedJudgmentChoicesCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreDelegatedJudgmentChoicesCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreDelegatedJudgmentChoicesCoreNativeJudgmentOperations coreNativeJudgmentOperations, ICoreDelegatedJudgmentChoicesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreDelegatedJudgmentChoicesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDelegatedJudgmentChoicesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreDelegatedJudgmentChoicesCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreDelegatedJudgmentChoicesCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreDelegatedJudgmentChoicesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreJudgmentReplacementProgramsOperations = coreJudgmentReplacementProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreJudgmentCursorRuntimeOperations = coreJudgmentCursorRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeJudgmentOperations = coreNativeJudgmentOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,53 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterWuFuAnniversaryEntries
+{
+    internal bool AdvanceWuFuChildren() => _resolve().AdvanceWuFuChildren();
+    internal void AnswerWuFu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWuFu(choice);
+    internal void AssertWuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuFu(f);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginWuFu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginWuFu(supplied, op);
+    internal void BindWuFuSlash(global::CardGame.Core.IGameEvent fact) => _resolve().BindWuFuSlash(fact);
+    internal bool CanWuFuSlash(int actor, int target) => _resolve().CanWuFuSlash(actor, target);
+    internal void CaptureWuFuPhaseGain(global::CardGame.Core.IGameEvent fact) => _resolve().CaptureWuFuPhaseGain(fact);
+    internal global::CardGame.Core.PromptChoice ChooseWuFu(global::CardGame.Core.PendingDecision p) => _resolve().ChooseWuFu(p);
+    internal void CompleteWuFuItem(global::CardGame.Core.ProgramSkillFrame f, bool used) => _resolve().CompleteWuFuItem(f, used);
+    internal void CompleteWuFuSlash(long id) => _resolve().CompleteWuFuSlash(id);
+    internal void ContinueWuFu(long id) => _resolve().ContinueWuFu(id);
+    internal bool DrainWuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainWuFu(f);
+    internal void FinishWuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWuFu(f);
+    internal bool FinishWuFuAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishWuFuAttack(attack, out paused);
+    internal bool HasAnniversaryWuFuPrompt() => _resolve().HasAnniversaryWuFuPrompt();
+    internal bool IsAnniversaryWuFuHandUseForbidden(int seat, global::System.Collections.Generic.IReadOnlyList<int> ids) => _resolve().IsAnniversaryWuFuHandUseForbidden(seat, ids);
+    internal bool IsAnniversaryWuFuSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsAnniversaryWuFuSettlementBatch(f, b);
+    internal bool IsWuFuUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsWuFuUse(use);
+    internal void IssueWuFuSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueWuFuSlash(f);
+    internal void PublishWuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishWuFu(f);
+    internal bool ResumeWuFu(long id) => _resolve().ResumeWuFu(id);
+    internal bool RetainWuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainWuFu(f);
+    internal bool ReturnWuFuAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt receipt) => _resolve().ReturnWuFuAttack(receipt);
+    internal void ReturnWuFuDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome o) => _resolve().ReturnWuFuDraw(f, o);
+    internal bool ReturnWuFuMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnWuFuMovement(f);
+    internal void ReturnWuFuUse(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnWuFuUse(use);
+    internal bool ValidWuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidWuFu(f);
+    internal void ValidateWuFuUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateWuFuUse(use);
+    internal bool WindowSettlement_IsAnniversaryWuFuSettlementBatch(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().WindowSettlement_IsAnniversaryWuFuSettlementBatch(frame, batch);
+    internal bool WuFuBeforeDamageObserver(long id) => _resolve().WuFuBeforeDamageObserver(id);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> WuFuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().WuFuChoices(f);
+    internal int WuFuChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().WuFuChooser(f);
+    internal bool WuFuDamageObserver(long id) => _resolve().WuFuDamageObserver(id);
+    internal bool WuFuDying() => _resolve().WuFuDying();
+    internal bool WuFuFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().WuFuFirstChild(f, child);
+    internal bool WuFuLegalUseBan(global::CardGame.Core.ProgramLegalActionQuery q) => _resolve().WuFuLegalUseBan(q);
+    internal bool WuFuMaterialBan(global::CardGame.Core.ProgramCardMaterialQuery q) => _resolve().WuFuMaterialBan(q);
+    internal bool WuFuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().WuFuMovement(f, e, p);
+    internal bool WuFuNativeEdge(int i) => _resolve().WuFuNativeEdge(i);
+    internal bool WuFuNativeResponseBan(global::CardGame.Core.ProgramNativeResponseQuery q) => _resolve().WuFuNativeResponseBan(q);
+    internal bool WuFuObserverEdge(int i) => _resolve().WuFuObserverEdge(i);
+    internal global::CardGame.Core.ProgramSkillFrame? WuFuObserverRoot() => _resolve().WuFuObserverRoot();
+    internal bool WuFuPhaseOpen(global::CardGame.Core.ActualDiscardRecoveryPhaseKey phase) => _resolve().WuFuPhaseOpen(phase);
+    internal bool WuFuResponseIsUse(int actor, global::CardGame.Core.CardKind kind, bool dying = false) => _resolve().WuFuResponseIsUse(actor, kind, dying);
+    internal void WuFuSubmittedUseBan(global::CardGame.Core.ProgramSubmittedUseQuery q) => _resolve().WuFuSubmittedUseBan(q);
+    internal global::CardGame.Core.AnniversaryWuFuTask WuFuTask(global::CardGame.Core.ProgramSkillFrame f) => _resolve().WuFuTask(f);
+    internal global::CardGame.Core.AnniversaryWuFuTask[] WuFuTasks(global::CardGame.Core.ProgramSkillFrame f) => _resolve().WuFuTasks(f);
+    internal bool WuFuViewAsBan(global::CardGame.Core.ProgramViewAsLegalityQuery q) => _resolve().WuFuViewAsBan(q);
+}

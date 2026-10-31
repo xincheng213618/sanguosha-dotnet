@@ -53,7 +53,7 @@ public sealed record ShenHuaTuoReceipt(CardConversionSource Source, string Gamep
     string? SelectedGeneralId = null, string? SelectedSkillId = null, uint RandomBefore = 0, uint RandomAfterGeneral = 0,
     uint RandomAfterSkill = 0, string? GrantedGrantId = null, bool GrantAdded = false)
 {
-    private IReadOnlyList<string> _generals = Array.AsReadOnly(Array.Empty<string>()), _skills = Array.AsReadOnly(Array.Empty<string>());
+    private IReadOnlyList<string> _generals = Array.AsReadOnly(Array.Empty<string>()),_skills = Array.AsReadOnly(Array.Empty<string>());
     private IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<string> GeneralCandidates { get => _generals; init => _generals = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<string> SkillCandidates { get => _skills; init => _skills = Array.AsReadOnly(value.ToArray()); }

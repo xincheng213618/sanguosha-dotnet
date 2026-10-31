@@ -1,0 +1,88 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZhangQiYingOlRuntime : global::CardGame.Core.IZhangQiYingProgramHost
+{
+    private readonly ICharacterZhangQiYingOlCharacterXiaoQiaoBoundaryMobileOperations _characterXiaoQiaoBoundaryMobileOperations;
+    private readonly ICharacterZhangQiYingOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterZhangQiYingOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhangQiYingOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhangQiYingOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterZhangQiYingOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterZhangQiYingOlCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterZhangQiYingOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterZhangQiYingOlCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterZhangQiYingOlCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterZhangQiYingOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterZhangQiYingOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterZhangQiYingOlCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICharacterZhangQiYingOlCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterZhangQiYingOlCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterZhangQiYingOlCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICharacterZhangQiYingOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhangQiYingOlCoreProgramTopReorderOperations _coreProgramTopReorderOperations;
+    private readonly ICharacterZhangQiYingOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZhangQiYingOlCoreShanheS5XuncanOperations _coreShanheS5XuncanOperations;
+    private readonly ICharacterZhangQiYingOlCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterZhangQiYingOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterZhangQiYingOlCoreHellDizangProgramsOperations _coreHellDizangProgramsOperations;
+    private readonly ICharacterZhangQiYingOlCoreJudgmentCursorRuntimeOperations _coreJudgmentCursorRuntimeOperations;
+    private readonly ICharacterZhangQiYingOlCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICharacterZhangQiYingOlCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICharacterZhangQiYingOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterZhangQiYingOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterZhangQiYingOlCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICharacterZhangQiYingOlCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterZhangQiYingOlCharacterZhangQiYingOlOperations _characterZhangQiYingOlOperations;
+    private readonly ICharacterZhangQiYingOlCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterZhangQiYingOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterZhangQiYingOlRuntime(ICharacterZhangQiYingOlCharacterXiaoQiaoBoundaryMobileOperations characterXiaoQiaoBoundaryMobileOperations, ICharacterZhangQiYingOlCardZonesOperations cardZonesOperations, ICharacterZhangQiYingOlContentRegistryOperations contentRegistryOperations, ICharacterZhangQiYingOlResolutionStackOperations resolutionStackOperations, ICharacterZhangQiYingOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterZhangQiYingOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterZhangQiYingOlCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterZhangQiYingOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterZhangQiYingOlCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterZhangQiYingOlCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterZhangQiYingOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterZhangQiYingOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterZhangQiYingOlCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICharacterZhangQiYingOlCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterZhangQiYingOlCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterZhangQiYingOlCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICharacterZhangQiYingOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhangQiYingOlCoreProgramTopReorderOperations coreProgramTopReorderOperations, ICharacterZhangQiYingOlCoreRuntimeOperations coreRuntimeOperations, ICharacterZhangQiYingOlCoreShanheS5XuncanOperations coreShanheS5XuncanOperations, ICharacterZhangQiYingOlCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterZhangQiYingOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterZhangQiYingOlCoreHellDizangProgramsOperations coreHellDizangProgramsOperations, ICharacterZhangQiYingOlCoreJudgmentCursorRuntimeOperations coreJudgmentCursorRuntimeOperations, ICharacterZhangQiYingOlCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICharacterZhangQiYingOlCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICharacterZhangQiYingOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterZhangQiYingOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterZhangQiYingOlCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICharacterZhangQiYingOlCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterZhangQiYingOlCharacterZhangQiYingOlOperations characterZhangQiYingOlOperations, ICharacterZhangQiYingOlCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterZhangQiYingOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterXiaoQiaoBoundaryMobileOperations = characterXiaoQiaoBoundaryMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramTopReorderOperations = coreProgramTopReorderOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheS5XuncanOperations = coreShanheS5XuncanOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreHellDizangProgramsOperations = coreHellDizangProgramsOperations;
+        this._coreJudgmentCursorRuntimeOperations = coreJudgmentCursorRuntimeOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._characterZhangQiYingOlOperations = characterZhangQiYingOlOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

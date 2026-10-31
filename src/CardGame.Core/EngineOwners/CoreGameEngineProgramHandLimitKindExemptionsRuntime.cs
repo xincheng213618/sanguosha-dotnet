@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramHandLimitKindExemptionsRuntime
+{
+    private readonly ICoreProgramHandLimitKindExemptionsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramHandLimitKindExemptionsTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreProgramHandLimitKindExemptionsCoreDeferredCardsOperations _coreDeferredCardsOperations;
+    private readonly ICoreProgramHandLimitKindExemptionsCoreDiscardOperations _coreDiscardOperations;
+    private readonly ICoreProgramHandLimitKindExemptionsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramHandLimitKindExemptionsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreProgramHandLimitKindExemptionsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramHandLimitKindExemptionsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreProgramHandLimitKindExemptionsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreProgramHandLimitKindExemptionsCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreProgramHandLimitKindExemptionsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess _coreActualTurnProgressTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramHandLimitKindExemptionsRuntime(ICoreProgramHandLimitKindExemptionsResolutionStackOperations resolutionStackOperations, ICoreProgramHandLimitKindExemptionsTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreProgramHandLimitKindExemptionsCoreDeferredCardsOperations coreDeferredCardsOperations, ICoreProgramHandLimitKindExemptionsCoreDiscardOperations coreDiscardOperations, ICoreProgramHandLimitKindExemptionsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramHandLimitKindExemptionsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreProgramHandLimitKindExemptionsCoreRuntimeOperations coreRuntimeOperations, ICoreProgramHandLimitKindExemptionsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreProgramHandLimitKindExemptionsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreProgramHandLimitKindExemptionsCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreProgramHandLimitKindExemptionsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberTurnProgressionAccess coreActualTurnProgressTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreDeferredCardsOperations = coreDeferredCardsOperations;
+        this._coreDiscardOperations = coreDiscardOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreActualTurnProgressTurnNumberTurnProgressionAccess = coreActualTurnProgressTurnNumberTurnProgressionAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

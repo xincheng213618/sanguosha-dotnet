@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineFinalizedCardTargetsRuntime
+{
+    private readonly ICoreFinalizedCardTargetsCharacterCaoZhenBoundaryMobileOperations _characterCaoZhenBoundaryMobileOperations;
+    private readonly ICoreFinalizedCardTargetsCharacterChengYuMouOperations _characterChengYuMouOperations;
+    private readonly ICoreFinalizedCardTargetsCharacterHuangZhongAnniversaryGodOperations _characterHuangZhongAnniversaryGodOperations;
+    private readonly ICoreFinalizedCardTargetsCharacterWeiYanHappyGodOperations _characterWeiYanHappyGodOperations;
+    private readonly ICoreFinalizedCardTargetsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreFinalizedCardTargetsModeRulesOperations _modeRulesOperations;
+    private readonly ICoreFinalizedCardTargetsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFinalizedCardTargetsCoreActivityOrdinaryTricksOperations _coreActivityOrdinaryTricksOperations;
+    private readonly ICoreFinalizedCardTargetsCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreFinalizedCardTargetsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreFinalizedCardTargetsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreFinalizedCardTargetsCoreProgramCardUseNullificationOperations _coreProgramCardUseNullificationOperations;
+    private readonly ICoreFinalizedCardTargetsCoreNativeEquipmentUseOperations _coreNativeEquipmentUseOperations;
+    private readonly ICoreFinalizedCardTargetsCoreProgramTargetWindowProtocolsOperations _coreProgramTargetWindowProtocolsOperations;
+    private readonly ICoreFinalizedCardTargetsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineFinalizedCardTargetsRuntime(ICoreFinalizedCardTargetsCharacterCaoZhenBoundaryMobileOperations characterCaoZhenBoundaryMobileOperations, ICoreFinalizedCardTargetsCharacterChengYuMouOperations characterChengYuMouOperations, ICoreFinalizedCardTargetsCharacterHuangZhongAnniversaryGodOperations characterHuangZhongAnniversaryGodOperations, ICoreFinalizedCardTargetsCharacterWeiYanHappyGodOperations characterWeiYanHappyGodOperations, ICoreFinalizedCardTargetsContentRegistryOperations contentRegistryOperations, ICoreFinalizedCardTargetsModeRulesOperations modeRulesOperations, ICoreFinalizedCardTargetsResolutionStackOperations resolutionStackOperations, ICoreFinalizedCardTargetsCoreActivityOrdinaryTricksOperations coreActivityOrdinaryTricksOperations, ICoreFinalizedCardTargetsCoreCardActionsOperations coreCardActionsOperations, ICoreFinalizedCardTargetsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreFinalizedCardTargetsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreFinalizedCardTargetsCoreProgramCardUseNullificationOperations coreProgramCardUseNullificationOperations, ICoreFinalizedCardTargetsCoreNativeEquipmentUseOperations coreNativeEquipmentUseOperations, ICoreFinalizedCardTargetsCoreProgramTargetWindowProtocolsOperations coreProgramTargetWindowProtocolsOperations, ICoreFinalizedCardTargetsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCaoZhenBoundaryMobileOperations = characterCaoZhenBoundaryMobileOperations;
+        this._characterChengYuMouOperations = characterChengYuMouOperations;
+        this._characterHuangZhongAnniversaryGodOperations = characterHuangZhongAnniversaryGodOperations;
+        this._characterWeiYanHappyGodOperations = characterWeiYanHappyGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._modeRulesOperations = modeRulesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActivityOrdinaryTricksOperations = coreActivityOrdinaryTricksOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardUseNullificationOperations = coreProgramCardUseNullificationOperations;
+        this._coreNativeEquipmentUseOperations = coreNativeEquipmentUseOperations;
+        this._coreProgramTargetWindowProtocolsOperations = coreProgramTargetWindowProtocolsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

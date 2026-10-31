@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static partial class WuLuKangComposition
 {
-    internal const string Shenduan = "wumiao:shenduan", Kegou = "wumiao:kegou", Dixian = "wumiao:dixian";
+    internal const string Shenduan = "wumiao:shenduan",Kegou = "wumiao:kegou",Dixian = "wumiao:dixian";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveWuLuKangShenduan or SkillProgramEffectOp.ResolveWuLuKangKegou or SkillProgramEffectOp.ResolveWuLuKangDixian;
     private static bool WuPlain(SkillProgramEffect e, SkillProgramEffectOp op) => e.Op == op && e.Target == SkillProgramEffectTarget.Owner &&
         e.Condition.Kind == SkillProgramConditionKind.Always && e.Amount == 0 && e.ActorReference is null && e.TargetReference is null &&

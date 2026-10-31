@@ -1,0 +1,60 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
+{
+    private readonly ICoreJoinedTrickDamageRewardsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreJoinedTrickDamageRewardsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreCompletedCategoryUseProofOperations _coreCompletedCategoryUseProofOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreJoinedTrickDamageObserversOperations _coreJoinedTrickDamageObserversOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCorePublicPilePreparationOperations _corePublicPilePreparationOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreUniqueLeaderTrickTargetsOperations _coreUniqueLeaderTrickTargetsOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreJoinedTrickDamageRewardsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreJoinedTrickDamageRewardsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineJoinedTrickDamageRewardsRuntime(ICoreJoinedTrickDamageRewardsContentRegistryOperations contentRegistryOperations, ICoreJoinedTrickDamageRewardsResolutionStackOperations resolutionStackOperations, ICoreJoinedTrickDamageRewardsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreJoinedTrickDamageRewardsCoreCardActionsOperations coreCardActionsOperations, ICoreJoinedTrickDamageRewardsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreJoinedTrickDamageRewardsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreJoinedTrickDamageRewardsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreJoinedTrickDamageRewardsCoreCompletedCategoryUseProofOperations coreCompletedCategoryUseProofOperations, ICoreJoinedTrickDamageRewardsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreJoinedTrickDamageRewardsCoreJoinedTrickDamageObserversOperations coreJoinedTrickDamageObserversOperations, ICoreJoinedTrickDamageRewardsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreJoinedTrickDamageRewardsCorePublicPilePreparationOperations corePublicPilePreparationOperations, ICoreJoinedTrickDamageRewardsCoreRuntimeOperations coreRuntimeOperations, ICoreJoinedTrickDamageRewardsCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreJoinedTrickDamageRewardsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreJoinedTrickDamageRewardsCoreUniqueLeaderTrickTargetsOperations coreUniqueLeaderTrickTargetsOperations, ICoreJoinedTrickDamageRewardsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreJoinedTrickDamageRewardsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreJoinedTrickDamageRewardsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreJoinedTrickDamageRewardsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreCompletedCategoryUseProofOperations = coreCompletedCategoryUseProofOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreJoinedTrickDamageObserversOperations = coreJoinedTrickDamageObserversOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPilePreparationOperations = corePublicPilePreparationOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreUniqueLeaderTrickTargetsOperations = coreUniqueLeaderTrickTargetsOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

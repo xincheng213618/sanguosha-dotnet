@@ -30,8 +30,8 @@ internal sealed class BoundaryXuChuDrawHandler : ISkillProgramEffectHandler
 
 internal static class BoundaryXuChuMobile
 {
-    internal const string Skill = "boundary:luoyi-mobile", Reveal = "luoyi-revealed", Gained = "luoyi-gained", Choice = "luoyi-draw-choice";
-    internal const string Skip = "skip-draw", Normal = "normal-draw";
+    internal const string Skill = "boundary:luoyi-mobile",Reveal = "luoyi-revealed",Gained = "luoyi-gained",Choice = "luoyi-draw-choice";
+    internal const string Skip = "skip-draw",Normal = "normal-draw";
     [ProgramCatalogValidation(59900)]
     private static void Validate(string path, SkillProgram p)
     {

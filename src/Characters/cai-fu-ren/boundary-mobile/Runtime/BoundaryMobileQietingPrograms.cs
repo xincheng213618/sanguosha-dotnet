@@ -21,7 +21,7 @@ internal sealed class BoundaryMobileQietingHandler : ISkillProgramEffectHandler
 
 public sealed record BoundaryMobileQietingSelection(uint RandomBefore, uint RandomAfter)
 {
-    private readonly IReadOnlyList<int> _hand = Array.AsReadOnly(Array.Empty<int>()), _viewed = Array.AsReadOnly(Array.Empty<int>());
+    private readonly IReadOnlyList<int> _hand = Array.AsReadOnly(Array.Empty<int>()),_viewed = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Hand { get => _hand; init => _hand = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Viewed { get => _viewed; init => _viewed = Array.AsReadOnly(value.ToArray()); }
     public int? ReplacedCardId { get; init; }

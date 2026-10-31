@@ -6,8 +6,7 @@ internal sealed partial class MouZhuRanRuntime(IMouZhuRanFacts facts,IMouZhuRanN
     IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramOperationDraws draws):IMouZhuRanHost
 {
     internal const string Zhenwei="mou-mobile:zhenwei",Heyuan="mou-mobile:heyuan",Action="mou-zhu-ran";
-    internal const string CostReason="skill-program.mou-mobile:zhenwei.discard",HeyuanCostReason="skill-program.mou-mobile:heyuan.discard",
-        DrawReason="skill-program.mou-mobile:zhenwei.draw",HeyuanDrawReason="skill-program.mou-mobile:heyuan.draw";
+    internal const string CostReason="skill-program.mou-mobile:zhenwei.discard",HeyuanCostReason="skill-program.mou-mobile:heyuan.discard",        DrawReason="skill-program.mou-mobile:zhenwei.draw",HeyuanDrawReason="skill-program.mou-mobile:heyuan.draw";
     private static CardConversionSource Source(ProgramSkillFrame f)=>new(f.SkillId,f.TriggerId??f.ActivationId,f.OwnerSeat,f.SkillInstanceId);
     private static bool Z(ProgramSkillFrame f)=>f.MouZhuRan?.Operation==SkillProgramEffectOp.ResolveMouZhuRanZhenwei;
     private MouZhuRanResolvedEvent? Last(int owner)

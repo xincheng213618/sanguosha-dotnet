@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineCharacterStateProgramsRuntime
+{
+    private readonly ICoreCharacterStateProgramsCharacterCaoPiAnniversaryGodOperations _characterCaoPiAnniversaryGodOperations;
+    private readonly ICoreCharacterStateProgramsCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
+    private readonly ICoreCharacterStateProgramsCharacterZhaoZhongOlOperations _characterZhaoZhongOlOperations;
+    private readonly ICoreCharacterStateProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCharacterStateProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCharacterStateProgramsCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreCharacterStateProgramsCoreChainedStateBasicConversionsOperations _coreChainedStateBasicConversionsOperations;
+    private readonly ICoreCharacterStateProgramsCoreConvertingGiftsOperations _coreConvertingGiftsOperations;
+    private readonly ICoreCharacterStateProgramsCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreCharacterStateProgramsCoreDeferredHandAlignmentsOperations _coreDeferredHandAlignmentsOperations;
+    private readonly ICoreCharacterStateProgramsCoreDragonBoatCardsOperations _coreDragonBoatCardsOperations;
+    private readonly ICoreCharacterStateProgramsCoreGuanduCardsOperations _coreGuanduCardsOperations;
+    private readonly ICoreCharacterStateProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreCharacterStateProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreCharacterStateProgramsCoreSoleIncomingRangeDrawOperations _coreSoleIncomingRangeDrawOperations;
+    private readonly ICoreCharacterStateProgramsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreCharacterStateProgramsCoreVirtualBasicOffersOperations _coreVirtualBasicOffersOperations;
+    private readonly ICoreCharacterStateProgramsCoreWenheCardsOperations _coreWenheCardsOperations;
+    private readonly ICoreCharacterStateProgramsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreCharacterStateProgramsCoreNativeCardEffectDrawsOperations _coreNativeCardEffectDrawsOperations;
+    private readonly ICoreCharacterStateProgramsCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreCharacterStateProgramsCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreCharacterStateProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreCharacterStateProgramsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreCharacterStateProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess _coreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess;
+    internal CoreGameEngineCharacterStateProgramsRuntime(ICoreCharacterStateProgramsCharacterCaoPiAnniversaryGodOperations characterCaoPiAnniversaryGodOperations, ICoreCharacterStateProgramsCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICoreCharacterStateProgramsCharacterZhaoZhongOlOperations characterZhaoZhongOlOperations, ICoreCharacterStateProgramsContentRegistryOperations contentRegistryOperations, ICoreCharacterStateProgramsResolutionStackOperations resolutionStackOperations, ICoreCharacterStateProgramsCoreActualTurnsOperations coreActualTurnsOperations, ICoreCharacterStateProgramsCoreChainedStateBasicConversionsOperations coreChainedStateBasicConversionsOperations, ICoreCharacterStateProgramsCoreConvertingGiftsOperations coreConvertingGiftsOperations, ICoreCharacterStateProgramsCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreCharacterStateProgramsCoreDeferredHandAlignmentsOperations coreDeferredHandAlignmentsOperations, ICoreCharacterStateProgramsCoreDragonBoatCardsOperations coreDragonBoatCardsOperations, ICoreCharacterStateProgramsCoreGuanduCardsOperations coreGuanduCardsOperations, ICoreCharacterStateProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreCharacterStateProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreCharacterStateProgramsCoreSoleIncomingRangeDrawOperations coreSoleIncomingRangeDrawOperations, ICoreCharacterStateProgramsCoreTableOrderOperations coreTableOrderOperations, ICoreCharacterStateProgramsCoreVirtualBasicOffersOperations coreVirtualBasicOffersOperations, ICoreCharacterStateProgramsCoreWenheCardsOperations coreWenheCardsOperations, ICoreCharacterStateProgramsCoreMatchLogOperations coreMatchLogOperations, ICoreCharacterStateProgramsCoreNativeCardEffectDrawsOperations coreNativeCardEffectDrawsOperations, ICoreCharacterStateProgramsCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreCharacterStateProgramsCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreCharacterStateProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreCharacterStateProgramsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreCharacterStateProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess coreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess)
+    {
+        this._characterCaoPiAnniversaryGodOperations = characterCaoPiAnniversaryGodOperations;
+        this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
+        this._characterZhaoZhongOlOperations = characterZhaoZhongOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreChainedStateBasicConversionsOperations = coreChainedStateBasicConversionsOperations;
+        this._coreConvertingGiftsOperations = coreConvertingGiftsOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreDeferredHandAlignmentsOperations = coreDeferredHandAlignmentsOperations;
+        this._coreDragonBoatCardsOperations = coreDragonBoatCardsOperations;
+        this._coreGuanduCardsOperations = coreGuanduCardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSoleIncomingRangeDrawOperations = coreSoleIncomingRangeDrawOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreVirtualBasicOffersOperations = coreVirtualBasicOffersOperations;
+        this._coreWenheCardsOperations = coreWenheCardsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardEffectDrawsOperations = coreNativeCardEffectDrawsOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreMatchSetupSetupCompleteAccess = coreMatchSetupSetupCompleteAccess;
+        this._coreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess = coreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess;
+    }
+}

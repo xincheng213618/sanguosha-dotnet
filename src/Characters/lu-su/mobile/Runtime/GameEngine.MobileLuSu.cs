@@ -35,26 +35,3 @@ internal sealed class MobileLuSuDimengSelectionValidator : IProgramSelectionVali
         request.Context.SkillId != "mobile:dimeng" || MobileLuSuDimengSelection.CanPay(request.Context, request.Targets, queries)
             ? null : new(CommandErrorCode.IllegalAction, "缔盟须有足额可弃置的手牌和装备牌支付两名目标的手牌数差额。");
 }
-
-public sealed partial class GameEngine
-{
-    // Mobile Dimeng pays before exchanging. The already paid original cost is
-    // retained by the native binding and movement ledger, including source loss
-    // in the real discard child; neither the cost nor the hand swap is reissued.
-    private bool MobileLuSuDimengPaid(ProgramSkillFrame f) => f.SkillId == "mobile:dimeng" && f.TriggerId is null &&
-        f.ActivationId == "alliance-pact" && f.InstructionIndex is 2 or 3 && f.SelectedTargetSeats is [var first, var second] && first != second &&
-        f.CardSetBindings.SingleOrDefault(b => b.Name == "dimeng-cost") is { CardIds.Count: > 0 } cost &&
-        cost.CardIds.Select((id, i) => (Id: id, From: cost.SourceLocations[i])).All(c =>
-            c.From.OwnerSeat == f.OwnerSeat && c.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment &&
-            CompleteProgramEventHistory().SkipWhile(e => e is not ProgramSkillStartedEvent started || started.FrameId != f.Id).OfType<CardMovedEvent>()
-                .Count(m => m.CardId == c.Id && m.From == c.From && m.To == CardLocation.DiscardPile && m.Reason.Value == "skill-program.mobile:dimeng.MoveBoundCards") == 1) &&
-        ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.ActivationId == f.ActivationId) == 1;
-    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 71500)]
-    private bool KeepMobileLuSuDimengPaid(ProgramSkillFrame f) => MobileLuSuDimengPaid(f);
-    [ProgramContinuation(ProgramContinuationKind.Movement, 71500)]
-    private bool ReturnMobileLuSuDimengPaid(ProgramSkillFrame f)
-    {
-        if (!MobileLuSuDimengPaid(f) || f.PendingMovementContinuation is not { SubjectSeat: var seat, BeforeCount: 0, CoverageResultBind: null } || seat != f.OwnerSeat) return false;
-        ReplaceRuntimeTop(f with { PendingMovementContinuation = null }); AdvanceRuntimeProgram(f.Id); return true;
-    }
-}

@@ -1,0 +1,84 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineTurnRedSlashBenefitsRuntime : global::CardGame.Core.ITurnRedSlashProgramHost
+{
+    private readonly ICoreTurnRedSlashBenefitsCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterHanDangMouMobileOperations _characterHanDangMouMobileOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterLiuPanOlOperations _characterLiuPanOlOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterLiuYanOlOperations _characterLiuYanOlOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterLiuZanMobileOperations _characterLiuZanMobileOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterLuZhiMouMobileOperations _characterLuZhiMouMobileOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterMaMiDiOlOperations _characterMaMiDiOlOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterQuHuangOlOperations _characterQuHuangOlOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterRuanYuOlOperations _characterRuanYuOlOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterWenChouMouOlOperations _characterWenChouMouOlOperations;
+    private readonly ICoreTurnRedSlashBenefitsCharacterWuJingOlOperations _characterWuJingOlOperations;
+    private readonly ICoreTurnRedSlashBenefitsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreTurnRedSlashBenefitsTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreActionDiscardColorsOperations _coreActionDiscardColorsOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreAdjacentRedTargetsOperations _coreAdjacentRedTargetsOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreAlternatingSuitAndCompletedTopOperations _coreAlternatingSuitAndCompletedTopOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreComparedBlackSlashPoliciesOperations _coreComparedBlackSlashPoliciesOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreCurrentTurnShownCardBenefitsOperations _coreCurrentTurnShownCardBenefitsOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreDamageTargetBudgetOperations _coreDamageTargetBudgetOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreDyingWindowSkillPoliciesOperations _coreDyingWindowSkillPoliciesOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreFinalTargetSlashOperations _coreFinalTargetSlashOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreSoleTargetProtectionOperations _coreSoleTargetProtectionOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreSourceCursesOperations _coreSourceCursesOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreTargetedOrdinaryTrickOperations _coreTargetedOrdinaryTrickOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreNativeBorrowedSwordOperations _coreNativeBorrowedSwordOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICoreTurnRedSlashBenefitsCoreNativeQinglongOperations _coreNativeQinglongOperations;
+    private readonly ICoreTurnRedSlashBenefitsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineTurnRedSlashBenefitsRuntime(ICoreTurnRedSlashBenefitsCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICoreTurnRedSlashBenefitsCharacterHanDangMouMobileOperations characterHanDangMouMobileOperations, ICoreTurnRedSlashBenefitsCharacterLiuPanOlOperations characterLiuPanOlOperations, ICoreTurnRedSlashBenefitsCharacterLiuYanOlOperations characterLiuYanOlOperations, ICoreTurnRedSlashBenefitsCharacterLiuZanMobileOperations characterLiuZanMobileOperations, ICoreTurnRedSlashBenefitsCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICoreTurnRedSlashBenefitsCharacterLuZhiMouMobileOperations characterLuZhiMouMobileOperations, ICoreTurnRedSlashBenefitsCharacterMaMiDiOlOperations characterMaMiDiOlOperations, ICoreTurnRedSlashBenefitsCharacterQuHuangOlOperations characterQuHuangOlOperations, ICoreTurnRedSlashBenefitsCharacterRuanYuOlOperations characterRuanYuOlOperations, ICoreTurnRedSlashBenefitsCharacterWenChouMouOlOperations characterWenChouMouOlOperations, ICoreTurnRedSlashBenefitsCharacterWuJingOlOperations characterWuJingOlOperations, ICoreTurnRedSlashBenefitsContentRegistryOperations contentRegistryOperations, ICoreTurnRedSlashBenefitsTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreTurnRedSlashBenefitsCoreActionDiscardColorsOperations coreActionDiscardColorsOperations, ICoreTurnRedSlashBenefitsCoreActionQueriesOperations coreActionQueriesOperations, ICoreTurnRedSlashBenefitsCoreAdjacentRedTargetsOperations coreAdjacentRedTargetsOperations, ICoreTurnRedSlashBenefitsCoreAlternatingSuitAndCompletedTopOperations coreAlternatingSuitAndCompletedTopOperations, ICoreTurnRedSlashBenefitsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreTurnRedSlashBenefitsCoreComparedBlackSlashPoliciesOperations coreComparedBlackSlashPoliciesOperations, ICoreTurnRedSlashBenefitsCoreCurrentTurnShownCardBenefitsOperations coreCurrentTurnShownCardBenefitsOperations, ICoreTurnRedSlashBenefitsCoreDamageTargetBudgetOperations coreDamageTargetBudgetOperations, ICoreTurnRedSlashBenefitsCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreTurnRedSlashBenefitsCoreDyingWindowSkillPoliciesOperations coreDyingWindowSkillPoliciesOperations, ICoreTurnRedSlashBenefitsCoreFinalTargetSlashOperations coreFinalTargetSlashOperations, ICoreTurnRedSlashBenefitsCoreSoleTargetProtectionOperations coreSoleTargetProtectionOperations, ICoreTurnRedSlashBenefitsCoreSourceCursesOperations coreSourceCursesOperations, ICoreTurnRedSlashBenefitsCoreTargetedOrdinaryTrickOperations coreTargetedOrdinaryTrickOperations, ICoreTurnRedSlashBenefitsCoreNativeBorrowedSwordOperations coreNativeBorrowedSwordOperations, ICoreTurnRedSlashBenefitsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreTurnRedSlashBenefitsCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICoreTurnRedSlashBenefitsCoreNativeQinglongOperations coreNativeQinglongOperations, ICoreTurnRedSlashBenefitsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
+        this._characterHanDangMouMobileOperations = characterHanDangMouMobileOperations;
+        this._characterLiuPanOlOperations = characterLiuPanOlOperations;
+        this._characterLiuYanOlOperations = characterLiuYanOlOperations;
+        this._characterLiuZanMobileOperations = characterLiuZanMobileOperations;
+        this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;
+        this._characterLuZhiMouMobileOperations = characterLuZhiMouMobileOperations;
+        this._characterMaMiDiOlOperations = characterMaMiDiOlOperations;
+        this._characterQuHuangOlOperations = characterQuHuangOlOperations;
+        this._characterRuanYuOlOperations = characterRuanYuOlOperations;
+        this._characterWenChouMouOlOperations = characterWenChouMouOlOperations;
+        this._characterWuJingOlOperations = characterWuJingOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreActionDiscardColorsOperations = coreActionDiscardColorsOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreAdjacentRedTargetsOperations = coreAdjacentRedTargetsOperations;
+        this._coreAlternatingSuitAndCompletedTopOperations = coreAlternatingSuitAndCompletedTopOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreComparedBlackSlashPoliciesOperations = coreComparedBlackSlashPoliciesOperations;
+        this._coreCurrentTurnShownCardBenefitsOperations = coreCurrentTurnShownCardBenefitsOperations;
+        this._coreDamageTargetBudgetOperations = coreDamageTargetBudgetOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreDyingWindowSkillPoliciesOperations = coreDyingWindowSkillPoliciesOperations;
+        this._coreFinalTargetSlashOperations = coreFinalTargetSlashOperations;
+        this._coreSoleTargetProtectionOperations = coreSoleTargetProtectionOperations;
+        this._coreSourceCursesOperations = coreSourceCursesOperations;
+        this._coreTargetedOrdinaryTrickOperations = coreTargetedOrdinaryTrickOperations;
+        this._coreNativeBorrowedSwordOperations = coreNativeBorrowedSwordOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._coreNativeQinglongOperations = coreNativeQinglongOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

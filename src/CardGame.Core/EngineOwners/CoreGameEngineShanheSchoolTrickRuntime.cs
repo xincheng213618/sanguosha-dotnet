@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheSchoolTrickRuntime : global::CardGame.Core.IShanheSchoolTrickHost
+{
+    private readonly ICoreShanheSchoolTrickCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICoreShanheSchoolTrickCharacterFeiYiOlOperations _characterFeiYiOlOperations;
+    private readonly ICoreShanheSchoolTrickCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreShanheSchoolTrickCharacterHuangYueyingOlMouOperations _characterHuangYueyingOlMouOperations;
+    private readonly ICoreShanheSchoolTrickCharacterJiangJiMouOperations _characterJiangJiMouOperations;
+    private readonly ICoreShanheSchoolTrickCharacterSunQuanOlMagicOperations _characterSunQuanOlMagicOperations;
+    private readonly ICoreShanheSchoolTrickContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheSchoolTrickResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSchoolTrickCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreShanheSchoolTrickCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreShanheSchoolTrickCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreShanheSchoolTrickCoreNamedAmbushInvalidationOperations _coreNamedAmbushInvalidationOperations;
+    private readonly ICoreShanheSchoolTrickCoreNextCardTargetAdjustmentsOperations _coreNextCardTargetAdjustmentsOperations;
+    private readonly ICoreShanheSchoolTrickCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreShanheSchoolTrickCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheSchoolTrickCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheSchoolTrickCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheSchoolTrickCoreSequentialTrickTargetsOperations _coreSequentialTrickTargetsOperations;
+    private readonly ICoreShanheSchoolTrickCoreShanheSchoolsOperations _coreShanheSchoolsOperations;
+    private readonly ICoreShanheSchoolTrickCoreSoleIncomingEffectRepeatOperations _coreSoleIncomingEffectRepeatOperations;
+    private readonly ICoreShanheSchoolTrickCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreShanheSchoolTrickCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreShanheSchoolTrickCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheSchoolTrickKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheSchoolTrickRuntime(ICoreShanheSchoolTrickCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICoreShanheSchoolTrickCharacterFeiYiOlOperations characterFeiYiOlOperations, ICoreShanheSchoolTrickCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreShanheSchoolTrickCharacterHuangYueyingOlMouOperations characterHuangYueyingOlMouOperations, ICoreShanheSchoolTrickCharacterJiangJiMouOperations characterJiangJiMouOperations, ICoreShanheSchoolTrickCharacterSunQuanOlMagicOperations characterSunQuanOlMagicOperations, ICoreShanheSchoolTrickContentRegistryOperations contentRegistryOperations, ICoreShanheSchoolTrickResolutionStackOperations resolutionStackOperations, ICoreShanheSchoolTrickCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreShanheSchoolTrickCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreShanheSchoolTrickCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreShanheSchoolTrickCoreNamedAmbushInvalidationOperations coreNamedAmbushInvalidationOperations, ICoreShanheSchoolTrickCoreNextCardTargetAdjustmentsOperations coreNextCardTargetAdjustmentsOperations, ICoreShanheSchoolTrickCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreShanheSchoolTrickCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheSchoolTrickCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheSchoolTrickCoreRuntimeOperations coreRuntimeOperations, ICoreShanheSchoolTrickCoreSequentialTrickTargetsOperations coreSequentialTrickTargetsOperations, ICoreShanheSchoolTrickCoreShanheSchoolsOperations coreShanheSchoolsOperations, ICoreShanheSchoolTrickCoreSoleIncomingEffectRepeatOperations coreSoleIncomingEffectRepeatOperations, ICoreShanheSchoolTrickCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreShanheSchoolTrickCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreShanheSchoolTrickCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheSchoolTrickKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._characterFeiYiOlOperations = characterFeiYiOlOperations;
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._characterHuangYueyingOlMouOperations = characterHuangYueyingOlMouOperations;
+        this._characterJiangJiMouOperations = characterJiangJiMouOperations;
+        this._characterSunQuanOlMagicOperations = characterSunQuanOlMagicOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreNamedAmbushInvalidationOperations = coreNamedAmbushInvalidationOperations;
+        this._coreNextCardTargetAdjustmentsOperations = coreNextCardTargetAdjustmentsOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialTrickTargetsOperations = coreSequentialTrickTargetsOperations;
+        this._coreShanheSchoolsOperations = coreShanheSchoolsOperations;
+        this._coreSoleIncomingEffectRepeatOperations = coreSoleIncomingEffectRepeatOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

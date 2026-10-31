@@ -1,0 +1,96 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDeckEquipmentProgramsRuntime : global::CardGame.Core.IDeckEquipmentProgramHost
+{
+    private readonly ICoreDeckEquipmentProgramsCharacterDuXiOlOperations _characterDuXiOlOperations;
+    private readonly ICoreDeckEquipmentProgramsCharacterGuoZhaoAnniversaryOperations _characterGuoZhaoAnniversaryOperations;
+    private readonly ICoreDeckEquipmentProgramsCharacterHuoJunOlOperations _characterHuoJunOlOperations;
+    private readonly ICoreDeckEquipmentProgramsCharacterMaChaoAnniversaryGodOperations _characterMaChaoAnniversaryGodOperations;
+    private readonly ICoreDeckEquipmentProgramsCharacterXiangChongOlOperations _characterXiangChongOlOperations;
+    private readonly ICoreDeckEquipmentProgramsCharacterYangFuOlOperations _characterYangFuOlOperations;
+    private readonly ICoreDeckEquipmentProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreDeckEquipmentProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDeckEquipmentProgramsRandomOperations _randomOperations;
+    private readonly ICoreDeckEquipmentProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreCharacterHostOperations _coreCharacterHostOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreFinalizedCardTargetsOperations _coreFinalizedCardTargetsOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreFriendTrioOperations _coreFriendTrioOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreDeckEquipmentProgramsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreProgramPhaseColorRestrictionsOperations _coreProgramPhaseColorRestrictionsOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreResponseEntityExchangeOperations _coreResponseEntityExchangeOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreWushuangJinzhiOperations _coreWushuangJinzhiOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreNativeEquipmentUseOperations _coreNativeEquipmentUseOperations;
+    private readonly ICoreDeckEquipmentProgramsCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
+    private readonly ICoreDeckEquipmentProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreDeckEquipmentProgramsKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreDeckEquipmentProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldSequenceBeneficiarySuitShieldsAccess _coreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldSequenceBeneficiarySuitShieldsAccess;
+    internal CoreGameEngineDeckEquipmentProgramsRuntime(ICoreDeckEquipmentProgramsCharacterDuXiOlOperations characterDuXiOlOperations, ICoreDeckEquipmentProgramsCharacterGuoZhaoAnniversaryOperations characterGuoZhaoAnniversaryOperations, ICoreDeckEquipmentProgramsCharacterHuoJunOlOperations characterHuoJunOlOperations, ICoreDeckEquipmentProgramsCharacterMaChaoAnniversaryGodOperations characterMaChaoAnniversaryGodOperations, ICoreDeckEquipmentProgramsCharacterXiangChongOlOperations characterXiangChongOlOperations, ICoreDeckEquipmentProgramsCharacterYangFuOlOperations characterYangFuOlOperations, ICoreDeckEquipmentProgramsCardZonesOperations cardZonesOperations, ICoreDeckEquipmentProgramsContentRegistryOperations contentRegistryOperations, ICoreDeckEquipmentProgramsRandomOperations randomOperations, ICoreDeckEquipmentProgramsResolutionStackOperations resolutionStackOperations, ICoreDeckEquipmentProgramsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreDeckEquipmentProgramsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreDeckEquipmentProgramsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDeckEquipmentProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreDeckEquipmentProgramsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreDeckEquipmentProgramsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreDeckEquipmentProgramsCoreCharacterHostOperations coreCharacterHostOperations, ICoreDeckEquipmentProgramsCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreDeckEquipmentProgramsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreDeckEquipmentProgramsCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreDeckEquipmentProgramsCoreFinalizedCardTargetsOperations coreFinalizedCardTargetsOperations, ICoreDeckEquipmentProgramsCoreFriendTrioOperations coreFriendTrioOperations, ICoreDeckEquipmentProgramsCoreHandComparisonOperations coreHandComparisonOperations, ICoreDeckEquipmentProgramsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreDeckEquipmentProgramsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreDeckEquipmentProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDeckEquipmentProgramsCoreProgramPhaseColorRestrictionsOperations coreProgramPhaseColorRestrictionsOperations, ICoreDeckEquipmentProgramsCoreResponseEntityExchangeOperations coreResponseEntityExchangeOperations, ICoreDeckEquipmentProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreDeckEquipmentProgramsCoreWushuangJinzhiOperations coreWushuangJinzhiOperations, ICoreDeckEquipmentProgramsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreDeckEquipmentProgramsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreDeckEquipmentProgramsCoreNativeEquipmentUseOperations coreNativeEquipmentUseOperations, ICoreDeckEquipmentProgramsCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICoreDeckEquipmentProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreDeckEquipmentProgramsKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreDeckEquipmentProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldSequenceBeneficiarySuitShieldsAccess coreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldSequenceBeneficiarySuitShieldsAccess)
+    {
+        this._characterDuXiOlOperations = characterDuXiOlOperations;
+        this._characterGuoZhaoAnniversaryOperations = characterGuoZhaoAnniversaryOperations;
+        this._characterHuoJunOlOperations = characterHuoJunOlOperations;
+        this._characterMaChaoAnniversaryGodOperations = characterMaChaoAnniversaryGodOperations;
+        this._characterXiangChongOlOperations = characterXiangChongOlOperations;
+        this._characterYangFuOlOperations = characterYangFuOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCharacterHostOperations = coreCharacterHostOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFinalizedCardTargetsOperations = coreFinalizedCardTargetsOperations;
+        this._coreFriendTrioOperations = coreFriendTrioOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramPhaseColorRestrictionsOperations = coreProgramPhaseColorRestrictionsOperations;
+        this._coreResponseEntityExchangeOperations = coreResponseEntityExchangeOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreWushuangJinzhiOperations = coreWushuangJinzhiOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeEquipmentUseOperations = coreNativeEquipmentUseOperations;
+        this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldSequenceBeneficiarySuitShieldsAccess = coreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldSequenceBeneficiarySuitShieldsAccess;
+    }
+}

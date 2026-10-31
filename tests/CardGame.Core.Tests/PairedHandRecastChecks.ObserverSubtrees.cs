@@ -17,9 +17,9 @@ internal static partial class PairedHandRecastChecks
             .Single(frame => frame.Id == root.PairedHandRecast!.Owner.CostBatchId);
         var observer = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Cost);
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-        var findRoot = typeof(GameEngine).GetMethod("PairedHandRecastObserverRoot", flags)!;
-        var advance = typeof(GameEngine).GetMethod("TryAdvancePairedHandRecastSubtree", flags)!;
-        var replace = typeof(GameEngine).GetMethod("ReplaceRuntimeFrame", flags)!;
+        var findRoot = global::FixtureRuntimeAccess.Engine.GetMethod("PairedHandRecastObserverRoot", flags)!;
+        var advance = global::FixtureRuntimeAccess.Engine.GetMethod("TryAdvancePairedHandRecastSubtree", flags)!;
+        var replace = global::FixtureRuntimeAccess.Engine.GetMethod("ReplaceRuntimeFrame", flags)!;
         ProgramSkillFrame? FindRoot() => (ProgramSkillFrame?)findRoot.Invoke(game, null);
         void Replace(ResolutionFrame frame) => replace.Invoke(game, [frame.Id, frame]);
 

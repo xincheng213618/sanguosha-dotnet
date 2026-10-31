@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramAtomicCardMovesRuntime
+{
+    private readonly ICoreProgramAtomicCardMovesCharacterZhongHuiAnniversaryGodOperations _characterZhongHuiAnniversaryGodOperations;
+    private readonly ICoreProgramAtomicCardMovesCharacterZuoCiHappyGodOperations _characterZuoCiHappyGodOperations;
+    private readonly ICoreProgramAtomicCardMovesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramAtomicCardMovesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramAtomicCardMovesCoreActualDiscardPhaseLedgerOperations _coreActualDiscardPhaseLedgerOperations;
+    private readonly ICoreProgramAtomicCardMovesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreProgramAtomicCardMovesCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreProgramAtomicCardMovesCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreProgramAtomicCardMovesCoreHellActivitiesOperations _coreHellActivitiesOperations;
+    private readonly ICoreProgramAtomicCardMovesCoreHellSoulCardsOperations _coreHellSoulCardsOperations;
+    private readonly ICoreProgramAtomicCardMovesCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreProgramAtomicCardMovesCoreHellMengpoProgramsOperations _coreHellMengpoProgramsOperations;
+    private readonly ICoreProgramAtomicCardMovesCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    internal CoreGameEngineProgramAtomicCardMovesRuntime(ICoreProgramAtomicCardMovesCharacterZhongHuiAnniversaryGodOperations characterZhongHuiAnniversaryGodOperations, ICoreProgramAtomicCardMovesCharacterZuoCiHappyGodOperations characterZuoCiHappyGodOperations, ICoreProgramAtomicCardMovesCardZonesOperations cardZonesOperations, ICoreProgramAtomicCardMovesResolutionStackOperations resolutionStackOperations, ICoreProgramAtomicCardMovesCoreActualDiscardPhaseLedgerOperations coreActualDiscardPhaseLedgerOperations, ICoreProgramAtomicCardMovesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreProgramAtomicCardMovesCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreProgramAtomicCardMovesCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreProgramAtomicCardMovesCoreHellActivitiesOperations coreHellActivitiesOperations, ICoreProgramAtomicCardMovesCoreHellSoulCardsOperations coreHellSoulCardsOperations, ICoreProgramAtomicCardMovesCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreProgramAtomicCardMovesCoreHellMengpoProgramsOperations coreHellMengpoProgramsOperations, ICoreProgramAtomicCardMovesCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess)
+    {
+        this._characterZhongHuiAnniversaryGodOperations = characterZhongHuiAnniversaryGodOperations;
+        this._characterZuoCiHappyGodOperations = characterZuoCiHappyGodOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualDiscardPhaseLedgerOperations = coreActualDiscardPhaseLedgerOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreHellActivitiesOperations = coreHellActivitiesOperations;
+        this._coreHellSoulCardsOperations = coreHellSoulCardsOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._coreHellMengpoProgramsOperations = coreHellMengpoProgramsOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+    }
+}

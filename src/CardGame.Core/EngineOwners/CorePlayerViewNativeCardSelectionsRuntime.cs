@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CorePlayerViewNativeCardSelectionsRuntime
+{
+    private readonly ICorePlayerViewNativeCardSelectionsCharacterLiYiOlOperations _characterLiYiOlOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsCharacterLuSuMobileShiOperations _characterLuSuMobileShiOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsCharacterQinLangOlOperations _characterQinLangOlOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsCharacterSunChenMobileShiOperations _characterSunChenMobileShiOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsCharacterSunJianMouOlOperations _characterSunJianMouOlOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsCharacterSunJunMobileShiOperations _characterSunJunMobileShiOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsCharacterZhangYanMobileShiOperations _characterZhangYanMobileShiOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsCardZonesOperations _cardZonesOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICorePlayerViewNativeCardSelectionsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CorePlayerViewNativeCardSelectionsRuntime(ICorePlayerViewNativeCardSelectionsCharacterLiYiOlOperations characterLiYiOlOperations, ICorePlayerViewNativeCardSelectionsCharacterLuSuMobileShiOperations characterLuSuMobileShiOperations, ICorePlayerViewNativeCardSelectionsCharacterQinLangOlOperations characterQinLangOlOperations, ICorePlayerViewNativeCardSelectionsCharacterSunChenMobileShiOperations characterSunChenMobileShiOperations, ICorePlayerViewNativeCardSelectionsCharacterSunJianMouOlOperations characterSunJianMouOlOperations, ICorePlayerViewNativeCardSelectionsCharacterSunJunMobileShiOperations characterSunJunMobileShiOperations, ICorePlayerViewNativeCardSelectionsCharacterZhangYanMobileShiOperations characterZhangYanMobileShiOperations, ICorePlayerViewNativeCardSelectionsCardZonesOperations cardZonesOperations, ICorePlayerViewNativeCardSelectionsContentRegistryOperations contentRegistryOperations, ICorePlayerViewNativeCardSelectionsResolutionStackOperations resolutionStackOperations, ICorePlayerViewNativeCardSelectionsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICorePlayerViewNativeCardSelectionsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLiYiOlOperations = characterLiYiOlOperations;
+        this._characterLuSuMobileShiOperations = characterLuSuMobileShiOperations;
+        this._characterQinLangOlOperations = characterQinLangOlOperations;
+        this._characterSunChenMobileShiOperations = characterSunChenMobileShiOperations;
+        this._characterSunJianMouOlOperations = characterSunJianMouOlOperations;
+        this._characterSunJunMobileShiOperations = characterSunJunMobileShiOperations;
+        this._characterZhangYanMobileShiOperations = characterZhangYanMobileShiOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineDeferredTurnEndPreludesRuntime
+{
+    private readonly ICoreDeferredTurnEndPreludesPendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICoreDeferredTurnEndPreludesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDeferredTurnEndPreludesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDeferredTurnEndPreludesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreDeferredTurnEndPreludesCoreDeferredHandAlignmentsOperations _coreDeferredHandAlignmentsOperations;
+    private readonly ICoreDeferredTurnEndPreludesCorePrivateTurnHoldsOperations _corePrivateTurnHoldsOperations;
+    private readonly ICoreDeferredTurnEndPreludesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDeferredTurnEndPreludesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDeferredTurnEndPreludesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDeferredTurnEndPreludesCardsMovedWindowOperations _cardsMovedWindowOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    internal CoreGameEngineDeferredTurnEndPreludesRuntime(ICoreDeferredTurnEndPreludesPendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICoreDeferredTurnEndPreludesResolutionStackOperations resolutionStackOperations, ICoreDeferredTurnEndPreludesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDeferredTurnEndPreludesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreDeferredTurnEndPreludesCoreDeferredHandAlignmentsOperations coreDeferredHandAlignmentsOperations, ICoreDeferredTurnEndPreludesCorePrivateTurnHoldsOperations corePrivateTurnHoldsOperations, ICoreDeferredTurnEndPreludesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDeferredTurnEndPreludesCoreRuntimeOperations coreRuntimeOperations, ICoreDeferredTurnEndPreludesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDeferredTurnEndPreludesCardsMovedWindowOperations cardsMovedWindowOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess)
+    {
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreDeferredHandAlignmentsOperations = coreDeferredHandAlignmentsOperations;
+        this._corePrivateTurnHoldsOperations = corePrivateTurnHoldsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._cardsMovedWindowOperations = cardsMovedWindowOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    }
+}

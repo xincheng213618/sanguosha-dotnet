@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProvenanceCardPoliciesRuntime
+{
+    private readonly ICoreProvenanceCardPoliciesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProvenanceCardPoliciesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProvenanceCardPoliciesCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreProvenanceCardPoliciesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreProvenanceCardPoliciesCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreProvenanceCardPoliciesCoreCardDeclarationsOperations _coreCardDeclarationsOperations;
+    private readonly ICoreProvenanceCardPoliciesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreProvenanceCardPoliciesCoreDiscardedProvenanceOperations _coreDiscardedProvenanceOperations;
+    private readonly ICoreProvenanceCardPoliciesCoreGrantedEntityPhasesOperations _coreGrantedEntityPhasesOperations;
+    private readonly ICoreProvenanceCardPoliciesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProvenanceCardPoliciesCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreProvenanceCardPoliciesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreProvenanceCardPoliciesCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreProvenanceCardPoliciesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineProvenanceCardPoliciesRuntime(ICoreProvenanceCardPoliciesCardZonesOperations cardZonesOperations, ICoreProvenanceCardPoliciesResolutionStackOperations resolutionStackOperations, ICoreProvenanceCardPoliciesCoreActionQueriesOperations coreActionQueriesOperations, ICoreProvenanceCardPoliciesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreProvenanceCardPoliciesCoreCardConversionsOperations coreCardConversionsOperations, ICoreProvenanceCardPoliciesCoreCardDeclarationsOperations coreCardDeclarationsOperations, ICoreProvenanceCardPoliciesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreProvenanceCardPoliciesCoreDiscardedProvenanceOperations coreDiscardedProvenanceOperations, ICoreProvenanceCardPoliciesCoreGrantedEntityPhasesOperations coreGrantedEntityPhasesOperations, ICoreProvenanceCardPoliciesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProvenanceCardPoliciesCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreProvenanceCardPoliciesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreProvenanceCardPoliciesCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreProvenanceCardPoliciesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDiscardedProvenanceOperations = coreDiscardedProvenanceOperations;
+        this._coreGrantedEntityPhasesOperations = coreGrantedEntityPhasesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

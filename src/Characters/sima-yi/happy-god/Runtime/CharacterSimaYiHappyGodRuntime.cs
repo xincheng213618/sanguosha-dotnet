@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSimaYiHappyGodRuntime : global::CardGame.Core.IHappySimaYiHost
+{
+    private readonly ICharacterSimaYiHappyGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSimaYiHappyGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSimaYiHappyGodCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterSimaYiHappyGodCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterSimaYiHappyGodCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterSimaYiHappyGodCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterSimaYiHappyGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterSimaYiHappyGodCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICharacterSimaYiHappyGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSimaYiHappyGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterSimaYiHappyGodCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterSimaYiHappyGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterSimaYiHappyGodCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterSimaYiHappyGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterSimaYiHappyGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterSimaYiHappyGodCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterSimaYiHappyGodKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterSimaYiHappyGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterSimaYiHappyGodRuntime(ICharacterSimaYiHappyGodContentRegistryOperations contentRegistryOperations, ICharacterSimaYiHappyGodResolutionStackOperations resolutionStackOperations, ICharacterSimaYiHappyGodCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterSimaYiHappyGodCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterSimaYiHappyGodCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterSimaYiHappyGodCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterSimaYiHappyGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterSimaYiHappyGodCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICharacterSimaYiHappyGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSimaYiHappyGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterSimaYiHappyGodCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterSimaYiHappyGodCoreRuntimeOperations coreRuntimeOperations, ICharacterSimaYiHappyGodCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterSimaYiHappyGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterSimaYiHappyGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterSimaYiHappyGodCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterSimaYiHappyGodKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterSimaYiHappyGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

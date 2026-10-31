@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineDamageZoneAcquisitionObserversRuntime
+{
+    private readonly ICoreDamageZoneAcquisitionObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDamageZoneAcquisitionObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreDamageZoneAcquisitionObserversCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDamageZoneAcquisitionObserversCoreDamageZoneAcquisitionOperations _coreDamageZoneAcquisitionOperations;
+    private readonly ICoreDamageZoneAcquisitionObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreDamageZoneAcquisitionObserversCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreDamageZoneAcquisitionObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDamageZoneAcquisitionObserversCoreDamageZoneAcquisitionObserversOperations _coreDamageZoneAcquisitionObserversOperations;
+    private readonly ICoreDamageZoneAcquisitionObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineDamageZoneAcquisitionObserversRuntime(ICoreDamageZoneAcquisitionObserversResolutionStackOperations resolutionStackOperations, ICoreDamageZoneAcquisitionObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreDamageZoneAcquisitionObserversCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDamageZoneAcquisitionObserversCoreDamageZoneAcquisitionOperations coreDamageZoneAcquisitionOperations, ICoreDamageZoneAcquisitionObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreDamageZoneAcquisitionObserversCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreDamageZoneAcquisitionObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDamageZoneAcquisitionObserversCoreDamageZoneAcquisitionObserversOperations coreDamageZoneAcquisitionObserversOperations, ICoreDamageZoneAcquisitionObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreDamageZoneAcquisitionOperations = coreDamageZoneAcquisitionOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreDamageZoneAcquisitionObserversOperations = coreDamageZoneAcquisitionObserversOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

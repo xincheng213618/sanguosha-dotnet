@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheS5ZhulingRuntime : global::CardGame.Core.IShanheS5JixianProgramHost
+{
+    private readonly ICoreShanheS5ZhulingResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheS5ZhulingCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreShanheS5ZhulingCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreShanheS5ZhulingCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheS5ZhulingCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheS5ZhulingCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICoreShanheS5ZhulingCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheS5ZhulingCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICoreShanheS5ZhulingCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreShanheS5ZhulingCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheS5ZhulingCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreShanheS5ZhulingKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreShanheS5ZhulingKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheS5ZhulingRuntime(ICoreShanheS5ZhulingResolutionStackOperations resolutionStackOperations, ICoreShanheS5ZhulingCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreShanheS5ZhulingCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreShanheS5ZhulingCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheS5ZhulingCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheS5ZhulingCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICoreShanheS5ZhulingCoreRuntimeOperations coreRuntimeOperations, ICoreShanheS5ZhulingCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICoreShanheS5ZhulingCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreShanheS5ZhulingCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheS5ZhulingCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreShanheS5ZhulingKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreShanheS5ZhulingKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

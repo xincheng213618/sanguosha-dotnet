@@ -1,0 +1,76 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterDongBaiMobileRuntime : global::CardGame.Core.IMobileDongBaiHost
+{
+    private readonly ICharacterDongBaiMobileCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICharacterDongBaiMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterDongBaiMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterDongBaiMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterDongBaiMobileCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterDongBaiMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterDongBaiMobileCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterDongBaiMobileCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterDongBaiMobileCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterDongBaiMobileCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterDongBaiMobileCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterDongBaiMobileCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterDongBaiMobileCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICharacterDongBaiMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterDongBaiMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterDongBaiMobileCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterDongBaiMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterDongBaiMobileCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterDongBaiMobileCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterDongBaiMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterDongBaiMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterDongBaiMobileCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterDongBaiMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterDongBaiMobileCharacterDongBaiMobileOperations _characterDongBaiMobileOperations;
+    private readonly ICharacterDongBaiMobileCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterDongBaiMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CharacterDongBaiMobileRuntime(ICharacterDongBaiMobileCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICharacterDongBaiMobileCardZonesOperations cardZonesOperations, ICharacterDongBaiMobileContentRegistryOperations contentRegistryOperations, ICharacterDongBaiMobileResolutionStackOperations resolutionStackOperations, ICharacterDongBaiMobileCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterDongBaiMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterDongBaiMobileCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterDongBaiMobileCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterDongBaiMobileCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterDongBaiMobileCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterDongBaiMobileCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterDongBaiMobileCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterDongBaiMobileCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICharacterDongBaiMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterDongBaiMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterDongBaiMobileCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterDongBaiMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterDongBaiMobileCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterDongBaiMobileCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterDongBaiMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterDongBaiMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterDongBaiMobileCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterDongBaiMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterDongBaiMobileCharacterDongBaiMobileOperations characterDongBaiMobileOperations, ICharacterDongBaiMobileCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterDongBaiMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterDongBaiMobileOperations = characterDongBaiMobileOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

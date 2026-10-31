@@ -1,0 +1,94 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheS5XuncanRuntime : global::CardGame.Core.IShanheS5XuncanHost
+{
+    private readonly ICoreShanheS5XuncanCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreShanheS5XuncanContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheS5XuncanResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheS5XuncanCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreShanheS5XuncanCoreActualPlayPhaseCardUsesOperations _coreActualPlayPhaseCardUsesOperations;
+    private readonly ICoreShanheS5XuncanCoreAlcoholSlashSuppressionsOperations _coreAlcoholSlashSuppressionsOperations;
+    private readonly ICoreShanheS5XuncanCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreShanheS5XuncanCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreShanheS5XuncanCoreCardUseDebitsOperations _coreCardUseDebitsOperations;
+    private readonly ICoreShanheS5XuncanCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreShanheS5XuncanCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreShanheS5XuncanCoreIssuedPlayUsePoliciesOperations _coreIssuedPlayUsePoliciesOperations;
+    private readonly ICoreShanheS5XuncanCorePhaseNamePredictionOperations _corePhaseNamePredictionOperations;
+    private readonly ICoreShanheS5XuncanCorePhaseStartControlPoliciesOperations _corePhaseStartControlPoliciesOperations;
+    private readonly ICoreShanheS5XuncanCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreShanheS5XuncanCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreShanheS5XuncanCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheS5XuncanCoreProgramJudgmentOutcomesOperations _coreProgramJudgmentOutcomesOperations;
+    private readonly ICoreShanheS5XuncanCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheS5XuncanCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICoreShanheS5XuncanCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheS5XuncanCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreShanheS5XuncanCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreShanheS5XuncanCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreShanheS5XuncanCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreShanheS5XuncanCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheS5XuncanCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreShanheS5XuncanCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreShanheS5XuncanCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheS5XuncanCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheS5XuncanCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreShanheS5XuncanCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreShanheS5XuncanCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreShanheS5XuncanKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreShanheS5XuncanKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CoreGameEngineShanheS5XuncanRuntime(ICoreShanheS5XuncanCharacterLuMengMouOperations characterLuMengMouOperations, ICoreShanheS5XuncanContentRegistryOperations contentRegistryOperations, ICoreShanheS5XuncanResolutionStackOperations resolutionStackOperations, ICoreShanheS5XuncanCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreShanheS5XuncanCoreActualPlayPhaseCardUsesOperations coreActualPlayPhaseCardUsesOperations, ICoreShanheS5XuncanCoreAlcoholSlashSuppressionsOperations coreAlcoholSlashSuppressionsOperations, ICoreShanheS5XuncanCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreShanheS5XuncanCoreCardActionsOperations coreCardActionsOperations, ICoreShanheS5XuncanCoreCardUseDebitsOperations coreCardUseDebitsOperations, ICoreShanheS5XuncanCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreShanheS5XuncanCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreShanheS5XuncanCoreIssuedPlayUsePoliciesOperations coreIssuedPlayUsePoliciesOperations, ICoreShanheS5XuncanCorePhaseNamePredictionOperations corePhaseNamePredictionOperations, ICoreShanheS5XuncanCorePhaseStartControlPoliciesOperations corePhaseStartControlPoliciesOperations, ICoreShanheS5XuncanCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreShanheS5XuncanCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreShanheS5XuncanCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheS5XuncanCoreProgramJudgmentOutcomesOperations coreProgramJudgmentOutcomesOperations, ICoreShanheS5XuncanCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheS5XuncanCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICoreShanheS5XuncanCoreRuntimeOperations coreRuntimeOperations, ICoreShanheS5XuncanCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreShanheS5XuncanCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreShanheS5XuncanCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreShanheS5XuncanCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreShanheS5XuncanCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheS5XuncanCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreShanheS5XuncanCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreShanheS5XuncanCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheS5XuncanCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheS5XuncanCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreShanheS5XuncanCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreShanheS5XuncanCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreShanheS5XuncanKernelCoreMainOperations kernelCoreMainOperations, ICoreShanheS5XuncanKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess)
+    {
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreActualPlayPhaseCardUsesOperations = coreActualPlayPhaseCardUsesOperations;
+        this._coreAlcoholSlashSuppressionsOperations = coreAlcoholSlashSuppressionsOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseDebitsOperations = coreCardUseDebitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreIssuedPlayUsePoliciesOperations = coreIssuedPlayUsePoliciesOperations;
+        this._corePhaseNamePredictionOperations = corePhaseNamePredictionOperations;
+        this._corePhaseStartControlPoliciesOperations = corePhaseStartControlPoliciesOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramJudgmentOutcomesOperations = coreProgramJudgmentOutcomesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+    }
+}

@@ -51,6 +51,7 @@ internal sealed class NativeDrawAttemptRuntime(IProgramRuntimeFrames frames,
         return attempt;
     }
 
+    [ProgramTriggerProof(ProgramTriggerProofPhase.NativeWindow, 40, SkillProgramTriggerWindow.NativeDrawStarting)]
     internal bool IsExactNativeDrawCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) =>
         ExactNativeDrawAttempt(context) is { Replacement: null } attempt &&
         candidate.OwnerSeat == attempt.Context.RecipientSeat && queries.IsAlive(candidate.OwnerSeat) &&

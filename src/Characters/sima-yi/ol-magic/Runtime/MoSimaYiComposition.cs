@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MoSimaYiComposition
 {
-    internal const string Guifu = "ol:mo-guifu", Moubian = "ol:mo-moubian", Zhouxi = "ol:mo-zhouxi", Lieshi = "ol:mo-lieshi";
+    internal const string Guifu = "ol:mo-guifu",Moubian = "ol:mo-moubian",Zhouxi = "ol:mo-zhouxi",Lieshi = "ol:mo-lieshi";
     internal static readonly IReadOnlyList<string> Pool = Array.AsReadOnly(new[]
     {
         "ol:zhendu", "ol:tianjie", "boundary:juece-current", "boundary:leiji", Lieshi,

@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineHpLossSlashMaterialsRuntime
+{
+    private readonly ICoreHpLossSlashMaterialsCharacterSunQuanOlMagicOperations _characterSunQuanOlMagicOperations;
+    private readonly ICoreHpLossSlashMaterialsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreHpLossSlashMaterialsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreHpLossSlashMaterialsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreAlternatingSuitAndCompletedTopOperations _coreAlternatingSuitAndCompletedTopOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreCurrentSlashFireOffersOperations _coreCurrentSlashFireOffersOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreCurrentUsePhysicalClaimsOperations _coreCurrentUsePhysicalClaimsOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreFinalTargetSlashOperations _coreFinalTargetSlashOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreNextActualUseTargetAdjustmentsOperations _coreNextActualUseTargetAdjustmentsOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreSlashTargetBenefitWindowsOperations _coreSlashTargetBenefitWindowsOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreSlashTargetPenaltyPaymentsOperations _coreSlashTargetPenaltyPaymentsOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreTurnRedSlashBenefitsOperations _coreTurnRedSlashBenefitsOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreNativeMaterialSlashOperations _coreNativeMaterialSlashOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreHpLossSlashMaterialsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineHpLossSlashMaterialsRuntime(ICoreHpLossSlashMaterialsCharacterSunQuanOlMagicOperations characterSunQuanOlMagicOperations, ICoreHpLossSlashMaterialsCardZonesOperations cardZonesOperations, ICoreHpLossSlashMaterialsContentRegistryOperations contentRegistryOperations, ICoreHpLossSlashMaterialsResolutionStackOperations resolutionStackOperations, ICoreHpLossSlashMaterialsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreHpLossSlashMaterialsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreHpLossSlashMaterialsCoreAlternatingSuitAndCompletedTopOperations coreAlternatingSuitAndCompletedTopOperations, ICoreHpLossSlashMaterialsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreHpLossSlashMaterialsCoreCurrentSlashFireOffersOperations coreCurrentSlashFireOffersOperations, ICoreHpLossSlashMaterialsCoreCurrentUsePhysicalClaimsOperations coreCurrentUsePhysicalClaimsOperations, ICoreHpLossSlashMaterialsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreHpLossSlashMaterialsCoreFinalTargetSlashOperations coreFinalTargetSlashOperations, ICoreHpLossSlashMaterialsCoreNextActualUseTargetAdjustmentsOperations coreNextActualUseTargetAdjustmentsOperations, ICoreHpLossSlashMaterialsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreHpLossSlashMaterialsCoreRuleQueriesOperations coreRuleQueriesOperations, ICoreHpLossSlashMaterialsCoreRuntimeOperations coreRuntimeOperations, ICoreHpLossSlashMaterialsCoreSlashTargetBenefitWindowsOperations coreSlashTargetBenefitWindowsOperations, ICoreHpLossSlashMaterialsCoreSlashTargetPenaltyPaymentsOperations coreSlashTargetPenaltyPaymentsOperations, ICoreHpLossSlashMaterialsCoreTurnRedSlashBenefitsOperations coreTurnRedSlashBenefitsOperations, ICoreHpLossSlashMaterialsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreHpLossSlashMaterialsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreHpLossSlashMaterialsCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICoreHpLossSlashMaterialsCoreNativeMaterialSlashOperations coreNativeMaterialSlashOperations, ICoreHpLossSlashMaterialsCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreHpLossSlashMaterialsCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreHpLossSlashMaterialsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterSunQuanOlMagicOperations = characterSunQuanOlMagicOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreAlternatingSuitAndCompletedTopOperations = coreAlternatingSuitAndCompletedTopOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentSlashFireOffersOperations = coreCurrentSlashFireOffersOperations;
+        this._coreCurrentUsePhysicalClaimsOperations = coreCurrentUsePhysicalClaimsOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreFinalTargetSlashOperations = coreFinalTargetSlashOperations;
+        this._coreNextActualUseTargetAdjustmentsOperations = coreNextActualUseTargetAdjustmentsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreRuleQueriesOperations = coreRuleQueriesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSlashTargetBenefitWindowsOperations = coreSlashTargetBenefitWindowsOperations;
+        this._coreSlashTargetPenaltyPaymentsOperations = coreSlashTargetPenaltyPaymentsOperations;
+        this._coreTurnRedSlashBenefitsOperations = coreTurnRedSlashBenefitsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._coreNativeMaterialSlashOperations = coreNativeMaterialSlashOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

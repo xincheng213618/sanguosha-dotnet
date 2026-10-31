@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineWushuangSkillsBAuditRuntime
+{
+    private readonly ICoreWushuangSkillsBAuditCardZonesOperations _cardZonesOperations;
+    private readonly ICoreWushuangSkillsBAuditContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreWushuangSkillsBAuditCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreWushuangSkillsBAuditCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreWushuangSkillsBAuditCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICoreWushuangSkillsBAuditCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreWushuangSkillsBAuditCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreWushuangSkillsBAuditCoreWushuangSkillsBOperations _coreWushuangSkillsBOperations;
+    private readonly ICoreWushuangSkillsBAuditCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreWushuangSkillsBAuditCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreWushuangSkillsBAuditCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreWushuangSkillsBAuditCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreWushuangSkillsBAuditKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineWushuangSkillsBAuditRuntime(ICoreWushuangSkillsBAuditCardZonesOperations cardZonesOperations, ICoreWushuangSkillsBAuditContentRegistryOperations contentRegistryOperations, ICoreWushuangSkillsBAuditCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreWushuangSkillsBAuditCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreWushuangSkillsBAuditCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICoreWushuangSkillsBAuditCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreWushuangSkillsBAuditCoreRuntimeOperations coreRuntimeOperations, ICoreWushuangSkillsBAuditCoreWushuangSkillsBOperations coreWushuangSkillsBOperations, ICoreWushuangSkillsBAuditCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreWushuangSkillsBAuditCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreWushuangSkillsBAuditCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreWushuangSkillsBAuditCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreWushuangSkillsBAuditKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreWushuangSkillsBOperations = coreWushuangSkillsBOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

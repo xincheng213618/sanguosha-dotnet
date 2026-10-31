@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineComparedBlackSlashPoliciesRuntime
+{
+    private readonly ICoreComparedBlackSlashPoliciesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreComparedBlackSlashPoliciesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreComparedBlackSlashPoliciesCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreComparedBlackSlashPoliciesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreComparedBlackSlashPoliciesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreComparedBlackSlashPoliciesCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreComparedBlackSlashPoliciesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreComparedBlackSlashPoliciesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreComparedBlackSlashPoliciesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineComparedBlackSlashPoliciesRuntime(ICoreComparedBlackSlashPoliciesContentRegistryOperations contentRegistryOperations, ICoreComparedBlackSlashPoliciesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreComparedBlackSlashPoliciesCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreComparedBlackSlashPoliciesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreComparedBlackSlashPoliciesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreComparedBlackSlashPoliciesCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreComparedBlackSlashPoliciesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreComparedBlackSlashPoliciesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreComparedBlackSlashPoliciesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

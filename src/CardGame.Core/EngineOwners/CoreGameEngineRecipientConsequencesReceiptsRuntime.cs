@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsRuntime
+{
+    private readonly ICoreRecipientConsequencesReceiptsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRecipientConsequencesReceiptsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRecipientConsequencesReceiptsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreRecipientConsequencesReceiptsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRecipientConsequencesReceiptsCoreBlackGiftContestsOperations _coreBlackGiftContestsOperations;
+    private readonly ICoreRecipientConsequencesReceiptsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreRecipientConsequencesReceiptsCorePrintedLordBenefitsOperations _corePrintedLordBenefitsOperations;
+    private readonly ICoreRecipientConsequencesReceiptsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreRecipientConsequencesReceiptsCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreRecipientConsequencesReceiptsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreRecipientConsequencesReceiptsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreRecipientConsequencesReceiptsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRecipientConsequencesReceiptsRuntime(ICoreRecipientConsequencesReceiptsContentRegistryOperations contentRegistryOperations, ICoreRecipientConsequencesReceiptsResolutionStackOperations resolutionStackOperations, ICoreRecipientConsequencesReceiptsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreRecipientConsequencesReceiptsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRecipientConsequencesReceiptsCoreBlackGiftContestsOperations coreBlackGiftContestsOperations, ICoreRecipientConsequencesReceiptsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreRecipientConsequencesReceiptsCorePrintedLordBenefitsOperations corePrintedLordBenefitsOperations, ICoreRecipientConsequencesReceiptsCoreRuntimeOperations coreRuntimeOperations, ICoreRecipientConsequencesReceiptsCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreRecipientConsequencesReceiptsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreRecipientConsequencesReceiptsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreRecipientConsequencesReceiptsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBlackGiftContestsOperations = coreBlackGiftContestsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._corePrintedLordBenefitsOperations = corePrintedLordBenefitsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess = coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

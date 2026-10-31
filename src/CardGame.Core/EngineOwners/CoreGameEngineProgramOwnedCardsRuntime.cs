@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramOwnedCardsRuntime
+{
+    private readonly ICoreProgramOwnedCardsCharacterDaQiaoXiaoQiaoHappyGodOperations _characterDaQiaoXiaoQiaoHappyGodOperations;
+    private readonly ICoreProgramOwnedCardsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramOwnedCardsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramOwnedCardsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramOwnedCardsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreProgramOwnedCardsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreProgramOwnedCardsCoreDeferredHandAlignmentsOperations _coreDeferredHandAlignmentsOperations;
+    private readonly ICoreProgramOwnedCardsCoreEquipmentPairPaymentsOperations _coreEquipmentPairPaymentsOperations;
+    private readonly ICoreProgramOwnedCardsCoreForcedPhaseAlcoholOperations _coreForcedPhaseAlcoholOperations;
+    private readonly ICoreProgramOwnedCardsCoreHalfHandPhaseDebtProgramsOperations _coreHalfHandPhaseDebtProgramsOperations;
+    private readonly ICoreProgramOwnedCardsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramOwnedCardsCoreOwnedExactCountAndNamedTargetsOperations _coreOwnedExactCountAndNamedTargetsOperations;
+    private readonly ICoreProgramOwnedCardsCorePindianHandReturnsOperations _corePindianHandReturnsOperations;
+    private readonly ICoreProgramOwnedCardsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreProgramOwnedCardsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreProgramOwnedCardsCoreProgramCategoryTargetLedgerOperations _coreProgramCategoryTargetLedgerOperations;
+    private readonly ICoreProgramOwnedCardsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramOwnedCardsCorePublicPileCashOutOperations _corePublicPileCashOutOperations;
+    private readonly ICoreProgramOwnedCardsCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly ICoreProgramOwnedCardsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramOwnedCardsCoreSharedSlashOffersOperations _coreSharedSlashOffersOperations;
+    private readonly ICoreProgramOwnedCardsCoreTriggeredCardConversionsOperations _coreTriggeredCardConversionsOperations;
+    private readonly ICoreProgramOwnedCardsCoreTurnDrawDebtsOperations _coreTurnDrawDebtsOperations;
+    private readonly ICoreProgramOwnedCardsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreProgramOwnedCardsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreProgramOwnedCardsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreProgramOwnedCardsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreProgramOwnedCardsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramOwnedCardsRuntime(ICoreProgramOwnedCardsCharacterDaQiaoXiaoQiaoHappyGodOperations characterDaQiaoXiaoQiaoHappyGodOperations, ICoreProgramOwnedCardsCardZonesOperations cardZonesOperations, ICoreProgramOwnedCardsContentRegistryOperations contentRegistryOperations, ICoreProgramOwnedCardsResolutionStackOperations resolutionStackOperations, ICoreProgramOwnedCardsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreProgramOwnedCardsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreProgramOwnedCardsCoreDeferredHandAlignmentsOperations coreDeferredHandAlignmentsOperations, ICoreProgramOwnedCardsCoreEquipmentPairPaymentsOperations coreEquipmentPairPaymentsOperations, ICoreProgramOwnedCardsCoreForcedPhaseAlcoholOperations coreForcedPhaseAlcoholOperations, ICoreProgramOwnedCardsCoreHalfHandPhaseDebtProgramsOperations coreHalfHandPhaseDebtProgramsOperations, ICoreProgramOwnedCardsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramOwnedCardsCoreOwnedExactCountAndNamedTargetsOperations coreOwnedExactCountAndNamedTargetsOperations, ICoreProgramOwnedCardsCorePindianHandReturnsOperations corePindianHandReturnsOperations, ICoreProgramOwnedCardsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreProgramOwnedCardsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreProgramOwnedCardsCoreProgramCategoryTargetLedgerOperations coreProgramCategoryTargetLedgerOperations, ICoreProgramOwnedCardsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramOwnedCardsCorePublicPileCashOutOperations corePublicPileCashOutOperations, ICoreProgramOwnedCardsCoreRuleQueriesOperations coreRuleQueriesOperations, ICoreProgramOwnedCardsCoreRuntimeOperations coreRuntimeOperations, ICoreProgramOwnedCardsCoreSharedSlashOffersOperations coreSharedSlashOffersOperations, ICoreProgramOwnedCardsCoreTriggeredCardConversionsOperations coreTriggeredCardConversionsOperations, ICoreProgramOwnedCardsCoreTurnDrawDebtsOperations coreTurnDrawDebtsOperations, ICoreProgramOwnedCardsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreProgramOwnedCardsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreProgramOwnedCardsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreProgramOwnedCardsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreProgramOwnedCardsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreDeferredHandAlignmentsOperations = coreDeferredHandAlignmentsOperations;
+        this._coreEquipmentPairPaymentsOperations = coreEquipmentPairPaymentsOperations;
+        this._coreForcedPhaseAlcoholOperations = coreForcedPhaseAlcoholOperations;
+        this._coreHalfHandPhaseDebtProgramsOperations = coreHalfHandPhaseDebtProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOwnedExactCountAndNamedTargetsOperations = coreOwnedExactCountAndNamedTargetsOperations;
+        this._corePindianHandReturnsOperations = corePindianHandReturnsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCategoryTargetLedgerOperations = coreProgramCategoryTargetLedgerOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPileCashOutOperations = corePublicPileCashOutOperations;
+        this._coreRuleQueriesOperations = coreRuleQueriesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSharedSlashOffersOperations = coreSharedSlashOffersOperations;
+        this._coreTriggeredCardConversionsOperations = coreTriggeredCardConversionsOperations;
+        this._coreTurnDrawDebtsOperations = coreTurnDrawDebtsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

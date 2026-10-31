@@ -1,0 +1,66 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterZhangXiuMouOlEntries
+{
+    internal bool AdvanceMouZhangXiuOlChildren() => _resolve().AdvanceMouZhangXiuOlChildren();
+    internal global::CardGame.Core.PromptChoice AiMouZhangXiuOl(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouZhangXiuOl(p, f);
+    internal void AnswerMouZhangXiuOl(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouZhangXiuOl(choice);
+    internal void AssertMouZhangXiuOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouZhangXiuOl(f);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginMouZhangXiuOlDefense(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouZhangXiuOlDefense(supplied);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginMouZhangXiuOlQiulie(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginMouZhangXiuOlQiulie(supplied, operation);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginMouZhangXiuOlZhuijiao(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginMouZhangXiuOlZhuijiao(supplied, operation);
+    internal void BindMouZhangXiuOlSlash(global::CardGame.Core.IGameEvent fact) => _resolve().BindMouZhangXiuOlSlash(fact);
+    internal bool CanChooseMouZhangXiuOlHunt(int owner) => _resolve().CanChooseMouZhangXiuOlHunt(owner);
+    internal bool CanRunIssuedMouZhangXiuOl(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanRunIssuedMouZhangXiuOl(c, w);
+    internal bool CanUseMouZhangXiuOlHunt(int owner, int target) => _resolve().CanUseMouZhangXiuOlHunt(owner, target);
+    internal void CaptureMouZhangXiuOlPreviousUse(global::CardGame.Core.IGameEvent fact) => _resolve().CaptureMouZhangXiuOlPreviousUse(fact);
+    internal bool CaptureMouZhangXiuOlUseDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageId) => _resolve().CaptureMouZhangXiuOlUseDamage(attack, damageId);
+    internal void CollectIssuedMouZhangXiuOl(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.ProgramCardTriggerCandidate> result) => _resolve().CollectIssuedMouZhangXiuOl(action, window, result);
+    internal void CompleteMouZhangXiuOlSlash(long id) => _resolve().CompleteMouZhangXiuOlSlash(id);
+    internal void ContinueMouZhangXiuOl(long id) => _resolve().ContinueMouZhangXiuOl(id);
+    internal bool ContinuePaidMouZhangXiuOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidMouZhangXiuOl(f);
+    internal bool DrainMouZhangXiuOl(long id) => _resolve().DrainMouZhangXiuOl(id);
+    internal void FinishMouZhangXiuOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouZhangXiuOl(f);
+    internal bool FinishMouZhangXiuOlSlashAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouZhangXiuOlSlashAttack(attack, out paused);
+    internal bool HasMouZhangXiuOlBeforeDamage(long id) => _resolve().HasMouZhangXiuOlBeforeDamage(id);
+    internal bool HasMouZhangXiuOlDamage(long id) => _resolve().HasMouZhangXiuOlDamage(id);
+    internal bool IsMouZhangXiuOlDying() => _resolve().IsMouZhangXiuOlDying();
+    internal bool IsMouZhangXiuOlMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsMouZhangXiuOlMovement(f, effect, movement);
+    internal bool IsMouZhangXiuOlQiulieIneffective(global::CardGame.Core.CardUseFrame use) => _resolve().IsMouZhangXiuOlQiulieIneffective(use);
+    internal bool IsMouZhangXiuOlRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouZhangXiuOlRecoveryParent(f, recovery);
+    internal bool IsMouZhangXiuOlSlash(global::CardGame.Core.CardUseFrame use) => _resolve().IsMouZhangXiuOlSlash(use);
+    internal void IssueMouZhangXiuOlSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouZhangXiuOlSlash(f);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouZhangXiuOlChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouZhangXiuOlChoices(f);
+    internal int MouZhangXiuOlChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouZhangXiuOlChooser(f);
+    internal global::CardGame.Core.CardUseFrame? MouZhangXiuOlContextUse(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().MouZhangXiuOlContextUse(c, w);
+    internal global::CardGame.Core.ActualDiscardRecoveryPhaseKey? MouZhangXiuOlCurrentPhase(int owner, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().MouZhangXiuOlCurrentPhase(owner, window);
+    internal int MouZhangXiuOlDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().MouZhangXiuOlDamageBonus(attack);
+    internal global::CardGame.Core.Card[] MouZhangXiuOlDiscardable(int owner, bool defense = false) => _resolve().MouZhangXiuOlDiscardable(owner, defense);
+    internal global::CardGame.Core.MouZhangXiuOlZhuijiaoEntry? MouZhangXiuOlEntry(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().MouZhangXiuOlEntry(use, c);
+    internal bool MouZhangXiuOlFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouZhangXiuOlFirstChild(f, child);
+    internal global::CardGame.Core.MouZhangXiuOlHuntChosenEvent? MouZhangXiuOlHunt(int owner) => _resolve().MouZhangXiuOlHunt(owner);
+    internal bool MouZhangXiuOlLionPayment(global::CardGame.Core.ProgramSkillFrame f, int seat, global::CardGame.Core.CardMoveReason? reason) => _resolve().MouZhangXiuOlLionPayment(f, seat, reason);
+    internal bool MouZhangXiuOlNativeEdge(int n) => _resolve().MouZhangXiuOlNativeEdge(n);
+    internal bool MouZhangXiuOlObserverEdge(int n) => _resolve().MouZhangXiuOlObserverEdge(n);
+    internal global::CardGame.Core.ProgramSkillFrame? MouZhangXiuOlObserverRoot() => _resolve().MouZhangXiuOlObserverRoot();
+    internal bool MouZhangXiuOlObserverSuffix(int n) => _resolve().MouZhangXiuOlObserverSuffix(n);
+    internal bool MouZhangXiuOlParentMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouZhangXiuOlParentMatches(f);
+    internal bool MouZhangXiuOlPaymentMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouZhangXiuOlPaymentMatches(f);
+    internal bool MouZhangXiuOlPhaseAlreadyOffered(int owner, global::CardGame.Core.ActualDiscardRecoveryPhaseKey p) => _resolve().MouZhangXiuOlPhaseAlreadyOffered(owner, p);
+    internal bool MouZhangXiuOlUseDamaged(long origin, int? instruction) => _resolve().MouZhangXiuOlUseDamaged(origin, instruction);
+    internal bool NormalizeMouZhangXiuOlDrawTwo(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().NormalizeMouZhangXiuOlDrawTwo(query);
+    internal bool ObserveMouZhangXiuOlAllUses(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().ObserveMouZhangXiuOlAllUses(query);
+    internal void PublishMouZhangXiuOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishMouZhangXiuOl(f);
+    internal bool QualifyMouZhangXiuOlPhase(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().QualifyMouZhangXiuOlPhase(c, t, w);
+    internal bool QualifyMouZhangXiuOlUse(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().QualifyMouZhangXiuOlUse(c, w);
+    internal bool ResumeMouZhangXiuOl(long id) => _resolve().ResumeMouZhangXiuOl(id);
+    internal void ReturnMouZhangXiuOlDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome draw) => _resolve().ReturnMouZhangXiuOlDraw(f, draw);
+    internal bool ReturnMouZhangXiuOlMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnMouZhangXiuOlMovement(f);
+    internal void ReturnMouZhangXiuOlSlash(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnMouZhangXiuOlSlash(use);
+    internal bool ReturnMouZhangXiuOlSlashAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnMouZhangXiuOlSlashAttack(completion);
+    internal void SetMouZhangXiuOlEntry(long useId, global::CardGame.Core.CardConversionSource source, global::System.Func<global::CardGame.Core.MouZhangXiuOlZhuijiaoEntry, global::CardGame.Core.MouZhangXiuOlZhuijiaoEntry> update) => _resolve().SetMouZhangXiuOlEntry(useId, source, update);
+    internal bool ValidMouZhangXiuOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidMouZhangXiuOl(f);
+    internal bool ValidMouZhangXiuOlEntry(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.MouZhangXiuOlZhuijiaoEntry e) => _resolve().ValidMouZhangXiuOlEntry(use, e);
+    internal void ValidateMouZhangXiuOlSlash(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateMouZhangXiuOlSlash(use);
+    internal bool HasMouZhangXiuOl { get => _resolve().HasMouZhangXiuOl; }
+}

@@ -1,0 +1,340 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterGuoTuOlRuntime
+{
+    internal void StoreWeijieResponse(WeijiePaidOrigin p)
+    {
+        var owner = _resolutionStackOperations._resolutionStack.Single(f => f.Id == p.Need.OwnerFrameId);
+        _coreRuntimeOperations.ReplaceRuntimeFrame(owner.Id, owner switch
+        {
+            CardUseFrame u => u with { WeijieResponseOrigin = p },
+            ProgramSkillFrame f => f with { WeijieResponseOrigin = p },
+            _ => throw new InvalidOperationException("Weijie response lost its typed incoming native owner.")});
+    }
+
+    internal static WeijiePaidOrigin? WeijieResponseOrigin(ResolutionFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieResponses.WeijieResponseOrigin(f);
+    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27462)]
+    internal void ObserveWeijieResponse(CardActionAcceptedEvent accepted)
+    {
+        var a = accepted.Action;
+        if (!HasWeijieCapability || a.Type != CardActionType.Response || a.PhysicalCards.Count != 0 || a.ConversionChain is not [var source] || source.SkillId != "ol:weijie")
+            return;
+        var owner = _resolutionStackOperations._resolutionStack.LastOrDefault(f => WeijieResponseOrigin(f)is { } p && p.Source == source && p.Need.ParentActionId == a.ParentActionId);
+        if (owner is null)
+            return;
+        var p = WeijieResponseOrigin(owner)!;
+        if (!ValidWeijiePayment(p) || p.OutputKind != a.EffectiveKind || p.Need.ActorSeat != a.ActorSeat || p.Need.ProviderSeat != a.ProviderSeat || p.Need.RequesterSeat != a.RequesterSeat || a.ResponderSeat != a.ActorSeat || a.TargetSeats.Count != 0 || a.OpponentSeat != p.Need.OpponentSeat || a.EffectiveIsRed is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieResponseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId) || _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieUseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId))
+            throw new InvalidOperationException("Weijie zero response changed its original native participants or already-issued cost.");
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WeijieResponseIssuedEvent(p.AttemptId, owner.Id, a.ActionId, a.ActorSeat, a.ProviderSeat, a.RequesterSeat, p.OutputKind, WeijieResponseContinuation(p)));
+    }
+
+    internal ProgramCardContinuation WeijieResponseContinuation(WeijiePaidOrigin p) => p.Need.Intent switch
+    {
+        WeijieIntent.Dodge => ProgramCardContinuation.Dodge,
+        WeijieIntent.Duel => ProgramCardContinuation.DuelSlash,
+        WeijieIntent.FactionDodge => ProgramCardContinuation.FactionDefenseDodge,
+        WeijieIntent.FactionSlashPlayed => _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest?.Purpose == FactionCardRequestPurpose.DuelResponse || _coreNativeCardContinuationCursorsOperations.ActiveDuel?.ResolutionId == p.Need.OwnerFrameId ? ProgramCardContinuation.FactionSlashDuelSlash : ProgramCardContinuation.FactionSlashGroupResponse,
+        _ => ProgramCardContinuation.GroupResponse
+    };
+    internal void DispatchWeijieResponse(WeijiePaidOrigin p)
+    {
+        var n = p.Need;
+        StoreWeijieResponse(p);
+        if (n.Intent == WeijieIntent.FactionDodge)
+        {
+            _coreNativeFactionDefenseOperations.CompleteFactionDefenseResponse(_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense!, _coreMatchParticipantsPlayersAccess._players[n.ProviderSeat], null, false, p.Source);
+            return;
+        }
+
+        var attack = n.Intent == WeijieIntent.Duel ? _coreNativeCardContinuationCursorsOperations.ActiveDuel!.Attack : n.Intent == WeijieIntent.Group ? _coreNativeCardContinuationCursorsOperations.ActiveGroupCard!.CurrentAttack! : n.Intent == WeijieIntent.FactionSlashPlayed ? _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.ResponseAttack! : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack!;
+        var continuation = WeijieResponseContinuation(p);
+        var faction = _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest;
+        global::CardGame.Core.GameEngine.FactionProviderRewardReceipt? reward = null;
+        if (n.Intent == WeijieIntent.FactionSlashPlayed)
+        {
+            reward = _coreFactionRequestPaymentsOperations.CaptureFactionProviderReward(faction!);
+            _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = null;
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashResolvedEvent(faction!.ResolutionId, n.ActorSeat, true, n.ProviderSeat, 0, p.OutputKind, false));
+        }
+
+        _coreNativeResponseWindowsOperations.PopResponseWindow(n.OwnerFrameId);
+        _coreNativePromptBoundaryOperations.ClearPendingDecision();
+        _coreNativeResponseWindowsOperations.SetResponseParentStep(n.OwnerFrameId, ResolutionFrameStep.ResolvingEffect);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(0, n.ActorSeat, n.OpponentSeat!.Value, p.OutputKind));
+        if (n.Intent == WeijieIntent.Duel || continuation == ProgramCardContinuation.FactionSlashDuelSlash)
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuelResponseEvent(n.OwnerFrameId, n.ActorSeat, true, 0, p.OutputKind));
+        else if (n.Intent == WeijieIntent.Group || continuation == ProgramCardContinuation.FactionSlashGroupResponse)
+        {
+            var g = _coreNativeCardContinuationCursorsOperations.ActiveGroupCard!;
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GroupResponseEvent(g.ResolutionId, g.Card.Kind, g.RequiredCardKind!.Value, n.ActorSeat, true, 0, p.OutputKind));
+        }
+
+        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind))
+            _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(n.ActorSeat, p.OutputKind);
+        if (reward is not null)
+            _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(reward, n.ProviderSeat);
+        if (_coreCardActionsOperations.TryBeginCardResponsePrograms(attack, _coreMatchParticipantsPlayersAccess._players[n.ActorSeat], _coreMatchParticipantsPlayersAccess._players[n.ProviderSeat], n.RequesterSeat, n.OpponentSeat!.Value, p.OutputKind, [], continuation, p.Source))
+            return;
+        if (continuation is ProgramCardContinuation.Dodge or ProgramCardContinuation.FactionDefenseDodge)
+            _coreNativeDodgeOperations.CompleteSuccessfulDodgeResponse(attack);
+        else if (continuation is ProgramCardContinuation.DuelSlash or ProgramCardContinuation.FactionSlashDuelSlash)
+            _coreNativeDuelOperations.ContinueDuelAfterSuccessfulSlash(_coreNativeCardContinuationCursorsOperations.ActiveDuel!, n.ActorSeat);
+        else
+            _coreNativeAttackCompletionOperations.CompleteAttack(attack);
+    }
+
+    internal bool IsWeijieZeroResponse(CardActionContext a, ProgramCardContinuation c)
+    {
+        if (a.Type != CardActionType.Response || a.PhysicalCards.Count != 0 || a.ConversionChain is not [var source] || source.SkillId != "ol:weijie")
+            return false;
+        return _resolutionStackOperations._resolutionStack.Any(f => WeijieResponseOrigin(f)is { } p && ValidWeijiePayment(p) && p.Source == source && p.Need.ActorSeat == a.ActorSeat && p.Need.ProviderSeat == a.ProviderSeat && p.Need.RequesterSeat == a.RequesterSeat && p.Need.ParentActionId == a.ParentActionId && p.OutputKind == a.EffectiveKind && _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieResponseIssuedEvent>().Count(e => e.AttemptId == p.AttemptId && e.OwnerFrameId == f.Id && e.ActionId == a.ActionId && e.Continuation == c) == 1);
+    }
+
+    internal void DispatchWeijieFactionUse(WeijiePaidOrigin p)
+    {
+        var n = p.Need;
+        var f = _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest ?? throw new InvalidOperationException("Weijie lost its actual faction provider request.");
+        var reward = _coreFactionRequestPaymentsOperations.CaptureFactionProviderReward(f);
+        var borrowed = f.BorrowedSword;
+        long? parent = f.ProgramSkillFrameId;
+        if (f.IsBorrowedSwordUse)
+        {
+            _coreNativeResponseWindowsOperations.PopResponseWindow(borrowed!.ResolutionId);
+            borrowed.AwaitingSlashChoice = false;
+            borrowed.SlashCardId = 0;
+            borrowed.EffectiveSlashKind = p.OutputKind;
+            _coreNativeCardUseFramesOperations.SetCardUseStep(borrowed.ResolutionId, ResolutionFrameStep.ResolvingEffect);
+        }
+        else if (f.IsQinglongCrescentBladeUse)
+        {
+            var old = _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade!.Attack;
+            _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade = null;
+            _coreNativeCardUseFramesOperations.SetCardUseStep(old.ResolutionId, ResolutionFrameStep.ResolvingEffect);
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QinglongCrescentBladeResolvedEvent(old.ResolutionId, n.ActorSeat, p.TargetSeat, true, [], p.OutputKind));
+            _coreQinglongInsertionOperations.SuspendContinuationForQinglongFollowup(old.ResolutionId);
+        }
+        else if (parent is { } id)
+        {
+            var program = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
+            _coreRuntimeOperations.ReplaceRuntimeTop(program = program with { WeijieReturn = new(p, 0, 0), Step = ResolutionFrameStep.ResolvingEffect });
+            if (f.IsAssistedProgramUse)
+            {
+                if (_characterSunYuanOlOperations.IsSayingSlashRequest(program) || _characterLiYiOlOperations.IsChanshuangSlashRequest(program) || _characterLvKuangLvXiangOlOperations.IsQigongRequest(program) || _characterWuJingOlOperations.IsWuJingHejiRequest(program) || _characterCaoChunOlOperations.IsCaoChunInitialRequest(program))
+                    PrepareWeijieProgram(program, p);
+                else
+                    _coreProgramSlashRequestOperations.CommitProgramChoiceResult(program.Id, f.AssistedResultBind!, "used-slash", n.ActorSeat, "诿解供给真实杀。");
+            }
+        }
+
+        f.AwaitingProviders = false;
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashResolvedEvent(f.ResolutionId, n.ActorSeat, true, n.ProviderSeat, 0, p.OutputKind, true, p.TargetSeat));
+        BeginWeijieSlash(p, borrowed, !f.IsAssistedProgramUse && !f.IsQinglongCrescentBladeUse, parent, f);
+        _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(reward, n.ProviderSeat);
+    }
+
+    internal bool IsWeijieZeroSupply(CardUseFrame use, global::CardGame.Core.NativeOwners.FactionCardRequestHandle request) => use.WeijieOrigin is { } p && p.Need.Intent == WeijieIntent.FactionSlashUse && IsIssuedWeijieUse(use) && p.Need.OwnerFrameId == request.OwnerFrameId && p.Need.ActorSeat == request.OwnerSeat && p.Need.ProviderSeat == request.CurrentCandidateSeat && p.Need.RequesterSeat == request.OwnerSeat && p.Need.Cursor == request.CandidateIndex && request.TargetSeat == p.TargetSeat && request.ActiveAttack?.ResolutionId == use.Id;
+    internal void RepublishWeijieNative(WeijieReceipt r)
+    {
+        var n = r.Need;
+        var actor = _coreMatchParticipantsPlayersAccess._players[n.ProviderSeat];
+        if (!_resolutionStackOperations._resolutionStack.Any(f => f.Id == n.RequestFrameId) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+            return;
+        var keepCurrentRequest = actor.IsAlive && r.Paid is { } requestPayment && ValidWeijiePayment(requestPayment) && SameWeijieNeed(requestPayment.Need, n) && WeijieNativeNeedCurrent(r);
+        if (!actor.IsAlive && n.Intent is WeijieIntent.Dodge or WeijieIntent.Group or WeijieIntent.Duel)
+        {
+            if (_resolutionStackOperations._resolutionStack.LastOrDefault()is ResponseWindowFrame response && response.ParentFrameId == n.OwnerFrameId)
+                _coreNativeResponseWindowsOperations.PopResponseWindow(n.OwnerFrameId);
+            _coreNativeResponseWindowsOperations.SetResponseParentStep(n.OwnerFrameId, ResolutionFrameStep.ResolvingEffect);
+            var attack = n.Intent == WeijieIntent.Group ? _coreNativeCardContinuationCursorsOperations.ActiveGroupCard?.CurrentAttack : n.Intent == WeijieIntent.Duel ? _coreNativeCardContinuationCursorsOperations.ActiveDuel?.Attack : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack;
+            if (attack is not null && attack.ResolutionId == n.OwnerFrameId)
+                _coreNativeAttackCompletionOperations.CompleteAttack(attack);
+            return;
+        }
+
+        if (!actor.IsAlive && n.Intent == WeijieIntent.Dying)
+        {
+            _coreNativeDyingOperations.RunOneDyingStep();
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.Dying)
+        {
+            if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.Id != n.OwnerFrameId || dying.ResponderSeat != n.ProviderSeat || dying.ResponderIndex != n.Cursor)
+                throw new InvalidOperationException("Weijie lost its original dying responder return.");
+            if (actor.IsHuman)
+                _coreNativeDyingOperations.RequestHumanDyingResponse(actor, _coreNativeDyingOperations.GetDyingPeaches(actor), _coreNativeDyingOperations.GetDyingAlcohols(actor, dying.VictimSeat));
+            else
+                _coreNativeDyingOperations.RunOneDyingStep();
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.FactionDodge)
+        {
+            _coreNativeFactionDefenseOperations.AdvanceFactionDefenseCandidate(keepCurrentRequest: keepCurrentRequest);
+            return;
+        }
+
+        if (n.Intent is WeijieIntent.FactionSlashPlayed or WeijieIntent.FactionSlashUse)
+        {
+            _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate(keepCurrentRequest: keepCurrentRequest);
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.Qinglong)
+        {
+            if (!actor.IsAlive)
+            {
+                if (r.Paid is not { } paid || !ValidWeijiePayment(paid) || !WeijieNativeNeedCurrent(r) || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != n.OwnerFrameId || blade.Attack.SourceSeat != n.ActorSeat || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack))
+                    throw new InvalidOperationException("A dead Weijie payer lost its exact still-unconsumed Qinglong parent.");
+                // This is the native no-follow-up return: no card or dead-player menu is issued.
+                var attack = blade.Attack;
+                _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade = null;
+                _coreNativePromptBoundaryOperations.ClearPendingDecision();
+                _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QinglongCrescentBladeResolvedEvent(attack.ResolutionId, n.ActorSeat, attack.TargetSeat, false, [], null));
+                _coreQinglongInsertionOperations.RestoreFactionRequestAfterQinglongChoice(attack.ResolutionId);
+                _coreNativeAttackCompletionOperations.CompleteAttack(attack);
+                return;
+            }
+
+            _coreNativeQinglongOperations.PublishQinglongCrescentBladeChoice(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade!, _coreNativeQinglongOperations.CanRequestQinglongCrescentBladeFactionSlash(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade!));
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.BorrowedSword)
+        {
+            var b = _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword!;
+            _coreNativeResponseWindowsOperations.PopResponseWindow(b.ResolutionId);
+            _coreNativeBorrowedSwordOperations.BeginBorrowedSwordSlashChoice(b, _coreNativeBorrowedSwordOperations.CanRequestBorrowedSwordFactionSlash(b), keepCurrentRequest: keepCurrentRequest);
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.Duel)
+        {
+            var d = _coreNativeCardContinuationCursorsOperations.ActiveDuel!;
+            _coreNativeResponseWindowsOperations.PopResponseWindow(d.ResolutionId);
+            _coreNativeDuelOperations.BeginDuelResponse(d, keepCurrentRequest: keepCurrentRequest);
+            return;
+        }
+
+        if (n.Intent is WeijieIntent.Dodge or WeijieIntent.Group)
+        {
+            var attack = n.Intent == WeijieIntent.Group ? _coreNativeCardContinuationCursorsOperations.ActiveGroupCard!.CurrentAttack! : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack!;
+            var required = n.Intent == WeijieIntent.Dodge ? CardKind.Dodge : _coreNativeCardContinuationCursorsOperations.ActiveGroupCard!.RequiredCardKind!.Value;
+            var cards = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(actor, required);
+            var choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(cards, required, attack.EffectiveCardKind, card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(actor, card, required), includeBagua: required == CardKind.Dodge && !attack.IgnoresArmor && _coreNativeEquipmentAndFactionQueriesOperations.HasBagua(actor), includeFactionDefense: required == CardKind.Dodge && _coreNativeEquipmentAndFactionQueriesOperations.CanRequestFactionDefense(actor, attack), includeFactionSlash: required == CardKind.Slash && _coreNativeEquipmentAndFactionQueriesOperations.CanRequestFactionSlashResponse(actor, attack), responder: actor);
+            _corePendingDecisionPolicyPipelineOperations._pendingDecision = WeijieNativeDecision(r.OriginalDecision)with
+            {
+                PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
+                ValidCardIds = choices.SelectMany(c => c.Cards).Distinct().ToArray(),
+                Choices = choices
+            };
+            _coreMatchOutcomeStatusWinnerAccess._status = actor.IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.WenyiPeach)
+        {
+            _coreWenyiPeachSuppliesOperations.RepublishWenyiAfterWeijie(r);
+            return;
+        }
+
+        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(n.OwnerFrameId);
+        var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)!;
+        if (!actor.IsAlive && n.Intent == WeijieIntent.NearestLegalSlash)
+        {
+            if (r.Paid is not { } paid || !ValidWeijiePayment(paid) || !WeijieNativeNeedCurrent(r) || effect.Op != SkillProgramEffectOp.RequestLegalSlashByNearest || n.RequestOp != effect.Op || f.InstructionIndex != n.InstructionIndex || n.ActorSeat != n.ProviderSeat || !f.ReexecuteParticipantInstruction || f.NearestLegalSlashRequest is not { AwaitingFaction: false } draft || draft.ActorSeat != n.ActorSeat || !draft.NearestSeats.SequenceEqual(n.Targets) || f.NumberBindings.SingleOrDefault(b => b.Name == "participant-cursor-" + (f.InstructionIndex - 1))is not { } cursor || cursor.Value < 1 || cursor.Value >= _coreMatchDefinitionOptionsPlayerCountAccess._playerCount || n.ActorSeat != _coreTableOrderOperations.TableStepSeat(f.OwnerSeat, cursor.Value))
+                throw new InvalidOperationException("A dead Weijie payer lost its exact committed nearest-participant cursor.");
+            _coreNativePromptBoundaryOperations.ClearPendingDecision();
+            _coreRuntimeOperations.ReplaceRuntimeTop(f with { NearestLegalSlashRequest = null });
+            _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
+            return;
+        }
+
+        if (_characterSunYuanOlOperations.IsSayingSlashRequest(f))
+        {
+            if (!actor.IsAlive)
+                _characterSunYuanOlOperations.FinishSayingSuppliedSlashFailure(f);
+            else
+                _characterSunYuanOlOperations.PublishSaying(f, keepCurrentRequest: keepCurrentRequest);
+            return;
+        }
+
+        if (_characterLiYiOlOperations.IsChanshuangSlashRequest(f))
+        {
+            if (!actor.IsAlive)
+                _characterLiYiOlOperations.FinishChanshuangSuppliedSlashFailure(f);
+            else
+                _characterLiYiOlOperations.PublishChanshuang(f);
+            return;
+        }
+
+        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(f))
+        {
+            _characterLvKuangLvXiangOlOperations.PublishLvKuangLvXiang(f);
+            return;
+        }
+
+        if (_characterWuJingOlOperations.IsWuJingHejiRequest(f))
+        {
+            _characterWuJingOlOperations.PublishWuJing(f, keepCurrentRequest: keepCurrentRequest);
+            return;
+        }
+
+        if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(f))
+        {
+            _characterCaoChunOlOperations.PublishCaoChun(f);
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.GenericBasic)
+        {
+            _characterKeBiNengOlOperations.PublishKeBiNeng(f);
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.ProgramSlash)
+        {
+            _coreProgramSlashRequestOperations.RequestProgramSlashByTarget(f, n.ActorSeat, effect.ResultBind!, keepCurrentRequest: keepCurrentRequest);
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.ProgramNearestSlash)
+        {
+            _coreProgramSlashRequestOperations.RequestProgramSlashByNearest(f, n.ActorSeat, effect.Amount, keepCurrentRequest: keepCurrentRequest);
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.AssistedSlash)
+        {
+            _coreAssistedPhysicalCardsOperations.PublishAssistedPhysicalSlashPrompt(f);
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.FixedSlash)
+        {
+            _coreFixedSlashAndDeclaredDeckProgramsOperations.PublishFixedSlashAndDeclaredDeckPrompt(f, _coreFixedSlashAndDeclaredDeckProgramsOperations.FixedTargetSlashChoices(f), "选择杀响应原请求。", n.Targets);
+            return;
+        }
+
+        if (n.Intent == WeijieIntent.NearestLegalSlash)
+        {
+            var choices = _coreNearestLegalSlashRequestsOperations.NearestLegalSlashChoices(f);
+            _corePendingDecisionPolicyPipelineOperations._pendingDecision = WeijieNativeDecision(r.OriginalDecision)with
+            {
+                PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
+                ValidCardIds = choices.SelectMany(c => c.Cards).Distinct().ToArray(),
+                Choices = choices
+            };
+            _coreMatchOutcomeStatusWinnerAccess._status = actor.IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
+            return;
+        }
+
+        throw new InvalidOperationException("Weijie has no native failed-request return.");
+    }
+}

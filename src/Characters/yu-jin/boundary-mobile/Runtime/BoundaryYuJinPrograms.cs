@@ -2,8 +2,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryYuJinComposition
 {
-    internal const string Skill = "boundary:jieyue-mobile", Gift = "jieyue-gift", Answer = "jieyue-answer",
-        Hand = "jieyue-kept-hand", Equipment = "jieyue-kept-equipment", Remainder = "jieyue-remainder";
+    internal const string Skill = "boundary:jieyue-mobile",Gift = "jieyue-gift",Answer = "jieyue-answer",        Hand = "jieyue-kept-hand",Equipment = "jieyue-kept-equipment",Remainder = "jieyue-remainder";
     [ProgramCatalogValidation(57600)]
     internal static void Validate(string path, SkillProgram p)
     {

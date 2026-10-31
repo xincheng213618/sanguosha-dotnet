@@ -68,8 +68,8 @@ internal static class IdentityDualGeneralChecks
                 (p.Role == Role.Lord ? 1 : 0)), "Every AI uses the same combination health rule as the human.");
             Require(human.MaxHp == (role == Role.Lord ? 4 : 3) && human.Hp == human.MaxHp,
                 "Odd combined health floors the average, with the original +1 Lord bonus.");
-            var state = ((IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!)[0];
-            var faction = typeof(GameEngine).GetMethod("GetEffectiveFactionId", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(game, [state]);
+            var state = ((IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!)[0];
+            var faction = global::FixtureRuntimeAccess.Engine.GetMethod("GetEffectiveFactionId", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(game, [state]);
             Require(state.Gender == GeneralGender.Male && Equals(faction, "wei"),
                 "A female Shu deputy must retain the male Wei primary's gender and effective faction.");
             Require(human.SecondarySkills!.Any(s => s.ContentId == "fixture:dual-deputy-skill") &&

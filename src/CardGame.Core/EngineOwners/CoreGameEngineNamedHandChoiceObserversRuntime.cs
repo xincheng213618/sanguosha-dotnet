@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineNamedHandChoiceObserversRuntime
+{
+    private readonly ICoreNamedHandChoiceObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNamedHandChoiceObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreNamedHandChoiceObserversCoreDamageSourceHandChoiceOperations _coreDamageSourceHandChoiceOperations;
+    private readonly ICoreNamedHandChoiceObserversCoreHalfHandPhaseDebtDamageObserversOperations _coreHalfHandPhaseDebtDamageObserversOperations;
+    private readonly ICoreNamedHandChoiceObserversCoreNamedAmbushOperations _coreNamedAmbushOperations;
+    private readonly ICoreNamedHandChoiceObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreNamedHandChoiceObserversCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreNamedHandChoiceObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNamedHandChoiceObserversCoreNamedHandChoiceObserversOperations _coreNamedHandChoiceObserversOperations;
+    private readonly ICoreNamedHandChoiceObserversCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineNamedHandChoiceObserversRuntime(ICoreNamedHandChoiceObserversResolutionStackOperations resolutionStackOperations, ICoreNamedHandChoiceObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreNamedHandChoiceObserversCoreDamageSourceHandChoiceOperations coreDamageSourceHandChoiceOperations, ICoreNamedHandChoiceObserversCoreHalfHandPhaseDebtDamageObserversOperations coreHalfHandPhaseDebtDamageObserversOperations, ICoreNamedHandChoiceObserversCoreNamedAmbushOperations coreNamedAmbushOperations, ICoreNamedHandChoiceObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreNamedHandChoiceObserversCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreNamedHandChoiceObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNamedHandChoiceObserversCoreNamedHandChoiceObserversOperations coreNamedHandChoiceObserversOperations, ICoreNamedHandChoiceObserversCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreDamageSourceHandChoiceOperations = coreDamageSourceHandChoiceOperations;
+        this._coreHalfHandPhaseDebtDamageObserversOperations = coreHalfHandPhaseDebtDamageObserversOperations;
+        this._coreNamedAmbushOperations = coreNamedAmbushOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreNamedHandChoiceObserversOperations = coreNamedHandChoiceObserversOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

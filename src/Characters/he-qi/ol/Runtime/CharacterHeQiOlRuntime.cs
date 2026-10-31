@@ -1,0 +1,92 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterHeQiOlRuntime : global::CardGame.Core.IHeQiProgramHost, global::CardGame.Core.IHeQiSelectionQueries
+{
+    private readonly ICharacterHeQiOlCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICharacterHeQiOlCharacterSunYuanOlOperations _characterSunYuanOlOperations;
+    private readonly ICharacterHeQiOlCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICharacterHeQiOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterHeQiOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterHeQiOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterHeQiOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterHeQiOlCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterHeQiOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterHeQiOlCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterHeQiOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterHeQiOlCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterHeQiOlCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICharacterHeQiOlCoreFrozenHandRosterOperations _coreFrozenHandRosterOperations;
+    private readonly ICharacterHeQiOlCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterHeQiOlCoreHpConditionalSkillGrantsOperations _coreHpConditionalSkillGrantsOperations;
+    private readonly ICharacterHeQiOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterHeQiOlCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterHeQiOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterHeQiOlCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterHeQiOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterHeQiOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterHeQiOlCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterHeQiOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterHeQiOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterHeQiOlCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICharacterHeQiOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterHeQiOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterHeQiOlCoreProgramSelectionModulesOperations _coreProgramSelectionModulesOperations;
+    private readonly ICharacterHeQiOlCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterHeQiOlCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICharacterHeQiOlCharacterHeQiOlOperations _characterHeQiOlOperations;
+    private readonly ICharacterHeQiOlCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterHeQiOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICharacterHeQiOlEquipmentSuitSkillInstancesSynchronizingEquipmentSuitSkillGrantsAccess _characterHeQiOlEquipmentSuitSkillInstancesSynchronizingEquipmentSuitSkillGrantsAccess;
+    internal CharacterHeQiOlRuntime(ICharacterHeQiOlCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICharacterHeQiOlCharacterSunYuanOlOperations characterSunYuanOlOperations, ICharacterHeQiOlCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICharacterHeQiOlCardZonesOperations cardZonesOperations, ICharacterHeQiOlContentRegistryOperations contentRegistryOperations, ICharacterHeQiOlResolutionStackOperations resolutionStackOperations, ICharacterHeQiOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterHeQiOlCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterHeQiOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterHeQiOlCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterHeQiOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterHeQiOlCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterHeQiOlCoreEquipmentContentOperations coreEquipmentContentOperations, ICharacterHeQiOlCoreFrozenHandRosterOperations coreFrozenHandRosterOperations, ICharacterHeQiOlCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterHeQiOlCoreHpConditionalSkillGrantsOperations coreHpConditionalSkillGrantsOperations, ICharacterHeQiOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterHeQiOlCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterHeQiOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterHeQiOlCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterHeQiOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterHeQiOlCoreRuntimeOperations coreRuntimeOperations, ICharacterHeQiOlCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterHeQiOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterHeQiOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterHeQiOlCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICharacterHeQiOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterHeQiOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterHeQiOlCoreProgramSelectionModulesOperations coreProgramSelectionModulesOperations, ICharacterHeQiOlCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterHeQiOlCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICharacterHeQiOlCharacterHeQiOlOperations characterHeQiOlOperations, ICharacterHeQiOlCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterHeQiOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICharacterHeQiOlEquipmentSuitSkillInstancesSynchronizingEquipmentSuitSkillGrantsAccess characterHeQiOlEquipmentSuitSkillInstancesSynchronizingEquipmentSuitSkillGrantsAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._characterSunYuanOlOperations = characterSunYuanOlOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFrozenHandRosterOperations = coreFrozenHandRosterOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreHpConditionalSkillGrantsOperations = coreHpConditionalSkillGrantsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramSelectionModulesOperations = coreProgramSelectionModulesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._characterHeQiOlOperations = characterHeQiOlOperations;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._characterHeQiOlEquipmentSuitSkillInstancesSynchronizingEquipmentSuitSkillGrantsAccess = characterHeQiOlEquipmentSuitSkillInstancesSynchronizingEquipmentSuitSkillGrantsAccess;
+    }
+}

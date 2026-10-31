@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterCaoCaoMobileGodRuntime : global::CardGame.Core.IMobileGuixinHost
+{
+    private readonly ICharacterCaoCaoMobileGodCharacterZuoCiHappyGodOperations _characterZuoCiHappyGodOperations;
+    private readonly ICharacterCaoCaoMobileGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterCaoCaoMobileGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreOrderedPrintedSkillLossObserversOperations _coreOrderedPrintedSkillLossObserversOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterCaoCaoMobileGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterCaoCaoMobileGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreShenwuNpcProgramsOperations _coreShenwuNpcProgramsOperations;
+    private readonly ICharacterCaoCaoMobileGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterCaoCaoMobileGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterCaoCaoMobileGodRuntime(ICharacterCaoCaoMobileGodCharacterZuoCiHappyGodOperations characterZuoCiHappyGodOperations, ICharacterCaoCaoMobileGodContentRegistryOperations contentRegistryOperations, ICharacterCaoCaoMobileGodResolutionStackOperations resolutionStackOperations, ICharacterCaoCaoMobileGodCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterCaoCaoMobileGodCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterCaoCaoMobileGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterCaoCaoMobileGodCoreOrderedPrintedSkillLossObserversOperations coreOrderedPrintedSkillLossObserversOperations, ICharacterCaoCaoMobileGodCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterCaoCaoMobileGodCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterCaoCaoMobileGodCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterCaoCaoMobileGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterCaoCaoMobileGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterCaoCaoMobileGodCoreRuntimeOperations coreRuntimeOperations, ICharacterCaoCaoMobileGodCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterCaoCaoMobileGodCoreTableOrderOperations coreTableOrderOperations, ICharacterCaoCaoMobileGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterCaoCaoMobileGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterCaoCaoMobileGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterCaoCaoMobileGodCoreShenwuNpcProgramsOperations coreShenwuNpcProgramsOperations, ICharacterCaoCaoMobileGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterCaoCaoMobileGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterZuoCiHappyGodOperations = characterZuoCiHappyGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOrderedPrintedSkillLossObserversOperations = coreOrderedPrintedSkillLossObserversOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreShenwuNpcProgramsOperations = coreShenwuNpcProgramsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

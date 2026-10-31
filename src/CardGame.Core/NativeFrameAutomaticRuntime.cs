@@ -38,21 +38,4 @@ internal sealed class NativeFrameAutomaticRuntime(INativeFrameAutomaticFacts fac
 
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class NativeFrameAutomaticFacts(GameEngine engine) : INativeFrameAutomaticFacts
-    {
-        public bool HasPendingDecision => engine._pendingDecision is not null;
-        public int StepCount(NativeFrameAutomaticPhase phase) =>
-            engine.ModeNativeFrames.Automatic[phase].Count;
-        public NativeFrameAutomaticStepMetadata StepAt(NativeFrameAutomaticPhase phase, int index) =>
-            engine.ModeNativeFrames.Automatic[phase][index].Step;
-        public bool Matches(NativeFrameAutomaticPhase phase, int index, ResolutionFrame frame) =>
-            engine.ModeNativeFrames.Automatic[phase][index].Matches(engine, frame);
-    }
-
-    [ProgramCapability]
-    private sealed class NativeFrameAutomaticRules(GameEngine engine) : INativeFrameAutomaticRules
-    {
-        public void AdvanceRulesAndPublishState() => engine.AdvanceRulesAndPublishState();
-    }
 }

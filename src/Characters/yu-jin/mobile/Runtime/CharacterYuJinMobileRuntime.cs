@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterYuJinMobileRuntime : global::CardGame.Core.IMobileYuJinHost
+{
+    private readonly ICharacterYuJinMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterYuJinMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterYuJinMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterYuJinMobileCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterYuJinMobileCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterYuJinMobileCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterYuJinMobileCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterYuJinMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterYuJinMobileCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterYuJinMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterYuJinMobileCorePublicPilePreparationOperations _corePublicPilePreparationOperations;
+    private readonly ICharacterYuJinMobileCorePublicPileSourcesOperations _corePublicPileSourcesOperations;
+    private readonly ICharacterYuJinMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterYuJinMobileCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterYuJinMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterYuJinMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterYuJinMobileCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterYuJinMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterYuJinMobileProgramPaidCardOperations _programPaidCardOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    internal CharacterYuJinMobileRuntime(ICharacterYuJinMobileCardZonesOperations cardZonesOperations, ICharacterYuJinMobileContentRegistryOperations contentRegistryOperations, ICharacterYuJinMobileResolutionStackOperations resolutionStackOperations, ICharacterYuJinMobileCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterYuJinMobileCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterYuJinMobileCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterYuJinMobileCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterYuJinMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterYuJinMobileCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterYuJinMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterYuJinMobileCorePublicPilePreparationOperations corePublicPilePreparationOperations, ICharacterYuJinMobileCorePublicPileSourcesOperations corePublicPileSourcesOperations, ICharacterYuJinMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterYuJinMobileCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterYuJinMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterYuJinMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterYuJinMobileCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterYuJinMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterYuJinMobileProgramPaidCardOperations programPaidCardOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess coreGameEnginePublicPileSourcesPublicPersistentPilesAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPilePreparationOperations = corePublicPilePreparationOperations;
+        this._corePublicPileSourcesOperations = corePublicPileSourcesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._programPaidCardOperations = programPaidCardOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEnginePublicPileSourcesPublicPersistentPilesAccess = coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    }
+}

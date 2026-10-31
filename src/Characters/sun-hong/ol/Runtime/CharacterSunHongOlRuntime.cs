@@ -1,0 +1,98 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSunHongOlRuntime : global::CardGame.Core.ISunHongXianbiHost, global::CardGame.Core.ISunHongZenrunHost
+{
+    private readonly ICharacterSunHongOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterSunHongOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSunHongOlObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICharacterSunHongOlRandomOperations _randomOperations;
+    private readonly ICharacterSunHongOlResolutionStackOperations2 _resolutionStackOperations;
+    private readonly ICharacterSunHongOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterSunHongOlCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterSunHongOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterSunHongOlCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterSunHongOlCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterSunHongOlCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterSunHongOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterSunHongOlCoreNativeDrawAttemptsOperations _coreNativeDrawAttemptsOperations;
+    private readonly ICharacterSunHongOlCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterSunHongOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterSunHongOlCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterSunHongOlCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterSunHongOlCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterSunHongOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSunHongOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterSunHongOlCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterSunHongOlCoreRecoveryReplacementDamageRidesOperations2 _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterSunHongOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterSunHongOlCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterSunHongOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterSunHongOlCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterSunHongOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterSunHongOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterSunHongOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterSunHongOlCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterSunHongOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterSunHongOlCharacterSunHongOlOperations _characterSunHongOlOperations;
+    private readonly ICharacterSunHongOlCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICharacterSunHongOlResolutionStackOperations _resolutionStackOperations2;
+    private readonly ICharacterSunHongOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICharacterSunHongOlCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations2;
+    private readonly ICharacterSunHongOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CharacterSunHongOlRuntime(ICharacterSunHongOlCardZonesOperations cardZonesOperations, ICharacterSunHongOlContentRegistryOperations contentRegistryOperations, ICharacterSunHongOlObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICharacterSunHongOlRandomOperations randomOperations, ICharacterSunHongOlResolutionStackOperations2 resolutionStackOperations, ICharacterSunHongOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterSunHongOlCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterSunHongOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterSunHongOlCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterSunHongOlCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterSunHongOlCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterSunHongOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterSunHongOlCoreNativeDrawAttemptsOperations coreNativeDrawAttemptsOperations, ICharacterSunHongOlCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterSunHongOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterSunHongOlCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterSunHongOlCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterSunHongOlCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterSunHongOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSunHongOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterSunHongOlCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterSunHongOlCoreRecoveryReplacementDamageRidesOperations2 coreRecoveryReplacementDamageRidesOperations, ICharacterSunHongOlCoreRuntimeOperations coreRuntimeOperations, ICharacterSunHongOlCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterSunHongOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterSunHongOlCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterSunHongOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterSunHongOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterSunHongOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterSunHongOlCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterSunHongOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterSunHongOlCharacterSunHongOlOperations characterSunHongOlOperations, ICharacterSunHongOlCharacterYanPuOlOperations characterYanPuOlOperations, ICharacterSunHongOlResolutionStackOperations resolutionStackOperations2, ICharacterSunHongOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICharacterSunHongOlCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations2, ICharacterSunHongOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeDrawAttemptsOperations = coreNativeDrawAttemptsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterSunHongOlOperations = characterSunHongOlOperations;
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._resolutionStackOperations2 = resolutionStackOperations2;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreRecoveryReplacementDamageRidesOperations2 = coreRecoveryReplacementDamageRidesOperations2;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

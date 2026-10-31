@@ -1,0 +1,84 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramPaidCardRuntimeRuntime : global::CardGame.Core.IProgramPaidCardFacts, global::CardGame.Core.IProgramPaidCardOperations
+{
+    private readonly ICoreProgramPaidCardRuntimeCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICoreProgramPaidCardRuntimeCharacterDaQiaoMobileOperations _characterDaQiaoMobileOperations;
+    private readonly ICoreProgramPaidCardRuntimeCharacterGuanYuRuntimeOperations _characterGuanYuRuntimeOperations;
+    private readonly ICoreProgramPaidCardRuntimeCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreProgramPaidCardRuntimeCharacterLeiBoAnniversaryOperations _characterLeiBoAnniversaryOperations;
+    private readonly ICoreProgramPaidCardRuntimeCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreProgramPaidCardRuntimeCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramPaidCardRuntimeContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramPaidCardRuntimeResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreEquipmentSlotGroupProgramsOperations _coreEquipmentSlotGroupProgramsOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreProgramCategoryChallengesOperations _coreProgramCategoryChallengesOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreProgramOwnedCardsOperations _coreProgramOwnedCardsOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreProgramRandomTransfersOperations _coreProgramRandomTransfersOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
+    private readonly ICoreProgramPaidCardRuntimeCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreProgramPaidCardRuntimeCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramPaidCardRuntimeCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess _coreMatchDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreProgramPaidCardRuntimeRuntime(ICoreProgramPaidCardRuntimeCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICoreProgramPaidCardRuntimeCharacterDaQiaoMobileOperations characterDaQiaoMobileOperations, ICoreProgramPaidCardRuntimeCharacterGuanYuRuntimeOperations characterGuanYuRuntimeOperations, ICoreProgramPaidCardRuntimeCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreProgramPaidCardRuntimeCharacterLeiBoAnniversaryOperations characterLeiBoAnniversaryOperations, ICoreProgramPaidCardRuntimeCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreProgramPaidCardRuntimeCardZonesOperations cardZonesOperations, ICoreProgramPaidCardRuntimeContentRegistryOperations contentRegistryOperations, ICoreProgramPaidCardRuntimeResolutionStackOperations resolutionStackOperations, ICoreProgramPaidCardRuntimeCoreActualTurnsOperations coreActualTurnsOperations, ICoreProgramPaidCardRuntimeCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreProgramPaidCardRuntimeCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreProgramPaidCardRuntimeCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreProgramPaidCardRuntimeCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreProgramPaidCardRuntimeCoreEquipmentSlotGroupProgramsOperations coreEquipmentSlotGroupProgramsOperations, ICoreProgramPaidCardRuntimeCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreProgramPaidCardRuntimeCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramPaidCardRuntimeCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreProgramPaidCardRuntimeCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreProgramPaidCardRuntimeCoreProgramCategoryChallengesOperations coreProgramCategoryChallengesOperations, ICoreProgramPaidCardRuntimeCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramPaidCardRuntimeCoreProgramOwnedCardsOperations coreProgramOwnedCardsOperations, ICoreProgramPaidCardRuntimeCoreProgramRandomTransfersOperations coreProgramRandomTransfersOperations, ICoreProgramPaidCardRuntimeCoreRuntimeOperations coreRuntimeOperations, ICoreProgramPaidCardRuntimeCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreProgramPaidCardRuntimeCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreProgramPaidCardRuntimeCoreMatchLogOperations coreMatchLogOperations, ICoreProgramPaidCardRuntimeCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreProgramPaidCardRuntimeCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICoreProgramPaidCardRuntimeCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreProgramPaidCardRuntimeCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramPaidCardRuntimeCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess coreMatchDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._characterDaQiaoMobileOperations = characterDaQiaoMobileOperations;
+        this._characterGuanYuRuntimeOperations = characterGuanYuRuntimeOperations;
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._characterLeiBoAnniversaryOperations = characterLeiBoAnniversaryOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreEquipmentSlotGroupProgramsOperations = coreEquipmentSlotGroupProgramsOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCategoryChallengesOperations = coreProgramCategoryChallengesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramOwnedCardsOperations = coreProgramOwnedCardsOperations;
+        this._coreProgramRandomTransfersOperations = coreProgramRandomTransfersOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchDefinitionPlayerCountAccess = coreMatchDefinitionPlayerCountAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

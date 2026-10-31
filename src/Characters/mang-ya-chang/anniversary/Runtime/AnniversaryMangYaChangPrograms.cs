@@ -21,7 +21,7 @@ internal sealed class AnniversaryJiedaoHandler(SkillProgramEffectOp operation) :
 }
 internal static class AnniversaryJiedaoComposition
 {
-    internal const string Skill = "anniversary:jiedao", Choose = "first-source-damage", Pay = "surviving-victim-cost";
+    internal const string Skill = "anniversary:jiedao",Choose = "first-source-damage",Pay = "surviving-victim-cost";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ChooseAnniversaryMangYaChangJiedao or SkillProgramEffectOp.PayAnniversaryMangYaChangJiedao;
     [ProgramCatalogValidation(44400)] internal static void Validate(string path, SkillProgram p)
     {

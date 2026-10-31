@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreLeastHandMarkerDrawProgramsRuntime : global::CardGame.Core.ILeastHandMarkerDrawProgramHost
+{
+    private readonly ICoreLeastHandMarkerDrawProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsCoreAttributedMarkerEventsOperations _coreAttributedMarkerEventsOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreLeastHandMarkerDrawProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreLeastHandMarkerDrawProgramsMarkerExtraDrawPoliciesAccess _coreLeastHandMarkerDrawProgramsMarkerExtraDrawPoliciesAccess;
+    internal CoreLeastHandMarkerDrawProgramsRuntime(ICoreLeastHandMarkerDrawProgramsContentRegistryOperations contentRegistryOperations, ICoreLeastHandMarkerDrawProgramsResolutionStackOperations resolutionStackOperations, ICoreLeastHandMarkerDrawProgramsCoreAttributedMarkerEventsOperations coreAttributedMarkerEventsOperations, ICoreLeastHandMarkerDrawProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreLeastHandMarkerDrawProgramsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreLeastHandMarkerDrawProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreLeastHandMarkerDrawProgramsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreLeastHandMarkerDrawProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreLeastHandMarkerDrawProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreLeastHandMarkerDrawProgramsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreLeastHandMarkerDrawProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreLeastHandMarkerDrawProgramsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreLeastHandMarkerDrawProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreLeastHandMarkerDrawProgramsMarkerExtraDrawPoliciesAccess coreLeastHandMarkerDrawProgramsMarkerExtraDrawPoliciesAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAttributedMarkerEventsOperations = coreAttributedMarkerEventsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreLeastHandMarkerDrawProgramsMarkerExtraDrawPoliciesAccess = coreLeastHandMarkerDrawProgramsMarkerExtraDrawPoliciesAccess;
+    }
+}

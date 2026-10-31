@@ -1,0 +1,112 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CoreGameEngineHalfHandPhaseDebtObserversRuntime
+{
+    internal bool HalfHandPhaseFirstChild(ProgramSkillFrame f, ResolutionFrame child)
+    {
+        if (f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat)
+            return false;
+        long before, after;
+        string reason;
+        int source, target;
+        IReadOnlyList<int> ids;
+        if (f.HalfHandDraw is { } drawn && _coreHalfHandPhaseDebtReceiptsOperations.ValidHalfHandDraw(f))
+        {
+            before = drawn.SequenceBefore;
+            after = drawn.SequenceAfter;
+            source = -1;
+            target = f.OwnerSeat;
+            ids = [];
+            reason = $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.DrawExtraAndArmHalfHandSupport)}";
+        }
+        else if (f.HalfHandGift is { } gift && _coreHalfHandPhaseDebtReceiptsOperations.ValidHalfHandGift(f))
+        {
+            before = gift.SequenceBefore;
+            after = gift.SequenceAfter;
+            source = f.OwnerSeat;
+            target = gift.RecipientSeat;
+            ids = gift.CardIds;
+            reason = $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.GiveHalfHandAndIssueTargetSupport)}";
+        }
+        else if (f.PhaseHandExchange is { Issued: true } exchange && _coreHalfHandPhaseDebtReceiptsOperations.ValidPhaseHandExchange(f))
+        {
+            before = exchange.SequenceBefore;
+            after = exchange.SequenceAfter;
+            source = -2;
+            target = -2;
+            ids = Array.AsReadOnly(exchange.FirstCardIds.Concat(exchange.SecondCardIds).ToArray());
+            reason = $"skill-program.{(f.SkillId)}.exchange";
+        }
+        else if (f.HalfHandSupport is { Paid: true, CardId: { } cardId } aid && _resolutionStackOperations._resolutionStack.FirstOrDefault(parent => parent.Id == f.WindowContext?.ParentFrameId)is ActualUseTargetWindowFrame supportWindow && _coreHalfHandTargetSupportOperations.HalfHandSupportPaymentMatches(f, supportWindow, true))
+        {
+            before = aid.SequenceBefore;
+            after = aid.SequenceAfter;
+            source = aid.RecipientSeat;
+            target = f.OwnerSeat;
+            ids = [cardId];
+            reason = $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.OfferHalfHandRecipientSupport)}";
+        }
+        else if (f.PhaseHandDebtPayment is { } paid && _coreHalfHandPhaseDebtReceiptsOperations.ValidPhaseHandDebtPayment(f) && f.InstructionIndex is 2 or 3 && f.CardSetBindings.SingleOrDefault(b => b.Name == paid.ResultBind)is { } binding && binding.CardIds.Count == paid.RequiredPaymentCount && binding.SourceLocations.Count == binding.CardIds.Count && binding.SourceLocations.All(l => l.OwnerSeat == f.OwnerSeat && l.Zone is CardZoneKind.Hand or CardZoneKind.Equipment))
+        {
+            before = paid.SequenceBefore;
+            after = _coreHalfHandPhaseDebtProgramsOperations.HalfHandDebtSequence;
+            source = f.OwnerSeat;
+            target = -3;
+            ids = binding.CardIds;
+            reason = $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.MoveBoundCards)}";
+            if (ids.Count == 0 || ids.Where((id, n) => _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > before && m.Sequence <= after && m.CardId == id && m.From == binding.SourceLocations[n] && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame && binding.SourceLocations[n].Zone == CardZoneKind.Equipment) && m.Reason.Value == reason) != 1).Any())
+                return false;
+        }
+        else
+            return false;
+        if (child is CardsMovedTriggerWindowFrame moved)
+            return moved.Batch.ParentFrameId == f.Id && (moved.Batch.AwaitingProgramFrameId is null || moved.Batch.AwaitingProgramFrameId == f.Id) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.Sequence > before && m.Sequence <= after && m.Reason.Value == reason && (ids.Count == 0 || ids.Contains(m.CardId)) && (source != -1 || m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(target)));
+        if (target != -3)
+            return false;
+        var lions = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > before && m.Sequence <= after && ids.Contains(m.CardId) && m.From == CardLocation.Equipment(f.OwnerSeat) && m.CardKind == CardKind.SilverLion && m.Reason.Value == reason).ToArray();
+        if (child is HpChangedTriggerWindowFrame hp)
+            return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == f.OwnerSeat && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Amount == 1 && lions.Length == 1;
+        return child is RecoveryReplacementFrame replacement && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(replacement, f) && replacement.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && replacement.Attempt.SourceSeat == f.OwnerSeat && replacement.Attempt.TargetSeat == f.OwnerSeat && replacement.Attempt.Amount == 1 && replacement.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && replacement.Attempt.Completion.MoveReason?.Value == reason && lions.Length == 1;
+    }
+
+    internal ProgramSkillFrame? HalfHandPhaseDebtObserverRoot()
+    {
+        for (var rootIndex = 0; rootIndex + 1 < _resolutionStackOperations._resolutionStack.Count; rootIndex++)
+        {
+            if (_resolutionStackOperations._resolutionStack[rootIndex] is not ProgramSkillFrame f || !HalfHandPhaseFirstChild(f, _resolutionStackOperations._resolutionStack[rootIndex + 1]))
+                continue;
+            var aligned = true;
+            for (var index = rootIndex + 1; index < _resolutionStackOperations._resolutionStack.Count; index++)
+            {
+                if (!_coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(index))
+                {
+                    aligned = false;
+                    break;
+                }
+
+                if (_resolutionStackOperations._resolutionStack[index] is DyingFrame d && (_coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(index, d) || _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(index, d) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(index, d) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(index, d)))
+                    break;
+            }
+
+            if (aligned)
+                return f;
+        }
+
+        return null;
+    }
+
+    internal bool HalfHandSupportObserverRootMatches(ProgramSkillFrame f, ActualUseTargetWindowFrame parent)
+    {
+        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
+        return index >= 0 && index + 1 < _resolutionStackOperations._resolutionStack.Count && _coreHalfHandTargetSupportOperations.HalfHandSupportPaymentMatches(f, parent, true) && HalfHandPhaseFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]);
+    }
+
+    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 470, group: 10)]
+    [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 550)]
+    internal bool IsHalfHandPhaseDebtProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && (HalfHandPhaseDebtObserverRoot() ?? _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().Select(w => _corePaidOwnTargetObserversOperations.ActualUseTargetObserverRoot(w.ParentFrameId)).LastOrDefault(f => f?.HalfHandSupport is { Paid: true }))is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+}

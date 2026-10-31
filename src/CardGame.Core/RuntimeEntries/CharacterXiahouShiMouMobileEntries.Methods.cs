@@ -1,0 +1,56 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterXiahouShiMouMobileEntries
+{
+    internal bool AdvanceMouXiahouShiChildren() => _resolve().AdvanceMouXiahouShiChildren();
+    internal global::CardGame.Core.PromptChoice AiMouXiahouShiQiaoshi(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouXiahouShiQiaoshi(pending, f);
+    internal global::CardGame.Core.PromptChoice AiMouXiahouShiSupport(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouXiahouShiSupport(pending, f);
+    internal void AnswerMouXiahouShiQiaoshi(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouXiahouShiQiaoshi(selected);
+    internal void AnswerMouXiahouShiSupport(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouXiahouShiSupport(selected);
+    internal void AssertMouXiahouShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouXiahouShi(f);
+    internal void AssertMouXiahouShiFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouXiahouShiFrame(f);
+    internal void AssertMouXiahouShiFrames() => _resolve().AssertMouXiahouShiFrames();
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginMouXiahouShiDiscard(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouXiahouShiDiscard(supplied);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginMouXiahouShiQiaoshi(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouXiahouShiQiaoshi(supplied);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginMouXiahouShiSupport(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouXiahouShiSupport(supplied);
+    internal bool CanMouXiahouShiCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanMouXiahouShiCandidate(candidate, context);
+    internal bool CanStartMouXiahouShiYanyu(global::CardGame.Core.CharacterState owner) => _resolve().CanStartMouXiahouShiYanyu(owner);
+    internal void ContinueMouXiahouShi(long id) => _resolve().ContinueMouXiahouShi(id);
+    internal global::CardGame.Core.MouXiahouShiTurnKey? CurrentMouXiahouShiTurn() => _resolve().CurrentMouXiahouShiTurn();
+    internal bool DrainMouXiahouShiChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouXiahouShiChildren(f);
+    internal bool ExactMouXiahouShiDamageContext(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactMouXiahouShiDamageContext(f);
+    internal bool ExactMouXiahouShiSupportContext(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactMouXiahouShiSupportContext(f);
+    internal void FinishMouXiahouShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouXiahouShi(f);
+    internal bool HasMouXiahouShiBeforeDamageObserver(long id) => _resolve().HasMouXiahouShiBeforeDamageObserver(id);
+    internal bool HasMouXiahouShiDamageObserver(long id) => _resolve().HasMouXiahouShiDamageObserver(id);
+    internal bool HasPaidMouXiahouShiSelection(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasPaidMouXiahouShiSelection(f);
+    internal bool IsMouXiahouShiDirectRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouXiahouShiDirectRecoveryParent(f, recovery);
+    internal bool IsMouXiahouShiDying() => _resolve().IsMouXiahouShiDying();
+    internal bool IsMouXiahouShiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouXiahouShiMovement(f, e, pending);
+    internal bool IsMouXiahouShiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouXiahouShiRecoveryParent(f, recovery);
+    internal bool MouXiahouShiDrawSigned(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome d, int recipient, int requested) => _resolve().MouXiahouShiDrawSigned(f, d, recipient, requested);
+    internal bool MouXiahouShiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouXiahouShiFirstChild(f, child);
+    internal bool MouXiahouShiMovementSigned(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().MouXiahouShiMovementSigned(f, m);
+    internal bool MouXiahouShiObserverEdge(int n) => _resolve().MouXiahouShiObserverEdge(n);
+    internal global::CardGame.Core.ProgramSkillFrame? MouXiahouShiObserverRoot() => _resolve().MouXiahouShiObserverRoot();
+    internal bool MouXiahouShiObserverSuffix(int index) => _resolve().MouXiahouShiObserverSuffix(index);
+    internal int MouXiahouShiPhaseUses(int owner, global::CardGame.Core.ActualDiscardRecoveryPhaseKey phase) => _resolve().MouXiahouShiPhaseUses(owner, phase);
+    internal int MouXiahouShiProjectedPhaseUses(int owner, string skill, int fallback) => _resolve().MouXiahouShiProjectedPhaseUses(owner, skill, fallback);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouXiahouShiQiaoshiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouXiahouShiQiaoshiChoices(f);
+    internal bool MouXiahouShiQiaoshiSpent(int owner, global::CardGame.Core.MouXiahouShiTurnKey turn) => _resolve().MouXiahouShiQiaoshiSpent(owner, turn);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouXiahouShiSupportChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouXiahouShiSupportChoices(f);
+    internal bool MouXiahouShiTurnBefore(global::CardGame.Core.IGameEvent fact, global::CardGame.Core.MouXiahouShiTurnKey turn) => _resolve().MouXiahouShiTurnBefore(fact, turn);
+    internal int MouXiahouShiTurnDiscards(int owner, global::CardGame.Core.MouXiahouShiTurnKey turn) => _resolve().MouXiahouShiTurnDiscards(owner, turn);
+    internal bool MouXiahouShiYanyuRoot(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouXiahouShiYanyuRoot(f);
+    internal bool PermitAcceptedMouXiahouShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PermitAcceptedMouXiahouShi(f);
+    internal bool PermitIssuedMouXiahouShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PermitIssuedMouXiahouShi(f);
+    internal void PublishMouXiahouShi(global::CardGame.Core.ProgramSkillFrame f, int chooser, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> choices, string text) => _resolve().PublishMouXiahouShi(f, chooser, choices, text);
+    internal bool ResumeMouXiahouShi(long id) => _resolve().ResumeMouXiahouShi(id);
+    internal void ReturnMouXiahouShiDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnMouXiahouShiDraw(f, outcome);
+    internal bool ReturnMouXiahouShiMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnMouXiahouShiMovement(f);
+    internal void SealMouXiahouShiMovements(long id, long before) => _resolve().SealMouXiahouShiMovements(id, before);
+    internal bool ValidMouXiahouShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidMouXiahouShi(f);
+    internal bool ValidMouXiahouShiPaidHistory(global::CardGame.Core.MouXiahouShiYanyuDiscardPaidEvent e) => _resolve().ValidMouXiahouShiPaidHistory(e);
+    internal bool ValidMouXiahouShiQiaoshi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidMouXiahouShiQiaoshi(f);
+    internal bool ValidMouXiahouShiYanyu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidMouXiahouShiYanyu(f);
+}

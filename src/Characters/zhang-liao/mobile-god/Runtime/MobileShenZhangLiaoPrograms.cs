@@ -44,7 +44,7 @@ internal sealed class MobileShenZhangLiaoHandler(SkillProgramEffectOp op) : ISki
 { public SkillProgramEffectOp Op => op; public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int seat, ISkillProgramEffectHost h) => h.GetCapability<IMobileShenZhangLiaoHost>().Resolve(f, op); }
 internal static class MobileShenZhangLiaoComposition
 {
-    internal const string Duorui = "mobile:duorui", Zhiti = "mobile:zhiti";
+    internal const string Duorui = "mobile:duorui",Zhiti = "mobile:zhiti";
     [ProgramCatalogValidation(39950)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Any(e => e.Op is SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill or SkillProgramEffectOp.RestoreMobileZhitiEquipmentSlot)) return;

@@ -66,7 +66,7 @@ public sealed record ShenZhangFeiXunshiEvent(CardConversionSource Source, string
 
 internal static class ShenZhangFeiComposition
 {
-    internal const string Shencai = "anniversary:shencai", HappyShencai = "happy:shencai", Xunshi = "anniversary:xunshi";
+    internal const string Shencai = "anniversary:shencai",HappyShencai = "happy:shencai",Xunshi = "anniversary:xunshi";
     internal static bool IsShencai(string id) => id is Shencai or HappyShencai;
     internal static readonly CardKind[] MultiTricks = [CardKind.BarbarianAssault, CardKind.ArrowBarrage, CardKind.FiveGrains, CardKind.PeachGarden, CardKind.IronChain];
     [ProgramCatalogValidation(38600)] internal static void Validate(string path, SkillProgram p)

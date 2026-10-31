@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineFirstSlashDuelLegacyWindowsRuntime
+{
+    private readonly ICoreFirstSlashDuelLegacyWindowsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreActualUseTargetProgramsOperations _coreActualUseTargetProgramsOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreCurrentTurnUseKindsOperations _coreCurrentTurnUseKindsOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreFirstSlashDuelBenefitsOperations _coreFirstSlashDuelBenefitsOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreSlashTargetBenefitWindowsOperations _coreSlashTargetBenefitWindowsOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreSlashTargetPenaltyWindowsOperations _coreSlashTargetPenaltyWindowsOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreFirstSlashDuelLegacyWindowsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineFirstSlashDuelLegacyWindowsRuntime(ICoreFirstSlashDuelLegacyWindowsContentRegistryOperations contentRegistryOperations, ICoreFirstSlashDuelLegacyWindowsResolutionStackOperations resolutionStackOperations, ICoreFirstSlashDuelLegacyWindowsCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreFirstSlashDuelLegacyWindowsCoreActualUseTargetProgramsOperations coreActualUseTargetProgramsOperations, ICoreFirstSlashDuelLegacyWindowsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreFirstSlashDuelLegacyWindowsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreFirstSlashDuelLegacyWindowsCoreCurrentTurnUseKindsOperations coreCurrentTurnUseKindsOperations, ICoreFirstSlashDuelLegacyWindowsCoreFirstSlashDuelBenefitsOperations coreFirstSlashDuelBenefitsOperations, ICoreFirstSlashDuelLegacyWindowsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreFirstSlashDuelLegacyWindowsCoreRuntimeOperations coreRuntimeOperations, ICoreFirstSlashDuelLegacyWindowsCoreSlashTargetBenefitWindowsOperations coreSlashTargetBenefitWindowsOperations, ICoreFirstSlashDuelLegacyWindowsCoreSlashTargetPenaltyWindowsOperations coreSlashTargetPenaltyWindowsOperations, ICoreFirstSlashDuelLegacyWindowsCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreFirstSlashDuelLegacyWindowsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreFirstSlashDuelLegacyWindowsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreActualUseTargetProgramsOperations = coreActualUseTargetProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentTurnUseKindsOperations = coreCurrentTurnUseKindsOperations;
+        this._coreFirstSlashDuelBenefitsOperations = coreFirstSlashDuelBenefitsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSlashTargetBenefitWindowsOperations = coreSlashTargetBenefitWindowsOperations;
+        this._coreSlashTargetPenaltyWindowsOperations = coreSlashTargetPenaltyWindowsOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

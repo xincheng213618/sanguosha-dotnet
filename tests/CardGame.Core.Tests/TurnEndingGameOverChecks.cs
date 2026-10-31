@@ -101,11 +101,11 @@ internal static class TurnEndingGameOverChecks
                 !game.State.Players[0].IsAlive) continue;
             var lordSeat = game.CreateSnapshot(0, true).Players.Single(player =>
                 player.Role == Role.Lord).Seat;
-            var players = (List<CharacterState>)typeof(GameEngine).GetField("_players",
+            var players = (List<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players",
                 BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
             if (!players[lordSeat].IsAlive || game.CreateSnapshot(0, true).Players[0].Hand.All(card =>
                 card.Suit is not (Suit.Heart or Suit.Spade))) continue;
-            var pool = (IReadOnlyList<GeneralDefinition>)typeof(GameEngine).GetField("_generalPool",
+            var pool = (IReadOnlyList<GeneralDefinition>)global::FixtureRuntimeAccess.Engine.GetField("_generalPool",
                 BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
             for (var observer = 1; observer < players.Count; observer++)
             {

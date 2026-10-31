@@ -1,0 +1,104 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeSlashCompletionRuntime
+{
+    private readonly ICoreNativeSlashCompletionCharacterDianWeiMouOperations _characterDianWeiMouOperations;
+    private readonly ICoreNativeSlashCompletionCharacterGuanHaiOlOperations _characterGuanHaiOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterHuBanOlOperations _characterHuBanOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterHuaManOlOperations _characterHuaManOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterLiYiOlOperations _characterLiYiOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreNativeSlashCompletionCharacterMengDaOlOperations _characterMengDaOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterMiHengLeOperations _characterMiHengLeOperations;
+    private readonly ICoreNativeSlashCompletionCharacterSunYuanOlOperations _characterSunYuanOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterWangChangAnniversaryOperations _characterWangChangAnniversaryOperations;
+    private readonly ICoreNativeSlashCompletionCharacterWuJingOlOperations _characterWuJingOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterXinPiOlOperations _characterXinPiOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterXuRongOlOperations _characterXuRongOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterXunXuAnniversaryOperations _characterXunXuAnniversaryOperations;
+    private readonly ICoreNativeSlashCompletionCharacterYaDanOlOperations _characterYaDanOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterYangFuOlOperations _characterYangFuOlOperations;
+    private readonly ICoreNativeSlashCompletionCharacterZhangYanOlOperations _characterZhangYanOlOperations;
+    private readonly ICoreNativeSlashCompletionCardZonesOperations _cardZonesOperations;
+    private readonly ICoreNativeSlashCompletionResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNativeSlashCompletionCoreActualHandGainProgramsOperations _coreActualHandGainProgramsOperations;
+    private readonly ICoreNativeSlashCompletionCoreActualTurnLegacyCompletionOperations _coreActualTurnLegacyCompletionOperations;
+    private readonly ICoreNativeSlashCompletionCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreNativeSlashCompletionCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreNativeSlashCompletionCoreCurrentSlashFireOffersOperations _coreCurrentSlashFireOffersOperations;
+    private readonly ICoreNativeSlashCompletionCoreCurrentUsePhysicalClaimsOperations _coreCurrentUsePhysicalClaimsOperations;
+    private readonly ICoreNativeSlashCompletionCoreDamageTargetObtainProgramsOperations _coreDamageTargetObtainProgramsOperations;
+    private readonly ICoreNativeSlashCompletionCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreNativeSlashCompletionCoreForeignPublicPileSlashesOperations _coreForeignPublicPileSlashesOperations;
+    private readonly ICoreNativeSlashCompletionCoreForeignSelectedCardSlashReturnsOperations _coreForeignSelectedCardSlashReturnsOperations;
+    private readonly ICoreNativeSlashCompletionCoreGuanduEquipmentOperations _coreGuanduEquipmentOperations;
+    private readonly ICoreNativeSlashCompletionCoreHellSoulCardsOperations _coreHellSoulCardsOperations;
+    private readonly ICoreNativeSlashCompletionCoreKenshangPaymentsOperations _coreKenshangPaymentsOperations;
+    private readonly ICoreNativeSlashCompletionCoreOriginalTargetAdditionsOperations _coreOriginalTargetAdditionsOperations;
+    private readonly ICoreNativeSlashCompletionCoreOriginalUseLightningOperations _coreOriginalUseLightningOperations;
+    private readonly ICoreNativeSlashCompletionCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreNativeSlashCompletionCoreShanheS5XuncanOperations _coreShanheS5XuncanOperations;
+    private readonly ICoreNativeSlashCompletionCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreNativeSlashCompletionCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreNativeSlashCompletionCoreNativeSlashTargetDuelOperations _coreNativeSlashTargetDuelOperations;
+    private readonly ICoreNativeSlashCompletionCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNativeSlashCompletionCoreProgramDamageHooksOperations _coreProgramDamageHooksOperations;
+    private readonly ICoreNativeSlashCompletionKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreNativeSlashCompletionKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    internal CoreNativeSlashCompletionRuntime(ICoreNativeSlashCompletionCharacterDianWeiMouOperations characterDianWeiMouOperations, ICoreNativeSlashCompletionCharacterGuanHaiOlOperations characterGuanHaiOlOperations, ICoreNativeSlashCompletionCharacterHuBanOlOperations characterHuBanOlOperations, ICoreNativeSlashCompletionCharacterHuaManOlOperations characterHuaManOlOperations, ICoreNativeSlashCompletionCharacterLiYiOlOperations characterLiYiOlOperations, ICoreNativeSlashCompletionCharacterLuMengMouOperations characterLuMengMouOperations, ICoreNativeSlashCompletionCharacterMengDaOlOperations characterMengDaOlOperations, ICoreNativeSlashCompletionCharacterMiHengLeOperations characterMiHengLeOperations, ICoreNativeSlashCompletionCharacterSunYuanOlOperations characterSunYuanOlOperations, ICoreNativeSlashCompletionCharacterWangChangAnniversaryOperations characterWangChangAnniversaryOperations, ICoreNativeSlashCompletionCharacterWuJingOlOperations characterWuJingOlOperations, ICoreNativeSlashCompletionCharacterXinPiOlOperations characterXinPiOlOperations, ICoreNativeSlashCompletionCharacterXuRongOlOperations characterXuRongOlOperations, ICoreNativeSlashCompletionCharacterXunXuAnniversaryOperations characterXunXuAnniversaryOperations, ICoreNativeSlashCompletionCharacterYaDanOlOperations characterYaDanOlOperations, ICoreNativeSlashCompletionCharacterYangFuOlOperations characterYangFuOlOperations, ICoreNativeSlashCompletionCharacterZhangYanOlOperations characterZhangYanOlOperations, ICoreNativeSlashCompletionCardZonesOperations cardZonesOperations, ICoreNativeSlashCompletionResolutionStackOperations resolutionStackOperations, ICoreNativeSlashCompletionCoreActualHandGainProgramsOperations coreActualHandGainProgramsOperations, ICoreNativeSlashCompletionCoreActualTurnLegacyCompletionOperations coreActualTurnLegacyCompletionOperations, ICoreNativeSlashCompletionCoreCardActionsOperations coreCardActionsOperations, ICoreNativeSlashCompletionCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreNativeSlashCompletionCoreCurrentSlashFireOffersOperations coreCurrentSlashFireOffersOperations, ICoreNativeSlashCompletionCoreCurrentUsePhysicalClaimsOperations coreCurrentUsePhysicalClaimsOperations, ICoreNativeSlashCompletionCoreDamageTargetObtainProgramsOperations coreDamageTargetObtainProgramsOperations, ICoreNativeSlashCompletionCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreNativeSlashCompletionCoreForeignPublicPileSlashesOperations coreForeignPublicPileSlashesOperations, ICoreNativeSlashCompletionCoreForeignSelectedCardSlashReturnsOperations coreForeignSelectedCardSlashReturnsOperations, ICoreNativeSlashCompletionCoreGuanduEquipmentOperations coreGuanduEquipmentOperations, ICoreNativeSlashCompletionCoreHellSoulCardsOperations coreHellSoulCardsOperations, ICoreNativeSlashCompletionCoreKenshangPaymentsOperations coreKenshangPaymentsOperations, ICoreNativeSlashCompletionCoreOriginalTargetAdditionsOperations coreOriginalTargetAdditionsOperations, ICoreNativeSlashCompletionCoreOriginalUseLightningOperations coreOriginalUseLightningOperations, ICoreNativeSlashCompletionCoreRuntimeOperations coreRuntimeOperations, ICoreNativeSlashCompletionCoreShanheS5XuncanOperations coreShanheS5XuncanOperations, ICoreNativeSlashCompletionCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreNativeSlashCompletionCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreNativeSlashCompletionCoreNativeSlashTargetDuelOperations coreNativeSlashTargetDuelOperations, ICoreNativeSlashCompletionCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeSlashCompletionCoreProgramDamageHooksOperations coreProgramDamageHooksOperations, ICoreNativeSlashCompletionKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreNativeSlashCompletionKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess)
+    {
+        this._characterDianWeiMouOperations = characterDianWeiMouOperations;
+        this._characterGuanHaiOlOperations = characterGuanHaiOlOperations;
+        this._characterHuBanOlOperations = characterHuBanOlOperations;
+        this._characterHuaManOlOperations = characterHuaManOlOperations;
+        this._characterLiYiOlOperations = characterLiYiOlOperations;
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._characterMengDaOlOperations = characterMengDaOlOperations;
+        this._characterMiHengLeOperations = characterMiHengLeOperations;
+        this._characterSunYuanOlOperations = characterSunYuanOlOperations;
+        this._characterWangChangAnniversaryOperations = characterWangChangAnniversaryOperations;
+        this._characterWuJingOlOperations = characterWuJingOlOperations;
+        this._characterXinPiOlOperations = characterXinPiOlOperations;
+        this._characterXuRongOlOperations = characterXuRongOlOperations;
+        this._characterXunXuAnniversaryOperations = characterXunXuAnniversaryOperations;
+        this._characterYaDanOlOperations = characterYaDanOlOperations;
+        this._characterYangFuOlOperations = characterYangFuOlOperations;
+        this._characterZhangYanOlOperations = characterZhangYanOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualHandGainProgramsOperations = coreActualHandGainProgramsOperations;
+        this._coreActualTurnLegacyCompletionOperations = coreActualTurnLegacyCompletionOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentSlashFireOffersOperations = coreCurrentSlashFireOffersOperations;
+        this._coreCurrentUsePhysicalClaimsOperations = coreCurrentUsePhysicalClaimsOperations;
+        this._coreDamageTargetObtainProgramsOperations = coreDamageTargetObtainProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreForeignPublicPileSlashesOperations = coreForeignPublicPileSlashesOperations;
+        this._coreForeignSelectedCardSlashReturnsOperations = coreForeignSelectedCardSlashReturnsOperations;
+        this._coreGuanduEquipmentOperations = coreGuanduEquipmentOperations;
+        this._coreHellSoulCardsOperations = coreHellSoulCardsOperations;
+        this._coreKenshangPaymentsOperations = coreKenshangPaymentsOperations;
+        this._coreOriginalTargetAdditionsOperations = coreOriginalTargetAdditionsOperations;
+        this._coreOriginalUseLightningOperations = coreOriginalUseLightningOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheS5XuncanOperations = coreShanheS5XuncanOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeSlashTargetDuelOperations = coreNativeSlashTargetDuelOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreProgramDamageHooksOperations = coreProgramDamageHooksOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+    }
+}

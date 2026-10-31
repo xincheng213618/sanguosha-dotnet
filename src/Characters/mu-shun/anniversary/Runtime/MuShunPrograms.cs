@@ -48,7 +48,7 @@ public sealed partial record JudgmentFrame { [JsonIgnore(Condition = JsonIgnoreC
 
 internal static class MuShunComposition
 {
-    internal const string Jinjian = "anniversary:jinjian", Shizhao = "anniversary:shizhao", Damage = "actual-damage-jin", Loss = "outside-first-last-hand", Result = "jinjian-contest";
+    internal const string Jinjian = "anniversary:jinjian",Shizhao = "anniversary:shizhao",Damage = "actual-damage-jin",Loss = "outside-first-last-hand",Result = "jinjian-contest";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveAnniversaryMuShunJinjian or SkillProgramEffectOp.ResolveAnniversaryMuShunShizhao;
     [ProgramCatalogValidation(45300)] internal static void Validate(string path, SkillProgram p)
     {

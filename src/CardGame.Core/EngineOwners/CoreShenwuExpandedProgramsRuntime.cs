@@ -1,0 +1,82 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreShenwuExpandedProgramsRuntime : global::CardGame.Core.IShenwuExpandedProgramHost
+{
+    private readonly ICoreShenwuExpandedProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreShenwuExpandedProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShenwuExpandedProgramsRandomOperations _randomOperations;
+    private readonly ICoreShenwuExpandedProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShenwuExpandedProgramsSkillBindingIndexOperations _skillBindingIndexOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreAttributedMarkerEventsOperations _coreAttributedMarkerEventsOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreFinalizedCardTargetsOperations _coreFinalizedCardTargetsOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreShenwuActivitiesOperations _coreShenwuActivitiesOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreNativeEquipmentUseOperations _coreNativeEquipmentUseOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShenwuExpandedProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShenwuExpandedProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreShenwuExpandedProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShenwuExpandedProgramsCoreShenwuNpcProgramsOperations _coreShenwuNpcProgramsOperations;
+    private readonly ICoreShenwuExpandedProgramsKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreShenwuExpandedProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreShenwuExpandedProgramsRuntime(ICoreShenwuExpandedProgramsCardZonesOperations cardZonesOperations, ICoreShenwuExpandedProgramsContentRegistryOperations contentRegistryOperations, ICoreShenwuExpandedProgramsRandomOperations randomOperations, ICoreShenwuExpandedProgramsResolutionStackOperations resolutionStackOperations, ICoreShenwuExpandedProgramsSkillBindingIndexOperations skillBindingIndexOperations, ICoreShenwuExpandedProgramsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreShenwuExpandedProgramsCoreAttributedMarkerEventsOperations coreAttributedMarkerEventsOperations, ICoreShenwuExpandedProgramsCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICoreShenwuExpandedProgramsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreShenwuExpandedProgramsCoreFinalizedCardTargetsOperations coreFinalizedCardTargetsOperations, ICoreShenwuExpandedProgramsCoreHandComparisonOperations coreHandComparisonOperations, ICoreShenwuExpandedProgramsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreShenwuExpandedProgramsCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreShenwuExpandedProgramsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreShenwuExpandedProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShenwuExpandedProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreShenwuExpandedProgramsCoreShenwuActivitiesOperations coreShenwuActivitiesOperations, ICoreShenwuExpandedProgramsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreShenwuExpandedProgramsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreShenwuExpandedProgramsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreShenwuExpandedProgramsCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICoreShenwuExpandedProgramsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreShenwuExpandedProgramsCoreNativeEquipmentUseOperations coreNativeEquipmentUseOperations, ICoreShenwuExpandedProgramsCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreShenwuExpandedProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShenwuExpandedProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShenwuExpandedProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreShenwuExpandedProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShenwuExpandedProgramsCoreShenwuNpcProgramsOperations coreShenwuNpcProgramsOperations, ICoreShenwuExpandedProgramsKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreShenwuExpandedProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillBindingIndexOperations = skillBindingIndexOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreAttributedMarkerEventsOperations = coreAttributedMarkerEventsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreFinalizedCardTargetsOperations = coreFinalizedCardTargetsOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShenwuActivitiesOperations = coreShenwuActivitiesOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeEquipmentUseOperations = coreNativeEquipmentUseOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreShenwuNpcProgramsOperations = coreShenwuNpcProgramsOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDeferredHandAlignmentsRuntime : global::CardGame.Core.IDeferredAlignmentProgramHost
+{
+    private readonly ICoreDeferredHandAlignmentsCharacterAHuiNanOlOperations _characterAHuiNanOlOperations;
+    private readonly ICoreDeferredHandAlignmentsCharacterQinLangOlOperations _characterQinLangOlOperations;
+    private readonly ICoreDeferredHandAlignmentsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreDeferredHandAlignmentsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDeferredHandAlignmentsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreDeferredTurnEndPreludesOperations _coreDeferredTurnEndPreludesOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreDeferredHandAlignmentsCorePrivateTurnHoldsOperations _corePrivateTurnHoldsOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreProgramOwnedCardsOperations _coreProgramOwnedCardsOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreSoleTargetQuarantineOperations _coreSoleTargetQuarantineOperations;
+    private readonly ICoreDeferredHandAlignmentsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDeferredHandAlignmentsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreDeferredHandAlignmentsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreDeferredHandAlignmentsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDeferredHandAlignmentsDeferredHandAlignmentSequenceDeferredHandAlignmentsAccess _coreGameEngineDeferredHandAlignmentsDeferredHandAlignmentSequenceDeferredHandAlignmentsAccess;
+    internal CoreGameEngineDeferredHandAlignmentsRuntime(ICoreDeferredHandAlignmentsCharacterAHuiNanOlOperations characterAHuiNanOlOperations, ICoreDeferredHandAlignmentsCharacterQinLangOlOperations characterQinLangOlOperations, ICoreDeferredHandAlignmentsCardZonesOperations cardZonesOperations, ICoreDeferredHandAlignmentsContentRegistryOperations contentRegistryOperations, ICoreDeferredHandAlignmentsResolutionStackOperations resolutionStackOperations, ICoreDeferredHandAlignmentsCoreActualTurnsOperations coreActualTurnsOperations, ICoreDeferredHandAlignmentsCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICoreDeferredHandAlignmentsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreDeferredHandAlignmentsCoreDeferredTurnEndPreludesOperations coreDeferredTurnEndPreludesOperations, ICoreDeferredHandAlignmentsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDeferredHandAlignmentsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreDeferredHandAlignmentsCorePrivateTurnHoldsOperations corePrivateTurnHoldsOperations, ICoreDeferredHandAlignmentsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDeferredHandAlignmentsCoreProgramOwnedCardsOperations coreProgramOwnedCardsOperations, ICoreDeferredHandAlignmentsCoreRuntimeOperations coreRuntimeOperations, ICoreDeferredHandAlignmentsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreDeferredHandAlignmentsCoreSoleTargetQuarantineOperations coreSoleTargetQuarantineOperations, ICoreDeferredHandAlignmentsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDeferredHandAlignmentsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreDeferredHandAlignmentsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreDeferredHandAlignmentsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDeferredHandAlignmentsDeferredHandAlignmentSequenceDeferredHandAlignmentsAccess coreGameEngineDeferredHandAlignmentsDeferredHandAlignmentSequenceDeferredHandAlignmentsAccess)
+    {
+        this._characterAHuiNanOlOperations = characterAHuiNanOlOperations;
+        this._characterQinLangOlOperations = characterQinLangOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreDeferredTurnEndPreludesOperations = coreDeferredTurnEndPreludesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePrivateTurnHoldsOperations = corePrivateTurnHoldsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramOwnedCardsOperations = coreProgramOwnedCardsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreSoleTargetQuarantineOperations = coreSoleTargetQuarantineOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineDeferredHandAlignmentsDeferredHandAlignmentSequenceDeferredHandAlignmentsAccess = coreGameEngineDeferredHandAlignmentsDeferredHandAlignmentSequenceDeferredHandAlignmentsAccess;
+    }
+}

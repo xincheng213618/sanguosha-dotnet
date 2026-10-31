@@ -1,0 +1,111 @@
+using System.Reflection;
+using CardGame.Core;
+
+internal static class DeferredCapabilityChecks
+{
+    public static void TypedFactoriesDeferCyclesAndRetainRefOutAndMatchIdentity()
+    {
+        var modules = new ProgramRuntimeModuleCatalog([typeof(First), typeof(Second)]);
+        var capabilities = new ProgramCapabilityCatalog([typeof(FirstPort), typeof(SecondPort)]);
+        var value = new ValueStore(5);
+        var match = new MatchRuntime(modules, capabilities, new NoEngineAdapters(),
+            [new(typeof(IValueStore), value)]);
+        var other = new MatchRuntime(modules, capabilities, new NoEngineAdapters(),
+            [new(typeof(IValueStore), new ValueStore(20))]);
+        var first = match.Capabilities.Get<IFirst>();
+        Require(ModuleCount(match) == 0 && ReferenceEquals(first, match.Capabilities.Get<IFirst>()),
+            "Resolving typed ports caches only their factories; their mutually dependent modules stay unconstructed.");
+        Require(first.Read() == 6 && ModuleCount(match) == 2 && match.Capabilities.Get<ISecond>().ReadFirst() == 6,
+            "The first invocation constructs each owner once and permits a later call back through the original typed port.");
+        var input = 3;
+        Require(first.Combine(ref input, out var total) && input == 8 && total == 13,
+            "Deferred ports preserve the caller's actual ref storage, output value and return value.");
+        first.Number = 7;
+        Require(value.Number == 7 && first.Read() == 8 && other.Capabilities.Get<IFirst>().Read() == 21 &&
+                !ReferenceEquals(match.GetModule(typeof(First)), other.GetModule(typeof(First))),
+            "A ref return reaches the actual state owner while factories and module instances remain isolated per match.");
+        Reject(() => new ProgramCapabilityCatalog([typeof(WrongFactoryPort)]));
+        Reject(() => new ProgramCapabilityCatalog([typeof(UndeclaredTargetPort)]));
+    }
+
+    private interface IFirst : IProgramRuntimeOperations
+    {
+        int Read();
+        bool Combine(ref int input, out int total);
+        ref int Number { get; }
+    }
+    private interface ISecond : IProgramRuntimeOperations
+    {
+        int Read();
+        int ReadFirst();
+        bool Combine(ref int input, out int total);
+        ref int Number { get; }
+    }
+    private interface IValueStore : IProgramRuntimeOperations { ref int Number { get; } }
+    private sealed class ValueStore(int initial) : IValueStore
+    {
+        private int _number = initial;
+        public ref int Number => ref _number;
+    }
+    [ProgramRuntimeModule]
+    private sealed class First(ISecond second)
+    {
+        internal int Read() => second.Read() + 1;
+        internal bool Combine(ref int input, out int total) => second.Combine(ref input, out total);
+        internal ref int Number => ref second.Number;
+    }
+    [ProgramRuntimeModule]
+    private sealed class Second(IFirst first, IValueStore value)
+    {
+        internal int Read() => value.Number;
+        internal int ReadFirst() => first.Read();
+        internal bool Combine(ref int input, out int total)
+        { input += value.Number; total = input + value.Number; return true; }
+        internal ref int Number => ref value.Number;
+    }
+    [ProgramCapability(typeof(First))]
+    private sealed class FirstPort(Func<First> target) : IFirst
+    {
+        public int Read() => target().Read();
+        public bool Combine(ref int input, out int total) => target().Combine(ref input, out total);
+        public ref int Number => ref target().Number;
+    }
+    [ProgramCapability(typeof(Second))]
+    private sealed class SecondPort(Func<Second> target) : ISecond
+    {
+        public int Read() => target().Read();
+        public int ReadFirst() => target().ReadFirst();
+        public bool Combine(ref int input, out int total) => target().Combine(ref input, out total);
+        public ref int Number => ref target().Number;
+    }
+    [ProgramCapability(typeof(First))]
+    private sealed class WrongFactoryPort(GameEngine engine) : IFirst
+    {
+        public int Read() => throw new NotSupportedException();
+        public bool Combine(ref int input, out int total) => throw new NotSupportedException();
+        public ref int Number => throw new NotSupportedException();
+    }
+    [ProgramCapability(typeof(ValueStore))]
+    private sealed class UndeclaredTargetPort(Func<ValueStore> target) : IValueStore
+    { public ref int Number => ref target().Number; }
+    private sealed class NoEngineAdapters : IMatchRuntimeAdapterFactory
+    {
+        public object CreateAdapter(ProgramCapabilityCatalog.Registration registration) => throw new Exception("Unexpected engine adapter.");
+        public Delegate BindCoreHandler(MethodInfo method, Type delegateType) => throw new Exception("Unexpected engine binding.");
+        public object CoreHandlerTarget(MethodInfo method) => throw new Exception("Unexpected engine target.");
+    }
+    private static int ModuleCount(MatchRuntime match)
+    {
+        var modules = typeof(MatchRuntime).GetField("_modules", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(match)!;
+        return ((System.Collections.IDictionary)typeof(ProgramRuntimeModuleRegistry)
+            .GetField("_instances", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(modules)!).Count;
+    }
+    private static void Require(bool condition, string message)
+    { if (!condition) throw new InvalidOperationException(message); }
+    private static void Reject(Action action)
+    {
+        try { action(); }
+        catch (InvalidOperationException) { return; }
+        throw new InvalidOperationException("An invalid deferred capability was accepted.");
+    }
+}

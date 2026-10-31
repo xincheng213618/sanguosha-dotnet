@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSourceExecutionerHuanfuRuntime
+{
+    private readonly ICoreSourceExecutionerHuanfuCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSourceExecutionerHuanfuContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSourceExecutionerHuanfuResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreSourceExecutionerHuanfuObserversOperations _coreSourceExecutionerHuanfuObserversOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreSourceExecutionerYishiOperations _coreSourceExecutionerYishiOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreSourceExecutionerHuanfuCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSourceExecutionerHuanfuCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreSourceExecutionerHuanfuCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreSourceExecutionerHuanfuKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSourceExecutionerHuanfuRuntime(ICoreSourceExecutionerHuanfuCardZonesOperations cardZonesOperations, ICoreSourceExecutionerHuanfuContentRegistryOperations contentRegistryOperations, ICoreSourceExecutionerHuanfuResolutionStackOperations resolutionStackOperations, ICoreSourceExecutionerHuanfuCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreSourceExecutionerHuanfuCoreCardActionsOperations coreCardActionsOperations, ICoreSourceExecutionerHuanfuCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreSourceExecutionerHuanfuCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreSourceExecutionerHuanfuCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreSourceExecutionerHuanfuCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreSourceExecutionerHuanfuCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreSourceExecutionerHuanfuCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreSourceExecutionerHuanfuCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSourceExecutionerHuanfuCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICoreSourceExecutionerHuanfuCoreRuntimeOperations coreRuntimeOperations, ICoreSourceExecutionerHuanfuCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreSourceExecutionerHuanfuCoreSourceExecutionerHuanfuObserversOperations coreSourceExecutionerHuanfuObserversOperations, ICoreSourceExecutionerHuanfuCoreSourceExecutionerYishiOperations coreSourceExecutionerYishiOperations, ICoreSourceExecutionerHuanfuCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreSourceExecutionerHuanfuCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreSourceExecutionerHuanfuCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSourceExecutionerHuanfuCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreSourceExecutionerHuanfuCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreSourceExecutionerHuanfuKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSourceExecutionerHuanfuObserversOperations = coreSourceExecutionerHuanfuObserversOperations;
+        this._coreSourceExecutionerYishiOperations = coreSourceExecutionerYishiOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

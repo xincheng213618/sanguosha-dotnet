@@ -7,18 +7,52 @@ namespace CardGame.Core;
 
 /// <summary>Registers one private, independently constructed program capability.</summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-internal sealed class ProgramCapabilityAttribute : Attribute { }
+internal sealed class ProgramCapabilityAttribute(Type? deferredModule = null) : Attribute
+{
+    internal Type? DeferredModule { get; } = deferredModule;
+}
 
 /// <summary>
-/// Immutable capability metadata. Factories accept a game when invoked and never
-/// capture a game; only the match-local registry retains capability instances.
+/// Immutable capability metadata. Constructors and contracts never capture a
+/// game; only the match runtime's registries retain executable instances.
 /// </summary>
 internal sealed class ProgramCapabilityCatalog
 {
+    private static readonly Lazy<ProgramCapabilityCatalog> BuiltIn = new(() =>
+        new(typeof(GameEngine).Assembly.GetTypes()), true);
+    internal static ProgramCapabilityCatalog Default => BuiltIn.Value;
+
     internal sealed record Registration(
         Type Implementation,
         IReadOnlyList<Type> Contracts,
-        Func<GameEngine, object> Create);
+        ConstructorInfo Constructor,
+        bool IsRuntimeModule,
+        Type? DeferredModule = null)
+    {
+        internal object CreateAdapter(GameEngine engine)
+        {
+            if (IsRuntimeModule) throw new InvalidOperationException("Independent modules are created by the match runtime.");
+            return DeferredModule is null ? Construct([engine]) : CreateDeferredAdapter(engine.GetRuntimeModuleInstance);
+        }
+
+        internal object CreateDeferredAdapter(Func<Type, object> resolveModule)
+        {
+            if (DeferredModule is null) throw new InvalidOperationException("This capability has no deferred module target.");
+            var factory = typeof(Registration).GetMethod(nameof(TargetFactory), BindingFlags.Static | BindingFlags.NonPublic)!
+                .MakeGenericMethod(DeferredModule).Invoke(null, [resolveModule])!;
+            return Construct([factory]);
+        }
+
+        private static Func<T> TargetFactory<T>(Func<Type, object> resolveModule) where T : class =>
+            () => (T)resolveModule(typeof(T));
+
+        private object Construct(object[] arguments)
+        {
+            try { return Constructor.Invoke(arguments); }
+            catch (TargetInvocationException failure) when (failure.InnerException is { } cause)
+            { ExceptionDispatchInfo.Capture(cause).Throw(); throw; }
+        }
+    }
 
     private readonly IReadOnlyDictionary<Type, Registration> _byContract;
     internal IReadOnlyList<Registration> Registrations { get; }
@@ -38,8 +72,20 @@ internal sealed class ProgramCapabilityCatalog
                 throw Invalid(type, "must be a sealed, non-generic class");
             var constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             var independent = ProgramRuntimeModuleCatalog.IsDeclared(type);
+            var deferredModule = type.GetCustomAttribute<ProgramCapabilityAttribute>()!.DeferredModule;
             if (independent)
+            {
+                if (deferredModule is not null) throw Invalid(type, "a runtime module cannot also be a deferred adapter");
                 _ = new ProgramRuntimeModuleCatalog([type]);
+            }
+            else if (deferredModule is not null)
+            {
+                _ = new ProgramRuntimeModuleCatalog([deferredModule]).Get(deferredModule);
+                if (deferredModule.IsAbstract || constructors is not [var deferredConstructor] ||
+                    !deferredConstructor.GetParameters().Select(parameter => parameter.ParameterType)
+                        .SequenceEqual([typeof(Func<>).MakeGenericType(deferredModule)]))
+                    throw Invalid(type, "a deferred adapter requires one factory for its declared independent module");
+            }
             else if (constructors is not [var legacyConstructor] ||
                 !legacyConstructor.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual([typeof(GameEngine)]))
                 throw Invalid(type, "requires exactly one constructor accepting only GameEngine, or an explicit independent runtime module");
@@ -49,9 +95,7 @@ internal sealed class ProgramCapabilityCatalog
             if (contracts.Length == 0 || contracts.Any(contract => contract.ContainsGenericParameters ||
                     contract == typeof(ISkillProgramExecutionHost) || contract == typeof(ISkillProgramEffectHost)))
                 throw Invalid(type, "requires dedicated capability interfaces, separate from the shared program host");
-            var registration = new Registration(type, Array.AsReadOnly(contracts), independent
-                ? engine => engine.GetRuntimeModuleInstance(type)
-                : engine => Construct(constructors[0], engine));
+            var registration = new Registration(type, Array.AsReadOnly(contracts), constructors[0], independent, deferredModule);
             foreach (var contract in contracts)
                 if (!byContract.TryAdd(contract, registration))
                     throw new InvalidOperationException($"Program capability '{contract.FullName}' is registered by both " +
@@ -72,24 +116,29 @@ internal sealed class ProgramCapabilityCatalog
         return _byContract.TryGetValue(contract, out registration);
     }
 
-    private static object Construct(ConstructorInfo constructor, GameEngine engine)
-    {
-        try { return constructor.Invoke([engine]); }
-        catch (TargetInvocationException failure) when (failure.InnerException is { } cause)
-        {
-            ExceptionDispatchInfo.Capture(cause).Throw();
-            throw;
-        }
-    }
-
     private static InvalidOperationException Invalid(Type type, string reason) =>
         new($"Program capability '{type.FullName}' {reason}.");
 }
 
-/// <summary>Resolves and caches dedicated adapters for exactly one game.</summary>
-internal sealed class ProgramCapabilityRegistry(GameEngine engine, ProgramCapabilityCatalog catalog)
+// Explicit per-match bindings carry existing native owners, never factories
+// that reach back into the engine or another copy of their mutable state.
+internal sealed record ProgramNativeCapabilityBinding(Type Contract, object Instance);
+
+/// <summary>Resolves dedicated adapters and actual native owners for exactly one game.</summary>
+internal sealed class ProgramCapabilityRegistry(ProgramCapabilityCatalog catalog,
+    Func<ProgramCapabilityCatalog.Registration, object> create,
+    IEnumerable<ProgramNativeCapabilityBinding>? nativeBindings = null)
 {
+    private readonly IReadOnlyDictionary<Type, object> _nativeBindings = ValidateNativeBindings(catalog, nativeBindings);
     private readonly Dictionary<Type, object> _instances = new();
+    private readonly HashSet<Type> _constructing = new();
+
+    // Compatibility for consumers that build an isolated adapter catalog. The
+    // production match supplies its own factory and owns both registries.
+    internal ProgramCapabilityRegistry(GameEngine engine,ProgramCapabilityCatalog catalog)
+        : this(catalog, registration => registration.IsRuntimeModule
+            ? engine.GetRuntimeModuleInstance(registration.Implementation)
+            : registration.CreateAdapter(engine)) { }
 
     internal T Get<T>() where T : class => TryGet<T>(out var capability)
         ? capability
@@ -105,15 +154,53 @@ internal sealed class ProgramCapabilityRegistry(GameEngine engine, ProgramCapabi
         return found;
     }
 
+    private static IReadOnlyDictionary<Type, object> ValidateNativeBindings(ProgramCapabilityCatalog catalog,
+        IEnumerable<ProgramNativeCapabilityBinding>? supplied)
+    {
+        ArgumentNullException.ThrowIfNull(catalog);
+        var bindings = new Dictionary<Type, object>();
+        foreach (var binding in supplied ?? [])
+        {
+            if (binding is null)
+                throw new InvalidOperationException("A native capability binding cannot be null.");
+            var contract = binding.Contract;
+            if (contract is null || !contract.IsInterface || contract.ContainsGenericParameters ||
+                contract == typeof(IProgramSelectionQuery) || contract == typeof(IProgramRuntimeOperations) ||
+                typeof(ISkillProgramExecutionHost).IsAssignableFrom(contract) ||
+                typeof(ISkillProgramEffectHost).IsAssignableFrom(contract) ||
+                !typeof(IProgramSelectionQuery).IsAssignableFrom(contract) &&
+                !typeof(IProgramRuntimeOperations).IsAssignableFrom(contract))
+                throw new InvalidOperationException("A native capability requires a dedicated query or runtime-operation interface.");
+            if (binding.Instance is null or GameEngine || !contract.IsInstanceOfType(binding.Instance))
+                throw new InvalidOperationException($"Native capability '{contract.FullName}' requires its matching state owner, never GameEngine.");
+            if (catalog.TryResolve(contract, out _) || !bindings.TryAdd(contract, binding.Instance))
+                throw new InvalidOperationException($"Native capability '{contract.FullName}' conflicts with another capability registration.");
+        }
+        return new ReadOnlyDictionary<Type, object>(bindings);
+    }
+
     private bool TryGet(Type contract, [NotNullWhen(true)] out object? capability)
     {
-        if (!catalog.TryResolve(contract, out var registration))
+        _ = catalog.TryResolve(contract, out var registration);
+        if (_nativeBindings.TryGetValue(contract, out capability)) return true;
+        if (registration is null)
         {
             capability = null;
             return false;
         }
         if (!_instances.TryGetValue(registration.Implementation, out var instance))
-            _instances.Add(registration.Implementation, instance = registration.Create(engine));
+        {
+            if (!_constructing.Add(registration.Implementation))
+                throw new InvalidOperationException($"Cyclic program capability dependency '{registration.Implementation.FullName}'.");
+            try
+            {
+                instance = create(registration);
+                if (!registration.Implementation.IsInstanceOfType(instance))
+                    throw new InvalidOperationException($"Capability factory returned an invalid '{registration.Implementation.FullName}' adapter.");
+                _instances.Add(registration.Implementation, instance);
+            }
+            finally { _constructing.Remove(registration.Implementation); }
+        }
         capability = instance;
         return true;
     }
@@ -123,27 +210,6 @@ public sealed partial class GameEngine
 {
     // Legacy nested adapters and explicit independent modules share one contract
     // directory; independent hook/capability entry points share one match instance.
-    private static readonly Lazy<ProgramCapabilityCatalog> ProgramCapabilityMetadata = new(() =>
-        new(typeof(GameEngine).GetNestedTypes(BindingFlags.NonPublic).Concat(
-            ProgramRuntimeModuleCatalog.Default.Registrations.Select(registration => registration.Type))), true);
     private ProgramCapabilityRegistry? _programCapabilities;
-    private ProgramCapabilityRegistry ProgramCapabilities =>
-        _programCapabilities ??= new(this, ProgramCapabilityMetadata.Value);
-
-    [ProgramCapability]
-    private sealed class ConfiguredConversionProgramCapability(GameEngine engine) : IConfiguredConversionProgramHost
-    {
-        public SkillProgramStepOutcome DeclareBoundCardName(ProgramSkillFrame frame, string sourceBind, string stateId) =>
-            engine.BeginConfiguredCardDeclaration(frame, sourceBind, stateId);
-        public void UpgradeConversionTier(ProgramSkillFrame frame, string stateId) =>
-            engine.UpgradeConfiguredConversionTier(frame, stateId);
-    }
-
-    [ProgramCapability]
-    private sealed class ActionCategoryGiftProgramCapability(GameEngine engine) : IActionCategoryGiftProgramHost
-    {
-        public SkillProgramStepOutcome ChooseDifferentActionCategoryGift(ProgramSkillFrame frame, int targetSeat,
-            string resultBind, IReadOnlyList<CardZoneKind> zones) =>
-            engine.BeginDifferentActionCategoryGift(frame, targetSeat, resultBind, zones);
-    }
+    private ProgramCapabilityRegistry ProgramCapabilities =>_programCapabilities ??= MatchRuntime.Capabilities;
 }

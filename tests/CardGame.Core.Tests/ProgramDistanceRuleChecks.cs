@@ -5,6 +5,7 @@ internal static class ProgramDistanceRuleChecks
 {
     public static void OrderedArithmeticAndNativeDistanceQueries()
     {
+        CheckIndependentDistanceComposition();
         var supplied = Methods(typeof(Fixture)).Reverse().ToList();
         var catalog = ProgramDistanceCatalog.Discover(supplied);
         supplied.Clear();
@@ -114,6 +115,80 @@ internal static class ProgramDistanceRuleChecks
     private static MethodInfo[] Methods(Type type) => type.GetMethods(BindingFlags.Instance | BindingFlags.Static |
         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
+
+    private static void CheckIndependentDistanceComposition()
+    {
+        var queries = new MatchDistanceQueries();
+        var facts = new DistanceArithmeticFixture();
+        var distance = queries.CalculateDistance(facts, excludedEquipmentSlot: EquipmentSlot.DefensiveHorse);
+        Need(Value(distance) == 5 && distance.BaseTerms.Select(term => term.SourceId).SequenceEqual(
+                ["equipment:11:outgoing-distance", "equipment:21:incoming-distance", "mode:fixture:alive-seat-distance"]) &&
+            distance.Stages.Select(stage => stage.Name).SequenceEqual(["outgoing", "incoming"]) &&
+            facts.Trace.SequenceEqual(["seats", "source-equipment", "target-equipment", "distance-base", "outgoing",
+                "turn-outgoing", "incoming", "incoming-extra", "distance-project"]),
+            "The independent query retains directed equipment exclusions, outgoing Set before incoming additions, and native projection order.");
+        facts.Trace.Clear(); facts.Fixed = 7;
+        Need(Value(queries.CalculateDistance(facts)) == 7 && facts.Trace.Count == 0,
+            "A fixed-distance mode returns before equipment, skill, turn or projection facts are queried.");
+        facts.Fixed = null;
+        var range = queries.CalculateAttackRange(facts, excludedEquipmentId: 52);
+        Need(Value(range) == 0 && range.BaseTerms.Single() is { SourceId: "equipment:51:printed-attack-range", Value: 0 } &&
+            facts.Exclusions == (52, null) && facts.Trace.SequenceEqual(["range-equipment", "range-base", "assigned-range",
+                "range-contributions", "libing", "yinxian", "base-zero", "range-extra", "turn-range", "range-project"]),
+            "After excluding the stronger weapon, RedBloodBlade keeps its real zero range and each later stage reads its facts in order.");
+        facts.Trace.Clear(); facts.Assigned = 4;
+        Need(Value(queries.CalculateAttackRange(facts, excludedEquipmentSlot: EquipmentSlot.Weapon)) == 4 &&
+                facts.Exclusions == (null, EquipmentSlot.Weapon),
+            "Weapon-slot exclusion reaches the native stage and the assigned range extends the remaining base.");
+        facts.Assigned = null; facts.ZeroBase = true;
+        Need(Value(queries.CalculateAttackRange(facts, excludedEquipmentSlot: EquipmentSlot.Weapon)) == 0,
+            "A zeroed range policy keeps a zero lower bound even when no physical weapon remains.");
+    }
+
+    private sealed class DistanceArithmeticFixture : IMatchDistanceQuery, IMatchAttackRangeQuery
+    {
+        private readonly CardKind _outgoing = EquipmentCatalog.Implemented.First(item => item.Slot == EquipmentSlot.OffensiveHorse).Kind;
+        private readonly CardKind _incoming = EquipmentCatalog.Implemented.First(item => item.Slot == EquipmentSlot.DefensiveHorse).Kind;
+        internal List<string> Trace { get; } = [];
+        internal int? Fixed { get; set; }
+        internal int? Assigned { get; set; }
+        internal bool ZeroBase { get; set; }
+        internal (int? Id, EquipmentSlot? Slot) Exclusions { get; private set; }
+        public string ModeId => "fixture";
+        public int? FixedDistance => Fixed;
+        public int SourceSeat => 0;
+        public int TargetSeat => 1;
+        public int Seat => 0;
+        public int TurnNumber => 1;
+        public int AliveSeatDistance() { Trace.Add("seats"); return 3; }
+        public IReadOnlyList<Card> SourceEquipment { get { Trace.Add("source-equipment"); return [new(11, _outgoing, Suit.Spade, 1)]; } }
+        public IReadOnlyList<Card> TargetEquipment { get { Trace.Add("target-equipment"); return [new(21, _incoming, Suit.Heart, 2)]; } }
+        public EquipmentDefinition EquipmentDefinition(CardKind kind) => EquipmentCatalog.Get(kind);
+        public void AddBaseTerms(List<RuleQueryBaseTerm> terms) => Trace.Add("distance-base");
+        public IEnumerable<RuleQueryContribution> OutgoingContributions
+        { get { Trace.Add("outgoing"); return [new FiniteRuleQueryContribution("fixture:outgoing", SkillRuleOperation.Set, 2)]; } }
+        public IReadOnlyList<TurnRuleModifier> OutgoingTurnModifiers { get { Trace.Add("turn-outgoing"); return []; } }
+        public IEnumerable<RuleQueryContribution> IncomingContributions
+        { get { Trace.Add("incoming"); return [new FiniteRuleQueryContribution("fixture:incoming", SkillRuleOperation.Add, 1)]; } }
+        public void AddIncomingContributions(List<RuleQueryContribution> contributions)
+        { Trace.Add("incoming-extra"); contributions.Add(new FiniteRuleQueryContribution("fixture:incoming-extra", SkillRuleOperation.Add, 2)); }
+        RuleQueryEvaluation IMatchDistanceQuery.Project(RuleQueryEvaluation evaluation)
+        { Trace.Add("distance-project"); return evaluation; }
+        public IReadOnlyList<Card> EffectiveEquipment
+        { get { Trace.Add("range-equipment"); return [new(51, CardKind.RedBloodBlade, Suit.Spade, 1), new(52, CardKind.StoneAxe, Suit.Club, 2)]; } }
+        public int WeaponAttackRange(Card weapon) => weapon.Kind == CardKind.RedBloodBlade ? 0 : 3;
+        public void AddBaseTerms(int? excludedEquipmentId, EquipmentSlot? excludedEquipmentSlot, List<RuleQueryBaseTerm> terms)
+        { Trace.Add("range-base"); Exclusions = (excludedEquipmentId, excludedEquipmentSlot); }
+        public int? AssignedRange { get { Trace.Add("assigned-range"); return Assigned; } }
+        public IEnumerable<RuleQueryContribution> Contributions { get { Trace.Add("range-contributions"); return []; } }
+        public int LibbingRangeBonus { get { Trace.Add("libing"); return 0; } }
+        public int YinXianRangeBonus { get { Trace.Add("yinxian"); return 0; } }
+        public bool FuanBaseZeroed { get { Trace.Add("base-zero"); return ZeroBase; } }
+        public void AddContributions(List<RuleQueryContribution> contributions) => Trace.Add("range-extra");
+        public IReadOnlyList<TurnRuleModifier> TurnModifiers { get { Trace.Add("turn-range"); return []; } }
+        RuleQueryEvaluation IMatchAttackRangeQuery.Project(RuleQueryEvaluation evaluation)
+        { Trace.Add("range-project"); return evaluation; }
+    }
 
     private sealed class Fixture
     {

@@ -191,8 +191,8 @@ internal static class DeclarationPaymentLookupChecks
         }
     }
 
-    private static MethodInfo Method(string name) => typeof(GameEngine).GetMethod(name, Flags)!;
-    private static T Field<T>(GameEngine game, string name) => (T)typeof(GameEngine).GetField(name, Flags)!.GetValue(game)!;
+    private static MethodInfo Method(string name) => global::FixtureRuntimeAccess.Engine.GetMethod(name, Flags)!;
+    private static T Field<T>(GameEngine game, string name) => (T)global::FixtureRuntimeAccess.Engine.GetField(name, Flags)!.GetValue(game)!;
     private static LookupOutcome Capture(Func<object?> query)
     {
         try { return new(query(), null, null); }

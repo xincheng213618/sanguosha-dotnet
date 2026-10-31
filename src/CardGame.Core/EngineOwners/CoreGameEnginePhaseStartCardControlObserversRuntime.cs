@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePhaseStartCardControlObserversRuntime
+{
+    private readonly ICorePhaseStartCardControlObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePhaseStartCardControlObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICorePhaseStartCardControlObserversCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePhaseStartCardControlObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICorePhaseStartCardControlObserversCorePhaseStartCardControlOperations _corePhaseStartCardControlOperations;
+    private readonly ICorePhaseStartCardControlObserversCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICorePhaseStartCardControlObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePhaseStartCardControlObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICorePhaseStartCardControlObserversCorePhaseStartCardControlObserversOperations _corePhaseStartCardControlObserversOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEnginePhaseStartCardControlObserversRuntime(ICorePhaseStartCardControlObserversResolutionStackOperations resolutionStackOperations, ICorePhaseStartCardControlObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICorePhaseStartCardControlObserversCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePhaseStartCardControlObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICorePhaseStartCardControlObserversCorePhaseStartCardControlOperations corePhaseStartCardControlOperations, ICorePhaseStartCardControlObserversCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICorePhaseStartCardControlObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePhaseStartCardControlObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICorePhaseStartCardControlObserversCorePhaseStartCardControlObserversOperations corePhaseStartCardControlObserversOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePhaseStartCardControlOperations = corePhaseStartCardControlOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._corePhaseStartCardControlObserversOperations = corePhaseStartCardControlObserversOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

@@ -161,8 +161,7 @@ internal sealed class ProgramActionRouter
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramActionCatalog> ProgramActionMetadata = new(() => new(RuntimeModuleMethods), true);
     private ProgramActionRouter? _programActions;
-    private ProgramActionRouter ProgramActions => _programActions ??= new(ProgramActionMetadata.Value,
+    private ProgramActionRouter ProgramActions => _programActions ??= new(global::CardGame.Core.EngineOwners.CoreProgramActionModulesDefinitions.ProgramActionMetadata.Value,
         BindRuntimeHandler);
 }

@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheSourceLiuYanTrioRuntime : global::CardGame.Core.IShanheSourceXiechanHost
+{
+    private readonly ICoreShanheSourceLiuYanTrioResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceLiuYanTrioCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreShanheSourceLiuYanTrioCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreShanheSourceLiuYanTrioCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheSourceLiuYanTrioCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheSourceLiuYanTrioCoreTeamActivitiesOperations _coreTeamActivitiesOperations;
+    private readonly ICoreShanheSourceLiuYanTrioCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreShanheSourceLiuYanTrioCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreShanheSourceLiuYanTrioCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreShanheSourceLiuYanTrioCoreTeamActivityProgramsOperations _coreTeamActivityProgramsOperations;
+    private readonly ICoreShanheSourceLiuYanTrioKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheSourceLiuYanTrioRuntime(ICoreShanheSourceLiuYanTrioResolutionStackOperations resolutionStackOperations, ICoreShanheSourceLiuYanTrioCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreShanheSourceLiuYanTrioCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreShanheSourceLiuYanTrioCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheSourceLiuYanTrioCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheSourceLiuYanTrioCoreTeamActivitiesOperations coreTeamActivitiesOperations, ICoreShanheSourceLiuYanTrioCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreShanheSourceLiuYanTrioCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreShanheSourceLiuYanTrioCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreShanheSourceLiuYanTrioCoreTeamActivityProgramsOperations coreTeamActivityProgramsOperations, ICoreShanheSourceLiuYanTrioKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreTeamActivitiesOperations = coreTeamActivitiesOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTeamActivityProgramsOperations = coreTeamActivityProgramsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

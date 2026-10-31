@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreForeignTurnContestRuntimePortsRuntime : global::CardGame.Core.IForeignTurnContestContinuations, global::CardGame.Core.IForeignTurnContestFacts, global::CardGame.Core.IForeignTurnContestSlashProducer
+{
+    private readonly ICoreForeignTurnContestRuntimePortsCharacterLiuPanOlOperations _characterLiuPanOlOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCharacterMaChengOlOperations _characterMaChengOlOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCharacterMaWanOlOperations _characterMaWanOlOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCharacterMaXiuMaTieOlOperations _characterMaXiuMaTieOlOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCharacterQianZhaoOlOperations _characterQianZhaoOlOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCharacterYangFuOlOperations _characterYangFuOlOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCharacterZhangYanOlOperations _characterZhangYanOlOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreCurrentSlashFireOffersOperations _coreCurrentSlashFireOffersOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreForeignTurnContestsOperations _coreForeignTurnContestsOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreOriginalTargetAdditionsOperations _coreOriginalTargetAdditionsOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreSameTypeActualUseAidOperations _coreSameTypeActualUseAidOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreShortRangeSlashTargetsOperations _coreShortRangeSlashTargetsOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICoreForeignTurnContestRuntimePortsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreForeignTurnContestRuntimePortsRuntime(ICoreForeignTurnContestRuntimePortsCharacterLiuPanOlOperations characterLiuPanOlOperations, ICoreForeignTurnContestRuntimePortsCharacterMaChengOlOperations characterMaChengOlOperations, ICoreForeignTurnContestRuntimePortsCharacterMaWanOlOperations characterMaWanOlOperations, ICoreForeignTurnContestRuntimePortsCharacterMaXiuMaTieOlOperations characterMaXiuMaTieOlOperations, ICoreForeignTurnContestRuntimePortsCharacterQianZhaoOlOperations characterQianZhaoOlOperations, ICoreForeignTurnContestRuntimePortsCharacterYangFuOlOperations characterYangFuOlOperations, ICoreForeignTurnContestRuntimePortsCharacterZhangYanOlOperations characterZhangYanOlOperations, ICoreForeignTurnContestRuntimePortsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreForeignTurnContestRuntimePortsCoreCurrentSlashFireOffersOperations coreCurrentSlashFireOffersOperations, ICoreForeignTurnContestRuntimePortsCoreForeignTurnContestsOperations coreForeignTurnContestsOperations, ICoreForeignTurnContestRuntimePortsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreForeignTurnContestRuntimePortsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreForeignTurnContestRuntimePortsCoreOriginalTargetAdditionsOperations coreOriginalTargetAdditionsOperations, ICoreForeignTurnContestRuntimePortsCoreSameTypeActualUseAidOperations coreSameTypeActualUseAidOperations, ICoreForeignTurnContestRuntimePortsCoreShortRangeSlashTargetsOperations coreShortRangeSlashTargetsOperations, ICoreForeignTurnContestRuntimePortsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreForeignTurnContestRuntimePortsCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICoreForeignTurnContestRuntimePortsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLiuPanOlOperations = characterLiuPanOlOperations;
+        this._characterMaChengOlOperations = characterMaChengOlOperations;
+        this._characterMaWanOlOperations = characterMaWanOlOperations;
+        this._characterMaXiuMaTieOlOperations = characterMaXiuMaTieOlOperations;
+        this._characterQianZhaoOlOperations = characterQianZhaoOlOperations;
+        this._characterYangFuOlOperations = characterYangFuOlOperations;
+        this._characterZhangYanOlOperations = characterZhangYanOlOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCurrentSlashFireOffersOperations = coreCurrentSlashFireOffersOperations;
+        this._coreForeignTurnContestsOperations = coreForeignTurnContestsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOriginalTargetAdditionsOperations = coreOriginalTargetAdditionsOperations;
+        this._coreSameTypeActualUseAidOperations = coreSameTypeActualUseAidOperations;
+        this._coreShortRangeSlashTargetsOperations = coreShortRangeSlashTargetsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

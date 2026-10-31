@@ -8,6 +8,6 @@ public sealed record NianResolutionCancelledEvent(long FrameId, ResolutionFrameK
 
 public sealed partial class GameEngine
 {
-    public bool IsNianClockRunning => NianFeature?.ClockRunning == true;
-    public int? NianRemainingMilliseconds => NianFeature?.RemainingMilliseconds;
+    public bool IsNianClockRunning =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreNianModeProjectionRuntime>().IsNianClockRunning;
+    public int? NianRemainingMilliseconds =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreNianModeProjectionRuntime>().NianRemainingMilliseconds;
 }

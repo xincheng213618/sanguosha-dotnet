@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineEquipmentPlacementAndHpPairRuntime
+{
+    private readonly ICoreEquipmentPlacementAndHpPairCardZonesOperations _cardZonesOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreEquipmentPlacementAndHpPairKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineEquipmentPlacementAndHpPairRuntime(ICoreEquipmentPlacementAndHpPairCardZonesOperations cardZonesOperations, ICoreEquipmentPlacementAndHpPairCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreEquipmentPlacementAndHpPairCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreEquipmentPlacementAndHpPairCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreEquipmentPlacementAndHpPairCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreEquipmentPlacementAndHpPairCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreEquipmentPlacementAndHpPairCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreEquipmentPlacementAndHpPairCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreEquipmentPlacementAndHpPairCoreRuntimeOperations coreRuntimeOperations, ICoreEquipmentPlacementAndHpPairCoreMatchLogOperations coreMatchLogOperations, ICoreEquipmentPlacementAndHpPairCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreEquipmentPlacementAndHpPairCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreEquipmentPlacementAndHpPairCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreEquipmentPlacementAndHpPairKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

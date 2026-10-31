@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineDamageTargetRegionObtainRuntime
+{
+    private readonly ICoreDamageTargetRegionObtainCharacterFanJiangZhangDaOlOperations _characterFanJiangZhangDaOlOperations;
+    private readonly ICoreDamageTargetRegionObtainCardZonesOperations _cardZonesOperations;
+    private readonly ICoreDamageTargetRegionObtainContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDamageTargetRegionObtainResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreDamageTargetObtainProgramsOperations _coreDamageTargetObtainProgramsOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreShanheS5ShuangxiongOperations _coreShanheS5ShuangxiongOperations;
+    private readonly ICoreDamageTargetRegionObtainCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreDamageTargetRegionObtainKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    internal CoreGameEngineDamageTargetRegionObtainRuntime(ICoreDamageTargetRegionObtainCharacterFanJiangZhangDaOlOperations characterFanJiangZhangDaOlOperations, ICoreDamageTargetRegionObtainCardZonesOperations cardZonesOperations, ICoreDamageTargetRegionObtainContentRegistryOperations contentRegistryOperations, ICoreDamageTargetRegionObtainResolutionStackOperations resolutionStackOperations, ICoreDamageTargetRegionObtainCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreDamageTargetRegionObtainCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDamageTargetRegionObtainCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreDamageTargetRegionObtainCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreDamageTargetRegionObtainCoreDamageTargetObtainProgramsOperations coreDamageTargetObtainProgramsOperations, ICoreDamageTargetRegionObtainCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreDamageTargetRegionObtainCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreDamageTargetRegionObtainCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICoreDamageTargetRegionObtainCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDamageTargetRegionObtainCoreRuntimeOperations coreRuntimeOperations, ICoreDamageTargetRegionObtainCoreShanheS5ShuangxiongOperations coreShanheS5ShuangxiongOperations, ICoreDamageTargetRegionObtainCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreDamageTargetRegionObtainKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess)
+    {
+        this._characterFanJiangZhangDaOlOperations = characterFanJiangZhangDaOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageTargetObtainProgramsOperations = coreDamageTargetObtainProgramsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheS5ShuangxiongOperations = coreShanheS5ShuangxiongOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    }
+}

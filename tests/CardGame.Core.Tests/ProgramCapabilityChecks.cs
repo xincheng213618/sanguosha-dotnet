@@ -9,22 +9,21 @@ internal static class ProgramCapabilityChecks
         var content = StandardContentRegistry.Create();
         var firstGame = GameEngine.CreateStandard(new GameOptions { Seed = 7 }, content);
         var secondGame = GameEngine.CreateStandard(new GameOptions { Seed = 7 }, content);
-        var types = typeof(GameEngine).GetNestedTypes(BindingFlags.NonPublic).Concat(
-            ProgramRuntimeModuleCatalog.Default.Registrations.Select(registration => registration.Type)).ToArray();
+        var types = typeof(GameEngine).Assembly.GetTypes();
         var production = new ProgramCapabilityCatalog(types);
         var reversed = new ProgramCapabilityCatalog(types.Reverse());
         Require(production.Registrations.Select(item => item.Implementation)
                 .SequenceEqual(reversed.Registrations.Select(item => item.Implementation)),
             "Discovery order must not change the registered capability modules.");
 
-        var hostType = typeof(GameEngine).GetNestedType("ProgramSkillHost", BindingFlags.NonPublic)!;
+        var hostType = global::FixtureRuntimeAccess.Engine.GetNestedType("ProgramSkillHost", BindingFlags.NonPublic)!;
         Require(hostType.GetInterfaces().OrderBy(type => type.FullName, StringComparer.Ordinal)
                 .SequenceEqual(new[] { typeof(ISkillProgramExecutionHost), typeof(ISkillProgramEffectHost), typeof(IResumableProgramDrawHost) }
                     .OrderBy(type => type.FullName, StringComparer.Ordinal)),
             "The shared host keeps execution/effect contracts plus the optional resumable Draw adapter; character capabilities stay separate.");
         var constructor = hostType.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single();
-        var firstHost = (ISkillProgramEffectHost)constructor.Invoke([firstGame]);
-        var secondHost = (ISkillProgramEffectHost)constructor.Invoke([secondGame]);
+        var firstHost = (ISkillProgramEffectHost)firstGame.ComposeNativeProgramSkillHost();
+        var secondHost = (ISkillProgramEffectHost)secondGame.ComposeNativeProgramSkillHost();
         var registryField = typeof(GameEngine).GetField("_programCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!;
         Require(registryField.GetValue(firstGame) is ProgramCapabilityRegistry firstRegistry &&
                 registryField.GetValue(secondGame) is ProgramCapabilityRegistry secondRegistry &&
@@ -47,6 +46,8 @@ internal static class ProgramCapabilityChecks
                 shared = capability;
             }
         }
+
+        CheckNativeBindings(firstGame, secondGame, production);
 
         FixtureCapability.Constructions = 0;
         var catalog = new ProgramCapabilityCatalog([typeof(UnregisteredCapability), typeof(FixtureCapability)]);
@@ -97,6 +98,101 @@ internal static class ProgramCapabilityChecks
         Require(legacy.Commits == 1, "A migrated effect handler must invoke an existing custom host exactly once.");
         Require(!legacyHost.TryGetCapability<IMissingCapability>(out _), "Legacy hosts must decline unsupported optional capabilities.");
         Reject<NotSupportedException>(() => legacyHost.GetCapability<IMissingCapability>());
+    }
+
+    private static void CheckNativeBindings(GameEngine firstGame, GameEngine secondGame, ProgramCapabilityCatalog production)
+    {
+        var registryField = typeof(GameEngine).GetField("_programCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var ownerField = typeof(GameEngine).GetField("_cardZones", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var first = ((ProgramCapabilityRegistry)registryField.GetValue(firstGame)!).Get<IAtomicCardMovementZones>();
+        var second = ((ProgramCapabilityRegistry)registryField.GetValue(secondGame)!).Get<IAtomicCardMovementZones>();
+        Require(ReferenceEquals(first, ownerField.GetValue(firstGame)) &&
+                ReferenceEquals(second, ownerField.GetValue(secondGame)) && !ReferenceEquals(first, second),
+            "Native capabilities must expose each match's actual zone owner, without an engine adapter or duplicate store.");
+        Require(!production.TryResolve(typeof(IAtomicCardMovementZones), out _),
+            "The direct native owner must not also be registered as a legacy adapter.");
+
+        var store = new CardZoneStore(2);
+        var provider = new MatchCoreCapabilityProvider(store);
+        Require(provider.Bindings is System.Collections.IList { IsReadOnly: true } &&
+                provider.Bindings.Select(binding => binding.Contract).ToHashSet()
+                    .SetEquals([typeof(IAtomicCardMovementZones), typeof(ICardZoneQueries), typeof(ICardDrawPileOrder)]) &&
+                provider.Bindings.All(binding => ReferenceEquals(binding.Instance, store)),
+            "Typed composition exposes the dedicated read, atomic and draw-pile order contracts of one zone owner and freezes its binding list.");
+        var history = ((ProgramCapabilityRegistry)registryField.GetValue(firstGame)!).Get<IProgramEventHistoryQueries>();
+        var secondHistory = ((ProgramCapabilityRegistry)registryField.GetValue(secondGame)!).Get<IProgramEventHistoryQueries>();
+        var historyField = typeof(GameEngine).GetField("_programHistory", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        Require(ReferenceEquals(history, historyField.GetValue(firstGame)) &&
+                ReferenceEquals(secondHistory, historyField.GetValue(secondGame)) && !ReferenceEquals(history, secondHistory),
+            "History queries must reach each match's actual incremental index without an engine adapter or shared cache.");
+        var factoryCalls = 0;
+        var supplied = provider.Bindings.ToList();
+        var registry = new ProgramCapabilityRegistry(production, _ => { factoryCalls++; return new object(); }, supplied);
+        supplied.Clear();
+        var zones = registry.Get<IAtomicCardMovementZones>();
+        Require(ReferenceEquals(zones, store) && ReferenceEquals(zones, registry.Get(typeof(IAtomicCardMovementZones))) && factoryCalls == 0,
+            "Native resolution must use the original owner, freeze supplied bindings and bypass adapter construction.");
+        Require(!registry.TryGet<IMissingCapability>(out var missing) && missing is null,
+            "Native bindings must not manufacture unknown optional capabilities.");
+        Reject<NotSupportedException>(() => registry.Get<IMissingCapability>());
+
+        store.LoadInitialDeck([
+            new Card(1, CardKind.Slash, Suit.Spade, 7), new Card(2, CardKind.Dodge, Suit.Heart, 2),
+            new Card(3, CardKind.Peach, Suit.Diamond, 3)]);
+        var beforeInvalid = store.CreateDiagnostics();
+        Reject<ArgumentOutOfRangeException>(() => zones.Move(1, CardLocation.DrawPile, CardLocation.Hand(99)));
+        Require(beforeInvalid.SequenceEqual(store.CreateDiagnostics()), "The direct port retains invalid destination atomicity.");
+        zones.Move(1, CardLocation.DrawPile, CardLocation.Hand(0));
+        beforeInvalid = store.CreateDiagnostics();
+        Reject<InvalidOperationException>(() => zones.MoveMany([2, 1], CardLocation.DrawPile, CardLocation.Hand(1)));
+        Require(beforeInvalid.SequenceEqual(store.CreateDiagnostics()), "The direct port validates an entire batch before changing any zone.");
+        var liveHand = zones.CardsAt(CardLocation.Hand(1));
+        Require(zones.MoveMany([2, 3], CardLocation.DrawPile, CardLocation.Hand(1)).Select(card => card.Id).SequenceEqual([2, 3]) &&
+                liveHand.Count == 2 && liveHand is not List<Card>,
+            "Native moves retain entity order and the existing read-only live zone view.");
+        Require(zones.MoveAll(CardLocation.Hand(1), CardLocation.DiscardPile).Select(card => card.Id).SequenceEqual([2, 3]) &&
+                zones.MoveBatch([new(1, CardLocation.Hand(0), CardLocation.Hand(1)),
+                    new(2, CardLocation.DiscardPile, CardLocation.Hand(0))]).Select(card => card.Id).SequenceEqual([1, 2]) &&
+                zones.GetLocation(1) == CardLocation.Hand(1),
+            "Every atomic zone primitive addresses the same state owner and preserves ordered physical identities.");
+        store.AssertInvariants(3);
+
+        var facts = new NativeFacts(5);
+        var nativeCatalog = new ProgramCapabilityCatalog([typeof(NativeFactsAdapter)]);
+        foreach (var invalid in new ProgramNativeCapabilityBinding[]
+                 {
+                     null!, new(null!, facts), new(typeof(object), facts), new(typeof(INativeGeneric<>), facts),
+                     new(typeof(IProgramSelectionQuery), facts), new(typeof(IProgramRuntimeOperations), store),
+                     new(typeof(ISkillProgramEffectHost), new object()), new(typeof(IFixtureCapability), facts),
+                     new(typeof(INativeFacts), null!), new(typeof(INativeFacts), new object()), new(typeof(INativeFacts), firstGame)
+                 })
+            Reject<InvalidOperationException>(() => new ProgramCapabilityRegistry(production,
+                _ => { factoryCalls++; return new object(); }, [invalid]));
+        Reject<InvalidOperationException>(() => new ProgramCapabilityRegistry(production,
+            _ => { factoryCalls++; return new object(); }, [new(typeof(INativeFacts), facts), new(typeof(INativeFacts), facts)]));
+        Reject<InvalidOperationException>(() => new ProgramCapabilityRegistry(nativeCatalog,
+            _ => { factoryCalls++; return new object(); }, [new(typeof(INativeFacts), facts)]));
+        Require(factoryCalls == 0, "Invalid native bindings must fail during composition, before any adapter or rule executes.");
+
+        var mismatchedFactoryCalls = 0;
+        var mismatched = new ProgramCapabilityRegistry(nativeCatalog, _ => { mismatchedFactoryCalls++; return new object(); });
+        Reject<InvalidOperationException>(() => mismatched.Get<INativeFacts>());
+        Reject<InvalidOperationException>(() => mismatched.Get<INativeFacts>());
+        Require(mismatchedFactoryCalls == 2,
+            "A mismatched adapter factory must fail without caching success or leaving the dependency guard stuck.");
+        var legacy = new ProgramCapabilityRegistry(firstGame, new ProgramCapabilityCatalog([typeof(FixtureCapability)]));
+        Require(!legacy.TryGet<IAtomicCardMovementZones>(out _),
+            "Isolated legacy catalogs retain their original scope and do not reach back into the engine for native owners.");
+    }
+
+    private interface INativeFacts : IProgramSelectionQuery { int Value { get; } }
+    private interface INativeGeneric<T> : IProgramSelectionQuery { }
+    private sealed record NativeFacts(int Value) : INativeFacts;
+    [ProgramCapability]
+    private sealed class NativeFactsAdapter : INativeFacts
+    {
+        internal NativeFactsAdapter(GameEngine engine) { }
+        public int Value => 0;
     }
 
     private interface IFixtureCapability { GameEngine Owner { get; } }

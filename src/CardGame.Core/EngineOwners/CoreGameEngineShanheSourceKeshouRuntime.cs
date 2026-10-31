@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheSourceKeshouRuntime : global::CardGame.Core.ISourceKeshouHost
+{
+    private readonly ICoreShanheSourceKeshouCardZonesOperations _cardZonesOperations;
+    private readonly ICoreShanheSourceKeshouContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheSourceKeshouResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceKeshouCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreShanheSourceKeshouCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreShanheSourceKeshouCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreShanheSourceKeshouCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreShanheSourceKeshouCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheSourceKeshouCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheSourceKeshouCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheSourceKeshouCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICoreShanheSourceKeshouCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreShanheSourceKeshouCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheSourceKeshouCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheSourceKeshouCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreShanheSourceKeshouKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShanheSourceKeshouRuntime(ICoreShanheSourceKeshouCardZonesOperations cardZonesOperations, ICoreShanheSourceKeshouContentRegistryOperations contentRegistryOperations, ICoreShanheSourceKeshouResolutionStackOperations resolutionStackOperations, ICoreShanheSourceKeshouCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreShanheSourceKeshouCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreShanheSourceKeshouCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreShanheSourceKeshouCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreShanheSourceKeshouCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheSourceKeshouCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheSourceKeshouCoreRuntimeOperations coreRuntimeOperations, ICoreShanheSourceKeshouCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICoreShanheSourceKeshouCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreShanheSourceKeshouCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheSourceKeshouCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheSourceKeshouCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreShanheSourceKeshouKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

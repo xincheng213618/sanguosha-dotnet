@@ -33,7 +33,7 @@ internal sealed class MobileSunHaoCommittedUseContract : IProgramCommittedUseCon
 }
 internal static class SunHaoComposition
 {
-    internal const string MobileCanshi = "mobile:sun-hao-canshi", MobileGuiming = "mobile:guiming";
+    internal const string MobileCanshi = "mobile:sun-hao-canshi",MobileGuiming = "mobile:guiming";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.GrantSunHaoCanshiDrawObligation or SkillProgramEffectOp.ResolveSunHaoCanshiUseDiscard;
     internal static void ValidateCanshiTrigger(SkillProgramTrigger t, bool mobile = false)
     {

@@ -28,7 +28,7 @@ internal sealed class AnniversaryLeJiuHandler(SkillProgramEffectOp op) : ISkillP
 }
 internal static class AnniversaryLeJiuComposition
 {
-    internal const string Skill = "anniversary:cuijin", Pay = "pay-original-use", Reward = "issued-undamaged-use";
+    internal const string Skill = "anniversary:cuijin",Pay = "pay-original-use",Reward = "issued-undamaged-use";
     [ProgramCatalogValidation(44100)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Any(e => e.Op is SkillProgramEffectOp.ArmAnniversaryLeJiuCuijin or SkillProgramEffectOp.BindAnniversaryLeJiuCuijinCompletion)) return;

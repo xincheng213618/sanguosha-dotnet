@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheSourceXiyingRuntime : global::CardGame.Core.IShanheSourceXiyingHost
+{
+    private readonly ICoreShanheSourceXiyingContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShanheSourceXiyingResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheSourceXiyingTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreShanheSourceXiyingCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreShanheSourceXiyingCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheSourceXiyingCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreShanheSourceXiyingCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreShanheSourceXiyingCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreShanheSourceXiyingCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreShanheSourceXiyingCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreShanheSourceXiyingCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheSourceXiyingCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheSourceXiyingCoreShanheSourceXiyingEndingOperations _coreShanheSourceXiyingEndingOperations;
+    private readonly ICoreShanheSourceXiyingCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreShanheSourceXiyingCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreShanheSourceXiyingCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreShanheSourceXiyingCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShanheSourceXiyingCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheSourceXiyingCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreShanheSourceXiyingKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess _coreMatchDefinitionModeDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineShanheSourceXiyingRuntime(ICoreShanheSourceXiyingContentRegistryOperations contentRegistryOperations, ICoreShanheSourceXiyingResolutionStackOperations resolutionStackOperations, ICoreShanheSourceXiyingTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreShanheSourceXiyingCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreShanheSourceXiyingCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheSourceXiyingCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreShanheSourceXiyingCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreShanheSourceXiyingCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreShanheSourceXiyingCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreShanheSourceXiyingCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreShanheSourceXiyingCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheSourceXiyingCoreRuntimeOperations coreRuntimeOperations, ICoreShanheSourceXiyingCoreShanheSourceXiyingEndingOperations coreShanheSourceXiyingEndingOperations, ICoreShanheSourceXiyingCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreShanheSourceXiyingCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreShanheSourceXiyingCoreTableOrderOperations coreTableOrderOperations, ICoreShanheSourceXiyingCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShanheSourceXiyingCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheSourceXiyingCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreShanheSourceXiyingKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess coreMatchDefinitionModeDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheSourceXiyingEndingOperations = coreShanheSourceXiyingEndingOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchDefinitionModeDefinitionOptionsAccess = coreMatchDefinitionModeDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

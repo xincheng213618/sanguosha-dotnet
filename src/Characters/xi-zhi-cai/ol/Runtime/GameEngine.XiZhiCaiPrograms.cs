@@ -29,14 +29,4 @@ public sealed partial record ProgramSkillFrame
 }
 public sealed partial class GameEngine
 {
-
- private CardConversionSource XiZhiCaiSource(ProgramSkillFrame f)=>new(f.SkillId,GetProgramBindingId(f),f.OwnerSeat,f.SkillInstanceId);
- [ProgramCapability]
- private sealed class XiZhiCaiProgramCapability(GameEngine engine) : IXiZhiCaiProgramHost
- {
-  public SkillProgramStepOutcome ArmXianfuRelation(ProgramSkillFrame f,int t)=>engine.ArmXianfuRelation(f,t);
-  public SkillProgramStepOutcome SettleXianfuNativeEcho(ProgramSkillFrame f)=>engine.SettleXianfuNativeEcho(f);
-  public SkillProgramStepOutcome StartChouceDamagePointJudgment(ProgramSkillFrame f,SkillProgramEffect e)=>engine.StartChouceDamagePointJudgment(f,e);
-  public SkillProgramStepOutcome ResolveChouceFrozenJudgment(ProgramSkillFrame f,SkillProgramEffect e)=>engine.ResolveChouceFrozenJudgment(f,e);
- }
 }

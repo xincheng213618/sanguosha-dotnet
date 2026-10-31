@@ -1,0 +1,32 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineShanheS5YimieObserversRuntime
+{
+    private readonly ICoreShanheS5YimieObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheS5YimieObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreShanheS5YimieObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICoreShanheS5YimieObserversCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheS5YimieObserversCoreShanheS5YimieOperations _coreShanheS5YimieOperations;
+    private readonly ICoreShanheS5YimieObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShanheS5YimieObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICoreShanheS5YimieObserversCoreShanheS5YimieObserversOperations _coreShanheS5YimieObserversOperations;
+    private readonly ICoreShanheS5YimieObserversKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    internal CoreGameEngineShanheS5YimieObserversRuntime(ICoreShanheS5YimieObserversResolutionStackOperations resolutionStackOperations, ICoreShanheS5YimieObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreShanheS5YimieObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICoreShanheS5YimieObserversCoreRuntimeOperations coreRuntimeOperations, ICoreShanheS5YimieObserversCoreShanheS5YimieOperations coreShanheS5YimieOperations, ICoreShanheS5YimieObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShanheS5YimieObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICoreShanheS5YimieObserversCoreShanheS5YimieObserversOperations coreShanheS5YimieObserversOperations, ICoreShanheS5YimieObserversKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheS5YimieOperations = coreShanheS5YimieOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreShanheS5YimieObserversOperations = coreShanheS5YimieObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+    }
+}

@@ -1,0 +1,12 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CoreGameEngineFinalTargetTurnCountsEntries
+{
+    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineFinalTargetTurnCountsRuntime> _resolve;
+    private CoreGameEngineFinalTargetTurnCountsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineFinalTargetTurnCountsRuntime> resolve)
+    {
+        _resolve = resolve;
+    }
+
+    internal static CoreGameEngineFinalTargetTurnCountsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineFinalTargetTurnCountsRuntime> resolve) => new(resolve);
+}

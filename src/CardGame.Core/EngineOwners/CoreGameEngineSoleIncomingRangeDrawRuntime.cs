@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSoleIncomingRangeDrawRuntime
+{
+    private readonly ICoreSoleIncomingRangeDrawContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSoleIncomingRangeDrawResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreNativeDrawAttemptsOperations _coreNativeDrawAttemptsOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreOutsidePhaseDrawDiscardOperations _coreOutsidePhaseDrawDiscardOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreNativeSlashCompletionOperations _coreNativeSlashCompletionOperations;
+    private readonly ICoreSoleIncomingRangeDrawCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSoleIncomingRangeDrawCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreSoleIncomingRangeDrawCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreSoleIncomingRangeDrawKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreSoleIncomingRangeDrawKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSoleIncomingRangeDrawRuntime(ICoreSoleIncomingRangeDrawContentRegistryOperations contentRegistryOperations, ICoreSoleIncomingRangeDrawResolutionStackOperations resolutionStackOperations, ICoreSoleIncomingRangeDrawCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreSoleIncomingRangeDrawCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSoleIncomingRangeDrawCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreSoleIncomingRangeDrawCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreSoleIncomingRangeDrawCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreSoleIncomingRangeDrawCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreSoleIncomingRangeDrawCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreSoleIncomingRangeDrawCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreSoleIncomingRangeDrawCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreSoleIncomingRangeDrawCoreNativeDrawAttemptsOperations coreNativeDrawAttemptsOperations, ICoreSoleIncomingRangeDrawCoreOutsidePhaseDrawDiscardOperations coreOutsidePhaseDrawDiscardOperations, ICoreSoleIncomingRangeDrawCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreSoleIncomingRangeDrawCoreRuntimeOperations coreRuntimeOperations, ICoreSoleIncomingRangeDrawCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreSoleIncomingRangeDrawCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreSoleIncomingRangeDrawCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreSoleIncomingRangeDrawCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreSoleIncomingRangeDrawCoreNativeSlashCompletionOperations coreNativeSlashCompletionOperations, ICoreSoleIncomingRangeDrawCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSoleIncomingRangeDrawCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreSoleIncomingRangeDrawCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreSoleIncomingRangeDrawCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreSoleIncomingRangeDrawKernelCoreMainOperations kernelCoreMainOperations, ICoreSoleIncomingRangeDrawKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeDrawAttemptsOperations = coreNativeDrawAttemptsOperations;
+        this._coreOutsidePhaseDrawDiscardOperations = coreOutsidePhaseDrawDiscardOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._coreNativeSlashCompletionOperations = coreNativeSlashCompletionOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

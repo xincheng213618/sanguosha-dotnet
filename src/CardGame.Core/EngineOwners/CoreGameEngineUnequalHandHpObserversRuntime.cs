@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineUnequalHandHpObserversRuntime
+{
+    private readonly ICoreUnequalHandHpObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreUnequalHandHpObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreUnequalHandHpObserversCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreUnequalHandHpObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreUnequalHandHpObserversCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreUnequalHandHpObserversCoreUnequalHandHpEndingOperations _coreUnequalHandHpEndingOperations;
+    private readonly ICoreUnequalHandHpObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreUnequalHandHpObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICoreUnequalHandHpObserversCoreUnequalHandHpObserversOperations _coreUnequalHandHpObserversOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineUnequalHandHpObserversRuntime(ICoreUnequalHandHpObserversResolutionStackOperations resolutionStackOperations, ICoreUnequalHandHpObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreUnequalHandHpObserversCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreUnequalHandHpObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreUnequalHandHpObserversCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreUnequalHandHpObserversCoreUnequalHandHpEndingOperations coreUnequalHandHpEndingOperations, ICoreUnequalHandHpObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreUnequalHandHpObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICoreUnequalHandHpObserversCoreUnequalHandHpObserversOperations coreUnequalHandHpObserversOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreUnequalHandHpEndingOperations = coreUnequalHandHpEndingOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreUnequalHandHpObserversOperations = coreUnequalHandHpObserversOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

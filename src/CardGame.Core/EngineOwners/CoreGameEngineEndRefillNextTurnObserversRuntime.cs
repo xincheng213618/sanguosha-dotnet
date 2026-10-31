@@ -1,0 +1,30 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineEndRefillNextTurnObserversRuntime
+{
+    private readonly ICoreEndRefillNextTurnObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreEndRefillNextTurnObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreEndRefillNextTurnObserversCoreEndRefillNextTurnOperations _coreEndRefillNextTurnOperations;
+    private readonly ICoreEndRefillNextTurnObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreEndRefillNextTurnObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreEndRefillNextTurnObserversCoreEndRefillNextTurnObserversOperations _coreEndRefillNextTurnObserversOperations;
+    private readonly ICoreEndRefillNextTurnObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineEndRefillNextTurnObserversRuntime(ICoreEndRefillNextTurnObserversResolutionStackOperations resolutionStackOperations, ICoreEndRefillNextTurnObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreEndRefillNextTurnObserversCoreEndRefillNextTurnOperations coreEndRefillNextTurnOperations, ICoreEndRefillNextTurnObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreEndRefillNextTurnObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreEndRefillNextTurnObserversCoreEndRefillNextTurnObserversOperations coreEndRefillNextTurnObserversOperations, ICoreEndRefillNextTurnObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreEndRefillNextTurnOperations = coreEndRefillNextTurnOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreEndRefillNextTurnObserversOperations = coreEndRefillNextTurnObserversOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

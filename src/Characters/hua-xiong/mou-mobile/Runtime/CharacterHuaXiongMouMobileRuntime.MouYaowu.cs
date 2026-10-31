@@ -1,0 +1,113 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+using System.Globalization;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterHuaXiongMouMobileRuntime
+{
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29101, SkillProgramEffectOp.ResolveMouHuaXiongYaowu)]
+    internal bool CanOfferMouYaowu(ProgramTriggerLegalityContext c) => c.Candidate.SkillId == MouYaowu && MouHuaXiongComposition.IsYaowu(c.Program) && c.Context.Window == SkillProgramTriggerWindow.BeforeDamageApplied && c.Context.TargetSeat == c.OwnerSeat && c.Context.Amount > 0 && c.Owner.IsAlive && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { EffectiveCardKind: { } kind } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
+    internal bool MouYaowuRoot(ProgramSkillFrame f)
+    {
+        if (f.SkillId != MouYaowu || f.TriggerId != "slash-damage-benefit" || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || context.TargetSeat != f.OwnerSeat || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !MouHuaXiongComposition.IsYaowu(p) || _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == context.ParentFrameId)is not BeforeDamageProgramWindowFrame window || window.TargetSeat != f.OwnerSeat || window.Amount <= 0 || window.Prevented || window.RedirectedTargetSeat is not null || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].Candidate))
+            return false;
+        var i = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == f.Id);
+        return i > 0 && _resolutionStackOperations._resolutionStack[i - 1].Id == window.Id;
+    }
+
+    internal SkillProgramStepOutcome ResolveMouYaowu(ProgramSkillFrame supplied)
+    {
+        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        if (!MouYaowuRoot(f) || f.InstructionIndex != 1 || f.MouHuaXiongYaowu is not null || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { EffectiveCardKind: { } kind } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuStartedEvent>().Any(e => e.FrameId == f.Id))
+            throw new InvalidOperationException("Yaowu needs its exact positive native Slash damage-recipient window.");
+        var action = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action;
+        var red = action is not null ? action.EffectiveIsRed ?? (action.EffectiveSuit is Suit.Heart or Suit.Diamond) : attack.Card?.Suit is Suit.Heart or Suit.Diamond;
+        var source = attack.IsSourceLess ? (int? )null : f.WindowContext!.SourceSeat;
+        var r = new MouHuaXiongYaowuReceipt(MouHuaXiongSource(f), f.GameplayHash, f.WindowContext!.ParentFrameId, attack.ResolutionId, f.OwnerSeat, source, kind, red);
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouHuaXiongYaowu = r });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHuaXiongYaowuStartedEvent(f.Id, r.WindowId, r.AttackId, f.OwnerSeat, source, kind, red));
+        if (!red)
+        {
+            CommitMouYaowuChoice(f, "owner-draw", f.OwnerSeat);
+            return SkillProgramStepOutcome.Continue;
+        }
+
+        if (source is not { } seat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive)
+        {
+            CommitMouYaowuChoice(f, "none", null);
+            return SkillProgramStepOutcome.Continue;
+        }
+
+        var choices = MouYaowuChoices(f);
+        var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, seat, "耀武：回复1点体力或摸一张牌。", [], [], f.OwnerSeat)
+        {
+            PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
+            IsPrivate = true,
+            TargetSeat = seat,
+            Choices = choices,
+            SkillPrompt = new(f.SkillId, skill.Name, skill.Name, skill.Description)
+        };
+        _coreMatchOutcomeStatusWinnerAccess._status = _coreMatchParticipantsPlayersAccess._players[seat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
+        return SkillProgramStepOutcome.AwaitChoice;
+    }
+
+    internal IReadOnlyList<PromptChoice> MouYaowuChoices(ProgramSkillFrame f)
+    {
+        var source = f.MouHuaXiongYaowu!.SourceSeat!.Value;
+        var options = _coreTreatedWoundedOperations.IsRuleWounded(_coreMatchParticipantsPlayersAccess._players[source]) ? new[]
+        {
+            "recover",
+            "draw"
+        }
+
+        : ["draw"];
+        return Array.AsReadOnly(options.Select(option => new PromptChoice(new($"mou-hua-xiong.yaowu.{(f.Id)}.{(option)}"), option == "recover" ? "回复1点体力" : "摸一张牌", [], [], new Dictionary<string, string> { ["program-action"] = "mou-hua-xiong-yaowu", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["option-id"] = option })).ToArray());
+    }
+
+    internal void CommitMouYaowuChoice(ProgramSkillFrame f, string benefit, int? recipient)
+    {
+        var r = f.MouHuaXiongYaowu!;
+        if (r.Benefit is not null || f.ChoiceBindings.Any(b => b.Name == "yaowu-benefit"))
+            throw new InvalidOperationException("Yaowu cannot choose or issue its reward twice.");
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouHuaXiongYaowu = r with { Benefit = benefit }, ChoiceBindings = Array.AsReadOnly(f.ChoiceBindings.Append(new ProgramChoiceResultBinding("yaowu-benefit", benefit, recipient ?? f.OwnerSeat)).ToArray()) });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHuaXiongYaowuBenefitChosenEvent(f.Id, recipient, benefit));
+    }
+
+    [ProgramAnswer("mou-hua-xiong-yaowu")]
+    internal void AnswerMouYaowu(PromptChoice selected)
+    {
+        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
+        if (!MouYaowuRoot(f) || f.InstructionIndex != 1 || f.MouHuaXiongYaowu is not { IsRed: true, Benefit: null, SourceSeat: { } source } || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true, Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != source || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouYaowuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+            throw new InvalidOperationException("Yaowu only accepts its actual damage source's canonical available reward.");
+        _coreNativePromptBoundaryOperations.ClearPendingDecision();
+        if (!_coreMatchParticipantsPlayersAccess._players[source].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        {
+            CommitMouYaowuChoice(f, "none", null);
+            _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
+            return;
+        }
+
+        CommitMouYaowuChoice(f, selected.Parameters.GetValueOrDefault("option-id") == "recover" ? "source-recover" : "source-draw", source);
+        _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
+    }
+
+    [ProgramAiChoice(SkillProgramEffectOp.ResolveMouHuaXiongYaowu)]
+    internal PromptChoice SelectAiMouYaowu(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("option-id") == "recover" && _coreMatchParticipantsPlayersAccess._players[f.MouHuaXiongYaowu!.SourceSeat!.Value].Hp <= 2) ?? p.Choices.Single(c => c.Parameters.GetValueOrDefault("option-id") == "draw");
+    internal bool ValidMouYaowuReceipt(ProgramSkillFrame f) => MouYaowuRoot(f) && f.MouHuaXiongYaowu is { } r && r.Source == MouHuaXiongSource(f) && r.GameplayHash == f.GameplayHash && r.OwnerSeat == f.OwnerSeat && r.WindowId == f.WindowContext!.ParentFrameId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.EffectiveKind) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuStartedEvent>().Count(e => e == new MouHuaXiongYaowuStartedEvent(f.Id, r.WindowId, r.AttackId, r.OwnerSeat, r.SourceSeat, r.EffectiveKind, r.IsRed)) == 1 && (r.Benefit is null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuBenefitChosenEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var chosen] && chosen.Benefit == r.Benefit && (r.Benefit switch
+    {
+        "owner-draw" => !r.IsRed && chosen.RecipientSeat == f.OwnerSeat,
+        "source-draw" or "source-recover" => r.IsRed && r.SourceSeat is { } seat && chosen.RecipientSeat == seat,
+        "none" => r.IsRed && chosen.RecipientSeat is null,
+        _ => false
+    }) && f.ChoiceBindings.Count(b => b.Name == "yaowu-benefit" && b.OptionId == r.Benefit && b.ChooserSeat == (chosen.RecipientSeat ?? f.OwnerSeat)) == 1);
+    internal bool IsMouHuaXiongChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding binding)
+    {
+        if (binding.Name != "yaowu-benefit" || f.InstructionIndex < 1 || f.MouHuaXiongYaowu is not { Benefit: not null } r || binding.OptionId != r.Benefit || !ValidMouYaowuReceipt(f))
+            return false;
+        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuBenefitChosenEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var chosen] && chosen.Benefit == binding.OptionId && binding.ChooserSeat == (chosen.RecipientSeat ?? f.OwnerSeat);
+    }
+}

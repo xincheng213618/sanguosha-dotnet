@@ -1,0 +1,30 @@
+#nullable enable
+namespace CardGame.Core.EngineStates;
+internal sealed class CoreGameEngineCurrentTurnSkillSuppressionsState : global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess
+{
+    private (long Projection, long Suppression) _currentTurnQualificationDependencies = default !;
+    internal ref (long Projection, long Suppression) ReferenceToCurrentTurnQualificationDependencies => ref _currentTurnQualificationDependencies;
+
+    private long _currentTurnQualificationStamp = default !;
+    internal ref long ReferenceToCurrentTurnQualificationStamp => ref _currentTurnQualificationStamp;
+
+    private long _currentTurnSkillSuppressionRevision = default !;
+    internal ref long ReferenceToCurrentTurnSkillSuppressionRevision => ref _currentTurnSkillSuppressionRevision;
+
+    private global::System.Collections.Generic.List<global::CardGame.Core.CurrentTurnNonLockedSkillSuppression> _currentTurnSkillSuppressions = [];
+    internal ref readonly global::System.Collections.Generic.List<global::CardGame.Core.CurrentTurnNonLockedSkillSuppression> ReferenceToCurrentTurnSkillSuppressions => ref _currentTurnSkillSuppressions;
+
+    ref long global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision => ref _currentTurnSkillSuppressionRevision;
+
+    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.CurrentTurnNonLockedSkillSuppression> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressions => ref _currentTurnSkillSuppressions;
+
+    ref long global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressionRevision => ref _currentTurnSkillSuppressionRevision;
+
+    ref (long Projection, long Suppression) global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnQualificationDependencies => ref _currentTurnQualificationDependencies;
+
+    ref long global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnQualificationStamp => ref _currentTurnQualificationStamp;
+
+    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.CurrentTurnNonLockedSkillSuppression> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressions => ref _currentTurnSkillSuppressions;
+
+    ref long global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressionRevision => ref _currentTurnSkillSuppressionRevision;
+}

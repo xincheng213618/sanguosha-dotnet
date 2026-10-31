@@ -56,7 +56,7 @@ internal sealed class SpSunShangxiangFanxiangHandler : ISkillProgramEffectHandle
 }
 internal static class SpSunShangxiangOlComposition
 {
-    internal const string Liangzhu = "ol:liangzhu", Fanxiang = "ol:fanxiang", Xiaoji = "classic:xiaoji";
+    internal const string Liangzhu = "ol:liangzhu",Fanxiang = "ol:fanxiang",Xiaoji = "classic:xiaoji";
     [ProgramCatalogValidation(1450)]
     internal static void Validate(string path, SkillProgram p)
     {

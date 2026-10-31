@@ -1,0 +1,80 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreMatchParticipantSetupRuntime
+{
+    private readonly ICoreMatchParticipantSetupCharacterDaQiaoXiaoQiaoHappyGodOperations _characterDaQiaoXiaoQiaoHappyGodOperations;
+    private readonly ICoreMatchParticipantSetupCardZonesOperations _cardZonesOperations;
+    private readonly ICoreMatchParticipantSetupContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreMatchParticipantSetupModeRulesOperations _modeRulesOperations;
+    private readonly ICoreMatchParticipantSetupModeRuntimeOperations _modeRuntimeOperations;
+    private readonly ICoreMatchParticipantSetupRandomOperations _randomOperations;
+    private readonly ICoreMatchParticipantSetupCoreConversionStatesOperations _coreConversionStatesOperations;
+    private readonly ICoreMatchParticipantSetupCoreIdentityConcealmentOperations _coreIdentityConcealmentOperations;
+    private readonly ICoreMatchParticipantSetupCoreInitialHandModifiersOperations _coreInitialHandModifiersOperations;
+    private readonly ICoreMatchParticipantSetupCoreModeRulesOperations _coreModeRulesOperations;
+    private readonly ICoreMatchParticipantSetupCoreModeSetupOperations _coreModeSetupOperations;
+    private readonly ICoreMatchParticipantSetupCoreModeSetupEquipmentOperations _coreModeSetupEquipmentOperations;
+    private readonly ICoreMatchParticipantSetupCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreMatchParticipantSetupCoreOpeningCustomizationOperations _coreOpeningCustomizationOperations;
+    private readonly ICoreMatchParticipantSetupCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreMatchParticipantSetupCoreMatchPresentationOperations _coreMatchPresentationOperations;
+    private readonly ICoreMatchParticipantSetupCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICoreMatchParticipantSetupCoreNativeAiDecisionsOperations _coreNativeAiDecisionsOperations;
+    private readonly ICoreMatchParticipantSetupCoreNativeCoreInvariantsOperations _coreNativeCoreInvariantsOperations;
+    private readonly ICoreMatchParticipantSetupCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreMatchParticipantSetupCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreMatchParticipantSetupCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreMatchParticipantSetupCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreMatchParticipantSetupCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreMatchParticipantSetupKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess _coreActualTurnProgressCurrentSeatAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess _coreAiDiagnosticsThoughtSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsPlayerCountAccess _coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess _coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICorePhysicalCardPopulationInitialCardCountAccess _corePhysicalCardPopulationInitialCardCountAccess;
+    internal CoreMatchParticipantSetupRuntime(ICoreMatchParticipantSetupCharacterDaQiaoXiaoQiaoHappyGodOperations characterDaQiaoXiaoQiaoHappyGodOperations, ICoreMatchParticipantSetupCardZonesOperations cardZonesOperations, ICoreMatchParticipantSetupContentRegistryOperations contentRegistryOperations, ICoreMatchParticipantSetupModeRulesOperations modeRulesOperations, ICoreMatchParticipantSetupModeRuntimeOperations modeRuntimeOperations, ICoreMatchParticipantSetupRandomOperations randomOperations, ICoreMatchParticipantSetupCoreConversionStatesOperations coreConversionStatesOperations, ICoreMatchParticipantSetupCoreIdentityConcealmentOperations coreIdentityConcealmentOperations, ICoreMatchParticipantSetupCoreInitialHandModifiersOperations coreInitialHandModifiersOperations, ICoreMatchParticipantSetupCoreModeRulesOperations coreModeRulesOperations, ICoreMatchParticipantSetupCoreModeSetupOperations coreModeSetupOperations, ICoreMatchParticipantSetupCoreModeSetupEquipmentOperations coreModeSetupEquipmentOperations, ICoreMatchParticipantSetupCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreMatchParticipantSetupCoreOpeningCustomizationOperations coreOpeningCustomizationOperations, ICoreMatchParticipantSetupCoreMatchLogOperations coreMatchLogOperations, ICoreMatchParticipantSetupCoreMatchPresentationOperations coreMatchPresentationOperations, ICoreMatchParticipantSetupCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICoreMatchParticipantSetupCoreNativeAiDecisionsOperations coreNativeAiDecisionsOperations, ICoreMatchParticipantSetupCoreNativeCoreInvariantsOperations coreNativeCoreInvariantsOperations, ICoreMatchParticipantSetupCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreMatchParticipantSetupCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreMatchParticipantSetupCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreMatchParticipantSetupCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreMatchParticipantSetupCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreMatchParticipantSetupKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess coreActualTurnProgressCurrentSeatAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess coreAiDiagnosticsThoughtSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsPlayerCountAccess coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess, global::CardGame.Core.EngineStates.Contracts.ICorePhysicalCardPopulationInitialCardCountAccess corePhysicalCardPopulationInitialCardCountAccess)
+    {
+        this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._modeRulesOperations = modeRulesOperations;
+        this._modeRuntimeOperations = modeRuntimeOperations;
+        this._randomOperations = randomOperations;
+        this._coreConversionStatesOperations = coreConversionStatesOperations;
+        this._coreIdentityConcealmentOperations = coreIdentityConcealmentOperations;
+        this._coreInitialHandModifiersOperations = coreInitialHandModifiersOperations;
+        this._coreModeRulesOperations = coreModeRulesOperations;
+        this._coreModeSetupOperations = coreModeSetupOperations;
+        this._coreModeSetupEquipmentOperations = coreModeSetupEquipmentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOpeningCustomizationOperations = coreOpeningCustomizationOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreMatchPresentationOperations = coreMatchPresentationOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativeAiDecisionsOperations = coreNativeAiDecisionsOperations;
+        this._coreNativeCoreInvariantsOperations = coreNativeCoreInvariantsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatAccess = coreActualTurnProgressCurrentSeatAccess;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreAiDiagnosticsThoughtSequenceAccess = coreAiDiagnosticsThoughtSequenceAccess;
+        this._coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess = coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess = coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess;
+        this._corePhysicalCardPopulationInitialCardCountAccess = corePhysicalCardPopulationInitialCardCountAccess;
+    }
+}

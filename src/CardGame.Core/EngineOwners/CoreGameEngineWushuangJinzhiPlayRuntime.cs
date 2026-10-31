@@ -1,0 +1,76 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineWushuangJinzhiPlayRuntime
+{
+    private readonly ICoreWushuangJinzhiPlayCharacterHuangGaiMouMobileOperations _characterHuangGaiMouMobileOperations;
+    private readonly ICoreWushuangJinzhiPlayCharacterHuangQuanOlOperations _characterHuangQuanOlOperations;
+    private readonly ICoreWushuangJinzhiPlayCharacterKeBiNengOlOperations _characterKeBiNengOlOperations;
+    private readonly ICoreWushuangJinzhiPlayCharacterZhugeLiangMouOperations _characterZhugeLiangMouOperations;
+    private readonly ICoreWushuangJinzhiPlayContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreAdvancedPoliciesOperations _coreAdvancedPoliciesOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreWushuangJinzhiPlayCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreRoundGainedSourceUsesOperations _coreRoundGainedSourceUsesOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreWushuangJinzhiOperations _coreWushuangJinzhiOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreNativeRecoveryCardsOperations _coreNativeRecoveryCardsOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreWushuangJinzhiPlayCoreTurnTargetCardQuotaAllowancesOperations _coreTurnTargetCardQuotaAllowancesOperations;
+    private readonly ICoreWushuangJinzhiPlayKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreWushuangJinzhiPlayKernelCoreGameEngineRuntimeOperations _kernelCoreGameEngineRuntimeOperations;
+    private readonly ICoreWushuangJinzhiPlayKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineWushuangJinzhiPlayRuntime(ICoreWushuangJinzhiPlayCharacterHuangGaiMouMobileOperations characterHuangGaiMouMobileOperations, ICoreWushuangJinzhiPlayCharacterHuangQuanOlOperations characterHuangQuanOlOperations, ICoreWushuangJinzhiPlayCharacterKeBiNengOlOperations characterKeBiNengOlOperations, ICoreWushuangJinzhiPlayCharacterZhugeLiangMouOperations characterZhugeLiangMouOperations, ICoreWushuangJinzhiPlayContentRegistryOperations contentRegistryOperations, ICoreWushuangJinzhiPlayCoreAdvancedPoliciesOperations coreAdvancedPoliciesOperations, ICoreWushuangJinzhiPlayCoreCardConversionsOperations coreCardConversionsOperations, ICoreWushuangJinzhiPlayCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreWushuangJinzhiPlayCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreWushuangJinzhiPlayCoreHandComparisonOperations coreHandComparisonOperations, ICoreWushuangJinzhiPlayCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreWushuangJinzhiPlayCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreWushuangJinzhiPlayCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreWushuangJinzhiPlayCoreRoundGainedSourceUsesOperations coreRoundGainedSourceUsesOperations, ICoreWushuangJinzhiPlayCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreWushuangJinzhiPlayCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICoreWushuangJinzhiPlayCoreWushuangJinzhiOperations coreWushuangJinzhiOperations, ICoreWushuangJinzhiPlayCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreWushuangJinzhiPlayCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreWushuangJinzhiPlayCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreWushuangJinzhiPlayCoreNativeRecoveryCardsOperations coreNativeRecoveryCardsOperations, ICoreWushuangJinzhiPlayCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreWushuangJinzhiPlayCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreWushuangJinzhiPlayCoreTurnTargetCardQuotaAllowancesOperations coreTurnTargetCardQuotaAllowancesOperations, ICoreWushuangJinzhiPlayKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreWushuangJinzhiPlayKernelCoreGameEngineRuntimeOperations kernelCoreGameEngineRuntimeOperations, ICoreWushuangJinzhiPlayKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangGaiMouMobileOperations = characterHuangGaiMouMobileOperations;
+        this._characterHuangQuanOlOperations = characterHuangQuanOlOperations;
+        this._characterKeBiNengOlOperations = characterKeBiNengOlOperations;
+        this._characterZhugeLiangMouOperations = characterZhugeLiangMouOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAdvancedPoliciesOperations = coreAdvancedPoliciesOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreRoundGainedSourceUsesOperations = coreRoundGainedSourceUsesOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreWushuangJinzhiOperations = coreWushuangJinzhiOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRecoveryCardsOperations = coreNativeRecoveryCardsOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._coreTurnTargetCardQuotaAllowancesOperations = coreTurnTargetCardQuotaAllowancesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreGameEngineRuntimeOperations = kernelCoreGameEngineRuntimeOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

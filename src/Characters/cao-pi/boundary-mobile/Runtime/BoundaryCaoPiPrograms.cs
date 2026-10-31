@@ -3,7 +3,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryCaoPiComposition
 {
-    internal const string Xingshang = "boundary:xingshang-mobile", Fangzhu = "boundary:fangzhu-mobile", Songwei = "boundary:songwei-mobile";
+    internal const string Xingshang = "boundary:xingshang-mobile",Fangzhu = "boundary:fangzhu-mobile",Songwei = "boundary:songwei-mobile";
     [ProgramCatalogValidation(54500)]
     internal static void Validate(string path, SkillProgram p)
     {

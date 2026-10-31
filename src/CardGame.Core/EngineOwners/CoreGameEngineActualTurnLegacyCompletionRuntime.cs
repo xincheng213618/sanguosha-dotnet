@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineActualTurnLegacyCompletionRuntime
+{
+    private readonly ICoreActualTurnLegacyCompletionCharacterCaiYongLeOperations _characterCaiYongLeOperations;
+    private readonly ICoreActualTurnLegacyCompletionCharacterCaoZhiLeOperations _characterCaoZhiLeOperations;
+    private readonly ICoreActualTurnLegacyCompletionCharacterCuiYanOlOperations _characterCuiYanOlOperations;
+    private readonly ICoreActualTurnLegacyCompletionCharacterHuangYueyingOlMouOperations _characterHuangYueyingOlMouOperations;
+    private readonly ICoreActualTurnLegacyCompletionCharacterKongShuOlOperations _characterKongShuOlOperations;
+    private readonly ICoreActualTurnLegacyCompletionCharacterLiuYanOlOperations _characterLiuYanOlOperations;
+    private readonly ICoreActualTurnLegacyCompletionContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreActualTurnLegacyCompletionResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreActualTurnLegacyCompletionCoreActualHandGainProgramsOperations _coreActualHandGainProgramsOperations;
+    private readonly ICoreActualTurnLegacyCompletionCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreActualTurnLegacyCompletionCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreActualTurnLegacyCompletionCoreCurrentTurnUseKindsOperations _coreCurrentTurnUseKindsOperations;
+    private readonly ICoreActualTurnLegacyCompletionCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreActualTurnLegacyCompletionCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreActualTurnLegacyCompletionCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreActualTurnLegacyCompletionCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreActualTurnLegacyCompletionKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CoreGameEngineActualTurnLegacyCompletionRuntime(ICoreActualTurnLegacyCompletionCharacterCaiYongLeOperations characterCaiYongLeOperations, ICoreActualTurnLegacyCompletionCharacterCaoZhiLeOperations characterCaoZhiLeOperations, ICoreActualTurnLegacyCompletionCharacterCuiYanOlOperations characterCuiYanOlOperations, ICoreActualTurnLegacyCompletionCharacterHuangYueyingOlMouOperations characterHuangYueyingOlMouOperations, ICoreActualTurnLegacyCompletionCharacterKongShuOlOperations characterKongShuOlOperations, ICoreActualTurnLegacyCompletionCharacterLiuYanOlOperations characterLiuYanOlOperations, ICoreActualTurnLegacyCompletionContentRegistryOperations contentRegistryOperations, ICoreActualTurnLegacyCompletionResolutionStackOperations resolutionStackOperations, ICoreActualTurnLegacyCompletionCoreActualHandGainProgramsOperations coreActualHandGainProgramsOperations, ICoreActualTurnLegacyCompletionCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreActualTurnLegacyCompletionCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreActualTurnLegacyCompletionCoreCurrentTurnUseKindsOperations coreCurrentTurnUseKindsOperations, ICoreActualTurnLegacyCompletionCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreActualTurnLegacyCompletionCoreRuntimeOperations coreRuntimeOperations, ICoreActualTurnLegacyCompletionCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreActualTurnLegacyCompletionCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreActualTurnLegacyCompletionKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess)
+    {
+        this._characterCaiYongLeOperations = characterCaiYongLeOperations;
+        this._characterCaoZhiLeOperations = characterCaoZhiLeOperations;
+        this._characterCuiYanOlOperations = characterCuiYanOlOperations;
+        this._characterHuangYueyingOlMouOperations = characterHuangYueyingOlMouOperations;
+        this._characterKongShuOlOperations = characterKongShuOlOperations;
+        this._characterLiuYanOlOperations = characterLiuYanOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualHandGainProgramsOperations = coreActualHandGainProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentTurnUseKindsOperations = coreCurrentTurnUseKindsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+    }
+}

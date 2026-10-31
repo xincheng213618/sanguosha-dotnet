@@ -1,0 +1,68 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSoleTargetQuarantineRuntime
+{
+    private readonly ICoreSoleTargetQuarantineCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSoleTargetQuarantineContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSoleTargetQuarantinePendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICoreSoleTargetQuarantineResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSoleTargetQuarantineCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICoreSoleTargetQuarantineCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSoleTargetQuarantineCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreSoleTargetQuarantineCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreSoleTargetQuarantineCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreSoleTargetQuarantineCoreCompletedCategoryUseProofOperations _coreCompletedCategoryUseProofOperations;
+    private readonly ICoreSoleTargetQuarantineCoreDeferredHandAlignmentsOperations _coreDeferredHandAlignmentsOperations;
+    private readonly ICoreSoleTargetQuarantineCoreDeferredTurnEndPreludesOperations _coreDeferredTurnEndPreludesOperations;
+    private readonly ICoreSoleTargetQuarantineCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSoleTargetQuarantineCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSoleTargetQuarantineCoreSoleTargetProtectionOperations _coreSoleTargetProtectionOperations;
+    private readonly ICoreSoleTargetQuarantineCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreSoleTargetQuarantineCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreSoleTargetQuarantineCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSoleTargetQuarantineCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreSoleTargetQuarantineCoreProgramTargetWindowProtocolsOperations _coreProgramTargetWindowProtocolsOperations;
+    private readonly ICoreSoleTargetQuarantineCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreSoleTargetQuarantineKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreSoleTargetQuarantineKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSoleTargetQuarantineRuntime(ICoreSoleTargetQuarantineCardZonesOperations cardZonesOperations, ICoreSoleTargetQuarantineContentRegistryOperations contentRegistryOperations, ICoreSoleTargetQuarantinePendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICoreSoleTargetQuarantineResolutionStackOperations resolutionStackOperations, ICoreSoleTargetQuarantineCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICoreSoleTargetQuarantineCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSoleTargetQuarantineCoreCardActionsOperations coreCardActionsOperations, ICoreSoleTargetQuarantineCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreSoleTargetQuarantineCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreSoleTargetQuarantineCoreCompletedCategoryUseProofOperations coreCompletedCategoryUseProofOperations, ICoreSoleTargetQuarantineCoreDeferredHandAlignmentsOperations coreDeferredHandAlignmentsOperations, ICoreSoleTargetQuarantineCoreDeferredTurnEndPreludesOperations coreDeferredTurnEndPreludesOperations, ICoreSoleTargetQuarantineCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSoleTargetQuarantineCoreRuntimeOperations coreRuntimeOperations, ICoreSoleTargetQuarantineCoreSoleTargetProtectionOperations coreSoleTargetProtectionOperations, ICoreSoleTargetQuarantineCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreSoleTargetQuarantineCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreSoleTargetQuarantineCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSoleTargetQuarantineCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreSoleTargetQuarantineCoreProgramTargetWindowProtocolsOperations coreProgramTargetWindowProtocolsOperations, ICoreSoleTargetQuarantineCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreSoleTargetQuarantineKernelCoreMainOperations kernelCoreMainOperations, ICoreSoleTargetQuarantineKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCompletedCategoryUseProofOperations = coreCompletedCategoryUseProofOperations;
+        this._coreDeferredHandAlignmentsOperations = coreDeferredHandAlignmentsOperations;
+        this._coreDeferredTurnEndPreludesOperations = coreDeferredTurnEndPreludesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSoleTargetProtectionOperations = coreSoleTargetProtectionOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreProgramTargetWindowProtocolsOperations = coreProgramTargetWindowProtocolsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

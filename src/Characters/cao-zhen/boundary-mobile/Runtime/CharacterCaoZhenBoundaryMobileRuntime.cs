@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime : global::CardGame.Core.IBoundaryCaoZhenHost
+{
+    private readonly ICharacterCaoZhenBoundaryMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreFriendTrioOperations _coreFriendTrioOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreResponseUseCompletionOperations _coreResponseUseCompletionOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreNativeTrickUseOperations _coreNativeTrickUseOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterCaoZhenBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterCaoZhenBoundaryMobileRuntime(ICharacterCaoZhenBoundaryMobileCardZonesOperations cardZonesOperations, ICharacterCaoZhenBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterCaoZhenBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterCaoZhenBoundaryMobileCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterCaoZhenBoundaryMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterCaoZhenBoundaryMobileCoreCardActionsOperations coreCardActionsOperations, ICharacterCaoZhenBoundaryMobileCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterCaoZhenBoundaryMobileCoreFriendTrioOperations coreFriendTrioOperations, ICharacterCaoZhenBoundaryMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterCaoZhenBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterCaoZhenBoundaryMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterCaoZhenBoundaryMobileCoreResponseUseCompletionOperations coreResponseUseCompletionOperations, ICharacterCaoZhenBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterCaoZhenBoundaryMobileCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICharacterCaoZhenBoundaryMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterCaoZhenBoundaryMobileCoreNativeTrickUseOperations coreNativeTrickUseOperations, ICharacterCaoZhenBoundaryMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterCaoZhenBoundaryMobileCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterCaoZhenBoundaryMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterCaoZhenBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreFriendTrioOperations = coreFriendTrioOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreResponseUseCompletionOperations = coreResponseUseCompletionOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeTrickUseOperations = coreNativeTrickUseOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

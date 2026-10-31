@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouZhuRongComposition
 {
-    internal const string Lieren = "mou-mobile:lieren", Juxiang = "mou-mobile:juxiang";
+    internal const string Lieren = "mou-mobile:lieren",Juxiang = "mou-mobile:juxiang";
     [ProgramCatalogValidation(1070)]
     internal static void ValidateProgram(string path, SkillProgram p)
     {

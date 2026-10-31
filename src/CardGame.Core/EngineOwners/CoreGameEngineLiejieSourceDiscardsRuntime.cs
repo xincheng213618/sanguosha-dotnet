@@ -1,0 +1,78 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
+{
+    private readonly ICoreLiejieSourceDiscardsCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICoreLiejieSourceDiscardsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreLiejieSourceDiscardsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreLiejieSourceDiscardsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreLiejieSourceDiscardsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreLiejieSourceDiscardsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreLiejieSourceDiscardsOperations _coreLiejieSourceDiscardsOperations;
+    private readonly ICoreLiejieSourceDiscardsCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICoreLiejieSourceDiscardsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineLiejieSourceDiscardsRuntime(ICoreLiejieSourceDiscardsCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICoreLiejieSourceDiscardsCardZonesOperations cardZonesOperations, ICoreLiejieSourceDiscardsContentRegistryOperations contentRegistryOperations, ICoreLiejieSourceDiscardsResolutionStackOperations resolutionStackOperations, ICoreLiejieSourceDiscardsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreLiejieSourceDiscardsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreLiejieSourceDiscardsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreLiejieSourceDiscardsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreLiejieSourceDiscardsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreLiejieSourceDiscardsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreLiejieSourceDiscardsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreLiejieSourceDiscardsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreLiejieSourceDiscardsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreLiejieSourceDiscardsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreLiejieSourceDiscardsCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreLiejieSourceDiscardsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreLiejieSourceDiscardsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreLiejieSourceDiscardsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreLiejieSourceDiscardsCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreLiejieSourceDiscardsCoreRuntimeOperations coreRuntimeOperations, ICoreLiejieSourceDiscardsCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreLiejieSourceDiscardsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreLiejieSourceDiscardsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreLiejieSourceDiscardsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreLiejieSourceDiscardsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreLiejieSourceDiscardsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreLiejieSourceDiscardsCoreLiejieSourceDiscardsOperations coreLiejieSourceDiscardsOperations, ICoreLiejieSourceDiscardsCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICoreLiejieSourceDiscardsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreLiejieSourceDiscardsOperations = coreLiejieSourceDiscardsOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

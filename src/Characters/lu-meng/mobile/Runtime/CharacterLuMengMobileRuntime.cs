@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CharacterLuMengMobileRuntime
+{
+    private readonly ICharacterLuMengMobileCharacterHuaTuoAnniversaryGodOperations _characterHuaTuoAnniversaryGodOperations;
+    private readonly ICharacterLuMengMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLuMengMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLuMengMobileCoreActualDiscardPhaseOperations _coreActualDiscardPhaseOperations;
+    private readonly ICharacterLuMengMobileCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICharacterLuMengMobileCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICharacterLuMengMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterLuMengMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLuMengMobileCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICharacterLuMengMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterLuMengMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLuMengMobileCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterLuMengMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCurrentTurnStatisticsUsedOrPlayedSlashDuringPlayPhaseAccess _coreCurrentTurnStatisticsUsedOrPlayedSlashDuringPlayPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreDelayedTurnEffectsPendingTurnDelayedEffectsAccess _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CharacterLuMengMobileRuntime(ICharacterLuMengMobileCharacterHuaTuoAnniversaryGodOperations characterHuaTuoAnniversaryGodOperations, ICharacterLuMengMobileContentRegistryOperations contentRegistryOperations, ICharacterLuMengMobileResolutionStackOperations resolutionStackOperations, ICharacterLuMengMobileCoreActualDiscardPhaseOperations coreActualDiscardPhaseOperations, ICharacterLuMengMobileCoreActualTurnsOperations coreActualTurnsOperations, ICharacterLuMengMobileCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICharacterLuMengMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLuMengMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterLuMengMobileCoreMatchLogOperations coreMatchLogOperations, ICharacterLuMengMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterLuMengMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLuMengMobileCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterLuMengMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCurrentTurnStatisticsUsedOrPlayedSlashDuringPlayPhaseAccess coreCurrentTurnStatisticsUsedOrPlayedSlashDuringPlayPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreDelayedTurnEffectsPendingTurnDelayedEffectsAccess coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._characterHuaTuoAnniversaryGodOperations = characterHuaTuoAnniversaryGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualDiscardPhaseOperations = coreActualDiscardPhaseOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        this._coreCurrentTurnStatisticsUsedOrPlayedSlashDuringPlayPhaseAccess = coreCurrentTurnStatisticsUsedOrPlayedSlashDuringPlayPhaseAccess;
+        this._coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess = coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreOwnedDrawPhaseRuntimePortsRuntime : global::CardGame.Core.IOwnedDrawPhaseFacts, global::CardGame.Core.IOwnedDrawPhaseNativeOperations
+{
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCharacterCaoXiOlOperations _characterCaoXiOlOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCharacterChengGongYingOlOperations _characterChengGongYingOlOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCharacterDuFuRenOlOperations _characterDuFuRenOlOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCharacterZhuHuanBoundaryMobileOperations _characterZhuHuanBoundaryMobileOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCoreNativeDrawAttemptsOperations _coreNativeDrawAttemptsOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCoreNativeDrawThresholdOperations _coreNativeDrawThresholdOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCoreShanheS5ShensuOperations _coreShanheS5ShensuOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCoreShanheSourceChunlaoJudgment3161Operations _coreShanheSourceChunlaoJudgment3161Operations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCoreLeastHandMarkerDrawProgramsOperations _coreLeastHandMarkerDrawProgramsOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreOwnedDrawPhaseRuntimePortsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    internal CoreOwnedDrawPhaseRuntimePortsRuntime(ICoreOwnedDrawPhaseRuntimePortsCharacterCaoXiOlOperations characterCaoXiOlOperations, ICoreOwnedDrawPhaseRuntimePortsCharacterChengGongYingOlOperations characterChengGongYingOlOperations, ICoreOwnedDrawPhaseRuntimePortsCharacterDuFuRenOlOperations characterDuFuRenOlOperations, ICoreOwnedDrawPhaseRuntimePortsCharacterZhuHuanBoundaryMobileOperations characterZhuHuanBoundaryMobileOperations, ICoreOwnedDrawPhaseRuntimePortsCoreActualTurnsOperations coreActualTurnsOperations, ICoreOwnedDrawPhaseRuntimePortsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreOwnedDrawPhaseRuntimePortsCoreNativeDrawAttemptsOperations coreNativeDrawAttemptsOperations, ICoreOwnedDrawPhaseRuntimePortsCoreNativeDrawThresholdOperations coreNativeDrawThresholdOperations, ICoreOwnedDrawPhaseRuntimePortsCoreShanheS5ShensuOperations coreShanheS5ShensuOperations, ICoreOwnedDrawPhaseRuntimePortsCoreShanheSourceChunlaoJudgment3161Operations coreShanheSourceChunlaoJudgment3161Operations, ICoreOwnedDrawPhaseRuntimePortsCoreTableOrderOperations coreTableOrderOperations, ICoreOwnedDrawPhaseRuntimePortsCoreLeastHandMarkerDrawProgramsOperations coreLeastHandMarkerDrawProgramsOperations, ICoreOwnedDrawPhaseRuntimePortsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreOwnedDrawPhaseRuntimePortsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess)
+    {
+        this._characterCaoXiOlOperations = characterCaoXiOlOperations;
+        this._characterChengGongYingOlOperations = characterChengGongYingOlOperations;
+        this._characterDuFuRenOlOperations = characterDuFuRenOlOperations;
+        this._characterZhuHuanBoundaryMobileOperations = characterZhuHuanBoundaryMobileOperations;
+        this._coreActualTurnsOperations = coreActualTurnsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeDrawAttemptsOperations = coreNativeDrawAttemptsOperations;
+        this._coreNativeDrawThresholdOperations = coreNativeDrawThresholdOperations;
+        this._coreShanheS5ShensuOperations = coreShanheS5ShensuOperations;
+        this._coreShanheSourceChunlaoJudgment3161Operations = coreShanheSourceChunlaoJudgment3161Operations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreLeastHandMarkerDrawProgramsOperations = coreLeastHandMarkerDrawProgramsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+    }
+}

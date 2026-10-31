@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSunCeMobileGodRuntime : global::CardGame.Core.IShenSunCeProgramHost, global::CardGame.Core.IShenSunCeSelectionQueries
+{
+    private readonly ICharacterSunCeMobileGodCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICharacterSunCeMobileGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSunCeMobileGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSunCeMobileGodCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterSunCeMobileGodCoreAttributedMarkerEventsOperations _coreAttributedMarkerEventsOperations;
+    private readonly ICharacterSunCeMobileGodCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICharacterSunCeMobileGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterSunCeMobileGodCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterSunCeMobileGodCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterSunCeMobileGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSunCeMobileGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterSunCeMobileGodCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterSunCeMobileGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterSunCeMobileGodCoreWushuangTacticRulesOperations _coreWushuangTacticRulesOperations;
+    private readonly ICharacterSunCeMobileGodCoreNativePlayerDeathOperations _coreNativePlayerDeathOperations;
+    private readonly ICharacterSunCeMobileGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterSunCeMobileGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterSunCeMobileGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterSunCeMobileGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterSunCeMobileGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterSunCeMobileGodRuntime(ICharacterSunCeMobileGodCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICharacterSunCeMobileGodContentRegistryOperations contentRegistryOperations, ICharacterSunCeMobileGodResolutionStackOperations resolutionStackOperations, ICharacterSunCeMobileGodCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterSunCeMobileGodCoreAttributedMarkerEventsOperations coreAttributedMarkerEventsOperations, ICharacterSunCeMobileGodCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICharacterSunCeMobileGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterSunCeMobileGodCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterSunCeMobileGodCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterSunCeMobileGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSunCeMobileGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterSunCeMobileGodCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterSunCeMobileGodCoreRuntimeOperations coreRuntimeOperations, ICharacterSunCeMobileGodCoreWushuangTacticRulesOperations coreWushuangTacticRulesOperations, ICharacterSunCeMobileGodCoreNativePlayerDeathOperations coreNativePlayerDeathOperations, ICharacterSunCeMobileGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterSunCeMobileGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterSunCeMobileGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterSunCeMobileGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterSunCeMobileGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAttributedMarkerEventsOperations = coreAttributedMarkerEventsOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreWushuangTacticRulesOperations = coreWushuangTacticRulesOperations;
+        this._coreNativePlayerDeathOperations = coreNativePlayerDeathOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

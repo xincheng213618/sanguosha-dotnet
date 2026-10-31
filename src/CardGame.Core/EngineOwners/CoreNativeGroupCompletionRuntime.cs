@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeGroupCompletionRuntime
+{
+    private readonly ICoreNativeGroupCompletionCharacterDiaoChanLeOperations _characterDiaoChanLeOperations;
+    private readonly ICoreNativeGroupCompletionCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreNativeGroupCompletionCharacterMiHengLeOperations _characterMiHengLeOperations;
+    private readonly ICoreNativeGroupCompletionCharacterTianChouOlOperations _characterTianChouOlOperations;
+    private readonly ICoreNativeGroupCompletionCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreNativeGroupCompletionCharacterXunXuAnniversaryOperations _characterXunXuAnniversaryOperations;
+    private readonly ICoreNativeGroupCompletionCardZonesOperations _cardZonesOperations;
+    private readonly ICoreNativeGroupCompletionCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreNativeGroupCompletionCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreNativeGroupCompletionCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreNativeGroupCompletionCoreCurrentUsePhysicalClaimsOperations _coreCurrentUsePhysicalClaimsOperations;
+    private readonly ICoreNativeGroupCompletionCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreNativeGroupCompletionCoreExtraCardEffectRoundsOperations _coreExtraCardEffectRoundsOperations;
+    private readonly ICoreNativeGroupCompletionCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreNativeGroupCompletionCoreTieredRoundZeroReturnsOperations _coreTieredRoundZeroReturnsOperations;
+    private readonly ICoreNativeGroupCompletionCoreVirtualOrdinaryTrickUsesOperations _coreVirtualOrdinaryTrickUsesOperations;
+    private readonly ICoreNativeGroupCompletionCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeGroupCompletionCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeGroupCompletionCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreNativeGroupCompletionCoreNativeNullificationFramesOperations _coreNativeNullificationFramesOperations;
+    private readonly ICoreNativeGroupCompletionCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeGroupCompletionCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNativeGroupCompletionKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreNativeGroupCompletionKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeGroupCompletionRuntime(ICoreNativeGroupCompletionCharacterDiaoChanLeOperations characterDiaoChanLeOperations, ICoreNativeGroupCompletionCharacterLuMengMouOperations characterLuMengMouOperations, ICoreNativeGroupCompletionCharacterMiHengLeOperations characterMiHengLeOperations, ICoreNativeGroupCompletionCharacterTianChouOlOperations characterTianChouOlOperations, ICoreNativeGroupCompletionCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreNativeGroupCompletionCharacterXunXuAnniversaryOperations characterXunXuAnniversaryOperations, ICoreNativeGroupCompletionCardZonesOperations cardZonesOperations, ICoreNativeGroupCompletionCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativeGroupCompletionCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreNativeGroupCompletionCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreNativeGroupCompletionCoreCurrentUsePhysicalClaimsOperations coreCurrentUsePhysicalClaimsOperations, ICoreNativeGroupCompletionCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreNativeGroupCompletionCoreExtraCardEffectRoundsOperations coreExtraCardEffectRoundsOperations, ICoreNativeGroupCompletionCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreNativeGroupCompletionCoreTieredRoundZeroReturnsOperations coreTieredRoundZeroReturnsOperations, ICoreNativeGroupCompletionCoreVirtualOrdinaryTrickUsesOperations coreVirtualOrdinaryTrickUsesOperations, ICoreNativeGroupCompletionCoreMatchLogOperations coreMatchLogOperations, ICoreNativeGroupCompletionCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeGroupCompletionCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreNativeGroupCompletionCoreNativeNullificationFramesOperations coreNativeNullificationFramesOperations, ICoreNativeGroupCompletionCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeGroupCompletionCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeGroupCompletionKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreNativeGroupCompletionKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDiaoChanLeOperations = characterDiaoChanLeOperations;
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._characterMiHengLeOperations = characterMiHengLeOperations;
+        this._characterTianChouOlOperations = characterTianChouOlOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._characterXunXuAnniversaryOperations = characterXunXuAnniversaryOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentUsePhysicalClaimsOperations = coreCurrentUsePhysicalClaimsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreExtraCardEffectRoundsOperations = coreExtraCardEffectRoundsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreTieredRoundZeroReturnsOperations = coreTieredRoundZeroReturnsOperations;
+        this._coreVirtualOrdinaryTrickUsesOperations = coreVirtualOrdinaryTrickUsesOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeNullificationFramesOperations = coreNativeNullificationFramesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

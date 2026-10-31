@@ -1,0 +1,56 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEnginePrivateGeneralLibrariesRuntime : global::CardGame.Core.IPrivateGeneralLibraryProgramHost
+{
+    private readonly ICorePrivateGeneralLibrariesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePrivateGeneralLibrariesRandomOperations _randomOperations;
+    private readonly ICorePrivateGeneralLibrariesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreConversionStatesOperations _coreConversionStatesOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreCurrentTurnSkillSuppressionsOperations _coreCurrentTurnSkillSuppressionsOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreLordSkillProjectionsOperations _coreLordSkillProjectionsOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreModeAllegianceOperations _coreModeAllegianceOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreNativeFactionChangesOperations _coreNativeFactionChangesOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICorePrivateGeneralLibrariesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePrivateGeneralLibrariesCorePrintedLordSkillQualificationsOperations _corePrintedLordSkillQualificationsOperations;
+    private readonly ICorePrivateGeneralLibrariesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICorePrivateGeneralLibrariesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionGeneralPoolOptionsAccess _coreMatchDefinitionGeneralPoolOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePrivateGeneralLibrariesFieldsAccess _coreGameEnginePrivateGeneralLibrariesFieldsAccess;
+    internal CoreGameEnginePrivateGeneralLibrariesRuntime(ICorePrivateGeneralLibrariesContentRegistryOperations contentRegistryOperations, ICorePrivateGeneralLibrariesRandomOperations randomOperations, ICorePrivateGeneralLibrariesResolutionStackOperations resolutionStackOperations, ICorePrivateGeneralLibrariesCoreConversionStatesOperations coreConversionStatesOperations, ICorePrivateGeneralLibrariesCoreCurrentTurnSkillSuppressionsOperations coreCurrentTurnSkillSuppressionsOperations, ICorePrivateGeneralLibrariesCoreLordSkillProjectionsOperations coreLordSkillProjectionsOperations, ICorePrivateGeneralLibrariesCoreModeAllegianceOperations coreModeAllegianceOperations, ICorePrivateGeneralLibrariesCoreNativeFactionChangesOperations coreNativeFactionChangesOperations, ICorePrivateGeneralLibrariesCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICorePrivateGeneralLibrariesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePrivateGeneralLibrariesCoreRuntimeOperations coreRuntimeOperations, ICorePrivateGeneralLibrariesCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICorePrivateGeneralLibrariesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICorePrivateGeneralLibrariesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePrivateGeneralLibrariesCorePrintedLordSkillQualificationsOperations corePrintedLordSkillQualificationsOperations, ICorePrivateGeneralLibrariesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICorePrivateGeneralLibrariesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionGeneralPoolOptionsAccess coreMatchDefinitionGeneralPoolOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePrivateGeneralLibrariesFieldsAccess coreGameEnginePrivateGeneralLibrariesFieldsAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreConversionStatesOperations = coreConversionStatesOperations;
+        this._coreCurrentTurnSkillSuppressionsOperations = coreCurrentTurnSkillSuppressionsOperations;
+        this._coreLordSkillProjectionsOperations = coreLordSkillProjectionsOperations;
+        this._coreModeAllegianceOperations = coreModeAllegianceOperations;
+        this._coreNativeFactionChangesOperations = coreNativeFactionChangesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePrintedLordSkillQualificationsOperations = corePrintedLordSkillQualificationsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchDefinitionGeneralPoolOptionsAccess = coreMatchDefinitionGeneralPoolOptionsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEnginePrivateGeneralLibrariesFieldsAccess = coreGameEnginePrivateGeneralLibrariesFieldsAccess;
+    }
+}

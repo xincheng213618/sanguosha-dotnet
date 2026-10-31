@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterCaoShuangOlRuntime : global::CardGame.Core.ICaoShuangProgramHost
+{
+    private readonly ICharacterCaoShuangOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterCaoShuangOlObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICharacterCaoShuangOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterCaoShuangOlCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICharacterCaoShuangOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterCaoShuangOlCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterCaoShuangOlCoreConversionStatesOperations _coreConversionStatesOperations;
+    private readonly ICharacterCaoShuangOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterCaoShuangOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICharacterCaoShuangOlCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterCaoShuangOlCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterCaoShuangOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterCaoShuangOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterCaoShuangOlCoreResponseEntityExchangeOperations _coreResponseEntityExchangeOperations;
+    private readonly ICharacterCaoShuangOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterCaoShuangOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterCaoShuangOlCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterCaoShuangOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterCaoShuangOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterCaoShuangOlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterCaoShuangOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterCaoShuangOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterCaoShuangOlCharacterCaoShuangOlOperations _characterCaoShuangOlOperations;
+    private readonly ICharacterCaoShuangOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICharacterCaoShuangOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess _coreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterCaoShuangOlRuntime(ICharacterCaoShuangOlContentRegistryOperations contentRegistryOperations, ICharacterCaoShuangOlObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICharacterCaoShuangOlResolutionStackOperations resolutionStackOperations, ICharacterCaoShuangOlCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICharacterCaoShuangOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterCaoShuangOlCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterCaoShuangOlCoreConversionStatesOperations coreConversionStatesOperations, ICharacterCaoShuangOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterCaoShuangOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICharacterCaoShuangOlCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterCaoShuangOlCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterCaoShuangOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterCaoShuangOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterCaoShuangOlCoreResponseEntityExchangeOperations coreResponseEntityExchangeOperations, ICharacterCaoShuangOlCoreRuntimeOperations coreRuntimeOperations, ICharacterCaoShuangOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterCaoShuangOlCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterCaoShuangOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterCaoShuangOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterCaoShuangOlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterCaoShuangOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterCaoShuangOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterCaoShuangOlCharacterCaoShuangOlOperations characterCaoShuangOlOperations, ICharacterCaoShuangOlCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICharacterCaoShuangOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess coreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreConversionStatesOperations = coreConversionStatesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreResponseEntityExchangeOperations = coreResponseEntityExchangeOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterCaoShuangOlOperations = characterCaoShuangOlOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess = coreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

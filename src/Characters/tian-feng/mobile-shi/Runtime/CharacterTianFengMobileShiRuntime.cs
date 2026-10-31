@@ -1,0 +1,60 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterTianFengMobileShiRuntime : global::CardGame.Core.IMobileShiTianFengHost
+{
+    private readonly ICharacterTianFengMobileShiCharacterLiuZanMobileOperations _characterLiuZanMobileOperations;
+    private readonly ICharacterTianFengMobileShiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterTianFengMobileShiResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterTianFengMobileShiSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICharacterTianFengMobileShiCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterTianFengMobileShiCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterTianFengMobileShiCorePrepPoisonOutcomesOperations _corePrepPoisonOutcomesOperations;
+    private readonly ICharacterTianFengMobileShiCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterTianFengMobileShiCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterTianFengMobileShiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterTianFengMobileShiCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterTianFengMobileShiCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterTianFengMobileShiCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterTianFengMobileShiCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterTianFengMobileShiCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterTianFengMobileShiCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterTianFengMobileShiCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterTianFengMobileShiCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterTianFengMobileShiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterTianFengMobileShiRuntime(ICharacterTianFengMobileShiCharacterLiuZanMobileOperations characterLiuZanMobileOperations, ICharacterTianFengMobileShiContentRegistryOperations contentRegistryOperations, ICharacterTianFengMobileShiResolutionStackOperations resolutionStackOperations, ICharacterTianFengMobileShiSkillRuntimeStateOperations skillRuntimeStateOperations, ICharacterTianFengMobileShiCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterTianFengMobileShiCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterTianFengMobileShiCorePrepPoisonOutcomesOperations corePrepPoisonOutcomesOperations, ICharacterTianFengMobileShiCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterTianFengMobileShiCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterTianFengMobileShiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterTianFengMobileShiCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterTianFengMobileShiCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterTianFengMobileShiCoreRuntimeOperations coreRuntimeOperations, ICharacterTianFengMobileShiCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterTianFengMobileShiCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterTianFengMobileShiCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterTianFengMobileShiCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterTianFengMobileShiCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterTianFengMobileShiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterLiuZanMobileOperations = characterLiuZanMobileOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePrepPoisonOutcomesOperations = corePrepPoisonOutcomesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

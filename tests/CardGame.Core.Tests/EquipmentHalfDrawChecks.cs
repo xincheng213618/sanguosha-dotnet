@@ -18,7 +18,7 @@ internal static class EquipmentHalfDrawChecks
         {
             var (game, registry) = Create();
             var zones = (CardZoneStore)typeof(GameEngine).GetField("_cardZones", PrivateInstance)!.GetValue(game)!;
-            var owner = ((IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", PrivateInstance)!.GetValue(game)!)[0];
+            var owner = ((IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", PrivateInstance)!.GetValue(game)!)[0];
             // These cases deliberately inject real zone entities to exercise expanded slots;
             // checkpoint replay is asserted separately for the unmodified zero-equipment case.
             if (equipmentCount > 0)

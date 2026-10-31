@@ -1,0 +1,22 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramDamageCardClaimNativeRulesRuntime : global::CardGame.Core.IProgramDamageCardClaimNativeRules
+{
+    private readonly ICoreProgramDamageCardClaimNativeRulesCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreProgramDamageCardClaimNativeRulesCoreExtraEffectMaterialClaimsOperations _coreExtraEffectMaterialClaimsOperations;
+    private readonly ICoreProgramDamageCardClaimNativeRulesCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreProgramDamageCardClaimNativeRulesCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    internal CoreProgramDamageCardClaimNativeRulesRuntime(ICoreProgramDamageCardClaimNativeRulesCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreProgramDamageCardClaimNativeRulesCoreExtraEffectMaterialClaimsOperations coreExtraEffectMaterialClaimsOperations, ICoreProgramDamageCardClaimNativeRulesCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreProgramDamageCardClaimNativeRulesCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations)
+    {
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreExtraEffectMaterialClaimsOperations = coreExtraEffectMaterialClaimsOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+    }
+}

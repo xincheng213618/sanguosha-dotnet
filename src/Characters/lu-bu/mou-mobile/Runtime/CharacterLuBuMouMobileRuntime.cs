@@ -1,0 +1,106 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLuBuMouMobileRuntime : global::CardGame.Core.IMouLuBuMobileHost
+{
+    private readonly ICharacterLuBuMouMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterLuBuMouMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLuBuMouMobileResolutionStackOperations2 _resolutionStackOperations;
+    private readonly ICharacterLuBuMouMobileCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICharacterLuBuMouMobileCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterLuBuMouMobileCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterLuBuMouMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterLuBuMouMobileCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterLuBuMouMobileCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICharacterLuBuMouMobileCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICharacterLuBuMouMobileCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterLuBuMouMobileCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICharacterLuBuMouMobileCoreDamageTargetMountProgramsOperations _coreDamageTargetMountProgramsOperations;
+    private readonly ICharacterLuBuMouMobileCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICharacterLuBuMouMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterLuBuMouMobileCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICharacterLuBuMouMobileCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterLuBuMouMobileCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterLuBuMouMobileCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterLuBuMouMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterLuBuMouMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLuBuMouMobileCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterLuBuMouMobileCoreProgramRecoveryReceiptsOperations _coreProgramRecoveryReceiptsOperations;
+    private readonly ICharacterLuBuMouMobileCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterLuBuMouMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLuBuMouMobileCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterLuBuMouMobileCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICharacterLuBuMouMobileCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICharacterLuBuMouMobileCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICharacterLuBuMouMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterLuBuMouMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLuBuMouMobileCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterLuBuMouMobileCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterLuBuMouMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterLuBuMouMobileCharacterLuBuMouMobileOperations _characterLuBuMouMobileOperations;
+    private readonly ICharacterLuBuMouMobileCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICharacterLuBuMouMobileResolutionStackOperations _resolutionStackOperations2;
+    private readonly ICharacterLuBuMouMobileCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICharacterLuBuMouMobileCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICharacterLuBuMouMobileCoreRecoveryReplacementDamageRidesOperations2 _coreRecoveryReplacementDamageRidesOperations2;
+    private readonly ICharacterLuBuMouMobileCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterLuBuMouMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterLuBuMouMobileRuntime(ICharacterLuBuMouMobileCardZonesOperations cardZonesOperations, ICharacterLuBuMouMobileContentRegistryOperations contentRegistryOperations, ICharacterLuBuMouMobileResolutionStackOperations2 resolutionStackOperations, ICharacterLuBuMouMobileCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICharacterLuBuMouMobileCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterLuBuMouMobileCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterLuBuMouMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterLuBuMouMobileCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterLuBuMouMobileCoreCardActionsOperations coreCardActionsOperations, ICharacterLuBuMouMobileCoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterLuBuMouMobileCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterLuBuMouMobileCoreCardUseModulesOperations coreCardUseModulesOperations, ICharacterLuBuMouMobileCoreDamageTargetMountProgramsOperations coreDamageTargetMountProgramsOperations, ICharacterLuBuMouMobileCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICharacterLuBuMouMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterLuBuMouMobileCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICharacterLuBuMouMobileCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterLuBuMouMobileCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterLuBuMouMobileCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterLuBuMouMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLuBuMouMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLuBuMouMobileCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterLuBuMouMobileCoreProgramRecoveryReceiptsOperations coreProgramRecoveryReceiptsOperations, ICharacterLuBuMouMobileCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterLuBuMouMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterLuBuMouMobileCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterLuBuMouMobileCoreNativeCardUseOperations coreNativeCardUseOperations, ICharacterLuBuMouMobileCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICharacterLuBuMouMobileCoreNativeNullificationOperations coreNativeNullificationOperations, ICharacterLuBuMouMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterLuBuMouMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLuBuMouMobileCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterLuBuMouMobileCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterLuBuMouMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterLuBuMouMobileCharacterLuBuMouMobileOperations characterLuBuMouMobileOperations, ICharacterLuBuMouMobileCharacterYanPuOlOperations characterYanPuOlOperations, ICharacterLuBuMouMobileResolutionStackOperations resolutionStackOperations2, ICharacterLuBuMouMobileCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICharacterLuBuMouMobileCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICharacterLuBuMouMobileCoreRecoveryReplacementDamageRidesOperations2 coreRecoveryReplacementDamageRidesOperations2, ICharacterLuBuMouMobileCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterLuBuMouMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreDamageTargetMountProgramsOperations = coreDamageTargetMountProgramsOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreProgramRecoveryReceiptsOperations = coreProgramRecoveryReceiptsOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterLuBuMouMobileOperations = characterLuBuMouMobileOperations;
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._resolutionStackOperations2 = resolutionStackOperations2;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreRecoveryReplacementDamageRidesOperations2 = coreRecoveryReplacementDamageRidesOperations2;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

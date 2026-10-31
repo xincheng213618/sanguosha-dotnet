@@ -1,0 +1,94 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterDuKuiAnniversaryRuntime : global::CardGame.Core.IAnniversaryDuKuiHost
+{
+    private readonly ICharacterDuKuiAnniversaryCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterDuKuiAnniversaryContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterDuKuiAnniversaryPendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICharacterDuKuiAnniversaryRandomOperations _randomOperations;
+    private readonly ICharacterDuKuiAnniversaryResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreActionDiscardColorsOperations _coreActionDiscardColorsOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreFinalizedCardTargetsOperations _coreFinalizedCardTargetsOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNextCardTargetAdjustmentsOperations _coreNextCardTargetAdjustmentsOperations;
+    private readonly ICharacterDuKuiAnniversaryCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreProgramOrdinaryTrickUsesOperations _coreProgramOrdinaryTrickUsesOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreSoleTargetProtectionOperations _coreSoleTargetProtectionOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNativeEquipmentUseOperations _coreNativeEquipmentUseOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICharacterDuKuiAnniversaryCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterDuKuiAnniversaryCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterDuKuiAnniversaryCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICharacterDuKuiAnniversaryKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess;
+    internal CharacterDuKuiAnniversaryRuntime(ICharacterDuKuiAnniversaryCardZonesOperations cardZonesOperations, ICharacterDuKuiAnniversaryContentRegistryOperations contentRegistryOperations, ICharacterDuKuiAnniversaryPendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICharacterDuKuiAnniversaryRandomOperations randomOperations, ICharacterDuKuiAnniversaryResolutionStackOperations resolutionStackOperations, ICharacterDuKuiAnniversaryCoreActionDiscardColorsOperations coreActionDiscardColorsOperations, ICharacterDuKuiAnniversaryCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterDuKuiAnniversaryCoreCardActionsOperations coreCardActionsOperations, ICharacterDuKuiAnniversaryCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterDuKuiAnniversaryCoreEquipmentContentOperations coreEquipmentContentOperations, ICharacterDuKuiAnniversaryCoreFinalizedCardTargetsOperations coreFinalizedCardTargetsOperations, ICharacterDuKuiAnniversaryCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterDuKuiAnniversaryCoreNextCardTargetAdjustmentsOperations coreNextCardTargetAdjustmentsOperations, ICharacterDuKuiAnniversaryCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterDuKuiAnniversaryCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterDuKuiAnniversaryCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterDuKuiAnniversaryCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterDuKuiAnniversaryCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterDuKuiAnniversaryCoreProgramOrdinaryTrickUsesOperations coreProgramOrdinaryTrickUsesOperations, ICharacterDuKuiAnniversaryCoreRuntimeOperations coreRuntimeOperations, ICharacterDuKuiAnniversaryCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterDuKuiAnniversaryCoreSoleTargetProtectionOperations coreSoleTargetProtectionOperations, ICharacterDuKuiAnniversaryCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterDuKuiAnniversaryCoreNativeCardUseOperations coreNativeCardUseOperations, ICharacterDuKuiAnniversaryCoreNativeEquipmentUseOperations coreNativeEquipmentUseOperations, ICharacterDuKuiAnniversaryCoreNativeLegalActionsOperations coreNativeLegalActionsOperations, ICharacterDuKuiAnniversaryCoreNativeNullificationOperations coreNativeNullificationOperations, ICharacterDuKuiAnniversaryCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterDuKuiAnniversaryCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICharacterDuKuiAnniversaryCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICharacterDuKuiAnniversaryCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICharacterDuKuiAnniversaryCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterDuKuiAnniversaryCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterDuKuiAnniversaryCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICharacterDuKuiAnniversaryKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActionDiscardColorsOperations = coreActionDiscardColorsOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFinalizedCardTargetsOperations = coreFinalizedCardTargetsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNextCardTargetAdjustmentsOperations = coreNextCardTargetAdjustmentsOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramOrdinaryTrickUsesOperations = coreProgramOrdinaryTrickUsesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreSoleTargetProtectionOperations = coreSoleTargetProtectionOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeEquipmentUseOperations = coreNativeEquipmentUseOperations;
+        this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess = coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess;
+    }
+}

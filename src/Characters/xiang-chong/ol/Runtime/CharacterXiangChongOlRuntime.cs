@@ -1,0 +1,104 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterXiangChongOlRuntime : global::CardGame.Core.IXiangChongHost
+{
+    private readonly ICharacterXiangChongOlActiveCardMovementBatchIdsOperations _activeCardMovementBatchIdsOperations;
+    private readonly ICharacterXiangChongOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterXiangChongOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterXiangChongOlRandomOperations _randomOperations;
+    private readonly ICharacterXiangChongOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterXiangChongOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterXiangChongOlCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterXiangChongOlCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICharacterXiangChongOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterXiangChongOlCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICharacterXiangChongOlCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICharacterXiangChongOlCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterXiangChongOlCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICharacterXiangChongOlCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICharacterXiangChongOlCoreEquipmentPlacementAndHpPairOperations _coreEquipmentPlacementAndHpPairOperations;
+    private readonly ICharacterXiangChongOlCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICharacterXiangChongOlCoreFinalizedCardTargetsOperations _coreFinalizedCardTargetsOperations;
+    private readonly ICharacterXiangChongOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterXiangChongOlCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterXiangChongOlCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterXiangChongOlCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterXiangChongOlCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterXiangChongOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterXiangChongOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterXiangChongOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterXiangChongOlCoreShownEntityTurnPoliciesOperations _coreShownEntityTurnPoliciesOperations;
+    private readonly ICharacterXiangChongOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterXiangChongOlCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICharacterXiangChongOlCoreNativeEquipmentUseOperations _coreNativeEquipmentUseOperations;
+    private readonly ICharacterXiangChongOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterXiangChongOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterXiangChongOlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterXiangChongOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterXiangChongOlCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly ICharacterXiangChongOlCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterXiangChongOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterXiangChongOlCharacterXiangChongOlOperations _characterXiangChongOlOperations;
+    private readonly ICharacterXiangChongOlResolutionStackOperations2 _resolutionStackOperations2;
+    private readonly ICharacterXiangChongOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICharacterXiangChongOlCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterXiangChongOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterXiangChongOlRuntime(ICharacterXiangChongOlActiveCardMovementBatchIdsOperations activeCardMovementBatchIdsOperations, ICharacterXiangChongOlCardZonesOperations cardZonesOperations, ICharacterXiangChongOlContentRegistryOperations contentRegistryOperations, ICharacterXiangChongOlRandomOperations randomOperations, ICharacterXiangChongOlResolutionStackOperations resolutionStackOperations, ICharacterXiangChongOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterXiangChongOlCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterXiangChongOlCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICharacterXiangChongOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterXiangChongOlCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICharacterXiangChongOlCoreCardActionsOperations coreCardActionsOperations, ICharacterXiangChongOlCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterXiangChongOlCoreCardUseModulesOperations coreCardUseModulesOperations, ICharacterXiangChongOlCoreEquipmentContentOperations coreEquipmentContentOperations, ICharacterXiangChongOlCoreEquipmentPlacementAndHpPairOperations coreEquipmentPlacementAndHpPairOperations, ICharacterXiangChongOlCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICharacterXiangChongOlCoreFinalizedCardTargetsOperations coreFinalizedCardTargetsOperations, ICharacterXiangChongOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterXiangChongOlCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterXiangChongOlCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterXiangChongOlCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterXiangChongOlCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterXiangChongOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterXiangChongOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterXiangChongOlCoreRuntimeOperations coreRuntimeOperations, ICharacterXiangChongOlCoreShownEntityTurnPoliciesOperations coreShownEntityTurnPoliciesOperations, ICharacterXiangChongOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterXiangChongOlCoreNativeCardUseOperations coreNativeCardUseOperations, ICharacterXiangChongOlCoreNativeEquipmentUseOperations coreNativeEquipmentUseOperations, ICharacterXiangChongOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterXiangChongOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterXiangChongOlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterXiangChongOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterXiangChongOlCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, ICharacterXiangChongOlCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterXiangChongOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterXiangChongOlCharacterXiangChongOlOperations characterXiangChongOlOperations, ICharacterXiangChongOlResolutionStackOperations2 resolutionStackOperations2, ICharacterXiangChongOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICharacterXiangChongOlCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterXiangChongOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._activeCardMovementBatchIdsOperations = activeCardMovementBatchIdsOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreEquipmentPlacementAndHpPairOperations = coreEquipmentPlacementAndHpPairOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreFinalizedCardTargetsOperations = coreFinalizedCardTargetsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShownEntityTurnPoliciesOperations = coreShownEntityTurnPoliciesOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeEquipmentUseOperations = coreNativeEquipmentUseOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterXiangChongOlOperations = characterXiangChongOlOperations;
+        this._resolutionStackOperations2 = resolutionStackOperations2;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

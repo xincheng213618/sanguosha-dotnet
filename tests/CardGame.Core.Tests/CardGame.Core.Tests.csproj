@@ -45,4 +45,7 @@
     <ProjectReference Include="..\..\src\CardGame.Content.Standard\CardGame.Content.Standard.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Shared\FixtureRuntimeAccess.cs" Link="FixtureRuntimeAccess.cs" />
+  </ItemGroup>
 </Project>

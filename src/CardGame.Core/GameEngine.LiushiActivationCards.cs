@@ -25,17 +25,4 @@ internal sealed class LiushiTopdeckSelectionValidator : IProgramSelectionValidat
 
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class LiushiTopdeckSelectionQuery(GameEngine engine) : ILiushiTopdeckSelectionQuery
-    { public bool CanTopdeck(int ownerSeat, int cardId) => engine.CanTopdeckLiushiCard(ownerSeat, cardId); }
-
-    private bool CanTopdeckLiushiCard(int ownerSeat, int cardId)
-    {
-        var card = GetHand(_players[ownerSeat]).Concat(GetEquipment(ownerSeat)).SingleOrDefault(c => c.Id == cardId);
-        if (card is null) return false;
-        var from = _cardZones.GetLocation(cardId);
-        return !(card.IsGeneralWeapon && from.Zone == CardZoneKind.Equipment) &&
-            !IsGuanduThunderChariotDeparture(card, from, CardLocation.DrawPile) &&
-            NormalizeEphemeralCardDestination(card, from, CardLocation.DrawPile) == CardLocation.DrawPile;
-    }
 }

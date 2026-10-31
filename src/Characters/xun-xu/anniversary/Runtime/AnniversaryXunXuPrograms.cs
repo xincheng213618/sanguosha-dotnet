@@ -22,7 +22,7 @@ internal sealed class AnniversaryXunXuHandler(SkillProgramEffectOp operation) : 
 }
 internal static class AnniversaryXunXuComposition
 {
-    internal const string Diyin = "anniversary:diyin", Boqia = "anniversary:boqia";
+    internal const string Diyin = "anniversary:diyin",Boqia = "anniversary:boqia";
     internal static readonly CardKind[] Kinds = [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.Dodge, CardKind.Peach, CardKind.Alcohol,
         CardKind.DrawTwo, CardKind.Dismantlement, CardKind.Snatch, CardKind.PeachGarden, CardKind.FiveGrains, CardKind.IronChain, CardKind.BorrowedSword, CardKind.Nullification];
     internal static bool IsBoqiaRuleId(string id) => id.StartsWith("boqia-", StringComparison.Ordinal);
@@ -59,7 +59,7 @@ public sealed record AnniversaryXunXuReceipt(CardConversionSource Source, string
     }
     public long Before { get; init; }
     public long After { get; init; }
-    private readonly IReadOnlyList<int> _cards = [], _recipients = [];
+    private readonly IReadOnlyList<int> _cards = [],_recipients = [];
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Recipients { get => _recipients; init => _recipients = Array.AsReadOnly(value.ToArray()); }
     private readonly IReadOnlyList<NativeDrawOutcome> _draws = [];

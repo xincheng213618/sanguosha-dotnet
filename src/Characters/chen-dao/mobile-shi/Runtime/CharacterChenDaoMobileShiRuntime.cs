@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterChenDaoMobileShiRuntime : global::CardGame.Core.IMobileShiChenDaoHost
+{
+    private readonly ICharacterChenDaoMobileShiCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterChenDaoMobileShiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterChenDaoMobileShiResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterChenDaoMobileShiCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterChenDaoMobileShiCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterChenDaoMobileShiCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICharacterChenDaoMobileShiCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterChenDaoMobileShiCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICharacterChenDaoMobileShiCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterChenDaoMobileShiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterChenDaoMobileShiCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterChenDaoMobileShiCoreResponseUseCompletionOperations _coreResponseUseCompletionOperations;
+    private readonly ICharacterChenDaoMobileShiCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterChenDaoMobileShiCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICharacterChenDaoMobileShiCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterChenDaoMobileShiCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterChenDaoMobileShiCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterChenDaoMobileShiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CharacterChenDaoMobileShiRuntime(ICharacterChenDaoMobileShiCardZonesOperations cardZonesOperations, ICharacterChenDaoMobileShiContentRegistryOperations contentRegistryOperations, ICharacterChenDaoMobileShiResolutionStackOperations resolutionStackOperations, ICharacterChenDaoMobileShiCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterChenDaoMobileShiCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterChenDaoMobileShiCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICharacterChenDaoMobileShiCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterChenDaoMobileShiCoreHandComparisonOperations coreHandComparisonOperations, ICharacterChenDaoMobileShiCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterChenDaoMobileShiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterChenDaoMobileShiCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterChenDaoMobileShiCoreResponseUseCompletionOperations coreResponseUseCompletionOperations, ICharacterChenDaoMobileShiCoreRuntimeOperations coreRuntimeOperations, ICharacterChenDaoMobileShiCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICharacterChenDaoMobileShiCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterChenDaoMobileShiCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterChenDaoMobileShiCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterChenDaoMobileShiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreResponseUseCompletionOperations = coreResponseUseCompletionOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

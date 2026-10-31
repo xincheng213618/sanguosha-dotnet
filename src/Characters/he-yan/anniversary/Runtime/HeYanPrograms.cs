@@ -66,7 +66,7 @@ public sealed record AnniversaryHeYanCompletedEvent(long FrameId) : IGameEvent;
 
 internal static class AnniversaryHeYanComposition
 {
-    internal const string Yachai = "anniversary:yachai", Qingtan = "anniversary:qingtan";
+    internal const string Yachai = "anniversary:yachai",Qingtan = "anniversary:qingtan";
     [ProgramCatalogValidation(44200)] internal static void Validate(string path, SkillProgram p)
     {
         if (p.Id is not (Yachai or Qingtan) && !p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryHeYanYachai or SkillProgramEffectOp.ResolveAnniversaryHeYanQingtan)) return;

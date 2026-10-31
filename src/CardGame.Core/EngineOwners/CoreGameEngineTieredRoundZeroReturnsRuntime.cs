@@ -1,0 +1,76 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineTieredRoundZeroReturnsRuntime
+{
+    private readonly ICoreTieredRoundZeroReturnsCharacterAHuiNanOlOperations _characterAHuiNanOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterBaoSanNiangOlOperations _characterBaoSanNiangOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterCuiYanOlOperations _characterCuiYanOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterGuanHaiOlOperations _characterGuanHaiOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterGuoTuOlOperations _characterGuoTuOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterHuCheErMouOperations _characterHuCheErMouOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterHuLieMouOperations _characterHuLieMouOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterHuangYueyingOlMouOperations _characterHuangYueyingOlMouOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterLiuYanOlOperations _characterLiuYanOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterLiuZhangOlOperations _characterLiuZhangOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterQinLangOlOperations _characterQinLangOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterTaoQianOlOperations _characterTaoQianOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterTianChouOlOperations _characterTianChouOlOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterZhangXiuMouOperations _characterZhangXiuMouOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterZhouYuMouOperations _characterZhouYuMouOperations;
+    private readonly ICoreTieredRoundZeroReturnsCharacterZhugeLiangMouOperations _characterZhugeLiangMouOperations;
+    private readonly ICoreTieredRoundZeroReturnsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreTieredRoundZeroReturnsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreCappedConversionBenefitsOperations _coreCappedConversionBenefitsOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreCurrentUsePhysicalClaimsOperations _coreCurrentUsePhysicalClaimsOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreRoundOnceCardlessNativeUsesOperations _coreRoundOnceCardlessNativeUsesOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreTieredRoundZeroUsesOperations _coreTieredRoundZeroUsesOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreNativeTrickUseOperations _coreNativeTrickUseOperations;
+    private readonly ICoreTieredRoundZeroReturnsCoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    internal CoreGameEngineTieredRoundZeroReturnsRuntime(ICoreTieredRoundZeroReturnsCharacterAHuiNanOlOperations characterAHuiNanOlOperations, ICoreTieredRoundZeroReturnsCharacterBaoSanNiangOlOperations characterBaoSanNiangOlOperations, ICoreTieredRoundZeroReturnsCharacterCuiYanOlOperations characterCuiYanOlOperations, ICoreTieredRoundZeroReturnsCharacterGuanHaiOlOperations characterGuanHaiOlOperations, ICoreTieredRoundZeroReturnsCharacterGuoTuOlOperations characterGuoTuOlOperations, ICoreTieredRoundZeroReturnsCharacterHuCheErMouOperations characterHuCheErMouOperations, ICoreTieredRoundZeroReturnsCharacterHuLieMouOperations characterHuLieMouOperations, ICoreTieredRoundZeroReturnsCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICoreTieredRoundZeroReturnsCharacterHuangYueyingOlMouOperations characterHuangYueyingOlMouOperations, ICoreTieredRoundZeroReturnsCharacterLiuYanOlOperations characterLiuYanOlOperations, ICoreTieredRoundZeroReturnsCharacterLiuZhangOlOperations characterLiuZhangOlOperations, ICoreTieredRoundZeroReturnsCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICoreTieredRoundZeroReturnsCharacterQinLangOlOperations characterQinLangOlOperations, ICoreTieredRoundZeroReturnsCharacterTaoQianOlOperations characterTaoQianOlOperations, ICoreTieredRoundZeroReturnsCharacterTianChouOlOperations characterTianChouOlOperations, ICoreTieredRoundZeroReturnsCharacterZhangXiuMouOperations characterZhangXiuMouOperations, ICoreTieredRoundZeroReturnsCharacterZhouYuMouOperations characterZhouYuMouOperations, ICoreTieredRoundZeroReturnsCharacterZhugeLiangMouOperations characterZhugeLiangMouOperations, ICoreTieredRoundZeroReturnsCardZonesOperations cardZonesOperations, ICoreTieredRoundZeroReturnsResolutionStackOperations resolutionStackOperations, ICoreTieredRoundZeroReturnsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreTieredRoundZeroReturnsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreTieredRoundZeroReturnsCoreCappedConversionBenefitsOperations coreCappedConversionBenefitsOperations, ICoreTieredRoundZeroReturnsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreTieredRoundZeroReturnsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreTieredRoundZeroReturnsCoreCurrentUsePhysicalClaimsOperations coreCurrentUsePhysicalClaimsOperations, ICoreTieredRoundZeroReturnsCoreRoundOnceCardlessNativeUsesOperations coreRoundOnceCardlessNativeUsesOperations, ICoreTieredRoundZeroReturnsCoreTieredRoundZeroUsesOperations coreTieredRoundZeroUsesOperations, ICoreTieredRoundZeroReturnsCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreTieredRoundZeroReturnsCoreNativeTrickUseOperations coreNativeTrickUseOperations, ICoreTieredRoundZeroReturnsCoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations)
+    {
+        this._characterAHuiNanOlOperations = characterAHuiNanOlOperations;
+        this._characterBaoSanNiangOlOperations = characterBaoSanNiangOlOperations;
+        this._characterCuiYanOlOperations = characterCuiYanOlOperations;
+        this._characterGuanHaiOlOperations = characterGuanHaiOlOperations;
+        this._characterGuoTuOlOperations = characterGuoTuOlOperations;
+        this._characterHuCheErMouOperations = characterHuCheErMouOperations;
+        this._characterHuLieMouOperations = characterHuLieMouOperations;
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._characterHuangYueyingOlMouOperations = characterHuangYueyingOlMouOperations;
+        this._characterLiuYanOlOperations = characterLiuYanOlOperations;
+        this._characterLiuZhangOlOperations = characterLiuZhangOlOperations;
+        this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;
+        this._characterQinLangOlOperations = characterQinLangOlOperations;
+        this._characterTaoQianOlOperations = characterTaoQianOlOperations;
+        this._characterTianChouOlOperations = characterTianChouOlOperations;
+        this._characterZhangXiuMouOperations = characterZhangXiuMouOperations;
+        this._characterZhouYuMouOperations = characterZhouYuMouOperations;
+        this._characterZhugeLiangMouOperations = characterZhugeLiangMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCappedConversionBenefitsOperations = coreCappedConversionBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentUsePhysicalClaimsOperations = coreCurrentUsePhysicalClaimsOperations;
+        this._coreRoundOnceCardlessNativeUsesOperations = coreRoundOnceCardlessNativeUsesOperations;
+        this._coreTieredRoundZeroUsesOperations = coreTieredRoundZeroUsesOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeTrickUseOperations = coreNativeTrickUseOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+    }
+}

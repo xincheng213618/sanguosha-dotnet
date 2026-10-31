@@ -76,7 +76,7 @@ internal static class CixiongMultiTargetChecks
             var use = stack.OfType<CardUseFrame>().Single(u => u.Id == original.Id);
             stack.Replace(use with { TargetIndex = index });
             var rejected = false;
-            try { typeof(GameEngine).GetMethod("AssertCoreInvariants", flags)!.Invoke(invalid, null); }
+            try { global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants", flags)!.Invoke(invalid, null); }
             catch (TargetInvocationException ex) when (ex.InnerException is InvalidOperationException)
             { rejected = true; }
             Need(rejected, "An out-of-range cursor or another accepted target cannot own the pending weapon choice.");

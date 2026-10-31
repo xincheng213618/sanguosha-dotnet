@@ -34,7 +34,7 @@ internal sealed class AnniversaryLeiBoHandler(SkillProgramEffectOp op) : ISkillP
 }
 internal static class AnniversaryLeiBoComposition
 {
-    internal const string Silei = "anniversary:silue", Shuaijie = "anniversary:shuaijie";
+    internal const string Silei = "anniversary:silue",Shuaijie = "anniversary:shuaijie";
     [ProgramCatalogValidation(49800)] internal static void Validate(string path, SkillProgram p)
     {
         static bool O(SkillProgramEffect e) => e.Op is >= SkillProgramEffectOp.InitializeAnniversaryLeiBoSilei and <= SkillProgramEffectOp.FinishAnniversaryLeiBoShuaijie;

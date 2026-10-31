@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRoundGainedSourceUsesRuntime
+{
+    private readonly ICoreRoundGainedSourceUsesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreRoundGainedSourceUsesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRoundGainedSourceUsesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreActualHandGainProgramsOperations _coreActualHandGainProgramsOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreCompletedCategoryUseProofOperations _coreCompletedCategoryUseProofOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreRoundGainedEquipmentDrawsOperations _coreRoundGainedEquipmentDrawsOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreRoundGainedSourceUsesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreRoundGainedSourceUsesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRoundGainedSourceUsesRuntime(ICoreRoundGainedSourceUsesCardZonesOperations cardZonesOperations, ICoreRoundGainedSourceUsesContentRegistryOperations contentRegistryOperations, ICoreRoundGainedSourceUsesResolutionStackOperations resolutionStackOperations, ICoreRoundGainedSourceUsesCoreActionQueriesOperations coreActionQueriesOperations, ICoreRoundGainedSourceUsesCoreActualHandGainProgramsOperations coreActualHandGainProgramsOperations, ICoreRoundGainedSourceUsesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRoundGainedSourceUsesCoreCardActionsOperations coreCardActionsOperations, ICoreRoundGainedSourceUsesCoreCardConversionsOperations coreCardConversionsOperations, ICoreRoundGainedSourceUsesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreRoundGainedSourceUsesCoreCompletedCategoryUseProofOperations coreCompletedCategoryUseProofOperations, ICoreRoundGainedSourceUsesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreRoundGainedSourceUsesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreRoundGainedSourceUsesCoreRoundGainedEquipmentDrawsOperations coreRoundGainedEquipmentDrawsOperations, ICoreRoundGainedSourceUsesCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreRoundGainedSourceUsesCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreRoundGainedSourceUsesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreRoundGainedSourceUsesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreActualHandGainProgramsOperations = coreActualHandGainProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCompletedCategoryUseProofOperations = coreCompletedCategoryUseProofOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRoundGainedEquipmentDrawsOperations = coreRoundGainedEquipmentDrawsOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

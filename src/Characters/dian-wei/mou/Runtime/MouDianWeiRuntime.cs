@@ -3,7 +3,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class MouDianWeiRuntime(IMouDianWeiFacts facts, IMouDianWeiNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouDianWeiRuntime
 {
-    internal const string Action = "mou-dian-wei", DrawReason = "skill-program.mou:kuangzhan.draw";
+    internal const string Action = "mou-dian-wei",DrawReason = "skill-program.mou:kuangzhan.draw";
     internal static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     internal static string Bind(MouDianWeiReceipt r) => "kuangzhan-" + r.Index;
     public SkillProgramStepOutcome Resolve(ProgramSkillFrame supplied, SkillProgramEffectOp op)

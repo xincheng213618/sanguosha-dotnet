@@ -223,7 +223,7 @@ internal static class ShanheXingtianChecks
         public PendingDecision? P => Enumerable.Range(0, 4).Select(v => G.CreateSnapshot(v).PendingDecision).FirstOrDefault(p => p is not null);
         public PlayerSnapshot V(int seat) => G.CreateSnapshot(seat).Players[seat];
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
-        public bool Forbidden(int seat, CardKind kind, CardActionType action) => (bool)typeof(GameEngine)
+        public bool Forbidden(int seat, CardKind kind, CardActionType action) => (bool)global::FixtureRuntimeAccess.Engine
             .GetMethod("IsCardUseForbidden", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(G, [seat, kind, action, false, null])!;
         public void Accept(GameCommand command)
         { var r = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([command])).Single()); Need(r.Accepted, r.Error?.Message ?? "Rejected real axe command."); }

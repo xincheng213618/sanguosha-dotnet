@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineBoundDiscardSlashBenefitsRuntime : global::CardGame.Core.IBoundDiscardSlashBenefitsHost
+{
+    private readonly ICoreBoundDiscardSlashBenefitsCharacterSunJunMobileShiOperations _characterSunJunMobileShiOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCharacterXinXianYingMobileShiOperations _characterXinXianYingMobileShiOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreBoundDiscardSlashBenefitsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineBoundDiscardSlashBenefitsRuntime(ICoreBoundDiscardSlashBenefitsCharacterSunJunMobileShiOperations characterSunJunMobileShiOperations, ICoreBoundDiscardSlashBenefitsCharacterXinXianYingMobileShiOperations characterXinXianYingMobileShiOperations, ICoreBoundDiscardSlashBenefitsCardZonesOperations cardZonesOperations, ICoreBoundDiscardSlashBenefitsContentRegistryOperations contentRegistryOperations, ICoreBoundDiscardSlashBenefitsResolutionStackOperations resolutionStackOperations, ICoreBoundDiscardSlashBenefitsSkillRuntimeStateOperations skillRuntimeStateOperations, ICoreBoundDiscardSlashBenefitsTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreBoundDiscardSlashBenefitsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreBoundDiscardSlashBenefitsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreBoundDiscardSlashBenefitsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreBoundDiscardSlashBenefitsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreBoundDiscardSlashBenefitsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreBoundDiscardSlashBenefitsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreBoundDiscardSlashBenefitsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreBoundDiscardSlashBenefitsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreBoundDiscardSlashBenefitsCoreRuntimeOperations coreRuntimeOperations, ICoreBoundDiscardSlashBenefitsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreBoundDiscardSlashBenefitsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreBoundDiscardSlashBenefitsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterSunJunMobileShiOperations = characterSunJunMobileShiOperations;
+        this._characterXinXianYingMobileShiOperations = characterXinXianYingMobileShiOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

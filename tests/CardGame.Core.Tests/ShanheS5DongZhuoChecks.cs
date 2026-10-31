@@ -106,8 +106,8 @@ internal static class ShanheS5DongZhuoChecks
             // Trusted read-only diagnostics, matching the retained binding-index
             // checks. A displayed printed skill is not an effective rule query.
             const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-            var players = (IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", flags)!.GetValue(G)!;
-            return (SkillBindingShard)typeof(GameEngine).GetMethod("GetSkillBindingShard", flags)!.Invoke(G, [players[seat]])!;
+            var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", flags)!.GetValue(G)!;
+            return (SkillBindingShard)global::FixtureRuntimeAccess.Engine.GetMethod("GetSkillBindingShard", flags)!.Invoke(G, [players[seat]])!;
         }
         public bool HasQualifiedBinding(int seat) => Binding(seat).ActiveGrants.Any(grant => grant.SkillId == Baonue &&
             grant.SourceId == CharacterState.PrimarySkillSource && grant.GrantId == $"{CharacterState.PrimarySkillSource}:{Baonue}" && grant.SkillInstanceId == grant.GrantId);

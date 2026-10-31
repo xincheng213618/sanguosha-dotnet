@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeFireAttackRuntime
+{
+    private readonly ICoreNativeFireAttackCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreNativeFireAttackCharacterZhugeLiangMouOperations _characterZhugeLiangMouOperations;
+    private readonly ICoreNativeFireAttackCardZonesOperations _cardZonesOperations;
+    private readonly ICoreNativeFireAttackResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNativeFireAttackCoreColorFireAttacksOperations _coreColorFireAttacksOperations;
+    private readonly ICoreNativeFireAttackCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreNativeFireAttackCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreNativeFireAttackCoreRevealedFireAttackPaymentOperations _coreRevealedFireAttackPaymentOperations;
+    private readonly ICoreNativeFireAttackCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreNativeFireAttackCoreSequentialTrickTargetsOperations _coreSequentialTrickTargetsOperations;
+    private readonly ICoreNativeFireAttackCoreWenhePoisonOperations _coreWenhePoisonOperations;
+    private readonly ICoreNativeFireAttackCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeFireAttackCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeFireAttackCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreNativeFireAttackCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreNativeFireAttackCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreNativeFireAttackCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeFireAttackCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNativeFireAttackCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreNativeFireAttackCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreNativeFireAttackKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeFireAttackRuntime(ICoreNativeFireAttackCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreNativeFireAttackCharacterZhugeLiangMouOperations characterZhugeLiangMouOperations, ICoreNativeFireAttackCardZonesOperations cardZonesOperations, ICoreNativeFireAttackResolutionStackOperations resolutionStackOperations, ICoreNativeFireAttackCoreColorFireAttacksOperations coreColorFireAttacksOperations, ICoreNativeFireAttackCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreNativeFireAttackCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreNativeFireAttackCoreRevealedFireAttackPaymentOperations coreRevealedFireAttackPaymentOperations, ICoreNativeFireAttackCoreRuntimeOperations coreRuntimeOperations, ICoreNativeFireAttackCoreSequentialTrickTargetsOperations coreSequentialTrickTargetsOperations, ICoreNativeFireAttackCoreWenhePoisonOperations coreWenhePoisonOperations, ICoreNativeFireAttackCoreMatchLogOperations coreMatchLogOperations, ICoreNativeFireAttackCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeFireAttackCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreNativeFireAttackCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreNativeFireAttackCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreNativeFireAttackCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeFireAttackCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeFireAttackCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreNativeFireAttackCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreNativeFireAttackKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._characterZhugeLiangMouOperations = characterZhugeLiangMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreColorFireAttacksOperations = coreColorFireAttacksOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreRevealedFireAttackPaymentOperations = coreRevealedFireAttackPaymentOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialTrickTargetsOperations = coreSequentialTrickTargetsOperations;
+        this._coreWenhePoisonOperations = coreWenhePoisonOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

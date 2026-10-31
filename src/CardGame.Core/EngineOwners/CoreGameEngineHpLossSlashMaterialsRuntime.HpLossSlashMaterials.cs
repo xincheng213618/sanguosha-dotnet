@@ -1,0 +1,142 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CoreGameEngineHpLossSlashMaterialsRuntime
+{
+    internal (CardConversionSource Source, string Hash)? HpLossSlashTargetSource(CharacterState owner)
+    {
+        var value = _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.SlashExtraTargetsByLostHp).FirstOrDefault();
+        return value.Source is null ? null : (new(value.Source.SkillId, value.Policy.Id, owner.Seat, value.Source.SkillInstanceId), value.Source.Program.GameplayHash);
+    }
+
+    internal bool HasHpLossSlashTargets(CharacterState owner) => HpLossSlashTargetSource(owner)is not null;
+    internal int HpLossSlashMaximum(CharacterState owner, CardKind kind, int original = 1) => Math.Min(_coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive && p.Seat != owner.Seat), original + global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateCardTargetCount(owner, kind)) - 1 + (_coreNextActualUseTargetAdjustmentsOperations.CurrentNextActualUseAdjustment(owner.Seat)is not null ? 1 : 0));
+    internal static SkillProgramEffect? HpLossSlashProgramProducer(ProgramExecutionPlan plan) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_HpLossSlashMaterials.HpLossSlashProgramProducer(plan);
+    internal HpLossSlashSelection? FreezeHpLossSlashSelection(CharacterState owner, ProgramExecutionPlan plan, IReadOnlyList<int> targets) => targets.Count > plan.Activation!.MaxTargets && HpLossSlashProgramProducer(plan)is { OutputKind: { } kind } && HpLossSlashTargetSource(owner)is { } policy ? new(policy.Source, policy.Hash, HpLossSlashMaximum(owner, kind), kind) : null;
+    internal bool HasExactHpLossSlashSelection(ProgramSkillFrame f, ProgramExecutionPlan plan)
+    {
+        if (f.HpLossSlashSelection is not { } r || f.TriggerId is not null || HpLossSlashProgramProducer(plan)is not { OutputKind: { } kind } || kind != r.OutputKind || r.PolicySource.OwnerSeat != f.OwnerSeat || r.FrozenMaximum < 2 || f.SelectedTargetSeats.Count < 2 || f.SelectedTargetSeats.Count > r.FrozenMaximum || f.SelectedTargetSeats.Distinct().Count() != f.SelectedTargetSeats.Count || _contentRegistryOperations._contentRegistry.GetSkill(r.PolicySource.SkillId).Program is not { } p || p.GameplayHash != r.PolicyHash || !p.CardPolicies.Any(x => x.Id == r.PolicySource.BindingId && x.Kind == SkillProgramCardPolicyKind.SlashExtraTargetsByLostHp))
+            return false;
+        if (r.CardUseFrameId is null)
+            return HpLossSlashTargetSource(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])is { } current && current.Source == r.PolicySource && current.Hash == r.PolicyHash;
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(r.CardUseFrameId.Value)is { HpLossMaterialSlashReturn: { } useReturn })
+            return useReturn.ParentProgramFrameId == f.Id && useReturn.ParentGameplayHash == f.GameplayHash && useReturn.ParentSkillInstanceId == f.SkillInstanceId;
+        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<HpLossMaterialSlashIssuedEvent>().Count(e => e.CardUseFrameId == r.CardUseFrameId && e.ParentProgramFrameId == f.Id && e.PolicySource == r.PolicySource && e.PolicyHash == r.PolicyHash && !e.IsZhangba) == 1 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.CardUseFrameId) == 1;
+    }
+
+    [ProgramCardAction(ProgramCardActionPhase.AfterProgram, 30)]
+    internal void AddHpLossSlashEquipmentActions(List<LegalAction> actions, CharacterState owner)
+    {
+        if (!HasHpLossSlashTargets(owner))
+            return;
+        for (var i = 0; i < actions.Count; i++)
+            if (actions[i] is { Kind: LegalActionKind.UseEquipmentEffect, EquipmentKind: CardKind.ZhangbaSerpentSpear } spear)
+                actions[i] = spear with
+                {
+                    MaxTargetCount = Math.Max(spear.MaxTargetCount, HpLossSlashMaximum(owner, CardKind.Slash))
+                };
+    }
+
+    internal CommandError? ValidateHpLossSlashZhangba(CharacterState owner, IReadOnlyList<int> ids, IReadOnlyList<int> targets)
+    {
+        if (targets.Count <= 1)
+            return null;
+        var cards = _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner).FirstOrDefault(p => p.Select(c => c.Id).Order().SequenceEqual(ids.Order()));
+        return HasHpLossSlashTargets(owner) && cards is not null && _coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(owner) && _characterSunQuanOlMagicOperations.IsMoQuanyuCompleteZhangbaQuotaLegal(owner, targets, cards) && targets.Count <= HpLossSlashMaximum(owner, CardKind.Slash) && targets.Distinct().Count() == targets.Count && targets.All(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, _coreMatchParticipantsPlayersAccess._players[t], CardKind.Slash, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards), _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(owner, cards), ids) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner.Seat, t, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[t], CardKind.Slash, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, t, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards))) ? null : new(CommandErrorCode.InvalidTarget, "The HP-based spear use lost its two real materials and legal targets.");
+    }
+
+    internal void ResolveHpLossSlashZhangba(CharacterState owner, IReadOnlyList<int> targets, IReadOnlyList<Card> cards)
+    {
+        if (ValidateHpLossSlashZhangba(owner, cards.Select(c => c.Id).ToArray(), targets)is { } error)
+            throw new InvalidOperationException(error.Message);
+        BeginHpLossMaterialSlash(owner, cards, CardKind.Slash, targets, null, null);
+    }
+
+    internal SkillProgramStepOutcome BeginHpLossSelectedSlash(ProgramSkillFrame f, ProgramMultiCardViewAsSelection selection)
+    {
+        var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
+        var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
+        if (!HasExactHpLossSlashSelection(f, plan) || f.HpLossSlashSelection!.CardUseFrameId is not null || HpLossSlashTargetSource(owner)is not { } policy || policy.Source != f.HpLossSlashSelection.PolicySource || f.SelectedTargetSeats.Count > HpLossSlashMaximum(owner, selection.OutputKind) || f.SelectedTargetSeats.Any(t => !_coreNextActualUseTargetAdjustmentsOperations.CanUseNextActualUseSelectedSlash(owner, _coreMatchParticipantsPlayersAccess._players[t], selection)))
+            throw new InvalidOperationException("The selected HP-based material Slash expired before actual payment.");
+        BeginHpLossMaterialSlash(owner, selection.Cards, selection.OutputKind, f.SelectedTargetSeats, selection.Source, f);
+        return SkillProgramStepOutcome.AwaitChild;
+    }
+
+    internal void BeginHpLossMaterialSlash(CharacterState owner, IReadOnlyList<Card> cards, CardKind kind, IReadOnlyList<int> seats, CardConversionSource? conversion, ProgramSkillFrame? parent)
+    {
+        var policy = HpLossSlashTargetSource(owner) ?? throw new InvalidOperationException("The target-count source expired before payment.");
+        // BeginCardUse emits the true declaration and can consume an existing
+        // next-use adjustment. Freeze this maximum before that producer runs.
+        var frozenMaximum = parent?.HpLossSlashSelection?.FrozenMaximum ?? HpLossSlashMaximum(owner, kind);
+        var armor = _coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(owner);
+        var id = _coreNativeCardUseOperations.BeginCardUse(cards[0], owner.Seat, seats, kind, ignoresArmor: armor, physicalCardIds: cards.Select(c => c.Id).ToArray(), conversionSource: conversion, isTrueZhangbaSlash: parent is null);
+        var action = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action ?? throw new InvalidOperationException("A material Slash must keep its true accepted action.");
+        var receipt = new HpLossMaterialSlashReturn(id, action.ActionId, policy.Source, policy.Hash, frozenMaximum, parent?.Id, parent?.GameplayHash, parent?.SkillInstanceId, parent?.InstructionIndex ?? 0, parent is null, _coreSlashTargetPenaltyPaymentsOperations.SlashTargetPenaltySequence + 1);
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, use => use with { HpLossMaterialSlashReturn = receipt, TargetsAdjusted = true });
+        if (parent is not null)
+            _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { HpLossSlashSelection = parent.HpLossSlashSelection!with { CardUseFrameId = id } });
+        _coreNativeMaterialSlashOperations.CompleteNativeMaterialSlash(id, owner, cards, kind, seats, conversion, armor);
+    }
+
+    internal bool MatchesHpLossMaterialSlash(CardUseFrame use)
+    {
+        if (use.HpLossMaterialSlashReturn is not { } r || use.Action is not { Type: CardActionType.Use } action || r.CardUseFrameId != use.Id || r.ActionId != action.ActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: >= 2 } ids || !ids.SequenceEqual(action.PhysicalCards.Select(c => c.CardId)) || action.ProviderSeat != r.PolicySource.OwnerSeat || r.FrozenMaximum < 2 || r.PaidFirst <= 0 || r.PaidLast < r.PaidFirst || use.TargetSeats.Count == 0 || !_coreSlashTargetBenefitWindowsOperations.MatchesSlashTargetBenefitUse(new(use.Id, action.ActionId, r.PolicySource.OwnerSeat, action.ProviderSeat, use.CardKind, use.TargetSeats[0], _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, null)) || _contentRegistryOperations._contentRegistry.GetSkill(r.PolicySource.SkillId).Program is not { } policy || policy.GameplayHash != r.PolicyHash || !policy.CardPolicies.Any(p => p.Id == r.PolicySource.BindingId && p.Kind == SkillProgramCardPolicyKind.SlashExtraTargetsByLostHp) || action.PhysicalCards.Any(c => _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence >= r.PaidFirst && m.Sequence <= r.PaidLast && m.CardId == c.CardId && m.From == c.From && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use) != 1) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<HpLossMaterialSlashIssuedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == action.ActionId && e.PolicySource == r.PolicySource && e.PolicyHash == r.PolicyHash && e.FrozenMaximum == r.FrozenMaximum && e.ParentProgramFrameId == r.ParentProgramFrameId && e.IsZhangba == r.IsZhangba) != 1)
+            return false;
+        // A genuine Cheng Pu committed producer may append only its frozen
+        // conversion after changing this already issued Slash to Fire Slash.
+        // Its mature proof validates every current target and changed fact.
+        var issuedAction = action;
+        if (use.CurrentSlashFirePolicy is { Converted: true } fire)
+        {
+            if (!_coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use))
+                return false;
+            _coreCurrentSlashFireOffersOperations.AssertCurrentSlashFirePolicy(use);
+            issuedAction = fire.OriginalAction;
+        }
+
+        if (r.IsZhangba)
+            return r.ParentProgramFrameId is null && r.ParentGameplayHash is null && r.ParentSkillInstanceId is null && r.ParentInstructionIndex == 0 && ids.Count == 2 && issuedAction.EffectiveKind == CardKind.Slash && issuedAction.ConversionChain.Count == 0 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhangbaSerpentSpearConvertedEvent>().Any(e => e.ResolutionId == use.Id && e.UserSeat == r.PolicySource.OwnerSeat && e.IsUse && e.PhysicalCardIds.SequenceEqual(ids));
+        var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == r.ParentProgramFrameId);
+        return f is not null && f.OwnerSeat == r.PolicySource.OwnerSeat && f.GameplayHash == r.ParentGameplayHash && f.SkillInstanceId == r.ParentSkillInstanceId && f.InstructionIndex == r.ParentInstructionIndex && f.HpLossSlashSelection is { } selection && selection.CardUseFrameId == use.Id && selection.PolicySource == r.PolicySource && selection.PolicyHash == r.PolicyHash && selection.FrozenMaximum == r.FrozenMaximum && f.SelectedCardIds.Order().SequenceEqual(ids.Order()) && issuedAction.ConversionChain is [var materialSource] && materialSource.SkillId == f.SkillId && materialSource.SkillInstanceId == f.SkillInstanceId && materialSource.OwnerSeat == f.OwnerSeat && materialSource.BindingId == ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect.SourceBind && HasExactHpLossSlashSelection(f, ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!));
+    }
+
+    internal long? HpLossMaterialSlashParent(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    {
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { HpLossMaterialSlashReturn: { } r } use)
+            return null;
+        if (!MatchesHpLossMaterialSlash(use))
+            throw new InvalidOperationException("The multi-material Slash lost its exact issued policy and typed parent.");
+        return r.ParentProgramFrameId;
+    }
+
+    internal bool HasExactHpLossMaterialReturn(CardUseFrame use)
+    {
+        if (use.HpLossMaterialSlashReturn is null)
+            return false;
+        if (!MatchesHpLossMaterialSlash(use))
+            throw new InvalidOperationException("The finished multi-material Slash lost its original payment/producer.");
+        return use.HpLossMaterialSlashReturn.ParentProgramFrameId is not null;
+    }
+
+    internal bool IsExactHpLossMaterialSlash(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
+    {
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { HpLossMaterialSlashReturn: not null } use || !MatchesHpLossMaterialSlash(use) || !attack.PhysicalCards.Select(c => c.Id).SequenceEqual(use.PhysicalCardIds!))
+            return false;
+        var retained = use.PhysicalCardIds!.Where(id => !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(use.Id, id)).ToHashSet();
+        return processing.All(c => retained.Contains(c.Id)) && retained.All(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile);
+    }
+
+    internal void AssertHpLossMaterialSlashes()
+    {
+        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use => use.HpLossMaterialSlashReturn is not null))
+            if (!MatchesHpLossMaterialSlash(use))
+                throw new InvalidOperationException("The HP-based multi-material use lost its immutable issuance or real costs.");
+        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.HpLossSlashSelection is not null))
+            if (!HasExactHpLossSlashSelection(f, ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!)))
+                throw new InvalidOperationException("The HP-based selected producer lost its exact target selection.");
+    }
+}

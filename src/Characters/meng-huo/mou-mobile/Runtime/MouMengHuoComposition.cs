@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouMengHuoComposition
 {
-    internal const string Huoshou = "mou-mobile:huoshou", Zaiqi = "mou-mobile:zaiqi";
+    internal const string Huoshou = "mou-mobile:huoshou",Zaiqi = "mou-mobile:zaiqi";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouMengHuoAttribution or SkillProgramEffectOp.ObtainMouMengHuoBarbarian or SkillProgramEffectOp.GainMouMengHuoCharge or SkillProgramEffectOp.ResolveMouMengHuoZaiqi;
     private static bool Trigger(SkillProgramTrigger t, string id, SkillProgramTriggerWindow window, SkillProgramEffectOp op) =>
         t.Id == id && t.Window == window && !t.Optional && t.UsageLimit is null && t.UsageScope is null && t.Condition.Kind == SkillProgramTriggerConditionKind.Always &&

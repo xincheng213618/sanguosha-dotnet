@@ -1,0 +1,78 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineForeignPublicPileSlashesRuntime
+{
+    private readonly ICoreForeignPublicPileSlashesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreForeignPublicPileSlashesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreActionDiscardColorsOperations _coreActionDiscardColorsOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreAlcoholSlashSuppressionsOperations _coreAlcoholSlashSuppressionsOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreCardUseDebitsOperations _coreCardUseDebitsOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreForeignPublicPileSlashesCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreRedAdditionalTargetsOperations _coreRedAdditionalTargetsOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreForeignPublicPileSlashesCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreForeignPublicPileSlashesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreForeignPublicPileSlashesKernelCoreMainOperations2 _kernelCoreMainOperations;
+    private readonly ICoreForeignPublicPileSlashesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreForeignPublicPileSlashesKernelCoreGameEngineRuntimeOperations _kernelCoreGameEngineRuntimeOperations;
+    private readonly ICoreForeignPublicPileSlashesKernelCoreMainOperations _kernelCoreMainOperations2;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CoreGameEngineForeignPublicPileSlashesRuntime(ICoreForeignPublicPileSlashesCardZonesOperations cardZonesOperations, ICoreForeignPublicPileSlashesResolutionStackOperations resolutionStackOperations, ICoreForeignPublicPileSlashesCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreForeignPublicPileSlashesCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreForeignPublicPileSlashesCoreActionDiscardColorsOperations coreActionDiscardColorsOperations, ICoreForeignPublicPileSlashesCoreAlcoholSlashSuppressionsOperations coreAlcoholSlashSuppressionsOperations, ICoreForeignPublicPileSlashesCoreCardActionsOperations coreCardActionsOperations, ICoreForeignPublicPileSlashesCoreCardUseDebitsOperations coreCardUseDebitsOperations, ICoreForeignPublicPileSlashesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreForeignPublicPileSlashesCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreForeignPublicPileSlashesCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreForeignPublicPileSlashesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreForeignPublicPileSlashesCoreRedAdditionalTargetsOperations coreRedAdditionalTargetsOperations, ICoreForeignPublicPileSlashesCoreRuntimeOperations coreRuntimeOperations, ICoreForeignPublicPileSlashesCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreForeignPublicPileSlashesCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreForeignPublicPileSlashesCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreForeignPublicPileSlashesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreForeignPublicPileSlashesCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreForeignPublicPileSlashesCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreForeignPublicPileSlashesCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreForeignPublicPileSlashesCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreForeignPublicPileSlashesCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreForeignPublicPileSlashesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreForeignPublicPileSlashesKernelCoreMainOperations2 kernelCoreMainOperations, ICoreForeignPublicPileSlashesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreForeignPublicPileSlashesKernelCoreGameEngineRuntimeOperations kernelCoreGameEngineRuntimeOperations, ICoreForeignPublicPileSlashesKernelCoreMainOperations kernelCoreMainOperations2, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreActionDiscardColorsOperations = coreActionDiscardColorsOperations;
+        this._coreAlcoholSlashSuppressionsOperations = coreAlcoholSlashSuppressionsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseDebitsOperations = coreCardUseDebitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreRedAdditionalTargetsOperations = coreRedAdditionalTargetsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreGameEngineRuntimeOperations = kernelCoreGameEngineRuntimeOperations;
+        this._kernelCoreMainOperations2 = kernelCoreMainOperations2;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+    }
+}

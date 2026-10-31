@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineGameTargetHandHpChoicesRuntime
+{
+    private readonly ICoreGameTargetHandHpChoicesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreGameTargetHandHpChoicesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreGameTargetHandHpChoicesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreGameTargetHandHpChoicesSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreFireTargetBenefitsOperations _coreFireTargetBenefitsOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreGameTargetHandHpChoicesCorePrivateCardOffersOperations _corePrivateCardOffersOperations;
+    private readonly ICoreGameTargetHandHpChoicesCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreGameTargetHandHpChoicesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreGameTargetHandHpChoicesCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreGameTargetHandHpChoicesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreGameTargetHandHpChoicesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreGameTargetHandHpChoicesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineGameTargetHandHpChoicesRuntime(ICoreGameTargetHandHpChoicesCardZonesOperations cardZonesOperations, ICoreGameTargetHandHpChoicesContentRegistryOperations contentRegistryOperations, ICoreGameTargetHandHpChoicesResolutionStackOperations resolutionStackOperations, ICoreGameTargetHandHpChoicesSkillRuntimeStateOperations skillRuntimeStateOperations, ICoreGameTargetHandHpChoicesCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreGameTargetHandHpChoicesCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreGameTargetHandHpChoicesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreGameTargetHandHpChoicesCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreGameTargetHandHpChoicesCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreGameTargetHandHpChoicesCoreFireTargetBenefitsOperations coreFireTargetBenefitsOperations, ICoreGameTargetHandHpChoicesCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreGameTargetHandHpChoicesCorePrivateCardOffersOperations corePrivateCardOffersOperations, ICoreGameTargetHandHpChoicesCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreGameTargetHandHpChoicesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreGameTargetHandHpChoicesCoreRuntimeOperations coreRuntimeOperations, ICoreGameTargetHandHpChoicesCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreGameTargetHandHpChoicesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreGameTargetHandHpChoicesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreGameTargetHandHpChoicesCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreGameTargetHandHpChoicesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreGameTargetHandHpChoicesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreGameTargetHandHpChoicesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreFireTargetBenefitsOperations = coreFireTargetBenefitsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePrivateCardOffersOperations = corePrivateCardOffersOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

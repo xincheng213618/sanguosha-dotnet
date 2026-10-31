@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineBaguaResponsesRuntime
+{
+    private readonly ICoreBaguaResponsesCoreConvertedSlashResponseOperations _coreConvertedSlashResponseOperations;
+    private readonly ICoreBaguaResponsesCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreBaguaResponsesCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreBaguaResponsesCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICoreBaguaResponsesCoreNativeFactionDefenseOperations _coreNativeFactionDefenseOperations;
+    private readonly ICoreBaguaResponsesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreBaguaResponsesCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreBaguaResponsesCoreNativeResponseWindowsOperations _coreNativeResponseWindowsOperations;
+    private readonly ICoreBaguaResponsesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreBaguaResponsesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreBaguaResponsesKernelCoreGameEngineRuntimeOperations _kernelCoreGameEngineRuntimeOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineBaguaResponsesRuntime(ICoreBaguaResponsesCoreConvertedSlashResponseOperations coreConvertedSlashResponseOperations, ICoreBaguaResponsesCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreBaguaResponsesCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreBaguaResponsesCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICoreBaguaResponsesCoreNativeFactionDefenseOperations coreNativeFactionDefenseOperations, ICoreBaguaResponsesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreBaguaResponsesCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreBaguaResponsesCoreNativeResponseWindowsOperations coreNativeResponseWindowsOperations, ICoreBaguaResponsesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreBaguaResponsesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreBaguaResponsesKernelCoreGameEngineRuntimeOperations kernelCoreGameEngineRuntimeOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._coreConvertedSlashResponseOperations = coreConvertedSlashResponseOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._coreNativeFactionDefenseOperations = coreNativeFactionDefenseOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._coreNativeResponseWindowsOperations = coreNativeResponseWindowsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreGameEngineRuntimeOperations = kernelCoreGameEngineRuntimeOperations;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

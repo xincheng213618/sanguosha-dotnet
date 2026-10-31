@@ -15,11 +15,11 @@ internal static class IdentityConcealmentChecks
         Need(V(g, 1).Equipment.Any(c => c.Kind == CardKind.SilverLion) && V(g, 1).IdentityConcealed, "Native equipment use installs a physical Lion without appearance."); g = Cold(g, registry);
         var action = g.GetHumanLegalActions().First(a => a.CardId is { } id && V(g, 0).Hand.Any(c => c.Id == id && c.Kind == CardKind.PeachGarden));
         Accept(g, new PlayCardCommand(0, action.CardId!.Value, action.TargetSeats, g.Revision, P(g)!.PromptId, action.PlayedCardKind, action.TargetCardId)); Play(g);
-        var actors = (IEnumerable<CharacterState>)typeof(GameEngine).GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(g)!;
+        var actors = (IEnumerable<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(g)!;
         Need(actors.Single(p => p.Seat == 1).Hp == 1 && V(g, 1).HpUndefined && V(g, 1).IdentityConcealed && !E<RecoveryAppliedEvent>(g).Any(e => e.TargetSeat == 1), "Actual Peach Garden cannot recover the hidden raw wound or reveal its target.");
         Need(V(g, 2).Hp == 2 && E<RecoveryAppliedEvent>(g).Count(e => e.TargetSeat == 2) == 1, "The same native group use really recovers the visible wounded peer once.");
         Use(g, "remove-equipment", 1); Reach(g, () => P(g)?.Choices.Any(c => c.Cards.Count == 1) == true); Answer(g, c => c.Cards.Count == 1); Play(g); g = Cold(g, registry);
-        actors = (IEnumerable<CharacterState>)typeof(GameEngine).GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(g)!;
+        actors = (IEnumerable<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(g)!;
         Need(V(g, 1).Equipment.Count == 0 && actors.Single(p => p.Seat == 1).Hp == 1 && V(g, 1).HpUndefined && V(g, 1).IdentityConcealed && !E<RecoveryAppliedEvent>(g).Any(e => e.TargetSeat == 1) && !E<SilverLionRemovedRecoveryEvent>(g).Any(), "Real Lion removal moves the entity without recovery or appearance, including cold replay.");
     }
     public static void GameStartingHpLossAppearanceDoesNotOfferOffTurnGaoling()
@@ -32,7 +32,7 @@ internal static class IdentityConcealmentChecks
     }
     public static void UndefinedHpRejectsNativeRecoveryAndMaxHpNumberCalculation()
     {
-        var (g, registry) = Start(peerInitialHp: 1); Play(g); var actors = (IEnumerable<CharacterState>)typeof(GameEngine).GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(g)!;
+        var (g, registry) = Start(peerInitialHp: 1); Play(g); var actors = (IEnumerable<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(g)!;
         Need(actors.Single(p => p.Seat == 1) is { Hp: 1, MaxHp: 3, HasHpValue: false }, "A real concealed template can retain a wounded raw initial HP without exposing a comparable rule value.");
         Use(g, "recover-self", 1); Play(g); Need(actors.Single(p => p.Seat == 1).Hp == 1 && V(g, 1).HpUndefined && !E<RecoveryAppliedEvent>(g).Any(e => e.TargetSeat == 1) && !E<IdentityGeneralAppearedEvent>(g).Any(e => e.Receipt.OwnerSeat == 1), "A native recovery aimed at the concealed undefined-HP target neither uses its stored wound nor reveals it.");
         Use(g, "clear-hand", 1); Play(g); Need(V(g, 1).Hand.Count == 0 && V(g, 1).HpUndefined, "Real card movement clears the concealed target's hand while leaving HP undefined.");
@@ -50,7 +50,7 @@ internal static class IdentityConcealmentChecks
             var p = g.CreateSnapshot(viewer).Players[seat]; Need(p.IdentityConcealed && p.HpUndefined && p.Hp == 0 && p.MaxHp == 0 && !p.IsGeneralPublic, "Concealed identity has no HP value even in its owner's normal view.");
             Need(viewer == seat ? p.GeneralId.StartsWith("fixture:identity-concealment-peer-", StringComparison.Ordinal) && p.Skills!.Any(s => s.ContentId == "ol:gaoling") : p.GeneralId == "concealment:ol" && (p.Skills?.Count ?? 0) == 0, "Only the real owner sees its primary template; every foreign view has the OL concealed facet and no skills.");
         }
-        var actors = (IEnumerable<CharacterState>)typeof(GameEngine).GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(g)!;
+        var actors = (IEnumerable<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(g)!;
         Need(actors.Where(p => p.Seat != 0).All(p => p.General.Gender == GeneralGender.Female && p.Gender == GeneralGender.Male && !p.HasHpValue && p.Hp == 3), "Trusted raw initial HP remains stored, while rule gender is male and no HP value exists before appearance.");
         Need(!g.GetHumanLegalActions().Any(a => a.ProgramActivationId == "hp-greater") && g.GetHumanLegalActions().Any(a => a.ProgramActivationId == "male-target" && a.SelectableTargetSeats.Contains(1)), "Hidden raw HP cannot qualify an HP comparison, while the existing male-only target filter uses concealed male rule gender rather than the real female template.");
         var before = State(g); Need(!g.Submit(new UseProgramSkillCommand(0, Driver, "hp-greater", [], [1], g.Revision, P(g)!.PromptId)).Accepted && before == State(g), "A command naming an undefined-HP target cannot bypass legal target discovery or mutate state.");

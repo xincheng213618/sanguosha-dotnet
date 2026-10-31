@@ -1,0 +1,60 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineAdjacentDiscardStorageRuntime : global::CardGame.Core.IAdjacentDiscardAndRoundAlcoholHost
+{
+    private readonly ICoreAdjacentDiscardStorageCardZonesOperations _cardZonesOperations;
+    private readonly ICoreAdjacentDiscardStorageContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreAdjacentDiscardStorageResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreCompletedUsePaymentsOperations _coreCompletedUsePaymentsOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreCurrentSlashFireOffersOperations _coreCurrentSlashFireOffersOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreRoundPricedPileAlcoholOperations _coreRoundPricedPileAlcoholOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreAdjacentDiscardStorageCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreAdjacentDiscardStorageCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreAdjacentDiscardStorageKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineAdjacentDiscardStorageRuntime(ICoreAdjacentDiscardStorageCardZonesOperations cardZonesOperations, ICoreAdjacentDiscardStorageContentRegistryOperations contentRegistryOperations, ICoreAdjacentDiscardStorageResolutionStackOperations resolutionStackOperations, ICoreAdjacentDiscardStorageCoreActionQueriesOperations coreActionQueriesOperations, ICoreAdjacentDiscardStorageCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreAdjacentDiscardStorageCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreAdjacentDiscardStorageCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreAdjacentDiscardStorageCoreCompletedUsePaymentsOperations coreCompletedUsePaymentsOperations, ICoreAdjacentDiscardStorageCoreCurrentSlashFireOffersOperations coreCurrentSlashFireOffersOperations, ICoreAdjacentDiscardStorageCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreAdjacentDiscardStorageCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreAdjacentDiscardStorageCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICoreAdjacentDiscardStorageCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreAdjacentDiscardStorageCoreRoundPricedPileAlcoholOperations coreRoundPricedPileAlcoholOperations, ICoreAdjacentDiscardStorageCoreRuntimeOperations coreRuntimeOperations, ICoreAdjacentDiscardStorageCoreTableOrderOperations coreTableOrderOperations, ICoreAdjacentDiscardStorageCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreAdjacentDiscardStorageCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreAdjacentDiscardStorageCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreAdjacentDiscardStorageKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreCompletedUsePaymentsOperations = coreCompletedUsePaymentsOperations;
+        this._coreCurrentSlashFireOffersOperations = coreCurrentSlashFireOffersOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRoundPricedPileAlcoholOperations = coreRoundPricedPileAlcoholOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

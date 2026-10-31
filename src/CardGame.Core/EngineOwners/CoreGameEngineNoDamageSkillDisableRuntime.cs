@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineNoDamageSkillDisableRuntime
+{
+    private readonly ICoreNoDamageSkillDisableContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNoDamageSkillDisableCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreNoDamageSkillDisableCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreNoDamageSkillDisableCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreNoDamageSkillDisableCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreNoDamageSkillDisableKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess _coreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess;
+    internal CoreGameEngineNoDamageSkillDisableRuntime(ICoreNoDamageSkillDisableContentRegistryOperations contentRegistryOperations, ICoreNoDamageSkillDisableCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreNoDamageSkillDisableCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreNoDamageSkillDisableCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreNoDamageSkillDisableCoreRuntimeOperations coreRuntimeOperations, ICoreNoDamageSkillDisableKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess coreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess = coreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess;
+        this._coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess = coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess;
+    }
+}

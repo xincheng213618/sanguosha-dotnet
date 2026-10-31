@@ -1,0 +1,102 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSunHaoOlRuntime : global::CardGame.Core.ISunHaoHost
+{
+    private readonly ICharacterSunHaoOlCharacterHeQiOlOperations _characterHeQiOlOperations;
+    private readonly ICharacterSunHaoOlCharacterSunHaoMobileOperations _characterSunHaoMobileOperations;
+    private readonly ICharacterSunHaoOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterSunHaoOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSunHaoOlResolutionStackOperations2 _resolutionStackOperations;
+    private readonly ICharacterSunHaoOlCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterSunHaoOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterSunHaoOlCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICharacterSunHaoOlCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICharacterSunHaoOlCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterSunHaoOlCoreCurrentTurnSkillSuppressionsOperations _coreCurrentTurnSkillSuppressionsOperations;
+    private readonly ICharacterSunHaoOlCoreHpConditionalSkillGrantsOperations _coreHpConditionalSkillGrantsOperations;
+    private readonly ICharacterSunHaoOlCoreLordSkillProjectionsOperations _coreLordSkillProjectionsOperations;
+    private readonly ICharacterSunHaoOlCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterSunHaoOlCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICharacterSunHaoOlCorePrivateGeneralLibrariesOperations _corePrivateGeneralLibrariesOperations;
+    private readonly ICharacterSunHaoOlCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterSunHaoOlCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterSunHaoOlCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterSunHaoOlCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICharacterSunHaoOlCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterSunHaoOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSunHaoOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterSunHaoOlCoreRecoveryReplacementDamageRidesOperations2 _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterSunHaoOlCoreResponseUseCompletionOperations _coreResponseUseCompletionOperations;
+    private readonly ICharacterSunHaoOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterSunHaoOlCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterSunHaoOlCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICharacterSunHaoOlCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly ICharacterSunHaoOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterSunHaoOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterSunHaoOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterSunHaoOlCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterSunHaoOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterSunHaoOlCharacterSunHaoOlOperations _characterSunHaoOlOperations;
+    private readonly ICharacterSunHaoOlCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICharacterSunHaoOlResolutionStackOperations _resolutionStackOperations2;
+    private readonly ICharacterSunHaoOlCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICharacterSunHaoOlCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations2;
+    private readonly ICharacterSunHaoOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterSunHaoOlRuntime(ICharacterSunHaoOlCharacterHeQiOlOperations characterHeQiOlOperations, ICharacterSunHaoOlCharacterSunHaoMobileOperations characterSunHaoMobileOperations, ICharacterSunHaoOlCardZonesOperations cardZonesOperations, ICharacterSunHaoOlContentRegistryOperations contentRegistryOperations, ICharacterSunHaoOlResolutionStackOperations2 resolutionStackOperations, ICharacterSunHaoOlCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterSunHaoOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterSunHaoOlCoreCardActionsOperations coreCardActionsOperations, ICharacterSunHaoOlCoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterSunHaoOlCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterSunHaoOlCoreCurrentTurnSkillSuppressionsOperations coreCurrentTurnSkillSuppressionsOperations, ICharacterSunHaoOlCoreHpConditionalSkillGrantsOperations coreHpConditionalSkillGrantsOperations, ICharacterSunHaoOlCoreLordSkillProjectionsOperations coreLordSkillProjectionsOperations, ICharacterSunHaoOlCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterSunHaoOlCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICharacterSunHaoOlCorePrivateGeneralLibrariesOperations corePrivateGeneralLibrariesOperations, ICharacterSunHaoOlCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterSunHaoOlCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterSunHaoOlCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterSunHaoOlCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICharacterSunHaoOlCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterSunHaoOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSunHaoOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterSunHaoOlCoreRecoveryReplacementDamageRidesOperations2 coreRecoveryReplacementDamageRidesOperations, ICharacterSunHaoOlCoreResponseUseCompletionOperations coreResponseUseCompletionOperations, ICharacterSunHaoOlCoreRuntimeOperations coreRuntimeOperations, ICharacterSunHaoOlCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterSunHaoOlCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICharacterSunHaoOlCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICharacterSunHaoOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterSunHaoOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterSunHaoOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterSunHaoOlCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterSunHaoOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterSunHaoOlCharacterSunHaoOlOperations characterSunHaoOlOperations, ICharacterSunHaoOlCharacterYanPuOlOperations characterYanPuOlOperations, ICharacterSunHaoOlResolutionStackOperations resolutionStackOperations2, ICharacterSunHaoOlCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICharacterSunHaoOlCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations2, ICharacterSunHaoOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHeQiOlOperations = characterHeQiOlOperations;
+        this._characterSunHaoMobileOperations = characterSunHaoMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentTurnSkillSuppressionsOperations = coreCurrentTurnSkillSuppressionsOperations;
+        this._coreHpConditionalSkillGrantsOperations = coreHpConditionalSkillGrantsOperations;
+        this._coreLordSkillProjectionsOperations = coreLordSkillProjectionsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateGeneralLibrariesOperations = corePrivateGeneralLibrariesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreResponseUseCompletionOperations = coreResponseUseCompletionOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterSunHaoOlOperations = characterSunHaoOlOperations;
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._resolutionStackOperations2 = resolutionStackOperations2;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreRecoveryReplacementDamageRidesOperations2 = coreRecoveryReplacementDamageRidesOperations2;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,77 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterXiaoQiaoLeEntries
+{
+    internal bool AdvanceQiqinChildren() => _resolve().AdvanceQiqinChildren();
+    internal bool AdvanceWeiwanChildren() => _resolve().AdvanceWeiwanChildren();
+    internal void AssertQiqin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertQiqin(f);
+    internal void AssertWeiwan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWeiwan(f);
+    internal void AssertWeiwanUses() => _resolve().AssertWeiwanUses();
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginQiqinCollect(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginQiqinCollect(supplied);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginWeiwan(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginWeiwan(supplied);
+    internal bool CanActivateWeiwan(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().CanActivateWeiwan(gate);
+    internal bool CanOfferQiqin(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferQiqin(gate);
+    internal bool CanPayWeiwanQin(int owner, global::CardGame.Core.Card card) => _resolve().CanPayWeiwanQin(owner, card);
+    internal global::CardGame.Core.ProgramLifecycleTriggerWindowFrame CaptureQiqinInitialEntities(global::CardGame.Core.ProgramLifecycleTriggerWindowFrame window) => _resolve().CaptureQiqinInitialEntities(window);
+    internal global::CardGame.Core.DeclaredCardPayment CaptureWeiwanDeclarationPayment(global::CardGame.Core.DeclaredCardPayment paid, global::CardGame.Core.CardDeclarationParentReturn parent) => _resolve().CaptureWeiwanDeclarationPayment(paid, parent);
+    internal global::CardGame.Core.WeiwanUseSnapshot CaptureWeiwanUseSnapshot(int actor) => _resolve().CaptureWeiwanUseSnapshot(actor);
+    internal void CaptureWeiwanZeroMaterialUse(global::CardGame.Core.IGameEvent payload) => _resolve().CaptureWeiwanZeroMaterialUse(payload);
+    internal void CompleteWeiwan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CompleteWeiwan(f);
+    internal bool ContinuePaidWeiwan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidWeiwan(f);
+    internal void ContinueQiqinCollect(long id) => _resolve().ContinueQiqinCollect(id);
+    internal void ContinueWeiwan(long id) => _resolve().ContinueWeiwan(id);
+    internal bool CurrentWeiwanLease(global::CardGame.Core.WeiwanTurnLease lease) => _resolve().CurrentWeiwanLease(lease);
+    internal bool DistanceCardUseExemption40HasWeiwanUseDistance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().DistanceCardUseExemption40HasWeiwanUseDistance(q);
+    internal bool DrainWeiwan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainWeiwan(f);
+    internal void FinishWeiwanObtain(long id, long batch, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord> moves) => _resolve().FinishWeiwanObtain(id, batch, moves);
+    internal bool HasPaidWeiwanSelection(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasPaidWeiwanSelection(f);
+    internal bool HasQiqinBeforeDamageObserver(long id) => _resolve().HasQiqinBeforeDamageObserver(id);
+    internal bool HasQiqinDamageObserver(long id) => _resolve().HasQiqinDamageObserver(id);
+    internal bool HasQiqinEntityMark(int id) => _resolve().HasQiqinEntityMark(id);
+    internal bool HasQiqinHandEntityMark(int owner, int id) => _resolve().HasQiqinHandEntityMark(owner, id);
+    internal bool HasWeiwanBeforeDamageObserver(long id) => _resolve().HasWeiwanBeforeDamageObserver(id);
+    internal bool HasWeiwanDamageObserver(long id) => _resolve().HasWeiwanDamageObserver(id);
+    internal bool HasWeiwanQuota(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target) => _resolve().HasWeiwanQuota(actor, target);
+    internal bool HasWeiwanUseDistance(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.CardKind kind, long? useId = default) => _resolve().HasWeiwanUseDistance(actor, target, kind, useId);
+    internal global::CardGame.Core.SkillProgramStepOutcome InitializeQiqin(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeQiqin(supplied);
+    internal bool IsIssuedQiqinCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedQiqinCandidate(c, context);
+    internal bool IsQiqinDying() => _resolve().IsQiqinDying();
+    internal bool IsQiqinHandLimitExempt(global::CardGame.Core.CharacterState owner, int id) => _resolve().IsQiqinHandLimitExempt(owner, id);
+    internal bool IsQiqinMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsQiqinMovement(f, effect, pending);
+    internal bool IsQiqinRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsQiqinRecoveryParent(f, recovery);
+    internal bool IsWeiwanDying() => _resolve().IsWeiwanDying();
+    internal bool IsWeiwanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWeiwanMovement(f, effect, pending);
+    internal bool IsWeiwanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWeiwanRecoveryParent(f, recovery);
+    internal bool IsWeiwanTargetForbidden(int actor, int target, global::CardGame.Core.CardKind kind, long? useId = default) => _resolve().IsWeiwanTargetForbidden(actor, target, kind, useId);
+    internal void IssueWeiwanUse(global::CardGame.Core.CardUseFrame use) => _resolve().IssueWeiwanUse(use);
+    internal void ObserveWeiwanHpLoss(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveWeiwanHpLoss(payload);
+    internal bool PermitIssuedQiqin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PermitIssuedQiqin(f);
+    internal void ProjectQiqinCardSkillMark(int cardId, ref global::CardGame.Core.CardSkillMarkProjection projection) => _resolve().ProjectQiqinCardSkillMark(cardId, ref projection);
+    internal bool QiqinBatchMatches(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().QiqinBatchMatches(f, batch);
+    internal bool QiqinFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().QiqinFirstChild(f, child);
+    internal global::CardGame.Core.ProgramSkillFrame? QiqinObserverRoot() => _resolve().QiqinObserverRoot();
+    internal bool QiqinObserverSuffix(int index) => _resolve().QiqinObserverSuffix(index);
+    internal bool ResumeQiqin(long id) => _resolve().ResumeQiqin(id);
+    internal bool ResumeWeiwan(long id) => _resolve().ResumeWeiwan(id);
+    internal bool ReturnQiqinMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnQiqinMovement(f);
+    internal bool ReturnWeiwanMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnWeiwanMovement(f);
+    internal global::CardGame.Core.WeiwanUseReceipt? ValidIssuedWeiwanUse(long id, int actor) => _resolve().ValidIssuedWeiwanUse(id, actor);
+    internal bool ValidQiqinReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidQiqinReceipt(f);
+    internal bool ValidWeiwanDeclaration(global::CardGame.Core.DeclaredCardPayment paid, global::CardGame.Core.WeiwanUseSnapshot q) => _resolve().ValidWeiwanDeclaration(paid, q);
+    internal bool ValidWeiwanLease(global::CardGame.Core.WeiwanTurnLease lease) => _resolve().ValidWeiwanLease(lease);
+    internal bool ValidWeiwanSnapshot(global::CardGame.Core.WeiwanUseSnapshot q) => _resolve().ValidWeiwanSnapshot(q);
+    internal bool WeiwanDirectedTargetProhibited(global::CardGame.Core.ProgramDirectedTargetQuery query) => _resolve().WeiwanDirectedTargetProhibited(query);
+    internal bool WeiwanFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().WeiwanFirstChild(f, child);
+    internal bool WeiwanLifecycleEdge(int index) => _resolve().WeiwanLifecycleEdge(index);
+    internal bool WeiwanLionRemoval(global::CardGame.Core.ProgramSkillFrame f, int seat) => _resolve().WeiwanLionRemoval(f, seat);
+    internal global::CardGame.Core.ProgramSkillFrame? WeiwanObserverRoot() => _resolve().WeiwanObserverRoot();
+    internal bool WeiwanObserverSuffix(int index) => _resolve().WeiwanObserverSuffix(index);
+    internal bool WeiwanOxSpill(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().WeiwanOxSpill(f, batch);
+    internal global::CardGame.Core.ActualDiscardRecoveryPhaseKey? WeiwanPlay(int actor) => _resolve().WeiwanPlay(actor);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.WeiwanTurnLease> WeiwanPreUseLeases(int actor) => _resolve().WeiwanPreUseLeases(actor);
+    internal bool WeiwanPrimaryMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().WeiwanPrimaryMovement(f, m);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.WeiwanTurnLease> WeiwanQueryLeases(int actor, long? useId) => _resolve().WeiwanQueryLeases(actor, useId);
+    internal bool WeiwanTargetQuotaAllowed(global::CardGame.Core.ProgramTargetQuotaQuery query) => _resolve().WeiwanTargetQuotaAllowed(query);
+    internal bool HasLeXiaoQiaoQiqinCapability { get => _resolve().HasLeXiaoQiaoQiqinCapability; }
+    internal bool HasLeXiaoQiaoWeiwanCapability { get => _resolve().HasLeXiaoQiaoWeiwanCapability; }
+}

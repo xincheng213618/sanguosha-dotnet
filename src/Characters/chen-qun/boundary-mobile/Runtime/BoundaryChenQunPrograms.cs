@@ -4,7 +4,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryChenQunComposition
 {
-    internal const string Skill = "boundary:dingpin-mobile", Activation = "judge-unused-category", Cost = "dingpin-cost", Card = "dingpin-card", Outcome = "dingpin-outcome", Reason = "skill.boundary.dingpin-mobile";
+    internal const string Skill = "boundary:dingpin-mobile",Activation = "judge-unused-category",Cost = "dingpin-cost",Card = "dingpin-card",Outcome = "dingpin-outcome",Reason = "skill.boundary.dingpin-mobile";
     [ProgramCatalogValidation(53600)]
     internal static void Validate(string path, SkillProgram p)
     {

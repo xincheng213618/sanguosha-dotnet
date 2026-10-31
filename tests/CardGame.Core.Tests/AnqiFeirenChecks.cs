@@ -76,8 +76,8 @@ internal static class AnqiFeirenChecks
         // Public views intentionally publish a HandLimit only for the current
         // turn owner. Query the real rule service for an off-turn target without
         // changing the actual turn or widening that presentation contract.
-        public int HandLimit(int seat) => (int)typeof(GameEngine).GetMethod("GetHandLimit", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .Invoke(G, [((IEnumerable<CharacterState>)typeof(GameEngine).GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!
+        public int HandLimit(int seat) => (int)global::FixtureRuntimeAccess.Engine.GetMethod("GetHandLimit", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(G, [((IEnumerable<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .GetValue(G)!).Single(p => p.Seat == seat)])!;
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
         private void Accept(GameCommand command) { var r = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([command])).Single()); Need(r.Accepted, r.Error?.ToString() ?? "Anqi native command rejected."); }

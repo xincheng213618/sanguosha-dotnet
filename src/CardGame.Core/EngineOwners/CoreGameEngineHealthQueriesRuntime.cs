@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineHealthQueriesRuntime
+{
+    private readonly ICoreHealthQueriesCharacterDaQiaoXiaoQiaoHappyGodOperations _characterDaQiaoXiaoQiaoHappyGodOperations;
+    private readonly ICoreHealthQueriesCharacterFeiYiOlOperations _characterFeiYiOlOperations;
+    private readonly ICoreHealthQueriesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHealthQueriesCoreCardDamageMaximumHpReplacementOperations _coreCardDamageMaximumHpReplacementOperations;
+    private readonly ICoreHealthQueriesCoreLastDamageSourceReciprocityObserversOperations _coreLastDamageSourceReciprocityObserversOperations;
+    private readonly ICoreHealthQueriesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreHealthQueriesKernelCoreGameEngineActionQueriesOperations _kernelCoreGameEngineActionQueriesOperations;
+    private readonly ICoreHealthQueriesKernelCoreGameEngineProgramExpressionsOperations _kernelCoreGameEngineProgramExpressionsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineActionQueriesActionQueryAccess _coreGameEngineActionQueriesActionQueryAccess;
+    internal CoreGameEngineHealthQueriesRuntime(ICoreHealthQueriesCharacterDaQiaoXiaoQiaoHappyGodOperations characterDaQiaoXiaoQiaoHappyGodOperations, ICoreHealthQueriesCharacterFeiYiOlOperations characterFeiYiOlOperations, ICoreHealthQueriesResolutionStackOperations resolutionStackOperations, ICoreHealthQueriesCoreCardDamageMaximumHpReplacementOperations coreCardDamageMaximumHpReplacementOperations, ICoreHealthQueriesCoreLastDamageSourceReciprocityObserversOperations coreLastDamageSourceReciprocityObserversOperations, ICoreHealthQueriesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreHealthQueriesKernelCoreGameEngineActionQueriesOperations kernelCoreGameEngineActionQueriesOperations, ICoreHealthQueriesKernelCoreGameEngineProgramExpressionsOperations kernelCoreGameEngineProgramExpressionsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineActionQueriesActionQueryAccess coreGameEngineActionQueriesActionQueryAccess)
+    {
+        this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;
+        this._characterFeiYiOlOperations = characterFeiYiOlOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardDamageMaximumHpReplacementOperations = coreCardDamageMaximumHpReplacementOperations;
+        this._coreLastDamageSourceReciprocityObserversOperations = coreLastDamageSourceReciprocityObserversOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._kernelCoreGameEngineActionQueriesOperations = kernelCoreGameEngineActionQueriesOperations;
+        this._kernelCoreGameEngineProgramExpressionsOperations = kernelCoreGameEngineProgramExpressionsOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineActionQueriesActionQueryAccess = coreGameEngineActionQueriesActionQueryAccess;
+    }
+}

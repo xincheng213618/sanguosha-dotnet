@@ -1,0 +1,84 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime : global::CardGame.Core.IGiftedSlashUseRewardHost
+{
+    private readonly ICoreGiftedSlashUseRewardsCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreGiftedSlashUseRewardsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreGiftedSlashUseRewardsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreGiftedSlashUseRewardsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreGiftedSlashUseRewardsSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreActionDiscardColorsOperations _coreActionDiscardColorsOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreGiftedSlashUseRewardsCorePublicPilePreparationOperations _corePublicPilePreparationOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreShownEntityTurnPoliciesOperations _coreShownEntityTurnPoliciesOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreGiftedSlashUseRewardsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreGiftedSlashUseRewardsOperations _coreGiftedSlashUseRewardsOperations;
+    private readonly ICoreGiftedSlashUseRewardsCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICoreGiftedSlashUseRewardsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineGiftedSlashUseRewardsRuntime(ICoreGiftedSlashUseRewardsCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreGiftedSlashUseRewardsCardZonesOperations cardZonesOperations, ICoreGiftedSlashUseRewardsContentRegistryOperations contentRegistryOperations, ICoreGiftedSlashUseRewardsResolutionStackOperations resolutionStackOperations, ICoreGiftedSlashUseRewardsSkillRuntimeStateOperations skillRuntimeStateOperations, ICoreGiftedSlashUseRewardsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreGiftedSlashUseRewardsCoreActionDiscardColorsOperations coreActionDiscardColorsOperations, ICoreGiftedSlashUseRewardsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreGiftedSlashUseRewardsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreGiftedSlashUseRewardsCoreCardActionsOperations coreCardActionsOperations, ICoreGiftedSlashUseRewardsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreGiftedSlashUseRewardsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreGiftedSlashUseRewardsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreGiftedSlashUseRewardsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreGiftedSlashUseRewardsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreGiftedSlashUseRewardsCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreGiftedSlashUseRewardsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreGiftedSlashUseRewardsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreGiftedSlashUseRewardsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreGiftedSlashUseRewardsCorePublicPilePreparationOperations corePublicPilePreparationOperations, ICoreGiftedSlashUseRewardsCoreRuntimeOperations coreRuntimeOperations, ICoreGiftedSlashUseRewardsCoreShownEntityTurnPoliciesOperations coreShownEntityTurnPoliciesOperations, ICoreGiftedSlashUseRewardsCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreGiftedSlashUseRewardsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreGiftedSlashUseRewardsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreGiftedSlashUseRewardsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreGiftedSlashUseRewardsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreGiftedSlashUseRewardsCoreGiftedSlashUseRewardsOperations coreGiftedSlashUseRewardsOperations, ICoreGiftedSlashUseRewardsCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICoreGiftedSlashUseRewardsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActionDiscardColorsOperations = coreActionDiscardColorsOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPilePreparationOperations = corePublicPilePreparationOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShownEntityTurnPoliciesOperations = coreShownEntityTurnPoliciesOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreGiftedSlashUseRewardsOperations = coreGiftedSlashUseRewardsOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

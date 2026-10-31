@@ -50,7 +50,7 @@ internal static class SkillProgramStartedJudgmentChecks
             "The configured Dodge judgment must reach its mandatory final-result binding.");
         var finalBinding = restored.Events.Select(item => item.Payload).OfType<ProgramBindingStartedEvent>()
             .Single(item => item.SkillId == ProgramId && item.BindingId == ResultTriggerId);
-        var players = (IReadOnlyList<CharacterState>)typeof(GameEngine)
+        var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine
             .GetField("_players", System.Reflection.BindingFlags.Instance |
                 System.Reflection.BindingFlags.NonPublic)!.GetValue(restored)!;
         Require(players[finalBinding.OwnerSeat].SkillGrants.Grants.Any(grant =>

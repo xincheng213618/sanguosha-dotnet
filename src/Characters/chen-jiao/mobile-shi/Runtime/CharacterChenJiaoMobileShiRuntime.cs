@@ -1,0 +1,96 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterChenJiaoMobileShiRuntime : global::CardGame.Core.IChenJiaoHost
+{
+    private readonly ICharacterChenJiaoMobileShiCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICharacterChenJiaoMobileShiCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterChenJiaoMobileShiContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterChenJiaoMobileShiResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreActualPlayPhaseCardUsesOperations _coreActualPlayPhaseCardUsesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreAlcoholSlashSuppressionsOperations _coreAlcoholSlashSuppressionsOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterChenJiaoMobileShiCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICharacterChenJiaoMobileShiCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterChenJiaoMobileShiCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterChenJiaoMobileShiCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterChenJiaoMobileShiKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICharacterChenJiaoMobileShiKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CharacterChenJiaoMobileShiRuntime(ICharacterChenJiaoMobileShiCharacterLuMengMouOperations characterLuMengMouOperations, ICharacterChenJiaoMobileShiCardZonesOperations cardZonesOperations, ICharacterChenJiaoMobileShiContentRegistryOperations contentRegistryOperations, ICharacterChenJiaoMobileShiResolutionStackOperations resolutionStackOperations, ICharacterChenJiaoMobileShiCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterChenJiaoMobileShiCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICharacterChenJiaoMobileShiCoreActualPlayPhaseCardUsesOperations coreActualPlayPhaseCardUsesOperations, ICharacterChenJiaoMobileShiCoreAlcoholSlashSuppressionsOperations coreAlcoholSlashSuppressionsOperations, ICharacterChenJiaoMobileShiCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICharacterChenJiaoMobileShiCoreCardActionsOperations coreCardActionsOperations, ICharacterChenJiaoMobileShiCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterChenJiaoMobileShiCoreCardUseModulesOperations coreCardUseModulesOperations, ICharacterChenJiaoMobileShiCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICharacterChenJiaoMobileShiCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterChenJiaoMobileShiCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICharacterChenJiaoMobileShiCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterChenJiaoMobileShiCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterChenJiaoMobileShiCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICharacterChenJiaoMobileShiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterChenJiaoMobileShiCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterChenJiaoMobileShiCoreRuleQueriesOperations coreRuleQueriesOperations, ICharacterChenJiaoMobileShiCoreRuntimeOperations coreRuntimeOperations, ICharacterChenJiaoMobileShiCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterChenJiaoMobileShiCoreMatchLogOperations coreMatchLogOperations, ICharacterChenJiaoMobileShiCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICharacterChenJiaoMobileShiCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICharacterChenJiaoMobileShiCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICharacterChenJiaoMobileShiCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterChenJiaoMobileShiCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICharacterChenJiaoMobileShiCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterChenJiaoMobileShiCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterChenJiaoMobileShiCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICharacterChenJiaoMobileShiCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterChenJiaoMobileShiCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterChenJiaoMobileShiKernelCoreMainOperations kernelCoreMainOperations, ICharacterChenJiaoMobileShiKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess)
+    {
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreActualPlayPhaseCardUsesOperations = coreActualPlayPhaseCardUsesOperations;
+        this._coreAlcoholSlashSuppressionsOperations = coreAlcoholSlashSuppressionsOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuleQueriesOperations = coreRuleQueriesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+    }
+}

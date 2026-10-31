@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineFinalTargetPublicPilesRuntime : global::CardGame.Core.IFinalTargetPublicPileHost
+{
+    private readonly ICoreFinalTargetPublicPilesCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICoreFinalTargetPublicPilesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreFinalTargetPublicPilesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreFinalTargetPublicPilesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFinalTargetPublicPilesCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreFinalTargetPublicPilesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreFinalTargetPublicPilesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreFinalTargetPublicPilesCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreFinalTargetPublicPilesCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreFinalTargetPublicPilesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreFinalTargetPublicPilesCorePublicPersistentPilesOperations _corePublicPersistentPilesOperations;
+    private readonly ICoreFinalTargetPublicPilesCorePublicPileSourcesOperations _corePublicPileSourcesOperations;
+    private readonly ICoreFinalTargetPublicPilesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreFinalTargetPublicPilesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreFinalTargetPublicPilesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreFinalTargetPublicPilesCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreFinalTargetPublicPilesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreFinalTargetPublicPilesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineFinalTargetPublicPilesRuntime(ICoreFinalTargetPublicPilesCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICoreFinalTargetPublicPilesCardZonesOperations cardZonesOperations, ICoreFinalTargetPublicPilesContentRegistryOperations contentRegistryOperations, ICoreFinalTargetPublicPilesResolutionStackOperations resolutionStackOperations, ICoreFinalTargetPublicPilesCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreFinalTargetPublicPilesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreFinalTargetPublicPilesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreFinalTargetPublicPilesCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreFinalTargetPublicPilesCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreFinalTargetPublicPilesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreFinalTargetPublicPilesCorePublicPersistentPilesOperations corePublicPersistentPilesOperations, ICoreFinalTargetPublicPilesCorePublicPileSourcesOperations corePublicPileSourcesOperations, ICoreFinalTargetPublicPilesCoreRuntimeOperations coreRuntimeOperations, ICoreFinalTargetPublicPilesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreFinalTargetPublicPilesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreFinalTargetPublicPilesCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreFinalTargetPublicPilesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreFinalTargetPublicPilesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPersistentPilesOperations = corePublicPersistentPilesOperations;
+        this._corePublicPileSourcesOperations = corePublicPileSourcesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

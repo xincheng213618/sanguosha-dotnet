@@ -8,7 +8,7 @@ public sealed record MouTianYuReceipt(CardConversionSource Source, string Gamepl
     MouTianYuStage Stage, string? Branch = null, MouTianYuStage AfterChildren = MouTianYuStage.Complete,
     long Before = 0, long After = 0)
 {
-    private readonly IReadOnlyList<int> _hand = Array.AsReadOnly(Array.Empty<int>()), _selected = Array.AsReadOnly(Array.Empty<int>());
+    private readonly IReadOnlyList<int> _hand = Array.AsReadOnly(Array.Empty<int>()),_selected = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Hand { get => _hand; init => _hand = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Selected { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }
 }
@@ -34,7 +34,7 @@ internal sealed class MouTianYuHandler(SkillProgramEffectOp op) : ISkillProgramE
 }
 internal static class MouTianYuComposition
 {
-    internal const string Zhenxi = "mou-mobile:zhenxi", Yangshi = "mou-mobile:yangshi";
+    internal const string Zhenxi = "mou-mobile:zhenxi",Yangshi = "mou-mobile:yangshi";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouTianYuZhenxi or SkillProgramEffectOp.ResolveMouTianYuYangshi;
     [ProgramCatalogValidation(1080)]
     internal static void ValidateProgram(string path, SkillProgram p)

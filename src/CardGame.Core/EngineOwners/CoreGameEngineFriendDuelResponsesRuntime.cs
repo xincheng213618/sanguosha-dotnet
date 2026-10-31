@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineFriendDuelResponsesRuntime
+{
+    private readonly ICoreFriendDuelResponsesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreFriendDuelResponsesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFriendDuelResponsesCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreFriendDuelResponsesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreFriendDuelResponsesCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreFriendDuelResponsesCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreFriendDuelResponsesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreFriendDuelResponsesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreFriendDuelResponsesCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreFriendDuelResponsesCoreFriendEventsOperations _coreFriendEventsOperations;
+    private readonly ICoreFriendDuelResponsesCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreFriendDuelResponsesCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreFriendDuelResponsesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreFriendDuelResponsesCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreFriendDuelResponsesCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreFriendDuelResponsesCoreNativeDuelOperations _coreNativeDuelOperations;
+    private readonly ICoreFriendDuelResponsesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreFriendDuelResponsesCoreNativeResponseWindowsOperations _coreNativeResponseWindowsOperations;
+    private readonly ICoreFriendDuelResponsesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreFriendDuelResponsesCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreFriendDuelResponsesCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreFriendDuelResponsesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineFriendDuelResponsesRuntime(ICoreFriendDuelResponsesCardZonesOperations cardZonesOperations, ICoreFriendDuelResponsesResolutionStackOperations resolutionStackOperations, ICoreFriendDuelResponsesCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreFriendDuelResponsesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreFriendDuelResponsesCoreCardActionsOperations coreCardActionsOperations, ICoreFriendDuelResponsesCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreFriendDuelResponsesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreFriendDuelResponsesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreFriendDuelResponsesCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreFriendDuelResponsesCoreFriendEventsOperations coreFriendEventsOperations, ICoreFriendDuelResponsesCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreFriendDuelResponsesCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreFriendDuelResponsesCoreRuntimeOperations coreRuntimeOperations, ICoreFriendDuelResponsesCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreFriendDuelResponsesCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreFriendDuelResponsesCoreNativeDuelOperations coreNativeDuelOperations, ICoreFriendDuelResponsesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreFriendDuelResponsesCoreNativeResponseWindowsOperations coreNativeResponseWindowsOperations, ICoreFriendDuelResponsesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreFriendDuelResponsesCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreFriendDuelResponsesCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreFriendDuelResponsesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreFriendEventsOperations = coreFriendEventsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDuelOperations = coreNativeDuelOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeResponseWindowsOperations = coreNativeResponseWindowsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -3,7 +3,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryZhangNiComposition
 {
-    internal const string Skill = "boundary:wurong-mobile", Activation = "private-mouyi", Skip = "issued-next-draw-skip", Result = "wurong-result";
+    internal const string Skill = "boundary:wurong-mobile",Activation = "private-mouyi",Skip = "issued-next-draw-skip",Result = "wurong-result";
     internal static readonly string[] Outcomes = ["suppress-resist", "suppress-submit", "appease-resist", "appease-submit"];
     [ProgramCatalogValidation(54200)]
     internal static void Validate(string path, SkillProgram p)

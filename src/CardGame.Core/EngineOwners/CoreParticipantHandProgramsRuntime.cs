@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreParticipantHandProgramsRuntime : global::CardGame.Core.IParticipantHandProgramHost
+{
+    private readonly ICoreParticipantHandProgramsCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreParticipantHandProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreParticipantHandProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreParticipantHandProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreParticipantHandProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreParticipantHandProgramsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreParticipantHandProgramsCoreMantianGuohaiOperations _coreMantianGuohaiOperations;
+    private readonly ICoreParticipantHandProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreParticipantHandProgramsCoreOwnedHandRankSumGiftOperations _coreOwnedHandRankSumGiftOperations;
+    private readonly ICoreParticipantHandProgramsCorePindianHandReturnsOperations _corePindianHandReturnsOperations;
+    private readonly ICoreParticipantHandProgramsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreParticipantHandProgramsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreParticipantHandProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreParticipantHandProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreParticipantHandProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreParticipantHandProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreParticipantHandProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreParticipantHandProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreParticipantHandProgramsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreParticipantHandProgramsCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreParticipantHandProgramsKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreParticipantHandProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreParticipantHandProgramsRuntime(ICoreParticipantHandProgramsCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreParticipantHandProgramsCardZonesOperations cardZonesOperations, ICoreParticipantHandProgramsContentRegistryOperations contentRegistryOperations, ICoreParticipantHandProgramsResolutionStackOperations resolutionStackOperations, ICoreParticipantHandProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreParticipantHandProgramsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreParticipantHandProgramsCoreMantianGuohaiOperations coreMantianGuohaiOperations, ICoreParticipantHandProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreParticipantHandProgramsCoreOwnedHandRankSumGiftOperations coreOwnedHandRankSumGiftOperations, ICoreParticipantHandProgramsCorePindianHandReturnsOperations corePindianHandReturnsOperations, ICoreParticipantHandProgramsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreParticipantHandProgramsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreParticipantHandProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreParticipantHandProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreParticipantHandProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreParticipantHandProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreParticipantHandProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreParticipantHandProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreParticipantHandProgramsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreParticipantHandProgramsCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreParticipantHandProgramsKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreParticipantHandProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreMantianGuohaiOperations = coreMantianGuohaiOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreOwnedHandRankSumGiftOperations = coreOwnedHandRankSumGiftOperations;
+        this._corePindianHandReturnsOperations = corePindianHandReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

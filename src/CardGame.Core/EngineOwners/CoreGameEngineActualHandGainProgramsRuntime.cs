@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineActualHandGainProgramsRuntime : global::CardGame.Core.IActualHandGainAndCategoryGiftHost
+{
+    private readonly ICoreActualHandGainProgramsCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICoreActualHandGainProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreActualHandGainProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreActualHandGainProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreActualHandGainProgramsCoreActualHandGainObserversOperations _coreActualHandGainObserversOperations;
+    private readonly ICoreActualHandGainProgramsCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICoreActualHandGainProgramsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreActualHandGainProgramsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreActualHandGainProgramsCoreCompletedCategoryUseProofOperations _coreCompletedCategoryUseProofOperations;
+    private readonly ICoreActualHandGainProgramsCoreFireTargetBenefitsOperations _coreFireTargetBenefitsOperations;
+    private readonly ICoreActualHandGainProgramsCoreGainGiftProgramsOperations _coreGainGiftProgramsOperations;
+    private readonly ICoreActualHandGainProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreActualHandGainProgramsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreActualHandGainProgramsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreActualHandGainProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreActualHandGainProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreActualHandGainProgramsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreActualHandGainProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreActualHandGainProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreActualHandGainProgramsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreActualHandGainProgramsCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreActualHandGainProgramsCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreActualHandGainProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CoreGameEngineActualHandGainProgramsRuntime(ICoreActualHandGainProgramsCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICoreActualHandGainProgramsCardZonesOperations cardZonesOperations, ICoreActualHandGainProgramsContentRegistryOperations contentRegistryOperations, ICoreActualHandGainProgramsResolutionStackOperations resolutionStackOperations, ICoreActualHandGainProgramsCoreActualHandGainObserversOperations coreActualHandGainObserversOperations, ICoreActualHandGainProgramsCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICoreActualHandGainProgramsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreActualHandGainProgramsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreActualHandGainProgramsCoreCompletedCategoryUseProofOperations coreCompletedCategoryUseProofOperations, ICoreActualHandGainProgramsCoreFireTargetBenefitsOperations coreFireTargetBenefitsOperations, ICoreActualHandGainProgramsCoreGainGiftProgramsOperations coreGainGiftProgramsOperations, ICoreActualHandGainProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreActualHandGainProgramsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreActualHandGainProgramsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreActualHandGainProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreActualHandGainProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreActualHandGainProgramsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreActualHandGainProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreActualHandGainProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreActualHandGainProgramsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreActualHandGainProgramsCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreActualHandGainProgramsCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreActualHandGainProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualHandGainObserversOperations = coreActualHandGainObserversOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCompletedCategoryUseProofOperations = coreCompletedCategoryUseProofOperations;
+        this._coreFireTargetBenefitsOperations = coreFireTargetBenefitsOperations;
+        this._coreGainGiftProgramsOperations = coreGainGiftProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+    }
+}

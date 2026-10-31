@@ -51,7 +51,7 @@ internal sealed class MobileOrdinaryQiangxiPairValidator : IProgramSelectionVali
 internal static class MobileOrdinaryQiangxiComposition
 {
     internal const string Skill = "mobile:qiangxi";
-    internal const string Hp = "lose-hp-and-damage", Weapon = "discard-weapon-and-damage";
+    internal const string Hp = "lose-hp-and-damage",Weapon = "discard-weapon-and-damage";
 
     [ProgramCatalogValidation(82800)]
     internal static void Validate(string path, SkillProgram program)

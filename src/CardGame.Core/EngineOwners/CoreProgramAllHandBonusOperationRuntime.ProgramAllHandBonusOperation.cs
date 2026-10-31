@@ -1,0 +1,14 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CoreProgramAllHandBonusOperationRuntime
+{
+    internal bool BypassesSlashLimitBySuit(CharacterState owner, Card card, CardKind effectiveKind) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind) && _coreBoundDiscardSlashBenefitsOperations.HasTurnSlashSuitAllowance(owner.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)) || _coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance(owner, card) || _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.BypassSlashLimitBySuit, effectiveKind).Any(item => item.Policy.InputSuit == _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card));
+    internal bool CanUsePeachToRescue(int responderSeat, int victimSeat) => _characterLuMengMouMobileOperations.IsMouLuMengPeachRescueAllowed(responderSeat) && _characterSimaYiHappyGodOperations.AllowsHappySimaPeach(responderSeat) && !(responderSeat == victimSeat && _coreHandComparisonOperations.HasSelfCardTargetProhibition(responderSeat)) && !(responderSeat != victimSeat && _coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[victimSeat], SkillProgramCardPolicyKind.DyingSelfRescueOnly, CardKind.Peach)) && (responderSeat == _coreActualTurnProgressCurrentSeatAccess._currentSeat || responderSeat == victimSeat || !_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatAccess._currentSeat].IsAlive || !_coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatAccess._currentSeat], SkillProgramCardPolicyKind.ExclusiveDyingPeachRescue, CardKind.Peach));
+    [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaAfterLimit, 90)]
+    internal bool SuitSlashQuotaAfterLimit(ProgramSlashQuotaQuery query) => query.PhysicalCard is not null && BypassesSlashLimitBySuit(query.Actor, query.PhysicalCard, query.Kind);
+}

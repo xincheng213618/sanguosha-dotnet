@@ -11,7 +11,7 @@ internal static partial class AnniversaryXiahouHuiChecks
         // Attach a brain to the externally controlled fixture seat only. Player,
         // frame, issued prompt, native payment and rule state remain untouched.
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-        var brains = (Dictionary<int, SimpleAiBrain>)typeof(GameEngine).GetField("_aiBrains", flags)!.GetValue(game)!;
+        var brains = (Dictionary<int, SimpleAiBrain>)global::FixtureRuntimeAccess.Engine.GetField("_aiBrains", flags)!.GetValue(game)!;
         brains[decision.PlayerSeat] = new SimpleAiBrain(decision.PlayerSeat, 79, AiDecisionPolicy.CurrentVersion);
         var router = typeof(GameEngine).GetProperty("ProgramInteractions", flags)!.GetValue(game)!;
         var effect = ProgramInstructionResolver.Default.Resolve(frame, game.ContentRegistry.GetSkill(frame.SkillId).Program!)

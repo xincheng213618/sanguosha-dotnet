@@ -51,7 +51,7 @@ internal sealed class AnniversaryKanZeHandler(SkillProgramEffectOp operation) : 
 
 internal static class AnniversaryKanZeComposition
 {
-    internal const string Kuanshi = "anniversary:kuanshi", Arm = "arm-until-next-actual-turn", Reward = "second-damage-point";
+    internal const string Kuanshi = "anniversary:kuanshi",Arm = "arm-until-next-actual-turn",Reward = "second-damage-point";
     [ProgramCatalogValidation(42900)]
     internal static void Validate(string path, SkillProgram program)
     {

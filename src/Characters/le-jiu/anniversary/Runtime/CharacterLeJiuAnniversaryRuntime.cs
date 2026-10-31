@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLeJiuAnniversaryRuntime : global::CardGame.Core.IAnniversaryLeJiuHost
+{
+    private readonly ICharacterLeJiuAnniversaryCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterLeJiuAnniversaryContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLeJiuAnniversaryResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLeJiuAnniversaryCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLeJiuAnniversaryCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterLeJiuAnniversaryKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterLeJiuAnniversaryRuntime(ICharacterLeJiuAnniversaryCardZonesOperations cardZonesOperations, ICharacterLeJiuAnniversaryContentRegistryOperations contentRegistryOperations, ICharacterLeJiuAnniversaryResolutionStackOperations resolutionStackOperations, ICharacterLeJiuAnniversaryCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterLeJiuAnniversaryCoreCardActionsOperations coreCardActionsOperations, ICharacterLeJiuAnniversaryCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterLeJiuAnniversaryCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterLeJiuAnniversaryCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterLeJiuAnniversaryCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterLeJiuAnniversaryCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICharacterLeJiuAnniversaryCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICharacterLeJiuAnniversaryCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLeJiuAnniversaryCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLeJiuAnniversaryCoreRuntimeOperations coreRuntimeOperations, ICharacterLeJiuAnniversaryCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterLeJiuAnniversaryKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

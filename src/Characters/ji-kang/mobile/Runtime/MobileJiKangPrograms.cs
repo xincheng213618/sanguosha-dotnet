@@ -15,7 +15,7 @@ public sealed record MobileJiKangReceipt
     public bool Paid { get; init; }
     public long Before { get; init; }
     public long After { get; init; }
-    private IReadOnlyList<int> _targets = Array.AsReadOnly(Array.Empty<int>()), _cards = Array.AsReadOnly(Array.Empty<int>());
+    private IReadOnlyList<int> _targets = Array.AsReadOnly(Array.Empty<int>()),_cards = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
 }

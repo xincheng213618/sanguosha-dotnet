@@ -1,0 +1,24 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreCommandResultProjectionRuntime
+{
+    private readonly ICoreCommandResultProjectionCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreCommandResultProjectionCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreCommandResultProjectionCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreCommandResultProjectionKernelCoreGameEngineCommandSessionOperations _kernelCoreGameEngineCommandSessionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess;
+    internal CoreCommandResultProjectionRuntime(ICoreCommandResultProjectionCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreCommandResultProjectionCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreCommandResultProjectionCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreCommandResultProjectionKernelCoreGameEngineCommandSessionOperations kernelCoreGameEngineCommandSessionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess)
+    {
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._kernelCoreGameEngineCommandSessionOperations = kernelCoreGameEngineCommandSessionOperations;
+        this._coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess = coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess;
+    }
+}

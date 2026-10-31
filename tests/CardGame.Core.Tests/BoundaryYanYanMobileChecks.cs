@@ -21,7 +21,7 @@ internal static class BoundaryYanYanMobileChecks
         public int Count=>State.PublicRuleStates!.Single(s=>s.StateId=="juzhan-state-count").Value;
         public int Bonus=>State.PublicRuleStates!.Single(s=>s.StateId=="juzhan-permanent-slash").Value;
         public int Limit()
-        {const BindingFlags flags=BindingFlags.Instance|BindingFlags.NonPublic;var players=(IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players",flags)!.GetValue(G)!;return(int)typeof(GameEngine).GetMethod("GetSlashUseLimit",flags)!.Invoke(G,[players[0],null,null])!;}
+        {const BindingFlags flags=BindingFlags.Instance|BindingFlags.NonPublic;var players=(IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players",flags)!.GetValue(G)!;return(int)global::FixtureRuntimeAccess.Engine.GetMethod("GetSlashUseLimit",flags)!.Invoke(G,[players[0],null,null])!;}
         public void Play(int actor)=>Reach(()=>P is{Kind:DecisionKind.PlayCard}&&P.PlayerSeat==actor);
         public void End()=>Accept(new EndPlayPhaseCommand(P!.PlayerSeat,G.Revision,P.PromptId));
         public void Draw()=>Accept(new UseProgramSkillCommand(0,Driver,"draw",[],[],G.Revision,P!.PromptId));

@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRecipientCategorySlashTargetsRuntime
+{
+    private readonly ICoreRecipientCategorySlashTargetsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreRecipientCategoryMarksOperations _coreRecipientCategoryMarksOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreRecipientCategorySlashTargetsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreRecipientCategorySlashTargetsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRecipientCategorySlashTargetsRuntime(ICoreRecipientCategorySlashTargetsContentRegistryOperations contentRegistryOperations, ICoreRecipientCategorySlashTargetsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreRecipientCategorySlashTargetsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRecipientCategorySlashTargetsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreRecipientCategorySlashTargetsCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICoreRecipientCategorySlashTargetsCoreHandComparisonOperations coreHandComparisonOperations, ICoreRecipientCategorySlashTargetsCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICoreRecipientCategorySlashTargetsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreRecipientCategorySlashTargetsCoreRecipientCategoryMarksOperations coreRecipientCategoryMarksOperations, ICoreRecipientCategorySlashTargetsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreRecipientCategorySlashTargetsCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreRecipientCategorySlashTargetsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreRecipientCategorySlashTargetsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecipientCategoryMarksOperations = coreRecipientCategoryMarksOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

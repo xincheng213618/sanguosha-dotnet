@@ -36,4 +36,7 @@
     <EmbeddedResource Include="Fixtures\national-v7.json" />
     <ProjectReference Include="..\..\src\CardGame.Wpf\CardGame.Wpf.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Shared\FixtureRuntimeAccess.cs" Link="FixtureRuntimeAccess.cs" />
+  </ItemGroup>
 </Project>

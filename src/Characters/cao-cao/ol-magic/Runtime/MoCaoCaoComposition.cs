@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MoCaoCaoComposition
 {
-    internal const string Fuzai = "ol:mo-fuzai", Bachao = "ol:mo-bachao", Baibi = "equipment:baibi-dao", BaibiBinding = "after-slash-damage";
+    internal const string Fuzai = "ol:mo-fuzai",Bachao = "ol:mo-bachao",Baibi = "equipment:baibi-dao",BaibiBinding = "after-slash-damage";
     [ProgramCatalogValidation(1600)]
     internal static void Validate(string path, SkillProgram p)
     {

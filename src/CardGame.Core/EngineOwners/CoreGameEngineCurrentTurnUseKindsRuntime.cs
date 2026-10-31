@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineCurrentTurnUseKindsRuntime
+{
+    private readonly ICoreCurrentTurnUseKindsCharacterCaiYongLeOperations _characterCaiYongLeOperations;
+    private readonly ICoreCurrentTurnUseKindsCharacterCaoZhiLeOperations _characterCaoZhiLeOperations;
+    private readonly ICoreCurrentTurnUseKindsCharacterLuSuMobileShiOperations _characterLuSuMobileShiOperations;
+    private readonly ICoreCurrentTurnUseKindsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCurrentTurnUseKindsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCurrentTurnUseKindsCoreActualTurnLegacyCompletionOperations _coreActualTurnLegacyCompletionOperations;
+    private readonly ICoreCurrentTurnUseKindsCoreCurrentRoundActualUsesOperations _coreCurrentRoundActualUsesOperations;
+    private readonly ICoreCurrentTurnUseKindsCoreDelayedNullificationOperations _coreDelayedNullificationOperations;
+    private readonly ICoreCurrentTurnUseKindsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreCurrentTurnUseKindsCoreWholeActualTurnUsesOperations _coreWholeActualTurnUsesOperations;
+    private readonly ICoreCurrentTurnUseKindsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreCurrentTurnUseKindsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    internal CoreGameEngineCurrentTurnUseKindsRuntime(ICoreCurrentTurnUseKindsCharacterCaiYongLeOperations characterCaiYongLeOperations, ICoreCurrentTurnUseKindsCharacterCaoZhiLeOperations characterCaoZhiLeOperations, ICoreCurrentTurnUseKindsCharacterLuSuMobileShiOperations characterLuSuMobileShiOperations, ICoreCurrentTurnUseKindsContentRegistryOperations contentRegistryOperations, ICoreCurrentTurnUseKindsResolutionStackOperations resolutionStackOperations, ICoreCurrentTurnUseKindsCoreActualTurnLegacyCompletionOperations coreActualTurnLegacyCompletionOperations, ICoreCurrentTurnUseKindsCoreCurrentRoundActualUsesOperations coreCurrentRoundActualUsesOperations, ICoreCurrentTurnUseKindsCoreDelayedNullificationOperations coreDelayedNullificationOperations, ICoreCurrentTurnUseKindsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreCurrentTurnUseKindsCoreWholeActualTurnUsesOperations coreWholeActualTurnUsesOperations, ICoreCurrentTurnUseKindsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreCurrentTurnUseKindsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess)
+    {
+        this._characterCaiYongLeOperations = characterCaiYongLeOperations;
+        this._characterCaoZhiLeOperations = characterCaoZhiLeOperations;
+        this._characterLuSuMobileShiOperations = characterLuSuMobileShiOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualTurnLegacyCompletionOperations = coreActualTurnLegacyCompletionOperations;
+        this._coreCurrentRoundActualUsesOperations = coreCurrentRoundActualUsesOperations;
+        this._coreDelayedNullificationOperations = coreDelayedNullificationOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreWholeActualTurnUsesOperations = coreWholeActualTurnUsesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+    }
+}

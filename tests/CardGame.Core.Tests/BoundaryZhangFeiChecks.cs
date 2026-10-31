@@ -29,7 +29,7 @@ internal static class BoundaryZhangFeiChecks
 
     private static IEnumerable<NextSlashDamageReservedEvent> Reserved(GameEngine g) => g.Events.Select(e => e.Payload).OfType<NextSlashDamageReservedEvent>();
     private static IEnumerable<NextSlashDamageConsumedEvent> Consumed(GameEngine g) => g.Events.Select(e => e.Payload).OfType<NextSlashDamageConsumedEvent>();
-    private static CharacterState[] Players(GameEngine g) => ((IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(g)!).ToArray();
+    private static CharacterState[] Players(GameEngine g) => ((IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(g)!).ToArray();
     private static void Slash(GameEngine g, int[] targets)
     {
         var a = g.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Slash && a.TargetSeat == targets[0]);

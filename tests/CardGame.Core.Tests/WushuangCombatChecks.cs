@@ -25,7 +25,7 @@ internal static partial class WushuangCombatChecks
             var revision = g.Revision;
             try
             {
-                typeof(GameEngine).GetMethod("GrantProgramArmor", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(g, [probe]);
+                global::FixtureRuntimeAccess.Engine.GetMethod("GrantProgramArmor", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(g, [probe]);
                 throw new InvalidOperationException("The no-gain policy bypassed the native instruction proof.");
             }
             catch (TargetInvocationException error) when (error.InnerException is InvalidOperationException failure &&

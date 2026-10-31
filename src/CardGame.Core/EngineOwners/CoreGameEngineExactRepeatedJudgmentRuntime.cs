@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineExactRepeatedJudgmentRuntime : global::CardGame.Core.IRepeatedJudgmentClaimPolicyProgramHost
+{
+    private readonly ICoreExactRepeatedJudgmentCardZonesOperations _cardZonesOperations;
+    private readonly ICoreExactRepeatedJudgmentContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreExactRepeatedJudgmentResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreExactRepeatedJudgmentTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreExactRepeatedJudgmentCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreExactRepeatedJudgmentCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreExactRepeatedJudgmentCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreExactRepeatedJudgmentCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreExactRepeatedJudgmentCoreProgramRepeatedJudgmentOperations _coreProgramRepeatedJudgmentOperations;
+    private readonly ICoreExactRepeatedJudgmentCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreExactRepeatedJudgmentCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreExactRepeatedJudgmentCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreExactRepeatedJudgmentKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineExactRepeatedJudgmentRuntime(ICoreExactRepeatedJudgmentCardZonesOperations cardZonesOperations, ICoreExactRepeatedJudgmentContentRegistryOperations contentRegistryOperations, ICoreExactRepeatedJudgmentResolutionStackOperations resolutionStackOperations, ICoreExactRepeatedJudgmentTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreExactRepeatedJudgmentCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreExactRepeatedJudgmentCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreExactRepeatedJudgmentCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreExactRepeatedJudgmentCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreExactRepeatedJudgmentCoreProgramRepeatedJudgmentOperations coreProgramRepeatedJudgmentOperations, ICoreExactRepeatedJudgmentCoreRuntimeOperations coreRuntimeOperations, ICoreExactRepeatedJudgmentCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreExactRepeatedJudgmentCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreExactRepeatedJudgmentKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramRepeatedJudgmentOperations = coreProgramRepeatedJudgmentOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

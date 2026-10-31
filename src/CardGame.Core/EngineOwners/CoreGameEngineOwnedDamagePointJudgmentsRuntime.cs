@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
+{
+    private readonly ICoreOwnedDamagePointJudgmentsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCorePublicPileEquipmentSequencesOperations _corePublicPileEquipmentSequencesOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreZhenyiJudgmentWindowsOperations _coreZhenyiJudgmentWindowsOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreNativeJudgmentOperations _coreNativeJudgmentOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreOwnedDamagePointJudgmentsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess _coreCommandJournalStorageEventsPendingEventsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineOwnedDamagePointJudgmentsRuntime(ICoreOwnedDamagePointJudgmentsContentRegistryOperations contentRegistryOperations, ICoreOwnedDamagePointJudgmentsResolutionStackOperations resolutionStackOperations, ICoreOwnedDamagePointJudgmentsCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreOwnedDamagePointJudgmentsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreOwnedDamagePointJudgmentsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreOwnedDamagePointJudgmentsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreOwnedDamagePointJudgmentsCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICoreOwnedDamagePointJudgmentsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreOwnedDamagePointJudgmentsCorePublicPileEquipmentSequencesOperations corePublicPileEquipmentSequencesOperations, ICoreOwnedDamagePointJudgmentsCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreOwnedDamagePointJudgmentsCoreRuntimeOperations coreRuntimeOperations, ICoreOwnedDamagePointJudgmentsCoreZhenyiJudgmentWindowsOperations coreZhenyiJudgmentWindowsOperations, ICoreOwnedDamagePointJudgmentsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreOwnedDamagePointJudgmentsCoreNativeJudgmentOperations coreNativeJudgmentOperations, ICoreOwnedDamagePointJudgmentsCoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations, ICoreOwnedDamagePointJudgmentsCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICoreOwnedDamagePointJudgmentsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreOwnedDamagePointJudgmentsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStorageEventsPendingEventsAccess coreCommandJournalStorageEventsPendingEventsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPileEquipmentSequencesOperations = corePublicPileEquipmentSequencesOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreZhenyiJudgmentWindowsOperations = coreZhenyiJudgmentWindowsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeJudgmentOperations = coreNativeJudgmentOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreCommandJournalStorageEventsPendingEventsAccess = coreCommandJournalStorageEventsPendingEventsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

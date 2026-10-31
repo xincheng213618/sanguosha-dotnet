@@ -1,0 +1,52 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterManChongBoundaryMobileRuntime : global::CardGame.Core.IBoundaryManChongHost
+{
+    private readonly ICharacterManChongBoundaryMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterManChongBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterManChongBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterManChongBoundaryMobileCoreFireTargetBenefitsOperations _coreFireTargetBenefitsOperations;
+    private readonly ICharacterManChongBoundaryMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterManChongBoundaryMobileCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterManChongBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterManChongBoundaryMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterManChongBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterManChongBoundaryMobileCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterManChongBoundaryMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterManChongBoundaryMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterManChongBoundaryMobileCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterManChongBoundaryMobileCorePlayerViewNativeCardSelectionsOperations _corePlayerViewNativeCardSelectionsOperations;
+    private readonly ICharacterManChongBoundaryMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterManChongBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterManChongBoundaryMobileRuntime(ICharacterManChongBoundaryMobileCardZonesOperations cardZonesOperations, ICharacterManChongBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterManChongBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterManChongBoundaryMobileCoreFireTargetBenefitsOperations coreFireTargetBenefitsOperations, ICharacterManChongBoundaryMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterManChongBoundaryMobileCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterManChongBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterManChongBoundaryMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterManChongBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterManChongBoundaryMobileCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterManChongBoundaryMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterManChongBoundaryMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterManChongBoundaryMobileCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterManChongBoundaryMobileCorePlayerViewNativeCardSelectionsOperations corePlayerViewNativeCardSelectionsOperations, ICharacterManChongBoundaryMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterManChongBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreFireTargetBenefitsOperations = coreFireTargetBenefitsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewNativeCardSelectionsOperations = corePlayerViewNativeCardSelectionsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

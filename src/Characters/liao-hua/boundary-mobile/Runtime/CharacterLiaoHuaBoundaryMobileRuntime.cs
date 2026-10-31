@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLiaoHuaBoundaryMobileRuntime : global::CardGame.Core.IBoundaryLiaoHuaMobileHost
+{
+    private readonly ICharacterLiaoHuaBoundaryMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileCoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLiaoHuaBoundaryMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterLiaoHuaBoundaryMobileRuntime(ICharacterLiaoHuaBoundaryMobileCardZonesOperations cardZonesOperations, ICharacterLiaoHuaBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterLiaoHuaBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterLiaoHuaBoundaryMobileCoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICharacterLiaoHuaBoundaryMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterLiaoHuaBoundaryMobileCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterLiaoHuaBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLiaoHuaBoundaryMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLiaoHuaBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterLiaoHuaBoundaryMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterLiaoHuaBoundaryMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLiaoHuaBoundaryMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,34 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRoundDistinctBasicRequestsRuntime
+{
+    private readonly ICoreRoundDistinctBasicRequestsCharacterKongShuOlOperations _characterKongShuOlOperations;
+    private readonly ICoreRoundDistinctBasicRequestsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRoundDistinctBasicRequestsCoreAlternatingSuitAndCompletedTopOperations _coreAlternatingSuitAndCompletedTopOperations;
+    private readonly ICoreRoundDistinctBasicRequestsCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreRoundDistinctBasicRequestsCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreRoundDistinctBasicRequestsCoreTurnRedSlashBenefitsOperations _coreTurnRedSlashBenefitsOperations;
+    private readonly ICoreRoundDistinctBasicRequestsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreRoundDistinctBasicRequestsCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreRoundDistinctBasicRequestsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRoundDistinctBasicRequestsRuntime(ICoreRoundDistinctBasicRequestsCharacterKongShuOlOperations characterKongShuOlOperations, ICoreRoundDistinctBasicRequestsContentRegistryOperations contentRegistryOperations, ICoreRoundDistinctBasicRequestsCoreAlternatingSuitAndCompletedTopOperations coreAlternatingSuitAndCompletedTopOperations, ICoreRoundDistinctBasicRequestsCoreCardConversionsOperations coreCardConversionsOperations, ICoreRoundDistinctBasicRequestsCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreRoundDistinctBasicRequestsCoreTurnRedSlashBenefitsOperations coreTurnRedSlashBenefitsOperations, ICoreRoundDistinctBasicRequestsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreRoundDistinctBasicRequestsCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreRoundDistinctBasicRequestsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterKongShuOlOperations = characterKongShuOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAlternatingSuitAndCompletedTopOperations = coreAlternatingSuitAndCompletedTopOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreTurnRedSlashBenefitsOperations = coreTurnRedSlashBenefitsOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

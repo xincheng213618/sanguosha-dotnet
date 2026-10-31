@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class MouXiahouShiComposition
 {
-    internal const string Yanyu = "mou-mobile:yanyu", Qiaoshi = "mou-mobile:qiaoshi";
+    internal const string Yanyu = "mou-mobile:yanyu",Qiaoshi = "mou-mobile:qiaoshi";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouXiahouShiYanyuDiscard or SkillProgramEffectOp.ResolveMouXiahouShiYanyuSupport or SkillProgramEffectOp.ResolveMouXiahouShiQiaoshi;
     private static bool Plain(SkillProgramEffect e, SkillProgramEffectOp op) => e.Op == op && e.Target == SkillProgramEffectTarget.Owner &&
         e.Condition.Kind == SkillProgramConditionKind.Always && e.Amount == 0 && e.ActorReference is null && e.TargetReference is null && e.SourceRef is null &&

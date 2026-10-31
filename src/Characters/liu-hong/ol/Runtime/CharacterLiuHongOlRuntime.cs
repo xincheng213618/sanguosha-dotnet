@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLiuHongOlRuntime : global::CardGame.Core.ILiuHongProgramHost
+{
+    private readonly ICharacterLiuHongOlCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICharacterLiuHongOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterLiuHongOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLiuHongOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLiuHongOlCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterLiuHongOlCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterLiuHongOlCoreCharacterHostOperations _coreCharacterHostOperations;
+    private readonly ICharacterLiuHongOlCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICharacterLiuHongOlCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterLiuHongOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLiuHongOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLiuHongOlCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICharacterLiuHongOlCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterLiuHongOlCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLiuHongOlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterLiuHongOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterLiuHongOlCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICharacterLiuHongOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterLiuHongOlKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterLiuHongOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesProgramUsesAccess _coreGameEngineSkillProgramsProgramPhaseUsesProgramUsesAccess;
+    internal CharacterLiuHongOlRuntime(ICharacterLiuHongOlCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICharacterLiuHongOlCardZonesOperations cardZonesOperations, ICharacterLiuHongOlContentRegistryOperations contentRegistryOperations, ICharacterLiuHongOlResolutionStackOperations resolutionStackOperations, ICharacterLiuHongOlCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterLiuHongOlCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterLiuHongOlCoreCharacterHostOperations coreCharacterHostOperations, ICharacterLiuHongOlCoreEquipmentContentOperations coreEquipmentContentOperations, ICharacterLiuHongOlCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterLiuHongOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLiuHongOlCoreRuntimeOperations coreRuntimeOperations, ICharacterLiuHongOlCoreMatchLogOperations coreMatchLogOperations, ICharacterLiuHongOlCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterLiuHongOlCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLiuHongOlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterLiuHongOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterLiuHongOlCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICharacterLiuHongOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterLiuHongOlKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterLiuHongOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesProgramUsesAccess coreGameEngineSkillProgramsProgramPhaseUsesProgramUsesAccess)
+    {
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCharacterHostOperations = coreCharacterHostOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineSkillProgramsProgramPhaseUsesProgramUsesAccess = coreGameEngineSkillProgramsProgramPhaseUsesProgramUsesAccess;
+    }
+}

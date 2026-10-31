@@ -1,0 +1,70 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShortRangeSlashTargetsRuntime : global::CardGame.Core.IDirectedDistanceDebtHost
+{
+    private readonly ICoreShortRangeSlashTargetsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreShortRangeSlashTargetsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreActualHandGainProgramsOperations _coreActualHandGainProgramsOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreActualUseTargetProgramsOperations _coreActualUseTargetProgramsOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreFinalTargetSlashOperations _coreFinalTargetSlashOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreFixedDistanceOneDebtOperations _coreFixedDistanceOneDebtOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreTieredRoundActualTargetWindowsOperations _coreTieredRoundActualTargetWindowsOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreShortRangeSlashTargetsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreShortRangeSlashTargetsCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreShortRangeSlashTargetsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreShortRangeSlashTargetsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineShortRangeSlashTargetsRuntime(ICoreShortRangeSlashTargetsContentRegistryOperations contentRegistryOperations, ICoreShortRangeSlashTargetsResolutionStackOperations resolutionStackOperations, ICoreShortRangeSlashTargetsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreShortRangeSlashTargetsCoreActualHandGainProgramsOperations coreActualHandGainProgramsOperations, ICoreShortRangeSlashTargetsCoreActualUseTargetProgramsOperations coreActualUseTargetProgramsOperations, ICoreShortRangeSlashTargetsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreShortRangeSlashTargetsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreShortRangeSlashTargetsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreShortRangeSlashTargetsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreShortRangeSlashTargetsCoreFinalTargetSlashOperations coreFinalTargetSlashOperations, ICoreShortRangeSlashTargetsCoreFixedDistanceOneDebtOperations coreFixedDistanceOneDebtOperations, ICoreShortRangeSlashTargetsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreShortRangeSlashTargetsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreShortRangeSlashTargetsCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICoreShortRangeSlashTargetsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShortRangeSlashTargetsCoreRuntimeOperations coreRuntimeOperations, ICoreShortRangeSlashTargetsCoreTableOrderOperations coreTableOrderOperations, ICoreShortRangeSlashTargetsCoreTieredRoundActualTargetWindowsOperations coreTieredRoundActualTargetWindowsOperations, ICoreShortRangeSlashTargetsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreShortRangeSlashTargetsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreShortRangeSlashTargetsCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreShortRangeSlashTargetsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreShortRangeSlashTargetsCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreShortRangeSlashTargetsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreShortRangeSlashTargetsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreActualHandGainProgramsOperations = coreActualHandGainProgramsOperations;
+        this._coreActualUseTargetProgramsOperations = coreActualUseTargetProgramsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreFinalTargetSlashOperations = coreFinalTargetSlashOperations;
+        this._coreFixedDistanceOneDebtOperations = coreFixedDistanceOneDebtOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreTieredRoundActualTargetWindowsOperations = coreTieredRoundActualTargetWindowsOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

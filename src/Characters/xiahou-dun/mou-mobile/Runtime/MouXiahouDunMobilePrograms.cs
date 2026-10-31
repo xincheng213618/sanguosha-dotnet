@@ -6,7 +6,7 @@ public sealed record MouXiahouDunMobileReceipt(CardConversionSource Source, stri
     public MouXiahouDunMobileStage Stage { get; init; }
     public ActualDiscardRecoveryPhaseKey? Phase { get; init; }
     public PublicPersistentPileSource? Pile { get; init; }
-    private readonly IReadOnlyList<int> _targets = Array.AsReadOnly(Array.Empty<int>()), _cards = Array.AsReadOnly(Array.Empty<int>());
+    private readonly IReadOnlyList<int> _targets = Array.AsReadOnly(Array.Empty<int>()),_cards = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     public int Index { get; init; }

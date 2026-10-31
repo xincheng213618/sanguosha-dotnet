@@ -5,7 +5,7 @@ public sealed record MouDiaoChanMobileReceipt(CardConversionSource Source, strin
 {
     public MouDiaoChanMobileStage Stage { get; init; }
     public bool Paid { get; init; }
-    private readonly IReadOnlyList<int> _targets = Array.AsReadOnly(Array.Empty<int>()), _cards = Array.AsReadOnly(Array.Empty<int>());
+    private readonly IReadOnlyList<int> _targets = Array.AsReadOnly(Array.Empty<int>()),_cards = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     public int Index { get; init; }

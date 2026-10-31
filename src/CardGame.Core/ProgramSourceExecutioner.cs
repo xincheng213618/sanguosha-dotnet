@@ -85,7 +85,7 @@ internal sealed class SourceExecutionerHuanfuHandler : ISkillProgramEffectHandle
 }
 internal static class SourceExecutionerContract
 {
-    internal const string Yishi = "shanhe:source-yishi-611", Huanfu = "shanhe:source-huanfu-3156";
+    internal const string Yishi = "shanhe:source-yishi-611",Huanfu = "shanhe:source-huanfu-3156";
     [ProgramCatalogValidation(62059)]
     internal static void ValidateYishi(string path, SkillProgram p)
     {

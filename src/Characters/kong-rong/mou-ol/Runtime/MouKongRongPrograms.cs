@@ -32,7 +32,7 @@ public sealed record MouKrLiwenReceipt(CardConversionSource Source, string Gamep
     public long After { get; init; }
     private PendingDecision? _originalDecision;
     public PendingDecision? OriginalDecision { get => _originalDecision; init => _originalDecision = value is null ? null : RequestedDeckBasicFrame.FreezeDecision(value); }
-    private IReadOnlyList<int> _recipients = [], _cards = [], _targets = [];
+    private IReadOnlyList<int> _recipients = [],_cards = [],_targets = [];
     private IReadOnlyList<MouKrScheduledSeat> _schedule = [];
     public IReadOnlyList<int> Recipients { get => _recipients; init => _recipients = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }

@@ -1,0 +1,26 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineCurrentEnhancementVirtualReturnRuntime
+{
+    private readonly ICoreCurrentEnhancementVirtualReturnCharacterLuBuHappyGodOperations _characterLuBuHappyGodOperations;
+    private readonly ICoreCurrentEnhancementVirtualReturnContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreCurrentEnhancementVirtualReturnResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreCurrentEnhancementVirtualReturnCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreCurrentEnhancementVirtualReturnCoreCurrentEnhancementSlashRedirectsOperations _coreCurrentEnhancementSlashRedirectsOperations;
+    private readonly ICoreCurrentEnhancementVirtualReturnCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    internal CoreGameEngineCurrentEnhancementVirtualReturnRuntime(ICoreCurrentEnhancementVirtualReturnCharacterLuBuHappyGodOperations characterLuBuHappyGodOperations, ICoreCurrentEnhancementVirtualReturnContentRegistryOperations contentRegistryOperations, ICoreCurrentEnhancementVirtualReturnResolutionStackOperations resolutionStackOperations, ICoreCurrentEnhancementVirtualReturnCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreCurrentEnhancementVirtualReturnCoreCurrentEnhancementSlashRedirectsOperations coreCurrentEnhancementSlashRedirectsOperations, ICoreCurrentEnhancementVirtualReturnCoreTableSeatQueriesOperations coreTableSeatQueriesOperations)
+    {
+        this._characterLuBuHappyGodOperations = characterLuBuHappyGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCurrentEnhancementSlashRedirectsOperations = coreCurrentEnhancementSlashRedirectsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+    }
+}

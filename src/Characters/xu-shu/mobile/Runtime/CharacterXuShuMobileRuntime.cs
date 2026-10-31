@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterXuShuMobileRuntime : global::CardGame.Core.IMobileSpXuShuJianyanHost
+{
+    private readonly ICharacterXuShuMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterXuShuMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterXuShuMobilePendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICharacterXuShuMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterXuShuMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterXuShuMobileCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterXuShuMobileCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterXuShuMobileCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICharacterXuShuMobileCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterXuShuMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterXuShuMobileCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterXuShuMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterXuShuMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterXuShuMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterXuShuMobileCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterXuShuMobileCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterXuShuMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterXuShuMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterXuShuMobileCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICharacterXuShuMobileCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterXuShuMobileCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICharacterXuShuMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterXuShuMobileRuntime(ICharacterXuShuMobileCardZonesOperations cardZonesOperations, ICharacterXuShuMobileContentRegistryOperations contentRegistryOperations, ICharacterXuShuMobilePendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICharacterXuShuMobileResolutionStackOperations resolutionStackOperations, ICharacterXuShuMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterXuShuMobileCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterXuShuMobileCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterXuShuMobileCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICharacterXuShuMobileCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterXuShuMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterXuShuMobileCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterXuShuMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterXuShuMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterXuShuMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterXuShuMobileCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterXuShuMobileCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterXuShuMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterXuShuMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterXuShuMobileCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICharacterXuShuMobileCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterXuShuMobileCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICharacterXuShuMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

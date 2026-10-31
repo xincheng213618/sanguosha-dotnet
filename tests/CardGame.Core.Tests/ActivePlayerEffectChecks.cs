@@ -61,7 +61,7 @@ internal static class ActivePlayerEffectChecks
             !JsonSerializer.Serialize(view.Players.Select(player => player.ActiveEffects)).Contains("private-"),
             "Color restrictions and armor loss belong to the affected recipient; stale modifiers and private bindings must not enter public effect facts.");
         var damageLimitType = typeof(GameEngine).GetNestedType("ProgramPlayDamageHandLimit", BindingFlags.NonPublic)!;
-        var limits = (IDictionary)typeof(GameEngine).GetField("_programPlayDamageHandLimits", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var limits = (IDictionary)global::FixtureRuntimeAccess.Engine.GetField("_programPlayDamageHandLimits", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         limits[0] = Activator.CreateInstance(damageLimitType, [0, "boundary:luoyi", "private-instance", turn, 1, 3]);
         Require(game.CreateSnapshot(0).Players[0].ActiveEffects?.Single().Description.Contains("伤害点数计算：3") == true,
             "A damage-derived hand-limit effect must show its live accumulated value without exposing its bookkeeping identity.");

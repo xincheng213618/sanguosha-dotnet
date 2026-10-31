@@ -1,0 +1,88 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineWushuangZengouRuntime : global::CardGame.Core.IWushuangZengouHost
+{
+    private readonly ICoreWushuangZengouCharacterHuanShuJunOlOperations _characterHuanShuJunOlOperations;
+    private readonly ICoreWushuangZengouCharacterQingheGongzhuOlOperations _characterQingheGongzhuOlOperations;
+    private readonly ICoreWushuangZengouCardZonesOperations _cardZonesOperations;
+    private readonly ICoreWushuangZengouContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreWushuangZengouResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreWushuangZengouCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreWushuangZengouCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreWushuangZengouCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreWushuangZengouCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreWushuangZengouCoreChainedStateBasicReturnsOperations _coreChainedStateBasicReturnsOperations;
+    private readonly ICoreWushuangZengouCoreDrawFundedDistinctBasicResponsesOperations _coreDrawFundedDistinctBasicResponsesOperations;
+    private readonly ICoreWushuangZengouCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreWushuangZengouCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreWushuangZengouCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreWushuangZengouCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreWushuangZengouCorePrepPoisonOutcomesOperations _corePrepPoisonOutcomesOperations;
+    private readonly ICoreWushuangZengouCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICoreWushuangZengouCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICoreWushuangZengouCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreWushuangZengouCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreWushuangZengouCoreResponseCompletionOperations _coreResponseCompletionOperations;
+    private readonly ICoreWushuangZengouCoreRoundOnceCardlessNativeResponsesOperations _coreRoundOnceCardlessNativeResponsesOperations;
+    private readonly ICoreWushuangZengouCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreWushuangZengouCoreTieredRoundZeroResponsesOperations _coreTieredRoundZeroResponsesOperations;
+    private readonly ICoreWushuangZengouCoreWushuangSkillsBOperations _coreWushuangSkillsBOperations;
+    private readonly ICoreWushuangZengouCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreWushuangZengouCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreWushuangZengouCoreNativeDamageApplicationOperations _coreNativeDamageApplicationOperations;
+    private readonly ICoreWushuangZengouCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreWushuangZengouCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreWushuangZengouCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreWushuangZengouCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreWushuangZengouCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreWushuangZengouKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineWushuangZengouRuntime(ICoreWushuangZengouCharacterHuanShuJunOlOperations characterHuanShuJunOlOperations, ICoreWushuangZengouCharacterQingheGongzhuOlOperations characterQingheGongzhuOlOperations, ICoreWushuangZengouCardZonesOperations cardZonesOperations, ICoreWushuangZengouContentRegistryOperations contentRegistryOperations, ICoreWushuangZengouResolutionStackOperations resolutionStackOperations, ICoreWushuangZengouCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreWushuangZengouCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreWushuangZengouCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreWushuangZengouCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreWushuangZengouCoreChainedStateBasicReturnsOperations coreChainedStateBasicReturnsOperations, ICoreWushuangZengouCoreDrawFundedDistinctBasicResponsesOperations coreDrawFundedDistinctBasicResponsesOperations, ICoreWushuangZengouCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreWushuangZengouCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreWushuangZengouCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreWushuangZengouCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreWushuangZengouCorePrepPoisonOutcomesOperations corePrepPoisonOutcomesOperations, ICoreWushuangZengouCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICoreWushuangZengouCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICoreWushuangZengouCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreWushuangZengouCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreWushuangZengouCoreResponseCompletionOperations coreResponseCompletionOperations, ICoreWushuangZengouCoreRoundOnceCardlessNativeResponsesOperations coreRoundOnceCardlessNativeResponsesOperations, ICoreWushuangZengouCoreRuntimeOperations coreRuntimeOperations, ICoreWushuangZengouCoreTieredRoundZeroResponsesOperations coreTieredRoundZeroResponsesOperations, ICoreWushuangZengouCoreWushuangSkillsBOperations coreWushuangSkillsBOperations, ICoreWushuangZengouCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreWushuangZengouCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreWushuangZengouCoreNativeDamageApplicationOperations coreNativeDamageApplicationOperations, ICoreWushuangZengouCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreWushuangZengouCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreWushuangZengouCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreWushuangZengouCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreWushuangZengouCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreWushuangZengouKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuanShuJunOlOperations = characterHuanShuJunOlOperations;
+        this._characterQingheGongzhuOlOperations = characterQingheGongzhuOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreChainedStateBasicReturnsOperations = coreChainedStateBasicReturnsOperations;
+        this._coreDrawFundedDistinctBasicResponsesOperations = coreDrawFundedDistinctBasicResponsesOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePrepPoisonOutcomesOperations = corePrepPoisonOutcomesOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreResponseCompletionOperations = coreResponseCompletionOperations;
+        this._coreRoundOnceCardlessNativeResponsesOperations = coreRoundOnceCardlessNativeResponsesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTieredRoundZeroResponsesOperations = coreTieredRoundZeroResponsesOperations;
+        this._coreWushuangSkillsBOperations = coreWushuangSkillsBOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeDamageApplicationOperations = coreNativeDamageApplicationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

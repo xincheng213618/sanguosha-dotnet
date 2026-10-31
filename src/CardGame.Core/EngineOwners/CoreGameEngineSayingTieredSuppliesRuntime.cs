@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSayingTieredSuppliesRuntime
+{
+    private readonly ICoreSayingTieredSuppliesCharacterSunYuanOlOperations _characterSunYuanOlOperations;
+    private readonly ICoreSayingTieredSuppliesCharacterWoLongFengChuOlOperations _characterWoLongFengChuOlOperations;
+    private readonly ICoreSayingTieredSuppliesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSayingTieredSuppliesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSayingTieredSuppliesCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreSayingTieredSuppliesCoreAlcoholSlashSuppressionsOperations _coreAlcoholSlashSuppressionsOperations;
+    private readonly ICoreSayingTieredSuppliesCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreSayingTieredSuppliesCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreSayingTieredSuppliesCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreSayingTieredSuppliesCoreCurrentCardEnhancementsOperations _coreCurrentCardEnhancementsOperations;
+    private readonly ICoreSayingTieredSuppliesCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreSayingTieredSuppliesCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreSayingTieredSuppliesCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreSayingTieredSuppliesCoreTieredRoundZeroUsesOperations _coreTieredRoundZeroUsesOperations;
+    private readonly ICoreSayingTieredSuppliesCoreNativeAiDecisionsOperations _coreNativeAiDecisionsOperations;
+    private readonly ICoreSayingTieredSuppliesCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreSayingTieredSuppliesCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreSayingTieredSuppliesCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreSayingTieredSuppliesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreSayingTieredSuppliesCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreSayingTieredSuppliesCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreSayingTieredSuppliesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSayingTieredSuppliesKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreSayingTieredSuppliesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSayingTieredSuppliesRuntime(ICoreSayingTieredSuppliesCharacterSunYuanOlOperations characterSunYuanOlOperations, ICoreSayingTieredSuppliesCharacterWoLongFengChuOlOperations characterWoLongFengChuOlOperations, ICoreSayingTieredSuppliesContentRegistryOperations contentRegistryOperations, ICoreSayingTieredSuppliesResolutionStackOperations resolutionStackOperations, ICoreSayingTieredSuppliesCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreSayingTieredSuppliesCoreAlcoholSlashSuppressionsOperations coreAlcoholSlashSuppressionsOperations, ICoreSayingTieredSuppliesCoreCardActionsOperations coreCardActionsOperations, ICoreSayingTieredSuppliesCoreCardConversionsOperations coreCardConversionsOperations, ICoreSayingTieredSuppliesCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreSayingTieredSuppliesCoreCurrentCardEnhancementsOperations coreCurrentCardEnhancementsOperations, ICoreSayingTieredSuppliesCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreSayingTieredSuppliesCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreSayingTieredSuppliesCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreSayingTieredSuppliesCoreTieredRoundZeroUsesOperations coreTieredRoundZeroUsesOperations, ICoreSayingTieredSuppliesCoreNativeAiDecisionsOperations coreNativeAiDecisionsOperations, ICoreSayingTieredSuppliesCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreSayingTieredSuppliesCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreSayingTieredSuppliesCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreSayingTieredSuppliesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreSayingTieredSuppliesCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreSayingTieredSuppliesCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreSayingTieredSuppliesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSayingTieredSuppliesKernelCoreMainOperations kernelCoreMainOperations, ICoreSayingTieredSuppliesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterSunYuanOlOperations = characterSunYuanOlOperations;
+        this._characterWoLongFengChuOlOperations = characterWoLongFengChuOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAlcoholSlashSuppressionsOperations = coreAlcoholSlashSuppressionsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentCardEnhancementsOperations = coreCurrentCardEnhancementsOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreTieredRoundZeroUsesOperations = coreTieredRoundZeroUsesOperations;
+        this._coreNativeAiDecisionsOperations = coreNativeAiDecisionsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

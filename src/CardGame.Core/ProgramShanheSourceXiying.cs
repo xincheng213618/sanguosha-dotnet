@@ -39,7 +39,7 @@ internal sealed class ResolveShanheSourceXiyingHandler : ISkillProgramEffectHand
 }
 internal static class ShanheSourceXiyingContract
 {
-    internal const string Skill = "shanhe:source-xiying-1180", Start = "play-start-pay-and-demand", Ending = "paid-play-ending-reward";
+    internal const string Skill = "shanhe:source-xiying-1180",Start = "play-start-pay-and-demand",Ending = "paid-play-ending-reward";
     [ProgramCatalogValidation(62063)]
     internal static void Validate(string path, SkillProgram p)
     {

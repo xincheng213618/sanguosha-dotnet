@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZhangLingOlRuntime : global::CardGame.Core.ICategoryTalismanSelectionQuery, global::CardGame.Core.IZhangLingProgramHost
+{
+    private readonly ICharacterZhangLingOlCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterZhangLingOlContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhangLingOlResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhangLingOlCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICharacterZhangLingOlCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICharacterZhangLingOlCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterZhangLingOlCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICharacterZhangLingOlCoreFireTargetBenefitsOperations _coreFireTargetBenefitsOperations;
+    private readonly ICharacterZhangLingOlCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterZhangLingOlCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
+    private readonly ICharacterZhangLingOlCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZhangLingOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhangLingOlCorePublicPileSourcesOperations _corePublicPileSourcesOperations;
+    private readonly ICharacterZhangLingOlCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZhangLingOlCoreTriggeredCardProgramsOperations _coreTriggeredCardProgramsOperations;
+    private readonly ICharacterZhangLingOlCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICharacterZhangLingOlCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICharacterZhangLingOlCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterZhangLingOlCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterZhangLingOlCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICharacterZhangLingOlCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterZhangLingOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICharacterZhangLingOlSynchronizingCategoryTalismansAccess _characterZhangLingOlSynchronizingCategoryTalismansAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    internal CharacterZhangLingOlRuntime(ICharacterZhangLingOlCardZonesOperations cardZonesOperations, ICharacterZhangLingOlContentRegistryOperations contentRegistryOperations, ICharacterZhangLingOlResolutionStackOperations resolutionStackOperations, ICharacterZhangLingOlCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterZhangLingOlCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICharacterZhangLingOlCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterZhangLingOlCoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterZhangLingOlCoreFireTargetBenefitsOperations coreFireTargetBenefitsOperations, ICharacterZhangLingOlCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterZhangLingOlCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations, ICharacterZhangLingOlCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhangLingOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhangLingOlCorePublicPileSourcesOperations corePublicPileSourcesOperations, ICharacterZhangLingOlCoreRuntimeOperations coreRuntimeOperations, ICharacterZhangLingOlCoreTriggeredCardProgramsOperations coreTriggeredCardProgramsOperations, ICharacterZhangLingOlCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICharacterZhangLingOlCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICharacterZhangLingOlCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterZhangLingOlCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterZhangLingOlCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICharacterZhangLingOlCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterZhangLingOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICharacterZhangLingOlSynchronizingCategoryTalismansAccess characterZhangLingOlSynchronizingCategoryTalismansAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess coreGameEnginePublicPileSourcesPublicPersistentPilesAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreFireTargetBenefitsOperations = coreFireTargetBenefitsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPileSourcesOperations = corePublicPileSourcesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTriggeredCardProgramsOperations = coreTriggeredCardProgramsOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._characterZhangLingOlSynchronizingCategoryTalismansAccess = characterZhangLingOlSynchronizingCategoryTalismansAccess;
+        this._coreGameEnginePublicPileSourcesPublicPersistentPilesAccess = coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    }
+}

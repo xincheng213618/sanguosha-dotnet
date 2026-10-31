@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterGuanPingMouRuntime : global::CardGame.Core.IMouGuanPingFacts, global::CardGame.Core.IMouGuanPingNative
+{
+    private readonly ICharacterGuanPingMouContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterGuanPingMouResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterGuanPingMouCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICharacterGuanPingMouCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterGuanPingMouCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterGuanPingMouCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterGuanPingMouCoreCurrentTurnSkillSuppressionsOperations _coreCurrentTurnSkillSuppressionsOperations;
+    private readonly ICharacterGuanPingMouCoreGuanHaiBridgesOperations _coreGuanHaiBridgesOperations;
+    private readonly ICharacterGuanPingMouCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterGuanPingMouCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterGuanPingMouCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterGuanPingMouCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterGuanPingMouCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterGuanPingMouCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterGuanPingMouCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICharacterGuanPingMouCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterGuanPingMouCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterGuanPingMouCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterGuanPingMouCharacterGuanPingMouOperations _characterGuanPingMouOperations;
+    private readonly ICharacterGuanPingMouKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICharacterGuanPingMouMouGuanPingOperations _mouGuanPingOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess _coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    internal CharacterGuanPingMouRuntime(ICharacterGuanPingMouContentRegistryOperations contentRegistryOperations, ICharacterGuanPingMouResolutionStackOperations resolutionStackOperations, ICharacterGuanPingMouCoreCardConversionsOperations coreCardConversionsOperations, ICharacterGuanPingMouCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterGuanPingMouCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterGuanPingMouCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterGuanPingMouCoreCurrentTurnSkillSuppressionsOperations coreCurrentTurnSkillSuppressionsOperations, ICharacterGuanPingMouCoreGuanHaiBridgesOperations coreGuanHaiBridgesOperations, ICharacterGuanPingMouCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterGuanPingMouCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterGuanPingMouCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterGuanPingMouCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterGuanPingMouCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterGuanPingMouCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterGuanPingMouCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICharacterGuanPingMouCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterGuanPingMouCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterGuanPingMouCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterGuanPingMouCharacterGuanPingMouOperations characterGuanPingMouOperations, ICharacterGuanPingMouKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICharacterGuanPingMouMouGuanPingOperations mouGuanPingOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess coreGameEngineSkillProgramsProgramPhaseUsesAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreCurrentTurnSkillSuppressionsOperations = coreCurrentTurnSkillSuppressionsOperations;
+        this._coreGuanHaiBridgesOperations = coreGuanHaiBridgesOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterGuanPingMouOperations = characterGuanPingMouOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._mouGuanPingOperations = mouGuanPingOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+        this._coreGameEngineSkillProgramsProgramPhaseUsesAccess = coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    }
+}

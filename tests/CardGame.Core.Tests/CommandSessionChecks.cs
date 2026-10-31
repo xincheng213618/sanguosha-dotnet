@@ -5,6 +5,50 @@ using CardGame.Core;
 
 internal static class CommandSessionChecks
 {
+    public static void IndependentSessionsIsolateExecutionAndRecovery()
+    {
+        var first = new SessionFixture();
+        var second = new SessionFixture();
+        var delivered = 0;
+        first.Run(() =>
+        {
+            var rejected = false;
+            try
+            {
+                first.Session.Execute(first, first.Journal,
+                    () => throw new InvalidOperationException("The reentrant operation must not run."),
+                    first.Snapshot, _ => { });
+            }
+            catch (InvalidOperationException failure) when (failure.Message.Contains("reentrantly", StringComparison.Ordinal))
+            {
+                rejected = true;
+            }
+            Require(rejected && first.Session.IsExecuting && !first.Session.IsFaulted,
+                "Reentrancy must be rejected by the owning session without poisoning the active outer operation.");
+            second.Run();
+        }, _ => delivered++);
+        Require(delivered == 1 && first.Session.Revision == 1 && second.Session.Revision == 1 &&
+                first.Events.Count == 1 && second.Events.Count == 1 &&
+                !first.Session.IsExecuting && !second.Session.IsExecuting,
+            "An active session must not block a separate session or share its command and event journal.");
+
+        var preceding = GameCheckpointJson.Serialize(first.Session.CreateCheckpoint(first));
+        var originalFailure = new InvalidOperationException("forced independent rule failure");
+        try
+        {
+            first.Run(() => throw originalFailure, _ => delivered++);
+            throw new InvalidOperationException("The independent rule failure must escape the command boundary.");
+        }
+        catch (InvalidOperationException failure) when (ReferenceEquals(failure, originalFailure)) { }
+        Require(first.Session.IsFaulted && !first.Session.IsExecuting &&
+                first.Session.Revision == 1 && first.Events.Count == 1 && delivered == 1 &&
+                GameCheckpointJson.Serialize(first.Session.LastTrustedCheckpoint!) == preceding,
+            "A failed session must preserve its original failure and preceding trusted command prefix without delivery.");
+        second.Run();
+        Require(!second.Session.IsFaulted && second.Session.Revision == 2 && second.Events.Count == 2,
+            "Another session must remain usable after the first session fails.");
+    }
+
     public static void EventCollectionObserversCannotRewriteCommittedHistory()
     {
         // Reuse the existing real conversion fixture and its verified seed 17;
@@ -129,6 +173,54 @@ internal static class CommandSessionChecks
             "Nested committed collections must preserve their concrete type, values and serialized shape after source or observer writes.");
     }
 
+    // The transaction is exercised without constructing GameEngine or a content
+    // registry, so isolation belongs to CommandSession itself rather than an adapter.
+    private sealed class SessionFixture : ICommandSessionRuntime
+    {
+        internal CommandSession Session { get; } = new();
+        internal List<EventEnvelope> Events { get; } = [];
+        private List<IGameEvent> PendingEvents { get; } = [];
+        private Queue<EngineNotification> Notifications { get; } = new();
+        internal CommandEventJournal Journal { get; }
+        private EngineStatus Status { get; set; } = EngineStatus.Running;
+
+        internal SessionFixture() => Journal = new(Events, PendingEvents, Notifications);
+        public GameOptions Options { get; } = new();
+        public string ModeId => "fixture:command-session";
+        public IReadOnlyList<string> ContentPackages => Array.Empty<string>();
+        public string ContentHash => "fixture:command-session";
+        public CommandOutcome Outcome => new(Status, Winner.None, null, null, null);
+        public long EventSequence { get; set; }
+        public void SynchronizeDerivedState() { }
+        public void AssertInvariants() { }
+        public void RefreshDecisionRevision() { }
+        public EventNotification?[] PreparePublicEvents(EventNotification[] events) => events;
+        public void ClearPendingEvents() => PendingEvents.Clear();
+        public void ClearPendingPublication() { }
+        public void MarkFaulted() => Status = EngineStatus.Faulted;
+
+        internal GameSnapshot Snapshot() => new(1, 0, Status, Winner.None, 0, 0,
+            TurnPhase.NotStarted, 0, 0, Array.Empty<PlayerSnapshot>(), null, Revision: Session.Revision);
+
+        internal EngineRunResult Run(Action? operation = null, Action<GameSnapshot>? deliver = null)
+        {
+            Session.CommandAwaitingCommit = new AdvanceOneStepCommand(Session.Revision);
+            try
+            {
+                return Session.Execute(this, Journal, () =>
+                {
+                    PendingEvents.Add(new TurnStartedEvent(1, 0));
+                    operation?.Invoke();
+                }, Snapshot, snapshot =>
+                {
+                    Notifications.Clear();
+                    deliver?.Invoke(snapshot);
+                });
+            }
+            finally { Session.CommandAwaitingCommit = null; }
+        }
+    }
+
     private static string SerializeEvent(EventEnvelope item) => JsonSerializer.Serialize(new
     {
         item.Id, item.ParentId, item.Sequence, item.Revision, item.CorrelationId,
@@ -250,9 +342,8 @@ internal static class CommandSessionChecks
         };
         var detached = game.State with { PendingDecision = prompt };
         var detachedJson = SnapshotJson.Serialize(detached);
-        var freezeView = typeof(GameEngine).GetMethod("FreezePlayerView", BindingFlags.NonPublic | BindingFlags.Static)!;
-        var frozen = (GameSnapshot)freezeView.Invoke(null, [detached])!;
-        var refrozen = (GameSnapshot)freezeView.Invoke(null, [frozen])!;
+        var frozen = PlayerViewFreezer.Freeze(detached);
+        var refrozen = PlayerViewFreezer.Freeze(frozen);
         var firstChoice = frozen.PendingDecision!.Choices[0];
         var secondChoice = refrozen.PendingDecision!.Choices[0];
         Require(!ReferenceEquals(firstChoice, secondChoice) &&
@@ -266,7 +357,7 @@ internal static class CommandSessionChecks
         Require(attempts == rejected && SnapshotJson.Serialize(frozen) == detachedJson &&
                 SnapshotJson.Serialize(detached) == detachedJson,
             "Populated decision lists and choice parameters must be frozen without modifying their detached source.");
-        var pendingField = typeof(GameEngine).GetField("_pendingDecisionBacking", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        var pendingField = global::FixtureRuntimeAccess.Engine.GetField("_pendingDecisionBacking", BindingFlags.NonPublic | BindingFlags.Instance)!;
         var originalPending = pendingField.GetValue(game);
         try
         {
@@ -369,7 +460,7 @@ internal static class CommandSessionChecks
     }
 
     private static object? InvokePrivate(GameEngine game, string name, params object?[] args) =>
-        typeof(GameEngine).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance)!
+        FixtureRuntimeAccess.Engine.GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance)!
             .Invoke(game, args);
 
     private static GameEngine Create(ContentRegistry? registry = null) =>

@@ -73,7 +73,7 @@ internal sealed class AnniversaryWuFuHandler(SkillProgramEffectOp op) : ISkillPr
 }
 internal static class AnniversaryWuFuComposition
 {
-    internal const string Zhonge = "anniversary:zhonge", Juekai = "anniversary:juekai";
+    internal const string Zhonge = "anniversary:zhonge",Juekai = "anniversary:juekai";
     [ProgramCatalogValidation(46600)] internal static void Validate(string path, SkillProgram p)
     {
         var owns = p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryWuFuZhonge or SkillProgramEffectOp.ResolveAnniversaryWuFuJuekai);

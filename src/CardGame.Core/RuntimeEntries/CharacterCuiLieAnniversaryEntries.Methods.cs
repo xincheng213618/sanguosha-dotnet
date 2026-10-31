@@ -1,0 +1,65 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterCuiLieAnniversaryEntries
+{
+    internal global::System.Collections.Generic.IReadOnlyList<int> AnniversaryCuiLieDelayedPlacementTargets(global::CardGame.Core.NativeOwners.JizhiResolution pending, global::System.Collections.Generic.IReadOnlyList<int> original) => _resolve().AnniversaryCuiLieDelayedPlacementTargets(pending, original);
+    internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> AnniversaryCuiLieIssuedPindianCandidates(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PindianRevealedCard> cards) => _resolve().AnniversaryCuiLieIssuedPindianCandidates(cards);
+    internal int AnniversaryCuiLiePindianBonus(int owner) => _resolve().AnniversaryCuiLiePindianBonus(owner);
+    internal void AnswerCuiLie(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerCuiLie(answer);
+    internal void ApplyCuiLieMutation(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> added) => _resolve().ApplyCuiLieMutation(f, added);
+    internal void AssertCuiLie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertCuiLie(f);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginCuiLie(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginCuiLie(supplied, op);
+    internal bool CanOfferCuiLie(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferCuiLie(c);
+    internal long CaptureAnniversaryCuiLieQualificationStamp(long underlying) => _resolve().CaptureAnniversaryCuiLieQualificationStamp(underlying);
+    internal bool ContinueAnniversaryCuiLieDelayedPlacement(global::CardGame.Core.CardUseFrame use) => _resolve().ContinueAnniversaryCuiLieDelayedPlacement(use);
+    internal void ContinueCuiLie(long id) => _resolve().ContinueCuiLie(id);
+    internal bool CuiLieAdditionalEligible(global::CardGame.Core.CardUseFrame u, int seat) => _resolve().CuiLieAdditionalEligible(u, seat);
+    internal bool CuiLieAdvanceChildren() => _resolve().CuiLieAdvanceChildren();
+    internal global::CardGame.Core.PromptChoice CuiLieAi(global::CardGame.Core.PendingDecision p) => _resolve().CuiLieAi(p);
+    internal bool CuiLieBeforeDamage(long id) => _resolve().CuiLieBeforeDamage(id);
+    internal global::CardGame.Core.ProgramSkillFrame CuiLieChildren(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.AnniversaryCuiLieStage stage) => _resolve().CuiLieChildren(f, stage);
+    internal global::CardGame.Core.PromptChoice CuiLieChoice(global::CardGame.Core.ProgramSkillFrame f, string verb, string value, string text, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().CuiLieChoice(f, verb, value, text, cards, targets);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> CuiLieChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CuiLieChoices(f);
+    internal int CuiLieChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CuiLieChooser(f);
+    internal bool CuiLieContestEligible(int owner, global::CardGame.Core.CardUseFrame use) => _resolve().CuiLieContestEligible(owner, use);
+    internal bool CuiLieDamageObserver(long id) => _resolve().CuiLieDamageObserver(id);
+    internal bool CuiLieDelayedTargetLegal(global::CardGame.Core.CardUseFrame use, int target) => _resolve().CuiLieDelayedTargetLegal(use, target);
+    internal bool CuiLieDisabled(int owner) => _resolve().CuiLieDisabled(owner);
+    internal bool CuiLieDying() => _resolve().CuiLieDying();
+    internal bool CuiLieFinalizedWindow(global::CardGame.Core.ProgramTargetCardWindowQuery q) => _resolve().CuiLieFinalizedWindow(q);
+    internal bool CuiLieFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().CuiLieFirstChild(f, child);
+    internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.RuleQueryContribution> CuiLieIncoming(int target) => _resolve().CuiLieIncoming(target);
+    internal global::CardGame.Core.AnniversaryCuiLieLeaseEvent[] CuiLieLeases(int owner) => _resolve().CuiLieLeases(owner);
+    internal bool CuiLieMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().CuiLieMovement(f, effect, p);
+    internal bool CuiLieObserverEdge(int i) => _resolve().CuiLieObserverEdge(i);
+    internal global::CardGame.Core.ProgramSkillFrame? CuiLieObserverRoot() => _resolve().CuiLieObserverRoot();
+    internal bool CuiLieObserverSuffix(int i) => _resolve().CuiLieObserverSuffix(i);
+    internal bool CuiLieOriginal(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().CuiLieOriginal(f, op);
+    internal bool CuiLieRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().CuiLieRecoveryParent(f, recovery);
+    internal global::CardGame.Core.Card[] CuiLieTransferable(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CuiLieTransferable(f);
+    internal global::CardGame.Core.CardUseFrame? CuiLieUse(global::CardGame.Core.ProgramSkillWindowContext? w) => _resolve().CuiLieUse(w);
+    internal void FinishCuiLie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishCuiLie(f);
+    internal void GiveCuiLie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GiveCuiLie(f);
+    internal bool HasAnniversaryCuiLieCancellation(global::CardGame.Core.CardUseFrame use) => _resolve().HasAnniversaryCuiLieCancellation(use);
+    internal bool HasAnniversaryCuiLieDelayedTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasAnniversaryCuiLieDelayedTail(use);
+    internal bool HasAnniversaryCuiLiePrompt() => _resolve().HasAnniversaryCuiLiePrompt();
+    internal bool IsAnniversaryCuiLieClaimedUseMaterial(long useId, int cardId) => _resolve().IsAnniversaryCuiLieClaimedUseMaterial(useId, cardId);
+    internal bool IsAnniversaryCuiLieDelayedMaterialPlaced(global::CardGame.Core.CardUseFrame use) => _resolve().IsAnniversaryCuiLieDelayedMaterialPlaced(use);
+    internal bool IsAnniversaryCuiLieGrantQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().IsAnniversaryCuiLieGrantQualified(owner, grant);
+    internal bool IsAnniversaryCuiLiePindianSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsAnniversaryCuiLiePindianSettlementBatch(f, batch);
+    internal bool IsAnniversaryCuiLieTargetMutationFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.AnniversaryCuiLieUseChangedEvent e, global::System.Collections.Generic.IReadOnlyList<int> original, int? currentProofActor = default) => _resolve().IsAnniversaryCuiLieTargetMutationFact(use, e, original, currentProofActor);
+    internal bool IsIssuedCuiLieDraw(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedCuiLieDraw(c, w);
+    internal void IssueCuiLieDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueCuiLieDraw(f);
+    internal bool KeepCuiLie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepCuiLie(f);
+    internal void PublishCuiLie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishCuiLie(f);
+    internal bool ResumeCuiLie(long id) => _resolve().ResumeCuiLie(id);
+    internal void ReturnCuiLieDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome draw) => _resolve().ReturnCuiLieDraw(supplied, draw);
+    internal bool ReturnCuiLieMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnCuiLieMovement(f);
+    internal void SettleCuiLieContest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SettleCuiLieContest(f);
+    internal void SkipCuiLieDelayedTarget(global::CardGame.Core.CardUseFrame use, int target, global::CardGame.Core.CardEffectSkipReason reason) => _resolve().SkipCuiLieDelayedTarget(use, target, reason);
+    internal bool TryBeginAnniversaryCuiLieDelayedPlacement(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().TryBeginAnniversaryCuiLieDelayedPlacement(window);
+    internal bool TrySkipAnniversaryCuiLieDelayedTarget(global::CardGame.Core.NullificationWindowFrame window) => _resolve().TrySkipAnniversaryCuiLieDelayedTarget(window);
+    internal bool ValidCuiLie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidCuiLie(f);
+    internal bool WindowSettlement_IsAnniversaryCuiLiePindianSettlementBatch(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().WindowSettlement_IsAnniversaryCuiLiePindianSettlementBatch(frame, batch);
+    internal bool HasAnniversaryCuiLieCapability { get => _resolve().HasAnniversaryCuiLieCapability; }
+}

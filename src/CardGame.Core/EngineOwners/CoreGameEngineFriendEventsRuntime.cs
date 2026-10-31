@@ -1,0 +1,80 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineFriendEventsRuntime : global::CardGame.Core.IFriendEventProgramHost
+{
+    private readonly ICoreFriendEventsCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
+    private readonly ICoreFriendEventsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreFriendEventsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreFriendEventsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFriendEventsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreFriendEventsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreFriendEventsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreFriendEventsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreFriendEventsCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreFriendEventsCoreFriendTrioOperations _coreFriendTrioOperations;
+    private readonly ICoreFriendEventsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreFriendEventsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreFriendEventsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreFriendEventsCoreNativeRecastInvocationsOperations _coreNativeRecastInvocationsOperations;
+    private readonly ICoreFriendEventsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreFriendEventsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreFriendEventsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreFriendEventsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreFriendEventsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreFriendEventsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreFriendEventsCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreFriendEventsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreFriendEventsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreFriendEventsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreFriendEventsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreFriendEventsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreFriendEventsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreFriendEventsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreFriendEventsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess _coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    internal CoreGameEngineFriendEventsRuntime(ICoreFriendEventsCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICoreFriendEventsCardZonesOperations cardZonesOperations, ICoreFriendEventsContentRegistryOperations contentRegistryOperations, ICoreFriendEventsResolutionStackOperations resolutionStackOperations, ICoreFriendEventsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreFriendEventsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreFriendEventsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreFriendEventsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreFriendEventsCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreFriendEventsCoreFriendTrioOperations coreFriendTrioOperations, ICoreFriendEventsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreFriendEventsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreFriendEventsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreFriendEventsCoreNativeRecastInvocationsOperations coreNativeRecastInvocationsOperations, ICoreFriendEventsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreFriendEventsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreFriendEventsCoreRuntimeOperations coreRuntimeOperations, ICoreFriendEventsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreFriendEventsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreFriendEventsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreFriendEventsCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreFriendEventsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreFriendEventsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreFriendEventsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreFriendEventsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreFriendEventsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreFriendEventsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreFriendEventsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreFriendEventsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess coreGameEngineSkillProgramsProgramPhaseUsesAccess)
+    {
+        this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreFriendTrioOperations = coreFriendTrioOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreNativeRecastInvocationsOperations = coreNativeRecastInvocationsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineSkillProgramsProgramPhaseUsesAccess = coreGameEngineSkillProgramsProgramPhaseUsesAccess;
+    }
+}

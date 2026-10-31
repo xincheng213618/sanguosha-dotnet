@@ -4,7 +4,7 @@ namespace CardGame.Core;
 
 internal static class ShanheSourceJiangdongTrioIds
 {
-    internal const string Lihuo = "shanhe:source-lihuo-3160", Chunlao = "shanhe:source-chunlao-3161";
+    internal const string Lihuo = "shanhe:source-lihuo-3160",Chunlao = "shanhe:source-chunlao-3161";
     internal const string FireTargetState = "fire-target-unlocked";
 }
 

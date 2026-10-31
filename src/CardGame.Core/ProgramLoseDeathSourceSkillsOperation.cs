@@ -37,24 +37,3 @@ public sealed class LoseDeathSourceSkillsSkillProgramEffectHandler : ISkillProgr
         return SkillProgramStepOutcome.Continue;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private void LoseProgramDeathSourceSkills(ProgramSkillFrame frame)
-    {
-        var context = frame.WindowContext;
-        if (context?.Window != SkillProgramTriggerWindow.OwnerDied)
-            throw new InvalidOperationException("Death source skill loss requires an owner-death window.");
-        if (context.SourceSeat is not { } sourceSeat || !IsValidPlayerSeat(sourceSeat)) return;
-
-        var source = _players[sourceSeat];
-        var lost = source.SkillGrants.Grants.Where(grant =>
-                grant.IsEnabled && !grant.IsModeRule && !grant.SourceId.StartsWith("equipment:", StringComparison.Ordinal))
-            .ToArray();
-        foreach (var grant in lost) source.SkillGrants.SetEnabled(grant.GrantId, false);
-        AdvanceEventRulesAndQueueFact(new CharacterSkillsLostEvent(sourceSeat, frame.OwnerSeat,
-            Array.AsReadOnly(lost.Select(grant => grant.SkillId).Distinct(StringComparer.Ordinal).ToArray())));
-        AddLog("SkillTriggered", $"{source.Name} 受到【断肠】影响，失去所有武将技能。",
-            frame.OwnerSeat, sourceSeat);
-    }
-}

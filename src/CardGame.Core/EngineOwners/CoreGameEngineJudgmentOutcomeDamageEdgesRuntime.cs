@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineJudgmentOutcomeDamageEdgesRuntime
+{
+    private readonly ICoreJudgmentOutcomeDamageEdgesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreJudgmentOutcomeDamageEdgesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreJudgmentOutcomeDamageEdgesCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreJudgmentOutcomeDamageEdgesCoreDamageJudgmentSuitPaymentObserversOperations _coreDamageJudgmentSuitPaymentObserversOperations;
+    private readonly ICoreJudgmentOutcomeDamageEdgesCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICoreJudgmentOutcomeDamageEdgesCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICoreJudgmentOutcomeDamageEdgesCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreJudgmentOutcomeDamageEdgesCoreProgramJudgmentOutcomesOperations _coreProgramJudgmentOutcomesOperations;
+    private readonly ICoreJudgmentOutcomeDamageEdgesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreJudgmentOutcomeDamageEdgesCoreZhenyiJudgmentWindowsOperations _coreZhenyiJudgmentWindowsOperations;
+    private readonly ICoreJudgmentOutcomeDamageEdgesCoreNativeJudgmentOperations _coreNativeJudgmentOperations;
+    internal CoreGameEngineJudgmentOutcomeDamageEdgesRuntime(ICoreJudgmentOutcomeDamageEdgesContentRegistryOperations contentRegistryOperations, ICoreJudgmentOutcomeDamageEdgesResolutionStackOperations resolutionStackOperations, ICoreJudgmentOutcomeDamageEdgesCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreJudgmentOutcomeDamageEdgesCoreDamageJudgmentSuitPaymentObserversOperations coreDamageJudgmentSuitPaymentObserversOperations, ICoreJudgmentOutcomeDamageEdgesCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICoreJudgmentOutcomeDamageEdgesCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICoreJudgmentOutcomeDamageEdgesCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreJudgmentOutcomeDamageEdgesCoreProgramJudgmentOutcomesOperations coreProgramJudgmentOutcomesOperations, ICoreJudgmentOutcomeDamageEdgesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreJudgmentOutcomeDamageEdgesCoreZhenyiJudgmentWindowsOperations coreZhenyiJudgmentWindowsOperations, ICoreJudgmentOutcomeDamageEdgesCoreNativeJudgmentOperations coreNativeJudgmentOperations)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreDamageJudgmentSuitPaymentObserversOperations = coreDamageJudgmentSuitPaymentObserversOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramJudgmentOutcomesOperations = coreProgramJudgmentOutcomesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreZhenyiJudgmentWindowsOperations = coreZhenyiJudgmentWindowsOperations;
+        this._coreNativeJudgmentOperations = coreNativeJudgmentOperations;
+    }
+}

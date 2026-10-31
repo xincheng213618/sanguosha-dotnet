@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineEndingPairSlashObserversRuntime
+{
+    private readonly ICoreEndingPairSlashObserversContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreEndingPairSlashObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreEndingPairSlashObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreEndingPairSlashObserversCoreEndingPairDrawsOperations _coreEndingPairDrawsOperations;
+    private readonly ICoreEndingPairSlashObserversCoreHalfHandPhaseDebtDamageObserversOperations _coreHalfHandPhaseDebtDamageObserversOperations;
+    private readonly ICoreEndingPairSlashObserversCorePlaySlashRecastsOperations _corePlaySlashRecastsOperations;
+    private readonly ICoreEndingPairSlashObserversCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreEndingPairSlashObserversCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICoreEndingPairSlashObserversCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreEndingPairSlashObserversCoreUnrespondableCounterspellsOperations _coreUnrespondableCounterspellsOperations;
+    private readonly ICoreEndingPairSlashObserversCoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    private readonly ICoreEndingPairSlashObserversCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineEndingPairSlashObserversRuntime(ICoreEndingPairSlashObserversContentRegistryOperations contentRegistryOperations, ICoreEndingPairSlashObserversResolutionStackOperations resolutionStackOperations, ICoreEndingPairSlashObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreEndingPairSlashObserversCoreEndingPairDrawsOperations coreEndingPairDrawsOperations, ICoreEndingPairSlashObserversCoreHalfHandPhaseDebtDamageObserversOperations coreHalfHandPhaseDebtDamageObserversOperations, ICoreEndingPairSlashObserversCorePlaySlashRecastsOperations corePlaySlashRecastsOperations, ICoreEndingPairSlashObserversCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreEndingPairSlashObserversCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICoreEndingPairSlashObserversCoreRuntimeOperations coreRuntimeOperations, ICoreEndingPairSlashObserversCoreUnrespondableCounterspellsOperations coreUnrespondableCounterspellsOperations, ICoreEndingPairSlashObserversCoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations, ICoreEndingPairSlashObserversCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreEndingPairDrawsOperations = coreEndingPairDrawsOperations;
+        this._coreHalfHandPhaseDebtDamageObserversOperations = coreHalfHandPhaseDebtDamageObserversOperations;
+        this._corePlaySlashRecastsOperations = corePlaySlashRecastsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreUnrespondableCounterspellsOperations = coreUnrespondableCounterspellsOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

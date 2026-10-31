@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePhaseNamePredictionObserversRuntime
+{
+    private readonly ICorePhaseNamePredictionObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePhaseNamePredictionObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICorePhaseNamePredictionObserversCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePhaseNamePredictionObserversCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICorePhaseNamePredictionObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICorePhaseNamePredictionObserversCorePhaseNamePredictionOperations _corePhaseNamePredictionOperations;
+    private readonly ICorePhaseNamePredictionObserversCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICorePhaseNamePredictionObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePhaseNamePredictionObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICorePhaseNamePredictionObserversCorePhaseNamePredictionObserversOperations _corePhaseNamePredictionObserversOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEnginePhaseNamePredictionObserversRuntime(ICorePhaseNamePredictionObserversResolutionStackOperations resolutionStackOperations, ICorePhaseNamePredictionObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICorePhaseNamePredictionObserversCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePhaseNamePredictionObserversCoreCardAttackStateOperations coreCardAttackStateOperations, ICorePhaseNamePredictionObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICorePhaseNamePredictionObserversCorePhaseNamePredictionOperations corePhaseNamePredictionOperations, ICorePhaseNamePredictionObserversCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICorePhaseNamePredictionObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePhaseNamePredictionObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICorePhaseNamePredictionObserversCorePhaseNamePredictionObserversOperations corePhaseNamePredictionObserversOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePhaseNamePredictionOperations = corePhaseNamePredictionOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._corePhaseNamePredictionObserversOperations = corePhaseNamePredictionObserversOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

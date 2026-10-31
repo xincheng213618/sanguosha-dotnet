@@ -1,0 +1,40 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterSunJianBoundaryMobileRuntime : global::CardGame.Core.IMobileSunJianPoluHost
+{
+    private readonly ICharacterSunJianBoundaryMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterSunJianBoundaryMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterSunJianBoundaryMobileCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterSunJianBoundaryMobileCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterSunJianBoundaryMobileCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterSunJianBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterSunJianBoundaryMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterSunJianBoundaryMobileCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterSunJianBoundaryMobileCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterSunJianBoundaryMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterSunJianBoundaryMobileCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterSunJianBoundaryMobileCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CharacterSunJianBoundaryMobileRuntime(ICharacterSunJianBoundaryMobileContentRegistryOperations contentRegistryOperations, ICharacterSunJianBoundaryMobileResolutionStackOperations resolutionStackOperations, ICharacterSunJianBoundaryMobileCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterSunJianBoundaryMobileCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterSunJianBoundaryMobileCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterSunJianBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterSunJianBoundaryMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterSunJianBoundaryMobileCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterSunJianBoundaryMobileCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICharacterSunJianBoundaryMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterSunJianBoundaryMobileCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterSunJianBoundaryMobileCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

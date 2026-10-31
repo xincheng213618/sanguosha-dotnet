@@ -1,0 +1,88 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
+{
+    private readonly ICoreJudgmentReplacementProgramsCharacterWangYiMobileOperations _characterWangYiMobileOperations;
+    private readonly ICoreJudgmentReplacementProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreJudgmentReplacementProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreJudgmentReplacementProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreDelegatedJudgmentChoicesOperations _coreDelegatedJudgmentChoicesOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreGainGiftProgramsOperations _coreGainGiftProgramsOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreRiceJudgmentOperations _coreRiceJudgmentOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreRicePileOperations _coreRicePileOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreJudgmentCursorRuntimeOperations _coreJudgmentCursorRuntimeOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreNativeAiDecisionsOperations _coreNativeAiDecisionsOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreNativeJudgmentOperations _coreNativeJudgmentOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreJudgmentReplacementProgramsCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
+    private readonly ICoreJudgmentReplacementProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreJudgmentReplacementProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreJudgmentReplacementProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreJudgmentReplacementProgramsCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreJudgmentReplacementProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly ICoreJudgmentReplacementProgramsKernelCoreGameEngineRuntimeOperations _kernelCoreGameEngineRuntimeOperations;
+    private readonly ICoreJudgmentReplacementProgramsKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess _coreAiDiagnosticsThoughtSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    internal CoreGameEngineJudgmentReplacementProgramsRuntime(ICoreJudgmentReplacementProgramsCharacterWangYiMobileOperations characterWangYiMobileOperations, ICoreJudgmentReplacementProgramsCardZonesOperations cardZonesOperations, ICoreJudgmentReplacementProgramsContentRegistryOperations contentRegistryOperations, ICoreJudgmentReplacementProgramsResolutionStackOperations resolutionStackOperations, ICoreJudgmentReplacementProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreJudgmentReplacementProgramsCoreDelegatedJudgmentChoicesOperations coreDelegatedJudgmentChoicesOperations, ICoreJudgmentReplacementProgramsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreJudgmentReplacementProgramsCoreGainGiftProgramsOperations coreGainGiftProgramsOperations, ICoreJudgmentReplacementProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreJudgmentReplacementProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreJudgmentReplacementProgramsCoreRiceJudgmentOperations coreRiceJudgmentOperations, ICoreJudgmentReplacementProgramsCoreRicePileOperations coreRicePileOperations, ICoreJudgmentReplacementProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreJudgmentReplacementProgramsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreJudgmentReplacementProgramsCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreJudgmentReplacementProgramsCoreJudgmentCursorRuntimeOperations coreJudgmentCursorRuntimeOperations, ICoreJudgmentReplacementProgramsCoreMatchLogOperations coreMatchLogOperations, ICoreJudgmentReplacementProgramsCoreNativeAiDecisionsOperations coreNativeAiDecisionsOperations, ICoreJudgmentReplacementProgramsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreJudgmentReplacementProgramsCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreJudgmentReplacementProgramsCoreNativeJudgmentOperations coreNativeJudgmentOperations, ICoreJudgmentReplacementProgramsCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreJudgmentReplacementProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreJudgmentReplacementProgramsCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICoreJudgmentReplacementProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreJudgmentReplacementProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreJudgmentReplacementProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreJudgmentReplacementProgramsCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreJudgmentReplacementProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, ICoreJudgmentReplacementProgramsKernelCoreGameEngineRuntimeOperations kernelCoreGameEngineRuntimeOperations, ICoreJudgmentReplacementProgramsKernelCoreMainOperations kernelCoreMainOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiDiagnosticsThoughtSequenceAccess coreAiDiagnosticsThoughtSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEnginePublicPileSourcesPublicPersistentPilesAccess coreGameEnginePublicPileSourcesPublicPersistentPilesAccess)
+    {
+        this._characterWangYiMobileOperations = characterWangYiMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreDelegatedJudgmentChoicesOperations = coreDelegatedJudgmentChoicesOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreGainGiftProgramsOperations = coreGainGiftProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRiceJudgmentOperations = coreRiceJudgmentOperations;
+        this._coreRicePileOperations = coreRicePileOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._coreJudgmentCursorRuntimeOperations = coreJudgmentCursorRuntimeOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeAiDecisionsOperations = coreNativeAiDecisionsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeJudgmentOperations = coreNativeJudgmentOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._kernelCoreGameEngineRuntimeOperations = kernelCoreGameEngineRuntimeOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreAiDiagnosticsThoughtSequenceAccess = coreAiDiagnosticsThoughtSequenceAccess;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEnginePublicPileSourcesPublicPersistentPilesAccess = coreGameEnginePublicPileSourcesPublicPersistentPilesAccess;
+    }
+}

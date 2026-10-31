@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouGuoYouZhiComposition
 {
-    internal const string Bique = "mou-mobile:bique", Zhongchun = "mou-mobile:zhongchun";
+    internal const string Bique = "mou-mobile:bique",Zhongchun = "mou-mobile:zhongchun";
     [ProgramCatalogValidation(1460)]
     internal static void ValidateProgram(string path, SkillProgram p)
     {

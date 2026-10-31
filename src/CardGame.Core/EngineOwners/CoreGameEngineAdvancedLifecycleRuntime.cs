@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineAdvancedLifecycleRuntime
+{
+    private readonly ICoreAdvancedLifecycleCharacterGuoJiaMobileGodOperations _characterGuoJiaMobileGodOperations;
+    private readonly ICoreAdvancedLifecycleCharacterLiuHongOlOperations _characterLiuHongOlOperations;
+    private readonly ICoreAdvancedLifecycleCardZonesOperations _cardZonesOperations;
+    private readonly ICoreAdvancedLifecycleObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICoreAdvancedLifecycleRandomOperations _randomOperations;
+    private readonly ICoreAdvancedLifecycleResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreAdvancedLifecycleSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICoreAdvancedLifecycleCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICoreAdvancedLifecycleCoreAdvancedLifecycleChoicesOperations _coreAdvancedLifecycleChoicesOperations;
+    private readonly ICoreAdvancedLifecycleCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreAdvancedLifecycleCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreAdvancedLifecycleCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreAdvancedLifecycleCoreLordSkillProjectionsOperations _coreLordSkillProjectionsOperations;
+    private readonly ICoreAdvancedLifecycleCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreAdvancedLifecycleCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreAdvancedLifecycleCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICoreAdvancedLifecycleCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreAdvancedLifecycleCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreAdvancedLifecycleCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreAdvancedLifecycleCoreStrategicProgramsOperations _coreStrategicProgramsOperations;
+    private readonly ICoreAdvancedLifecycleCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreAdvancedLifecycleCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreAdvancedLifecycleCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreAdvancedLifecycleCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreAdvancedLifecycleCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreAdvancedLifecycleKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreDelayedTurnEffectsPendingTurnDelayedEffectsAccess _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionGeneralPoolAccess _coreMatchDefinitionGeneralPoolAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsUsedGeneralWeaponSourcesAccess _coreGameEngineAdvancedWeaponsUsedGeneralWeaponSourcesAccess;
+    internal CoreGameEngineAdvancedLifecycleRuntime(ICoreAdvancedLifecycleCharacterGuoJiaMobileGodOperations characterGuoJiaMobileGodOperations, ICoreAdvancedLifecycleCharacterLiuHongOlOperations characterLiuHongOlOperations, ICoreAdvancedLifecycleCardZonesOperations cardZonesOperations, ICoreAdvancedLifecycleObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICoreAdvancedLifecycleRandomOperations randomOperations, ICoreAdvancedLifecycleResolutionStackOperations resolutionStackOperations, ICoreAdvancedLifecycleSkillRuntimeStateOperations skillRuntimeStateOperations, ICoreAdvancedLifecycleCoreActionQueriesOperations coreActionQueriesOperations, ICoreAdvancedLifecycleCoreAdvancedLifecycleChoicesOperations coreAdvancedLifecycleChoicesOperations, ICoreAdvancedLifecycleCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreAdvancedLifecycleCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreAdvancedLifecycleCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreAdvancedLifecycleCoreLordSkillProjectionsOperations coreLordSkillProjectionsOperations, ICoreAdvancedLifecycleCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreAdvancedLifecycleCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreAdvancedLifecycleCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICoreAdvancedLifecycleCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreAdvancedLifecycleCoreRuntimeOperations coreRuntimeOperations, ICoreAdvancedLifecycleCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreAdvancedLifecycleCoreStrategicProgramsOperations coreStrategicProgramsOperations, ICoreAdvancedLifecycleCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreAdvancedLifecycleCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreAdvancedLifecycleCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreAdvancedLifecycleCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreAdvancedLifecycleCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreAdvancedLifecycleKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreDelayedTurnEffectsPendingTurnDelayedEffectsAccess coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionGeneralPoolAccess coreMatchDefinitionGeneralPoolAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsUsedGeneralWeaponSourcesAccess coreGameEngineAdvancedWeaponsUsedGeneralWeaponSourcesAccess)
+    {
+        this._characterGuoJiaMobileGodOperations = characterGuoJiaMobileGodOperations;
+        this._characterLiuHongOlOperations = characterLiuHongOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._coreAdvancedLifecycleChoicesOperations = coreAdvancedLifecycleChoicesOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreLordSkillProjectionsOperations = coreLordSkillProjectionsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreStrategicProgramsOperations = coreStrategicProgramsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess = coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess;
+        this._coreMatchDefinitionGeneralPoolAccess = coreMatchDefinitionGeneralPoolAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineAdvancedWeaponsUsedGeneralWeaponSourcesAccess = coreGameEngineAdvancedWeaponsUsedGeneralWeaponSourcesAccess;
+    }
+}

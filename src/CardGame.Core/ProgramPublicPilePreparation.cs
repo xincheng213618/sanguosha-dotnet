@@ -4,7 +4,7 @@ namespace CardGame.Core;
 public enum PublicPilePreparationStage { Choosing, PaymentChildren, RecoveryChildren, DrawChildren }
 public sealed record PublicPilePreparationReceipt
 {
-    private IReadOnlyList<int> _selected = Array.Empty<int>(), _paid = Array.Empty<int>();
+    private IReadOnlyList<int> _selected = Array.Empty<int>(),_paid = Array.Empty<int>();
     private IReadOnlyList<CardLocation> _locations = Array.Empty<CardLocation>();
     public int InstructionIndex { get; init; }
     public SkillProgramEffectOp Operation { get; init; }

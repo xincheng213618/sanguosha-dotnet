@@ -69,8 +69,8 @@ internal static class OlShenCaoPiChecks
         public PlayerSnapshot V(int seat) => G.CreateSnapshot(seat).Players[seat];
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
         public int[] Pile() => (V(0).PublicPersistentPileCards ?? []).Select(c => c.Id).ToArray();
-        public int Limit() => (int)typeof(GameEngine).GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G,
-            [((System.Collections.IList)typeof(GameEngine).GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!)[0]])!;
+        public int Limit() => (int)global::FixtureRuntimeAccess.Engine.GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G,
+            [((System.Collections.IList)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!)[0]])!;
         public void Use(string activation) => Accept(new UseProgramSkillCommand(0, Driver, activation, [], [2], G.Revision, P!.PromptId));
         public void BeginDeposit(string amount)
         {

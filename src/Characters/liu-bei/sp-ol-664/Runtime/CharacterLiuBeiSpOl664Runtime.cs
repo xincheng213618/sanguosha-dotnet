@@ -1,0 +1,90 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLiuBeiSpOl664Runtime : global::CardGame.Core.IOlSpLiuBei664Host
+{
+    private readonly ICharacterLiuBeiSpOl664CharacterHuangGaiMouMobileOperations _characterHuangGaiMouMobileOperations;
+    private readonly ICharacterLiuBeiSpOl664CharacterHuangQuanOlOperations _characterHuangQuanOlOperations;
+    private readonly ICharacterLiuBeiSpOl664CharacterZhouYuOlMouOperations _characterZhouYuOlMouOperations;
+    private readonly ICharacterLiuBeiSpOl664CardZonesOperations _cardZonesOperations;
+    private readonly ICharacterLiuBeiSpOl664ContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLiuBeiSpOl664ResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLiuBeiSpOl664SkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreAlcoholIdentityPoliciesOperations _coreAlcoholIdentityPoliciesOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreBoundCardMovementContinuationOperations _coreBoundCardMovementContinuationOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreNativeDyingOperations _coreNativeDyingOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreNativeDyingFramesOperations _coreNativeDyingFramesOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    private readonly ICharacterLiuBeiSpOl664CorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLiuBeiSpOl664CorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterLiuBeiSpOl664CorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreProgramTargetRulesOperations _coreProgramTargetRulesOperations;
+    private readonly ICharacterLiuBeiSpOl664CoreTeamActivityProgramsOperations _coreTeamActivityProgramsOperations;
+    private readonly ICharacterLiuBeiSpOl664KernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterLiuBeiSpOl664Runtime(ICharacterLiuBeiSpOl664CharacterHuangGaiMouMobileOperations characterHuangGaiMouMobileOperations, ICharacterLiuBeiSpOl664CharacterHuangQuanOlOperations characterHuangQuanOlOperations, ICharacterLiuBeiSpOl664CharacterZhouYuOlMouOperations characterZhouYuOlMouOperations, ICharacterLiuBeiSpOl664CardZonesOperations cardZonesOperations, ICharacterLiuBeiSpOl664ContentRegistryOperations contentRegistryOperations, ICharacterLiuBeiSpOl664ResolutionStackOperations resolutionStackOperations, ICharacterLiuBeiSpOl664SkillRuntimeStateOperations skillRuntimeStateOperations, ICharacterLiuBeiSpOl664CoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICharacterLiuBeiSpOl664CoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterLiuBeiSpOl664CoreAlcoholIdentityPoliciesOperations coreAlcoholIdentityPoliciesOperations, ICharacterLiuBeiSpOl664CoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterLiuBeiSpOl664CoreBoundCardMovementContinuationOperations coreBoundCardMovementContinuationOperations, ICharacterLiuBeiSpOl664CoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterLiuBeiSpOl664CoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterLiuBeiSpOl664CoreCardUseModulesOperations coreCardUseModulesOperations, ICharacterLiuBeiSpOl664CoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICharacterLiuBeiSpOl664CoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLiuBeiSpOl664CoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLiuBeiSpOl664CoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterLiuBeiSpOl664CoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICharacterLiuBeiSpOl664CoreRuntimeOperations coreRuntimeOperations, ICharacterLiuBeiSpOl664CoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterLiuBeiSpOl664CoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterLiuBeiSpOl664CoreNativeCardUseOperations coreNativeCardUseOperations, ICharacterLiuBeiSpOl664CoreNativeDyingOperations coreNativeDyingOperations, ICharacterLiuBeiSpOl664CoreNativeDyingFramesOperations coreNativeDyingFramesOperations, ICharacterLiuBeiSpOl664CoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterLiuBeiSpOl664CoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations, ICharacterLiuBeiSpOl664CorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLiuBeiSpOl664CorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterLiuBeiSpOl664CorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterLiuBeiSpOl664CoreProgramTargetRulesOperations coreProgramTargetRulesOperations, ICharacterLiuBeiSpOl664CoreTeamActivityProgramsOperations coreTeamActivityProgramsOperations, ICharacterLiuBeiSpOl664KernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuangGaiMouMobileOperations = characterHuangGaiMouMobileOperations;
+        this._characterHuangQuanOlOperations = characterHuangQuanOlOperations;
+        this._characterZhouYuOlMouOperations = characterZhouYuOlMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlcoholIdentityPoliciesOperations = coreAlcoholIdentityPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreBoundCardMovementContinuationOperations = coreBoundCardMovementContinuationOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeDyingOperations = coreNativeDyingOperations;
+        this._coreNativeDyingFramesOperations = coreNativeDyingFramesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramTargetRulesOperations = coreProgramTargetRulesOperations;
+        this._coreTeamActivityProgramsOperations = coreTeamActivityProgramsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,67 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterCaiYongLeEntries
+{
+    internal global::CardGame.Core.JiaoweiProtectionArmedEvent? ActiveJiaoweiProtection(int owner) => _resolve().ActiveJiaoweiProtection(owner);
+    internal bool AdvanceFeibaiChildren() => _resolve().AdvanceFeibaiChildren();
+    internal void AnswerFeibaiSample(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerFeibaiSample(choice);
+    internal void AssertLeCaiYongFeibai(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLeCaiYongFeibai(f);
+    internal bool AwaitFeibaiChildren(long id) => _resolve().AwaitFeibaiChildren(id);
+    internal void BeginFeibaiFallback(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginFeibaiFallback(f);
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginLeCaiYongFeibai(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginLeCaiYongFeibai(supplied);
+    internal bool CanOfferJiaoweiInitial(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferJiaoweiInitial(gate);
+    internal bool CanOfferLeCaiYongFeibai(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferLeCaiYongFeibai(gate);
+    internal void CaptureFeibaiDeclaredName(long origin, global::CardGame.Core.CardActionContext? action, global::CardGame.Core.CardKind kind, int? instruction) => _resolve().CaptureFeibaiDeclaredName(origin, action, kind, instruction);
+    internal global::CardGame.Core.ProgramLifecycleTriggerWindowFrame CaptureJiaoweiInitialEntities(global::CardGame.Core.ProgramLifecycleTriggerWindowFrame window) => _resolve().CaptureJiaoweiInitialEntities(window);
+    internal void CaptureJiaoweiLossQualifications(global::CardGame.Core.CardMovementBatchContext batch, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.JiaoweiLossSource> sources) => _resolve().CaptureJiaoweiLossQualifications(batch, sources);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.JiaoweiLossSource> CaptureJiaoweiLossSources(global::System.Collections.Generic.IEnumerable<global::CardGame.Core.CardLocation> locations) => _resolve().CaptureJiaoweiLossSources(locations);
+    internal void CaptureLeCaiYongFeibaiQualification(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().CaptureLeCaiYongFeibaiQualification(action, window);
+    internal void CaptureMovementBatchStartJiaoweiLossSources(global::CardGame.Core.CardMovementBatchBuilder batch) => _resolve().CaptureMovementBatchStartJiaoweiLossSources(batch);
+    internal global::CardGame.Core.CardMovementBatchContext CompleteMovementBatchCaptureJiaoweiLossQualifications(global::CardGame.Core.CardMovementBatchBuilder batch, global::CardGame.Core.CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureJiaoweiLossQualifications(batch, completed);
+    internal void ContinueLeCaiYongFeibai(long id) => _resolve().ContinueLeCaiYongFeibai(id);
+    internal global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent? FeibaiDeclarationForAction(global::CardGame.Core.CardActionContext action, global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent[] facts) => _resolve().FeibaiDeclarationForAction(action, facts);
+    internal int FeibaiDeclarationSequence(global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent fact) => _resolve().FeibaiDeclarationSequence(fact);
+    internal bool FeibaiDisabled(int owner, int turn) => _resolve().FeibaiDisabled(owner, turn);
+    internal bool FeibaiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().FeibaiFirstChild(f, child);
+    internal global::CardGame.Core.ProgramSkillFrame? FeibaiObserverRoot() => _resolve().FeibaiObserverRoot();
+    internal bool FeibaiObserverSuffix(int index) => _resolve().FeibaiObserverSuffix(index);
+    internal bool FeibaiOperationMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().FeibaiOperationMovement(f, m);
+    internal global::CardGame.Core.FeibaiUsePrefixCapturedEvent? FeibaiPrefix(global::CardGame.Core.CardActionContext action) => _resolve().FeibaiPrefix(action);
+    internal global::CardGame.Core.CardSnapshot[] FeibaiPrivateCards(int viewer) => _resolve().FeibaiPrivateCards(viewer);
+    internal global::CardGame.Core.FeibaiQualification? FeibaiQualificationFor(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().FeibaiQualificationFor(candidate, context);
+    internal global::CardGame.Core.CardKind FeibaiRecordedKind(global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent fact) => _resolve().FeibaiRecordedKind(fact);
+    internal global::CardGame.Core.FeibaiDeclaredNameEvent FeibaiRecordedName(global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent fact) => _resolve().FeibaiRecordedName(fact);
+    internal bool FeibaiRootMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FeibaiRootMatches(f);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> FeibaiSampleChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FeibaiSampleChoices(f);
+    internal global::CardGame.Core.CardKind FeibaiSourceBoundEffectiveUseKind(global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent fact, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.IGameEvent> history, int prefixEnd, global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent current) => _resolve().FeibaiSourceBoundEffectiveUseKind(fact, history, prefixEnd, current);
+    internal bool FeibaiWindowMatches(global::CardGame.Core.ProgramCardTriggerWindowFrame window, global::CardGame.Core.FeibaiQualification q) => _resolve().FeibaiWindowMatches(window, q);
+    internal bool HasFeibaiBeforeDamageObserver(long id) => _resolve().HasFeibaiBeforeDamageObserver(id);
+    internal bool HasFeibaiDamageObserver(long id) => _resolve().HasFeibaiDamageObserver(id);
+    internal bool HasLeCaiYongFeibaiRescueContinuation(long dyingId) => _resolve().HasLeCaiYongFeibaiRescueContinuation(dyingId);
+    internal bool HasLeCaiYongFeibaiUseContinuation(long nativeId) => _resolve().HasLeCaiYongFeibaiUseContinuation(nativeId);
+    internal bool HasXianEntityMark(int cardId) => _resolve().HasXianEntityMark(cardId);
+    internal global::CardGame.Core.SkillProgramStepOutcome InitializeJiaowei(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeJiaowei(supplied);
+    internal global::CardGame.Core.ProgramDamageInterception InterceptJiaoweiProtection(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, global::CardGame.Core.DamageNature nature) => _resolve().InterceptJiaoweiProtection(attack, amount, nature);
+    internal bool IsExactFeibaiFallbackDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().IsExactFeibaiFallbackDraw(f, outcome);
+    internal bool IsFeibaiDying() => _resolve().IsFeibaiDying();
+    internal bool IsFeibaiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsFeibaiMovement(f, effect, pending);
+    internal bool IsFeibaiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsFeibaiRecoveryParent(f, recovery);
+    internal bool IsFeibaiTrueUse(global::CardGame.Core.CardActionContext action) => _resolve().IsFeibaiTrueUse(action);
+    internal bool IsIssuedJiaoweiInitialCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedJiaoweiInitialCandidate(candidate, context);
+    internal bool IsJiaoweiHandLimitExempt(global::CardGame.Core.CharacterState owner, int cardId) => _resolve().IsJiaoweiHandLimitExempt(owner, cardId);
+    internal bool JiaoweiActualTurnIsOpen(int turn) => _resolve().JiaoweiActualTurnIsOpen(turn);
+    internal void MarkFeibaiActualDrawEntities(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().MarkFeibaiActualDrawEntities(frame, outcome);
+    internal bool PermitIssuedJiaoweiInitial(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PermitIssuedJiaoweiInitial(frame);
+    internal bool PermitPaidLeCaiYongFeibai(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PermitPaidLeCaiYongFeibai(f);
+    internal void ProjectXianCardSkillMark(int cardId, ref global::CardGame.Core.CardSkillMarkProjection projection) => _resolve().ProjectXianCardSkillMark(cardId, ref projection);
+    internal bool ResumeLeCaiYongFeibai(long id) => _resolve().ResumeLeCaiYongFeibai(id);
+    internal void ReturnLeCaiYongFeibaiDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnLeCaiYongFeibaiDraw(f, outcome);
+    internal bool ReturnLeCaiYongFeibaiMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnLeCaiYongFeibaiMovement(f);
+    internal global::CardGame.Core.PromptChoice SelectAiFeibaiSample(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame f) => _resolve().SelectAiFeibaiSample(decision, f);
+    internal bool TryConsumeJiaoweiProtection(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, global::CardGame.Core.DamageNature nature) => _resolve().TryConsumeJiaoweiProtection(attack, amount, nature);
+    internal bool ValidJiaoweiProtectionSource(global::CardGame.Core.JiaoweiLossSource source) => _resolve().ValidJiaoweiProtectionSource(source);
+    internal bool FeibaiActualUseScopeIsOpen { get => _resolve().FeibaiActualUseScopeIsOpen; }
+    internal long? FeibaiSetupEpoch { get => _resolve().FeibaiSetupEpoch; }
+    internal bool HasLeCaiYongFeibaiCapability { get => _resolve().HasLeCaiYongFeibaiCapability; }
+    internal bool HasLeCaiYongJiaoweiCapability { get => _resolve().HasLeCaiYongJiaoweiCapability; }
+}

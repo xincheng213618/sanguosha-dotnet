@@ -1,0 +1,94 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeDamagePoliciesRuntime
+{
+    private readonly ICoreNativeDamagePoliciesCharacterCheZhouAnniversaryOperations _characterCheZhouAnniversaryOperations;
+    private readonly ICoreNativeDamagePoliciesCharacterDingYuanOlOperations _characterDingYuanOlOperations;
+    private readonly ICoreNativeDamagePoliciesCharacterLuMengMouOperations _characterLuMengMouOperations;
+    private readonly ICoreNativeDamagePoliciesCharacterMaChaoAnniversaryGodOperations _characterMaChaoAnniversaryGodOperations;
+    private readonly ICoreNativeDamagePoliciesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNativeDamagePoliciesModeRuntimeOperations _modeRuntimeOperations;
+    private readonly ICoreNativeDamagePoliciesTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreNativeDamagePoliciesCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreNativeDamagePoliciesCoreDirectSkillDamageOperations _coreDirectSkillDamageOperations;
+    private readonly ICoreNativeDamagePoliciesCoreDyingWindowSkillPoliciesOperations _coreDyingWindowSkillPoliciesOperations;
+    private readonly ICoreNativeDamagePoliciesCoreExtendedViewAsOperations _coreExtendedViewAsOperations;
+    private readonly ICoreNativeDamagePoliciesCoreFinalTargetSlashOperations _coreFinalTargetSlashOperations;
+    private readonly ICoreNativeDamagePoliciesCoreHeartSlashDamageOperations _coreHeartSlashDamageOperations;
+    private readonly ICoreNativeDamagePoliciesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreNativeDamagePoliciesCorePassiveDamageCapsOperations _corePassiveDamageCapsOperations;
+    private readonly ICoreNativeDamagePoliciesCorePassiveRulePoliciesOperations _corePassiveRulePoliciesOperations;
+    private readonly ICoreNativeDamagePoliciesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreNativeDamagePoliciesCoreProgramDodgeResponsesOperations _coreProgramDodgeResponsesOperations;
+    private readonly ICoreNativeDamagePoliciesCoreQiaoquHaoduoOperations _coreQiaoquHaoduoOperations;
+    private readonly ICoreNativeDamagePoliciesCoreShanheBadaoOperations _coreShanheBadaoOperations;
+    private readonly ICoreNativeDamagePoliciesCoreShanheS5QuyiOperations _coreShanheS5QuyiOperations;
+    private readonly ICoreNativeDamagePoliciesCoreShanheSchoolLateOperations _coreShanheSchoolLateOperations;
+    private readonly ICoreNativeDamagePoliciesCoreShanheSchoolsOperations _coreShanheSchoolsOperations;
+    private readonly ICoreNativeDamagePoliciesCoreShenwuEquipmentOperations _coreShenwuEquipmentOperations;
+    private readonly ICoreNativeDamagePoliciesCoreSlashUseOrdinalsOperations _coreSlashUseOrdinalsOperations;
+    private readonly ICoreNativeDamagePoliciesCoreWholeActualTurnUsesOperations _coreWholeActualTurnUsesOperations;
+    private readonly ICoreNativeDamagePoliciesCoreWushuangCombatTacticsOperations _coreWushuangCombatTacticsOperations;
+    private readonly ICoreNativeDamagePoliciesCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeDamagePoliciesCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICoreNativeDamagePoliciesCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreNativeDamagePoliciesCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICoreNativeDamagePoliciesCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreNativeDamagePoliciesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreNativeDamagePoliciesCoreProgramDamageHooksOperations _coreProgramDamageHooksOperations;
+    private readonly ICoreNativeDamagePoliciesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreNativeDamagePoliciesCoreTeamActivityProgramsOperations _coreTeamActivityProgramsOperations;
+    private readonly ICoreNativeDamagePoliciesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeDamagePoliciesRuntime(ICoreNativeDamagePoliciesCharacterCheZhouAnniversaryOperations characterCheZhouAnniversaryOperations, ICoreNativeDamagePoliciesCharacterDingYuanOlOperations characterDingYuanOlOperations, ICoreNativeDamagePoliciesCharacterLuMengMouOperations characterLuMengMouOperations, ICoreNativeDamagePoliciesCharacterMaChaoAnniversaryGodOperations characterMaChaoAnniversaryGodOperations, ICoreNativeDamagePoliciesContentRegistryOperations contentRegistryOperations, ICoreNativeDamagePoliciesModeRuntimeOperations modeRuntimeOperations, ICoreNativeDamagePoliciesTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreNativeDamagePoliciesCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreNativeDamagePoliciesCoreDirectSkillDamageOperations coreDirectSkillDamageOperations, ICoreNativeDamagePoliciesCoreDyingWindowSkillPoliciesOperations coreDyingWindowSkillPoliciesOperations, ICoreNativeDamagePoliciesCoreExtendedViewAsOperations coreExtendedViewAsOperations, ICoreNativeDamagePoliciesCoreFinalTargetSlashOperations coreFinalTargetSlashOperations, ICoreNativeDamagePoliciesCoreHeartSlashDamageOperations coreHeartSlashDamageOperations, ICoreNativeDamagePoliciesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreNativeDamagePoliciesCorePassiveDamageCapsOperations corePassiveDamageCapsOperations, ICoreNativeDamagePoliciesCorePassiveRulePoliciesOperations corePassiveRulePoliciesOperations, ICoreNativeDamagePoliciesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreNativeDamagePoliciesCoreProgramDodgeResponsesOperations coreProgramDodgeResponsesOperations, ICoreNativeDamagePoliciesCoreQiaoquHaoduoOperations coreQiaoquHaoduoOperations, ICoreNativeDamagePoliciesCoreShanheBadaoOperations coreShanheBadaoOperations, ICoreNativeDamagePoliciesCoreShanheS5QuyiOperations coreShanheS5QuyiOperations, ICoreNativeDamagePoliciesCoreShanheSchoolLateOperations coreShanheSchoolLateOperations, ICoreNativeDamagePoliciesCoreShanheSchoolsOperations coreShanheSchoolsOperations, ICoreNativeDamagePoliciesCoreShenwuEquipmentOperations coreShenwuEquipmentOperations, ICoreNativeDamagePoliciesCoreSlashUseOrdinalsOperations coreSlashUseOrdinalsOperations, ICoreNativeDamagePoliciesCoreWholeActualTurnUsesOperations coreWholeActualTurnUsesOperations, ICoreNativeDamagePoliciesCoreWushuangCombatTacticsOperations coreWushuangCombatTacticsOperations, ICoreNativeDamagePoliciesCoreMatchLogOperations coreMatchLogOperations, ICoreNativeDamagePoliciesCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICoreNativeDamagePoliciesCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreNativeDamagePoliciesCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICoreNativeDamagePoliciesCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreNativeDamagePoliciesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreNativeDamagePoliciesCoreProgramDamageHooksOperations coreProgramDamageHooksOperations, ICoreNativeDamagePoliciesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreNativeDamagePoliciesCoreTeamActivityProgramsOperations coreTeamActivityProgramsOperations, ICoreNativeDamagePoliciesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCheZhouAnniversaryOperations = characterCheZhouAnniversaryOperations;
+        this._characterDingYuanOlOperations = characterDingYuanOlOperations;
+        this._characterLuMengMouOperations = characterLuMengMouOperations;
+        this._characterMaChaoAnniversaryGodOperations = characterMaChaoAnniversaryGodOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._modeRuntimeOperations = modeRuntimeOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreDirectSkillDamageOperations = coreDirectSkillDamageOperations;
+        this._coreDyingWindowSkillPoliciesOperations = coreDyingWindowSkillPoliciesOperations;
+        this._coreExtendedViewAsOperations = coreExtendedViewAsOperations;
+        this._coreFinalTargetSlashOperations = coreFinalTargetSlashOperations;
+        this._coreHeartSlashDamageOperations = coreHeartSlashDamageOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePassiveDamageCapsOperations = corePassiveDamageCapsOperations;
+        this._corePassiveRulePoliciesOperations = corePassiveRulePoliciesOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramDodgeResponsesOperations = coreProgramDodgeResponsesOperations;
+        this._coreQiaoquHaoduoOperations = coreQiaoquHaoduoOperations;
+        this._coreShanheBadaoOperations = coreShanheBadaoOperations;
+        this._coreShanheS5QuyiOperations = coreShanheS5QuyiOperations;
+        this._coreShanheSchoolLateOperations = coreShanheSchoolLateOperations;
+        this._coreShanheSchoolsOperations = coreShanheSchoolsOperations;
+        this._coreShenwuEquipmentOperations = coreShenwuEquipmentOperations;
+        this._coreSlashUseOrdinalsOperations = coreSlashUseOrdinalsOperations;
+        this._coreWholeActualTurnUsesOperations = coreWholeActualTurnUsesOperations;
+        this._coreWushuangCombatTacticsOperations = coreWushuangCombatTacticsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramDamageHooksOperations = coreProgramDamageHooksOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreTeamActivityProgramsOperations = coreTeamActivityProgramsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

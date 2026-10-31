@@ -1,0 +1,26 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEnginePlayerViewProjectionQueriesRuntime : global::CardGame.Core.IHandCardProjectionRules
+{
+    private readonly ICorePlayerViewProjectionQueriesCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
+    private readonly ICorePlayerViewProjectionQueriesProgramPipelineHooksOperations _programPipelineHooksOperations;
+    private readonly ICorePlayerViewProjectionQueriesCoreActionQueriesOperations _coreActionQueriesOperations;
+    private readonly ICorePlayerViewProjectionQueriesKernelCoreGameEngineActivePlayerEffectQueriesOperations _kernelCoreGameEngineActivePlayerEffectQueriesOperations;
+    private readonly ICorePlayerViewProjectionQueriesKernelCoreGameEnginePlayerViewProjectionQueriesOperations _kernelCoreGameEnginePlayerViewProjectionQueriesOperations;
+    private readonly ICorePlayerViewProjectionQueriesPlayerViewProjectorOperations _playerViewProjectorOperations;
+    internal CoreGameEnginePlayerViewProjectionQueriesRuntime(ICorePlayerViewProjectionQueriesCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICorePlayerViewProjectionQueriesProgramPipelineHooksOperations programPipelineHooksOperations, ICorePlayerViewProjectionQueriesCoreActionQueriesOperations coreActionQueriesOperations, ICorePlayerViewProjectionQueriesKernelCoreGameEngineActivePlayerEffectQueriesOperations kernelCoreGameEngineActivePlayerEffectQueriesOperations, ICorePlayerViewProjectionQueriesKernelCoreGameEnginePlayerViewProjectionQueriesOperations kernelCoreGameEnginePlayerViewProjectionQueriesOperations, ICorePlayerViewProjectionQueriesPlayerViewProjectorOperations playerViewProjectorOperations)
+    {
+        this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
+        this._programPipelineHooksOperations = programPipelineHooksOperations;
+        this._coreActionQueriesOperations = coreActionQueriesOperations;
+        this._kernelCoreGameEngineActivePlayerEffectQueriesOperations = kernelCoreGameEngineActivePlayerEffectQueriesOperations;
+        this._kernelCoreGameEnginePlayerViewProjectionQueriesOperations = kernelCoreGameEnginePlayerViewProjectionQueriesOperations;
+        this._playerViewProjectorOperations = playerViewProjectorOperations;
+    }
+}

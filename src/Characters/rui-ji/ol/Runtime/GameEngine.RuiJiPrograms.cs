@@ -30,24 +30,4 @@ public sealed partial record ProgramSkillFrame
 
 public sealed partial class GameEngine
 {
-    internal const string QiaoliWeaponBinding = "qiaoli-weapon";
-    internal const string QiaoliArmorBinding = "qiaoli-armor";
-    private const string QingliangRevealBinding = "qingliang-reveal";
-
-
-
-    [ProgramCapability]
-    private sealed class RuiJiProgramCapability(GameEngine engine) : IRuiJiProgramHost
-    {
-        public SkillProgramStepOutcome QiaoliWeaponDuel(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.QiaoliProgramDuelLaunch(frame, unrespondable: false);
-        public SkillProgramStepOutcome QiaoliArmorDuel(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.QiaoliProgramDuelLaunch(frame, unrespondable: true);
-        public SkillProgramStepOutcome QiaoliWeaponDamageDraw(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.QiaoliProgramWeaponDamageDraw(frame, effect);
-        public SkillProgramStepOutcome QiaoliEndingEquipmentGain(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.QiaoliProgramEndingEquipmentGain(frame, effect);
-        public SkillProgramStepOutcome QingliangChooseOption(ProgramSkillFrame frame, SkillProgramEffect effect) =>
-            engine.QingliangProgramChooseOption(frame, effect);
-    }
 }

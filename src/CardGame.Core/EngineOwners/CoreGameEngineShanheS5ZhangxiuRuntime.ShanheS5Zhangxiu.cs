@@ -1,0 +1,88 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CoreGameEngineShanheS5ZhangxiuRuntime
+{
+    internal const string ShanheS5XiongluanId = "shanhe:s5-xiongluan-14116";
+    internal const string ShanheXiongluanJudgmentReason = "shanhe.s5.xiongluan.abolish-judgment";
+    SkillProgramStepOutcome global::CardGame.Core.IShanheS5ZhangxiuHost.PayShanheS5Xiongluan(ProgramSkillFrame f) => PayShanheS5Xiongluan(f);
+    void global::CardGame.Core.IShanheS5ZhangxiuHost.ResolveShanheLeizhenUse(ProgramSkillFrame f) => _coreShanheLeizhenOperations.ResolveShanheLeizhenUse(f);
+    [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 59401)]
+    internal bool CanPayShanheS5Xiongluan(CharacterState owner, SkillProgramActivation activation) => !activation.Effects.Any(e => e.Op == SkillProgramEffectOp.PayShanheS5Xiongluan) || owner.IsAlive && Enum.GetValues<EquipmentSlot>().Any(slot => owner.EquipmentSlotCapacity(slot) > 0);
+    internal SkillProgramStepOutcome PayShanheS5Xiongluan(ProgramSkillFrame input)
+    {
+        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
+        var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
+        if (f.SkillId != ShanheS5XiongluanId || f.TriggerId is not null || f.InstructionIndex != 1 || f.ShanheS5Xiongluan is not null || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !owner.IsAlive || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
+            throw new InvalidOperationException("S5 Xiongluan needs one real other target in its original own Play activation.");
+        var slots = Enum.GetValues<EquipmentSlot>().Where(slot => owner.EquipmentSlotCapacity(slot) > 0).Order().ToArray();
+        if (slots.Length == 0)
+            throw new InvalidOperationException("S5 Xiongluan requires a remaining actual equipment slot.");
+        var beforeRandom = _randomOperations._random.State;
+        var chosen = slots[_randomOperations._random.Next(slots.Length)];
+        var afterRandom = _randomOperations._random.State;
+        var receipt = new ShanheS5XiongluanPayment(new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, target, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, chosen, slots.Length, beforeRandom, afterRandom, owner.JudgmentAreaAbolished, _coreCardMovementJournalMovementSequenceAccess._movementSequence, _coreCardMovementJournalMovementSequenceAccess._movementSequence, false);
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheS5Xiongluan = receipt, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        if (!owner.JudgmentAreaAbolished)
+            _coreProgramAbolishAreasOperationOperations.AbolishProgramOwnerAreas(f, [CardZoneKind.Judgment]);
+        _coreAdvancedLifecycleOperations.SetEquipmentSlotCapacity(owner, chosen, 0);
+        _coreProgramLifecycleOperations.DiscardProgramOwnedZoneCards(f, [CardZoneKind.Judgment], new(ShanheXiongluanJudgmentReason));
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        receipt = receipt with
+        {
+            Paid = true,
+            MovementAfter = _coreCardMovementJournalMovementSequenceAccess._movementSequence
+        };
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheS5Xiongluan = receipt });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5XiongluanCostPaidEvent(f.Id, receipt.Source, receipt.GameplayHash, target, receipt.ActualTurnNumber, receipt.PhaseInstanceId, chosen, slots.Length, receipt.JudgmentWasAbolished, receipt.MovementBefore, receipt.MovementAfter));
+        _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
+        return SkillProgramStepOutcome.AwaitChild;
+    }
+
+    [ProgramContinuation(ProgramContinuationKind.Resume, 59401)]
+    internal bool ResumeShanheS5Xiongluan(long id)
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheS5Xiongluan: { Paid: true, ChildrenCompleted: false } r } f || f.Id != id)
+            return false;
+        AssertShanheS5Xiongluan(f);
+        if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id))
+            return true;
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheS5Xiongluan = r with { ChildrenCompleted = true }, PendingMovementContinuation = null });
+        _coreRuntimeOperations.AdvanceRuntimeProgram(id);
+        return true;
+    }
+
+    [ProgramContinuation(ProgramContinuationKind.Movement, 59401)]
+    internal bool ReturnShanheS5XiongluanMovement(ProgramSkillFrame f) => f.ShanheS5Xiongluan is { ChildrenCompleted: false } && ResumeShanheS5Xiongluan(f.Id);
+    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 59401)]
+    internal bool IsShanheS5XiongluanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
+    {
+        if (effect?.Op != SkillProgramEffectOp.PayShanheS5Xiongluan || f.ShanheS5Xiongluan is not { Paid: true, ChildrenCompleted: false } || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null)
+            return false;
+        AssertShanheS5Xiongluan(f);
+        return true;
+    }
+
+    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 59401)]
+    internal void AssertShanheS5Xiongluan(ProgramSkillFrame f)
+    {
+        if (f.ShanheS5Xiongluan is not { } r)
+            return;
+        if (!r.Paid || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || f.SkillId != ShanheS5XiongluanId || r.GameplayHash != f.GameplayHash || f.TriggerId is not null || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.CandidateCount is < 1 or > 5 || !Enum.IsDefined(r.Slot) || r.RandomBefore == r.RandomAfter || r.MovementBefore < 0 || r.MovementAfter < r.MovementBefore || r.MovementAfter > _coreCardMovementJournalMovementSequenceAccess._movementSequence || f.SelectedTargetSeats is not [var target] || target != r.TargetSeat || target == f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5XiongluanCostPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid.Source != r.Source || paid.GameplayHash != r.GameplayHash || paid.TargetSeat != target || paid.ActualTurnNumber != r.ActualTurnNumber || paid.PhaseInstanceId != r.PhaseInstanceId || paid.Slot != r.Slot || paid.CandidateCount != r.CandidateCount || paid.JudgmentWasAbolished != r.JudgmentWasAbolished || paid.MovementBefore != r.MovementBefore || paid.MovementAfter != r.MovementAfter || (r.ChildrenCompleted ? f.PendingMovementContinuation is not null : f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat))
+            throw new InvalidOperationException("S5 Xiongluan lost its original private random payment, actual area cost or typed movement continuation.");
+    }
+
+    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 59401)]
+    [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 59401)]
+    internal bool ContinuePaidShanheS5Xiongluan(ProgramSkillFrame f)
+    {
+        if (f.ShanheS5Xiongluan is not { Paid: true })
+            return false;
+        AssertShanheS5Xiongluan(f);
+        return true;
+    }
+}

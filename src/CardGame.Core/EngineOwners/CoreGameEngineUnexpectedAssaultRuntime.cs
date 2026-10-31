@@ -1,0 +1,70 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineUnexpectedAssaultRuntime
+{
+    private readonly ICoreUnexpectedAssaultCharacterFeiYiOlOperations _characterFeiYiOlOperations;
+    private readonly ICoreUnexpectedAssaultCharacterXiaoQiaoMouOlOperations _characterXiaoQiaoMouOlOperations;
+    private readonly ICoreUnexpectedAssaultResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreUnexpectedAssaultCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreUnexpectedAssaultCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreUnexpectedAssaultCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreUnexpectedAssaultCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreUnexpectedAssaultCoreExtraCardEffectRoundsOperations _coreExtraCardEffectRoundsOperations;
+    private readonly ICoreUnexpectedAssaultCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreUnexpectedAssaultCoreSequentialTrickTargetsOperations _coreSequentialTrickTargetsOperations;
+    private readonly ICoreUnexpectedAssaultCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreUnexpectedAssaultCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreUnexpectedAssaultCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreUnexpectedAssaultCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreUnexpectedAssaultCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreUnexpectedAssaultCoreNativeDamageApplicationOperations _coreNativeDamageApplicationOperations;
+    private readonly ICoreUnexpectedAssaultCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
+    private readonly ICoreUnexpectedAssaultCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreUnexpectedAssaultCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreUnexpectedAssaultCoreNativeTrickEffectsOperations _coreNativeTrickEffectsOperations;
+    private readonly ICoreUnexpectedAssaultCoreNativeTrickUseOperations _coreNativeTrickUseOperations;
+    private readonly ICoreUnexpectedAssaultCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreUnexpectedAssaultCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreUnexpectedAssaultCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreUnexpectedAssaultCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreUnexpectedAssaultKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreUnexpectedAssaultKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineUnexpectedAssaultRuntime(ICoreUnexpectedAssaultCharacterFeiYiOlOperations characterFeiYiOlOperations, ICoreUnexpectedAssaultCharacterXiaoQiaoMouOlOperations characterXiaoQiaoMouOlOperations, ICoreUnexpectedAssaultResolutionStackOperations resolutionStackOperations, ICoreUnexpectedAssaultCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreUnexpectedAssaultCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreUnexpectedAssaultCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreUnexpectedAssaultCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreUnexpectedAssaultCoreExtraCardEffectRoundsOperations coreExtraCardEffectRoundsOperations, ICoreUnexpectedAssaultCoreRuntimeOperations coreRuntimeOperations, ICoreUnexpectedAssaultCoreSequentialTrickTargetsOperations coreSequentialTrickTargetsOperations, ICoreUnexpectedAssaultCoreMatchLogOperations coreMatchLogOperations, ICoreUnexpectedAssaultCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreUnexpectedAssaultCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreUnexpectedAssaultCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreUnexpectedAssaultCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreUnexpectedAssaultCoreNativeDamageApplicationOperations coreNativeDamageApplicationOperations, ICoreUnexpectedAssaultCoreNativeLegalActionsOperations coreNativeLegalActionsOperations, ICoreUnexpectedAssaultCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreUnexpectedAssaultCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreUnexpectedAssaultCoreNativeTrickEffectsOperations coreNativeTrickEffectsOperations, ICoreUnexpectedAssaultCoreNativeTrickUseOperations coreNativeTrickUseOperations, ICoreUnexpectedAssaultCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreUnexpectedAssaultCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreUnexpectedAssaultCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreUnexpectedAssaultCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreUnexpectedAssaultKernelCoreMainOperations kernelCoreMainOperations, ICoreUnexpectedAssaultKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterFeiYiOlOperations = characterFeiYiOlOperations;
+        this._characterXiaoQiaoMouOlOperations = characterXiaoQiaoMouOlOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreExtraCardEffectRoundsOperations = coreExtraCardEffectRoundsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialTrickTargetsOperations = coreSequentialTrickTargetsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeDamageApplicationOperations = coreNativeDamageApplicationOperations;
+        this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativeTrickEffectsOperations = coreNativeTrickEffectsOperations;
+        this._coreNativeTrickUseOperations = coreNativeTrickUseOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

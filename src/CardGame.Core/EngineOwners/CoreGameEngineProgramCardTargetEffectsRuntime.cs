@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramCardTargetEffectsRuntime
+{
+    private readonly ICoreProgramCardTargetEffectsCharacterXinPiOlOperations _characterXinPiOlOperations;
+    private readonly ICoreProgramCardTargetEffectsCharacterZhangXiuMouOlOperations _characterZhangXiuMouOlOperations;
+    private readonly ICoreProgramCardTargetEffectsCharacterZhouQunOlOperations _characterZhouQunOlOperations;
+    private readonly ICoreProgramCardTargetEffectsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramCardTargetEffectsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramCardTargetEffectsTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreNamedAmbushInvalidationOperations _coreNamedAmbushInvalidationOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreProgramCardUseNullificationOperations _coreProgramCardUseNullificationOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreSequentialTrickTargetsOperations _coreSequentialTrickTargetsOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreNativeNullificationFramesOperations _coreNativeNullificationFramesOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreNativeSlashTargetDuelOperations _coreNativeSlashTargetDuelOperations;
+    private readonly ICoreProgramCardTargetEffectsCoreNativeTrickUseOperations _coreNativeTrickUseOperations;
+    private readonly ICoreProgramCardTargetEffectsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramCardTargetEffectsRuntime(ICoreProgramCardTargetEffectsCharacterXinPiOlOperations characterXinPiOlOperations, ICoreProgramCardTargetEffectsCharacterZhangXiuMouOlOperations characterZhangXiuMouOlOperations, ICoreProgramCardTargetEffectsCharacterZhouQunOlOperations characterZhouQunOlOperations, ICoreProgramCardTargetEffectsContentRegistryOperations contentRegistryOperations, ICoreProgramCardTargetEffectsResolutionStackOperations resolutionStackOperations, ICoreProgramCardTargetEffectsTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreProgramCardTargetEffectsCoreNamedAmbushInvalidationOperations coreNamedAmbushInvalidationOperations, ICoreProgramCardTargetEffectsCoreProgramCardUseNullificationOperations coreProgramCardUseNullificationOperations, ICoreProgramCardTargetEffectsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramCardTargetEffectsCoreRuntimeOperations coreRuntimeOperations, ICoreProgramCardTargetEffectsCoreSequentialTrickTargetsOperations coreSequentialTrickTargetsOperations, ICoreProgramCardTargetEffectsCoreMatchLogOperations coreMatchLogOperations, ICoreProgramCardTargetEffectsCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreProgramCardTargetEffectsCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreProgramCardTargetEffectsCoreNativeNullificationFramesOperations coreNativeNullificationFramesOperations, ICoreProgramCardTargetEffectsCoreNativeSlashTargetDuelOperations coreNativeSlashTargetDuelOperations, ICoreProgramCardTargetEffectsCoreNativeTrickUseOperations coreNativeTrickUseOperations, ICoreProgramCardTargetEffectsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterXinPiOlOperations = characterXinPiOlOperations;
+        this._characterZhangXiuMouOlOperations = characterZhangXiuMouOlOperations;
+        this._characterZhouQunOlOperations = characterZhouQunOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreNamedAmbushInvalidationOperations = coreNamedAmbushInvalidationOperations;
+        this._coreProgramCardUseNullificationOperations = coreProgramCardUseNullificationOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialTrickTargetsOperations = coreSequentialTrickTargetsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeNullificationFramesOperations = coreNativeNullificationFramesOperations;
+        this._coreNativeSlashTargetDuelOperations = coreNativeSlashTargetDuelOperations;
+        this._coreNativeTrickUseOperations = coreNativeTrickUseOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

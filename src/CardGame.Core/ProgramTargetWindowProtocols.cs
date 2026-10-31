@@ -112,9 +112,7 @@ internal sealed class ProgramTargetWindowProtocols
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramTargetWindowCatalog> TargetWindowMetadata = new(() =>
-        ProgramTargetWindowCatalog.Discover(RuntimeModuleMethods), true);
     private ProgramTargetWindowProtocols? _targetWindowProtocols;
-    private ProgramTargetWindowProtocols TargetWindowProtocols => _targetWindowProtocols ??= new(TargetWindowMetadata.Value,
+    private ProgramTargetWindowProtocols TargetWindowProtocols => _targetWindowProtocols ??= new(global::CardGame.Core.EngineOwners.CoreProgramTargetWindowProtocolsDefinitions.TargetWindowMetadata.Value,
         BindRuntimeHandler);
 }

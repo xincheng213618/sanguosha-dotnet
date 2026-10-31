@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeSkillContextQueriesRuntime
+{
+    private readonly ICoreNativeSkillContextQueriesCharacterHuCheErMouOperations _characterHuCheErMouOperations;
+    private readonly ICoreNativeSkillContextQueriesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreNativeSkillContextQueriesCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreNativeSkillContextQueriesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreNativeSkillContextQueriesCorePassiveDamageCapsOperations _corePassiveDamageCapsOperations;
+    private readonly ICoreNativeSkillContextQueriesCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreNativeSkillContextQueriesCorePublicDamagePredictionOperations _corePublicDamagePredictionOperations;
+    private readonly ICoreNativeSkillContextQueriesCoreStrategicProgramsOperations _coreStrategicProgramsOperations;
+    private readonly ICoreNativeSkillContextQueriesCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly ICoreNativeSkillContextQueriesCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreNativeSkillContextQueriesCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreNativeSkillContextQueriesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreNativeSkillContextQueriesCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    internal CoreNativeSkillContextQueriesRuntime(ICoreNativeSkillContextQueriesCharacterHuCheErMouOperations characterHuCheErMouOperations, ICoreNativeSkillContextQueriesContentRegistryOperations contentRegistryOperations, ICoreNativeSkillContextQueriesCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreNativeSkillContextQueriesCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreNativeSkillContextQueriesCorePassiveDamageCapsOperations corePassiveDamageCapsOperations, ICoreNativeSkillContextQueriesCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreNativeSkillContextQueriesCorePublicDamagePredictionOperations corePublicDamagePredictionOperations, ICoreNativeSkillContextQueriesCoreStrategicProgramsOperations coreStrategicProgramsOperations, ICoreNativeSkillContextQueriesCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICoreNativeSkillContextQueriesCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreNativeSkillContextQueriesCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreNativeSkillContextQueriesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreNativeSkillContextQueriesCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess)
+    {
+        this._characterHuCheErMouOperations = characterHuCheErMouOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePassiveDamageCapsOperations = corePassiveDamageCapsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._corePublicDamagePredictionOperations = corePublicDamagePredictionOperations;
+        this._coreStrategicProgramsOperations = coreStrategicProgramsOperations;
+        this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+    }
+}

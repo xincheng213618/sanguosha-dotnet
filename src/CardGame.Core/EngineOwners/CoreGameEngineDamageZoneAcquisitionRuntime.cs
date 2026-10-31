@@ -1,0 +1,74 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime : global::CardGame.Core.IDamageZoneAndAdjacentTargetHost
+{
+    private readonly ICoreDamageZoneAcquisitionCardZonesOperations _cardZonesOperations;
+    private readonly ICoreDamageZoneAcquisitionContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreDamageZoneAcquisitionResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreAdjacentRedTargetsOperations _coreAdjacentRedTargetsOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreDamageZoneAcquisitionCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreDamageZoneAcquisitionCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreDamageZoneAcquisitionCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreDamageZoneAcquisitionKernelCoreGameEngineProgramAttackAttemptOperations _kernelCoreGameEngineProgramAttackAttemptOperations;
+    private readonly ICoreDamageZoneAcquisitionKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreDamageZoneAcquisitionKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineDamageZoneAcquisitionRuntime(ICoreDamageZoneAcquisitionCardZonesOperations cardZonesOperations, ICoreDamageZoneAcquisitionContentRegistryOperations contentRegistryOperations, ICoreDamageZoneAcquisitionResolutionStackOperations resolutionStackOperations, ICoreDamageZoneAcquisitionCoreAdjacentRedTargetsOperations coreAdjacentRedTargetsOperations, ICoreDamageZoneAcquisitionCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreDamageZoneAcquisitionCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreDamageZoneAcquisitionCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreDamageZoneAcquisitionCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreDamageZoneAcquisitionCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreDamageZoneAcquisitionCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreDamageZoneAcquisitionCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreDamageZoneAcquisitionCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreDamageZoneAcquisitionCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDamageZoneAcquisitionCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreDamageZoneAcquisitionCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreDamageZoneAcquisitionCoreRuntimeOperations coreRuntimeOperations, ICoreDamageZoneAcquisitionCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreDamageZoneAcquisitionCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreDamageZoneAcquisitionCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreDamageZoneAcquisitionCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreDamageZoneAcquisitionCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreDamageZoneAcquisitionCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreDamageZoneAcquisitionCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreDamageZoneAcquisitionKernelCoreGameEngineProgramAttackAttemptOperations kernelCoreGameEngineProgramAttackAttemptOperations, ICoreDamageZoneAcquisitionKernelCoreMainOperations kernelCoreMainOperations, ICoreDamageZoneAcquisitionKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdjacentRedTargetsOperations = coreAdjacentRedTargetsOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineProgramAttackAttemptOperations = kernelCoreGameEngineProgramAttackAttemptOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

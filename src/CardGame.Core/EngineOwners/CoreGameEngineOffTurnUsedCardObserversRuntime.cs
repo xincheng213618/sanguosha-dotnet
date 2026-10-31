@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
+{
+    private readonly ICoreOffTurnUsedCardObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreOffTurnUsedCardObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreOffTurnUsedCardObserversCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreOffTurnUsedCardObserversCoreHalfHandPhaseDebtDamageObserversOperations _coreHalfHandPhaseDebtDamageObserversOperations;
+    private readonly ICoreOffTurnUsedCardObserversCoreOffTurnUsedCardsOperations _coreOffTurnUsedCardsOperations;
+    private readonly ICoreOffTurnUsedCardObserversCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreOffTurnUsedCardObserversCoreUnrespondableCounterspellsOperations _coreUnrespondableCounterspellsOperations;
+    private readonly ICoreOffTurnUsedCardObserversCoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    private readonly ICoreOffTurnUsedCardObserversCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICoreOffTurnUsedCardObserversCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineOffTurnUsedCardObserversRuntime(ICoreOffTurnUsedCardObserversResolutionStackOperations resolutionStackOperations, ICoreOffTurnUsedCardObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreOffTurnUsedCardObserversCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreOffTurnUsedCardObserversCoreHalfHandPhaseDebtDamageObserversOperations coreHalfHandPhaseDebtDamageObserversOperations, ICoreOffTurnUsedCardObserversCoreOffTurnUsedCardsOperations coreOffTurnUsedCardsOperations, ICoreOffTurnUsedCardObserversCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreOffTurnUsedCardObserversCoreUnrespondableCounterspellsOperations coreUnrespondableCounterspellsOperations, ICoreOffTurnUsedCardObserversCoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations, ICoreOffTurnUsedCardObserversCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICoreOffTurnUsedCardObserversCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreHalfHandPhaseDebtDamageObserversOperations = coreHalfHandPhaseDebtDamageObserversOperations;
+        this._coreOffTurnUsedCardsOperations = coreOffTurnUsedCardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreUnrespondableCounterspellsOperations = coreUnrespondableCounterspellsOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

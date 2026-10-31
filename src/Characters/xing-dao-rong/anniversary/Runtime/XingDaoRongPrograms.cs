@@ -37,7 +37,7 @@ public sealed record XingDaoRongXuHeDiscardedEvent(long FrameId, int Ordinal, in
 public sealed record XingDaoRongXuHeDrawnEvent(long FrameId, int Ordinal, int TargetSeat, int ActualCount, long Before, long After) : IGameEvent;
 internal static class XingDaoRongComposition
 {
-    internal const string Skill = "anniversary:xuhe", Starting = "pay-maximum-neighbors", Ending = "not-highest-maximum";
+    internal const string Skill = "anniversary:xuhe",Starting = "pay-maximum-neighbors",Ending = "not-highest-maximum";
     [ProgramCatalogValidation(45700)] internal static void Validate(string path, SkillProgram p)
     {
         if (p.Id != Skill && !p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op == SkillProgramEffectOp.ResolveAnniversaryXingDaoRongXuHe)) return;

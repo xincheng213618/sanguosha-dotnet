@@ -1,0 +1,178 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterGuoSiOlRuntime
+{
+    internal const string TanbeiGainReason = "skill-program.tanbei.gain";
+    internal static CardConversionSource GuoSiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_si_ol_GuoSiPrograms.GuoSiSource(f);
+    internal SkillProgramStepOutcome ExecuteGuoSi(SkillProgramEffectOp op, ProgramSkillFrame supplied)
+    {
+        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        if (f.GuoSi is not null || f.InstructionIndex != 1 || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            throw new InvalidOperationException("Guo Si requires the unpaid actual own Play source.");
+        if (op == SkillProgramEffectOp.ChooseTanbeiTargetPact)
+        {
+            if (f.TriggerId is not null || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
+                throw new InvalidOperationException("Tanbei requires exactly one other living target.");
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { GuoSi = new(GuoSiSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, target, GuoSiStage.TargetChoice) });
+            PublishGuoSiChoice(f);
+            return SkillProgramStepOutcome.AwaitChoice;
+        }
+
+        if (f.WindowContext?.CardUse is not { } i || _coreCardUseLifecycleOperations.LifecycleCardUse(i.ParentCardUseFrameId)is not { GuoSiPair: { } pair, Action: { } a } || a.ActionId != i.CardActionId || SidaoActions(f.OwnerSeat, pair).Count == 0)
+            throw new InvalidOperationException("Sidao requires its frozen completed native pair.");
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { GuoSi = new(GuoSiSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, -1, GuoSiStage.SidaoChoice, pair) });
+        PublishGuoSiChoice(f);
+        return SkillProgramStepOutcome.AwaitChoice;
+    }
+
+    internal IReadOnlyList<PromptChoice> GuoSiChoices(ProgramSkillFrame f)
+    {
+        var r = f.GuoSi!;
+        if (r.Stage == GuoSiStage.TargetChoice)
+            return Array.AsReadOnly(Enumerable.Range(0, 2).Select(b => new PromptChoice(new($"tanbei.{(f.Id)}.{(b)}"), b == 0 ? "令其随机获得你区域里的一张牌；其本回合不能对你使用牌" : "其本回合对你使用牌无距离和次数限制", [], [], new Dictionary<string, string> { { "program-action", "guo-si" }, { "option", b.ToString() } })).ToArray());
+        if (r.Stage != GuoSiStage.SidaoChoice || r.Pair is null)
+            return[];
+        var choices = SidaoActions(f.OwnerSeat, r.Pair).Select((a, index) => new PromptChoice(new($"sidao.{(f.Id)}.{(index)}"), a.Description, [a.CardId!.Value], a.TargetSeats, new Dictionary<string, string> { { "program-action", "guo-si" }, { "option", index.ToString() } })).ToList();
+        choices.Add(new(new($"sidao.{(f.Id)}.skip"), "不使用", [], [], new Dictionary<string, string> { { "program-action", "guo-si" }, { "option", "skip" } }));
+        return Array.AsReadOnly(choices.ToArray());
+    }
+
+    internal void PublishGuoSiChoice(ProgramSkillFrame f)
+    {
+        var r = f.GuoSi!;
+        var actor = r.Stage == GuoSiStage.TargetChoice ? r.Target : f.OwnerSeat;
+        var choices = GuoSiChoices(f);
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { Step = ResolutionFrameStep.AwaitingResponse });
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, actor, r.Stage == GuoSiStage.TargetChoice ? "请选择贪狈的效果" : "可将一张手牌当顺手牵羊对连续用牌的共同目标使用", choices.SelectMany(c => c.Cards).Distinct().ToArray(), choices.SelectMany(c => c.Targets).Distinct().ToArray(), actor)
+        {
+            PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
+            IsPrivate = true,
+            Choices = choices
+        };
+        _coreMatchOutcomeStatusWinnerAccess._status = _coreMatchParticipantsPlayersAccess._players[actor].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    }
+
+    [ProgramAiChoice(SkillProgramEffectOp.ChooseTanbeiTargetPact, SkillProgramEffectOp.OfferSidaoCompletedPairSnatch)]
+    internal PromptChoice GuoSiAiChoice(ProgramSkillFrame f) => GuoSiChoices(f).First();
+    [ProgramAnswer("guo-si")]
+    internal void ResolveGuoSiChoice(PromptChoice choice)
+    {
+        var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
+        RequireIssuedGuoSi(f);
+        var r = f.GuoSi!;
+        var actor = r.Stage == GuoSiStage.TargetChoice ? r.Target : f.OwnerSeat;
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != actor || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], GuoSiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+            throw new InvalidOperationException("Guo Si choice lost actual chooser, material or target authority.");
+        _coreNativePromptBoundaryOperations.ClearPendingDecision();
+        if (r.Stage == GuoSiStage.SidaoChoice)
+        {
+            if (choice.Parameters["option"] == "skip")
+            {
+                FinishGuoSi(f);
+                return;
+            }
+
+            var action = SidaoActions(f.OwnerSeat, r.Pair!)[int.Parse(choice.Parameters["option"])];
+            IssueSidao(f, action);
+            return;
+        }
+
+        var branch = int.Parse(choice.Parameters["option"]);
+        var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+        var randomBefore = _randomOperations._random.State;
+        var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.Target]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[r.Target])).Concat(_corePhysicalOwnedCardQueriesOperations.GetJudgment(_coreMatchParticipantsPlayersAccess._players[r.Target])).OrderBy(c => c.Id).ToArray();
+        int? id = branch == 0 && cards.Length > 0 ? cards[_randomOperations._random.Next(cards.Length)].Id : null;
+        var from = id is { } entity ? _cardZonesOperations._cardZones.GetLocation(entity) : (CardLocation? )null;
+        var pact = new GuoSiTurnPact(f.Id, r.Source, r.GameplayHash, r.Turn, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, r.Phase, f.OwnerSeat, r.Target, branch);
+        _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].GuoSiPacts = Array.AsReadOnly((_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].GuoSiPacts ?? []).Append(pact).ToArray());
+        r = r with
+        {
+            Branch = branch,
+            Stage = GuoSiStage.MovementChildren,
+            Before = before,
+            After = before,
+            SelectedId = id,
+            SelectedFrom = from,
+            RandomBefore = randomBefore,
+            RandomAfter = _randomOperations._random.State
+        };
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { GuoSi = r, Step = ResolutionFrameStep.ResolvingEffect, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        if (id is { } paid)
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([paid], CardLocation.Hand(f.OwnerSeat), new(TanbeiGainReason));
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        r = f.GuoSi!with
+        {
+            After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
+        };
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { GuoSi = r });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuoSiPactPaidEvent(pact, before, r.After, id.HasValue ? 1 : 0, randomBefore, r.RandomAfter));
+        _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
+    }
+
+    internal void FinishGuoSi(ProgramSkillFrame f)
+    {
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { GuoSi = null, PendingMovementContinuation = null });
+        _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+    }
+
+    internal bool DrainGuoSi(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
+    [ProgramContinuation(ProgramContinuationKind.Resume, 24300)]
+    internal bool ResumeGuoSi(long id)
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuoSi: { } r } f || f.Id != id || r.Stage is GuoSiStage.TargetChoice or GuoSiStage.SidaoChoice or GuoSiStage.NativeUse)
+            return false;
+        RequireIssuedGuoSi(f);
+        if (DrainGuoSi(f))
+            return true;
+        FinishGuoSi(f);
+        return true;
+    }
+
+    [ProgramContinuation(ProgramContinuationKind.Movement, 24300)]
+    internal bool ReturnGuoSiMovement(ProgramSkillFrame f) => f.GuoSi is not null && ResumeGuoSi(f.Id);
+    [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 250)]
+    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 250)]
+    internal bool CanContinueIssuedGuoSi(ProgramSkillFrame f)
+    {
+        if (f.GuoSi?.Stage is not (GuoSiStage.MovementChildren or GuoSiStage.NativeUse or GuoSiStage.Completed))
+            return false;
+        RequireIssuedGuoSi(f);
+        return true;
+    }
+
+    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 250)]
+    internal bool IsGuoSiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.GuoSi is { Stage: GuoSiStage.MovementChildren } && e?.Op == SkillProgramEffectOp.ChooseTanbeiTargetPact && CanContinueIssuedGuoSi(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
+    internal void RequireIssuedGuoSi(ProgramSkillFrame f)
+    {
+        if (f.GuoSi is not { } r || r.Source != GuoSiSource(f) || r.GameplayHash != f.GameplayHash || r.Instruction != f.InstructionIndex || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Phase <= 0 || (r.Stage is GuoSiStage.TargetChoice or GuoSiStage.SidaoChoice) && r.Phase != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
+            throw new InvalidOperationException("Guo Si lacks its exact owning source and instruction receipt.");
+        if (r.Stage == GuoSiStage.MovementChildren)
+        {
+            var paid = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GuoSiPactPaidEvent>().Where(e => e.Pact.FrameId == f.Id && e.Pact.Source == r.Source && e.Pact.GameplayHash == r.GameplayHash && e.Before == r.Before && e.After == r.After && e.Pact.Branch == r.Branch && e.Pact.Target == r.Target && e.Pact.Phase == r.Phase && e.Pact.Turn == r.Turn && e.Pact.Actor == f.OwnerSeat && e.RandomBefore == r.RandomBefore && e.RandomAfter == r.RandomAfter).ToArray();
+            if (paid.Length != 1 || paid[0].ActualCount != (r.SelectedId.HasValue ? 1 : 0) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == TanbeiGainReason && m.From == r.SelectedFrom && m.To == CardLocation.Hand(f.OwnerSeat) && m.CardId == r.SelectedId) != (r.SelectedId.HasValue ? 1 : 0) || f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null, SubjectSeat: var s } || s != f.OwnerSeat)
+                throw new InvalidOperationException("Tanbei lacks its exact paid target choice and native movement bounds.");
+        }
+
+        if ((r.Stage is GuoSiStage.SidaoChoice or GuoSiStage.NativeUse or GuoSiStage.Completed) && (r.Pair is not { } pair || f.WindowContext?.CardUse is not { } identity || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)?.GuoSiPair != pair || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GuoSiPairQualifiedEvent>().Any(e => e.NativeUseId == identity.ParentCardUseFrameId && e.OwnerSeat == f.OwnerSeat && e.FirstActionId == pair.First.ActionId && e.SecondActionId == pair.Second.ActionId)))
+            throw new InvalidOperationException("Sidao lost its actual completed-window pair qualification.");
+        if ((r.Stage is GuoSiStage.NativeUse or GuoSiStage.Completed) && (r.Native is not { } n || n.ParentActionId != f.WindowContext?.CardUse?.CardActionId || n.Phase != r.Phase || n.Turn != r.Turn || n.Instruction != r.Instruction || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GuoSiNativeIssuedEvent>().Count(e => e.Receipt == n) != 1))
+            throw new InvalidOperationException("Sidao has no unique issued native use.");
+        if (r.Stage == GuoSiStage.Completed && (r.Native is not { } returned || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GuoSiNativeReturnedEvent>().Count(e => e.Receipt == returned) != 1 || _coreCardUseLifecycleOperations.LifecycleCardUse(returned.NativeUseId)is not null))
+            throw new InvalidOperationException("Sidao terminal completion requires its once-returned native use.");
+    }
+
+    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 290)]
+    internal void AssertRegisteredIssuedGuoSi(ProgramSkillFrame frame)
+    {
+        if (frame.GuoSi is not null)
+            RequireIssuedGuoSi(frame);
+    }
+
+    SkillProgramStepOutcome global::CardGame.Core.IGuoSiProgramHost.ExecuteGuoSi(SkillProgramEffectOp op, ProgramSkillFrame f) => ExecuteGuoSi(op, f);
+}

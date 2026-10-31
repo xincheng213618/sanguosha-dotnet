@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSoleTargetRedirectRuntime
+{
+    private readonly ICoreSoleTargetRedirectContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSoleTargetRedirectResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSoleTargetRedirectCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSoleTargetRedirectCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreSoleTargetRedirectCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreSoleTargetRedirectCoreCurrentUseTargetCandidateRefreshOperations _coreCurrentUseTargetCandidateRefreshOperations;
+    private readonly ICoreSoleTargetRedirectCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICoreSoleTargetRedirectCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreSoleTargetRedirectCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICoreSoleTargetRedirectCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSoleTargetRedirectCoreSoleTargetProtectionOperations _coreSoleTargetProtectionOperations;
+    private readonly ICoreSoleTargetRedirectCoreSoleTargetQuarantineOperations _coreSoleTargetQuarantineOperations;
+    private readonly ICoreSoleTargetRedirectCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreSoleTargetRedirectCoreProgramTargetWindowProtocolsOperations _coreProgramTargetWindowProtocolsOperations;
+    private readonly ICoreSoleTargetRedirectCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreSoleTargetRedirectKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSoleTargetRedirectRuntime(ICoreSoleTargetRedirectContentRegistryOperations contentRegistryOperations, ICoreSoleTargetRedirectResolutionStackOperations resolutionStackOperations, ICoreSoleTargetRedirectCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSoleTargetRedirectCoreCardActionsOperations coreCardActionsOperations, ICoreSoleTargetRedirectCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreSoleTargetRedirectCoreCurrentUseTargetCandidateRefreshOperations coreCurrentUseTargetCandidateRefreshOperations, ICoreSoleTargetRedirectCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICoreSoleTargetRedirectCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreSoleTargetRedirectCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICoreSoleTargetRedirectCoreRuntimeOperations coreRuntimeOperations, ICoreSoleTargetRedirectCoreSoleTargetProtectionOperations coreSoleTargetProtectionOperations, ICoreSoleTargetRedirectCoreSoleTargetQuarantineOperations coreSoleTargetQuarantineOperations, ICoreSoleTargetRedirectCoreTableOrderOperations coreTableOrderOperations, ICoreSoleTargetRedirectCoreProgramTargetWindowProtocolsOperations coreProgramTargetWindowProtocolsOperations, ICoreSoleTargetRedirectCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreSoleTargetRedirectKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentUseTargetCandidateRefreshOperations = coreCurrentUseTargetCandidateRefreshOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSoleTargetProtectionOperations = coreSoleTargetProtectionOperations;
+        this._coreSoleTargetQuarantineOperations = coreSoleTargetQuarantineOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreProgramTargetWindowProtocolsOperations = coreProgramTargetWindowProtocolsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

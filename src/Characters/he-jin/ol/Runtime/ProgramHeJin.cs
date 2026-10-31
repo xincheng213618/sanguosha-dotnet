@@ -12,7 +12,7 @@ public sealed partial record CardUseFrame
 }
 public sealed record HeJinDeathCards(int OwnerSeat)
 {
-    private readonly IReadOnlyList<int> _handIds = Array.AsReadOnly(Array.Empty<int>()), _equipmentIds = Array.AsReadOnly(Array.Empty<int>());
+    private readonly IReadOnlyList<int> _handIds = Array.AsReadOnly(Array.Empty<int>()),_equipmentIds = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> HandIds { get => _handIds; init => _handIds = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> EquipmentIds { get => _equipmentIds; init => _equipmentIds = Array.AsReadOnly(value.ToArray()); }
 }

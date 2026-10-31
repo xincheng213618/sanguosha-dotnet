@@ -83,11 +83,11 @@ internal static class TurnHandLimitKindExemptionChecks
     private static void Use(GameEngine g, string skill, string activation) =>
         Accept(g, new UseProgramSkillCommand(0, skill, activation, [], [], g.Revision, g.PendingDecision!.PromptId));
     private static IReadOnlyList<CharacterState> Players(GameEngine g) =>
-        (IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", Flags)!.GetValue(g)!;
+        (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", Flags)!.GetValue(g)!;
     private static IReadOnlyList<Card> Eligible(GameEngine g, int seat) =>
-        (IReadOnlyList<Card>)typeof(GameEngine).GetMethod("GetDiscardEligibleHand", Flags)!.Invoke(g, [Players(g)[seat]])!;
+        (IReadOnlyList<Card>)global::FixtureRuntimeAccess.Engine.GetMethod("GetDiscardEligibleHand", Flags)!.Invoke(g, [Players(g)[seat]])!;
     private static bool HasSource(GameEngine g, SkillGrant grant) =>
-        (bool)typeof(GameEngine).GetMethod("HasRuntimeSkillInstance", Flags)!.Invoke(g, [Players(g)[0], grant.SkillId, grant.SkillInstanceId])!;
+        (bool)global::FixtureRuntimeAccess.Engine.GetMethod("HasRuntimeSkillInstance", Flags)!.Invoke(g, [Players(g)[0], grant.SkillId, grant.SkillInstanceId])!;
     private static bool Expired(GameEngine g, long sequence) => g.Events.Select(envelope => envelope.Payload)
         .OfType<TurnCardUseEffectsExpiredEvent>().Any(envelope => envelope.GrantSequences.Contains(sequence));
     private static void AssertFrozen<T>(IReadOnlyList<T> values)

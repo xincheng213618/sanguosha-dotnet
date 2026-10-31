@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRoundGainedEquipmentDrawsRuntime
+{
+    private readonly ICoreRoundGainedEquipmentDrawsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCorePublicPilePreparationOperations _corePublicPilePreparationOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreRoundGainedEquipmentObserversOperations _coreRoundGainedEquipmentObserversOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreRoundGainedSourceUsesOperations _coreRoundGainedSourceUsesOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreRoundGainedEquipmentDrawsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRoundGainedEquipmentDrawsRuntime(ICoreRoundGainedEquipmentDrawsContentRegistryOperations contentRegistryOperations, ICoreRoundGainedEquipmentDrawsResolutionStackOperations resolutionStackOperations, ICoreRoundGainedEquipmentDrawsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRoundGainedEquipmentDrawsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreRoundGainedEquipmentDrawsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreRoundGainedEquipmentDrawsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreRoundGainedEquipmentDrawsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreRoundGainedEquipmentDrawsCorePublicPilePreparationOperations corePublicPilePreparationOperations, ICoreRoundGainedEquipmentDrawsCoreRoundGainedEquipmentObserversOperations coreRoundGainedEquipmentObserversOperations, ICoreRoundGainedEquipmentDrawsCoreRoundGainedSourceUsesOperations coreRoundGainedSourceUsesOperations, ICoreRoundGainedEquipmentDrawsCoreRuntimeOperations coreRuntimeOperations, ICoreRoundGainedEquipmentDrawsCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreRoundGainedEquipmentDrawsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreRoundGainedEquipmentDrawsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreRoundGainedEquipmentDrawsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreRoundGainedEquipmentDrawsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPilePreparationOperations = corePublicPilePreparationOperations;
+        this._coreRoundGainedEquipmentObserversOperations = coreRoundGainedEquipmentObserversOperations;
+        this._coreRoundGainedSourceUsesOperations = coreRoundGainedSourceUsesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

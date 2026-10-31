@@ -39,7 +39,7 @@ public sealed record MouChenLinInvitation(CardConversionSource Source, string Ga
     public MouChenLinCard? PendingCard { get; init; }
     public long Before { get; init; }
     public long After { get; init; }
-    private readonly IReadOnlyList<int> _eligible = [], _answered = [];
+    private readonly IReadOnlyList<int> _eligible = [],_answered = [];
     public IReadOnlyList<int> Eligible { get => _eligible; init => _eligible = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Answered { get => _answered; init => _answered = Array.AsReadOnly(value.ToArray()); }
     private readonly IReadOnlyList<MouChenLinGift> _gifts = [];

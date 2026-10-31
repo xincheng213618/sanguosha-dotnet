@@ -63,8 +63,8 @@ internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IM
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
     IProgramOperationDraws draws, IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouXiaoQiaoOlRuntime
 {
-    internal const string Miluo = "mou-ol:miluo", Jueyan = "mou-ol:jueyan";
-    internal const string GiveReason = "skill-program.mou-ol:miluo.give", DrawReason = "skill-program.mou-ol:jueyan.draw";
+    internal const string Miluo = "mou-ol:miluo",Jueyan = "mou-ol:jueyan";
+    internal const string GiveReason = "skill-program.mou-ol:miluo.give",DrawReason = "skill-program.mou-ol:jueyan.draw";
     private static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     private static bool SameChoice(PromptChoice a, PromptChoice b) => a.Id == b.Id && a.Cards.SequenceEqual(b.Cards) &&
         a.Targets.SequenceEqual(b.Targets) && a.Parameters.Count == b.Parameters.Count && a.Parameters.All(p => b.Parameters.GetValueOrDefault(p.Key) == p.Value);

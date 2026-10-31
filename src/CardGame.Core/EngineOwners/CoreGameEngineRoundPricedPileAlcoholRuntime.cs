@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRoundPricedPileAlcoholRuntime
+{
+    private readonly ICoreRoundPricedPileAlcoholCardZonesOperations _cardZonesOperations;
+    private readonly ICoreRoundPricedPileAlcoholContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreRoundPricedPileAlcoholResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreAlcoholIdentityPoliciesOperations _coreAlcoholIdentityPoliciesOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreUnrespondableCounterspellsOperations _coreUnrespondableCounterspellsOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICoreRoundPricedPileAlcoholCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreRoundPricedPileAlcoholCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreRoundPricedPileAlcoholCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreRoundPricedPileAlcoholKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRoundPricedPileAlcoholRuntime(ICoreRoundPricedPileAlcoholCardZonesOperations cardZonesOperations, ICoreRoundPricedPileAlcoholContentRegistryOperations contentRegistryOperations, ICoreRoundPricedPileAlcoholResolutionStackOperations resolutionStackOperations, ICoreRoundPricedPileAlcoholCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreRoundPricedPileAlcoholCoreAlcoholIdentityPoliciesOperations coreAlcoholIdentityPoliciesOperations, ICoreRoundPricedPileAlcoholCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreRoundPricedPileAlcoholCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreRoundPricedPileAlcoholCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreRoundPricedPileAlcoholCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreRoundPricedPileAlcoholCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreRoundPricedPileAlcoholCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreRoundPricedPileAlcoholCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICoreRoundPricedPileAlcoholCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreRoundPricedPileAlcoholCoreRuntimeOperations coreRuntimeOperations, ICoreRoundPricedPileAlcoholCoreUnrespondableCounterspellsOperations coreUnrespondableCounterspellsOperations, ICoreRoundPricedPileAlcoholCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreRoundPricedPileAlcoholCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreRoundPricedPileAlcoholCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreRoundPricedPileAlcoholCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreRoundPricedPileAlcoholCoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations, ICoreRoundPricedPileAlcoholCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICoreRoundPricedPileAlcoholCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreRoundPricedPileAlcoholCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreRoundPricedPileAlcoholCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreRoundPricedPileAlcoholKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlcoholIdentityPoliciesOperations = coreAlcoholIdentityPoliciesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreUnrespondableCounterspellsOperations = coreUnrespondableCounterspellsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

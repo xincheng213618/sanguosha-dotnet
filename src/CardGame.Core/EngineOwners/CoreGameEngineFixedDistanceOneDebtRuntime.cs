@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineFixedDistanceOneDebtRuntime
+{
+    private readonly ICoreFixedDistanceOneDebtCardZonesOperations _cardZonesOperations;
+    private readonly ICoreFixedDistanceOneDebtContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreFixedDistanceOneDebtResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreFixedDistanceOneDebtCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreFixedDistanceOneDebtCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreFixedDistanceOneDebtCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreFixedDistanceOneDebtCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreFixedDistanceOneDebtKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineFixedDistanceOneDebtRuntime(ICoreFixedDistanceOneDebtCardZonesOperations cardZonesOperations, ICoreFixedDistanceOneDebtContentRegistryOperations contentRegistryOperations, ICoreFixedDistanceOneDebtResolutionStackOperations resolutionStackOperations, ICoreFixedDistanceOneDebtCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreFixedDistanceOneDebtCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreFixedDistanceOneDebtCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreFixedDistanceOneDebtCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreFixedDistanceOneDebtCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreFixedDistanceOneDebtCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreFixedDistanceOneDebtCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreFixedDistanceOneDebtCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreFixedDistanceOneDebtCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreFixedDistanceOneDebtCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreFixedDistanceOneDebtCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreFixedDistanceOneDebtCoreRuntimeOperations coreRuntimeOperations, ICoreFixedDistanceOneDebtCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreFixedDistanceOneDebtCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreFixedDistanceOneDebtCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreFixedDistanceOneDebtCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreFixedDistanceOneDebtCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreFixedDistanceOneDebtCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreFixedDistanceOneDebtKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

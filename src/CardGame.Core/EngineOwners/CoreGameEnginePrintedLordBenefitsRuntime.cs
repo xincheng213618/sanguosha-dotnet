@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePrintedLordBenefitsRuntime
+{
+    private readonly ICorePrintedLordBenefitsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePrintedLordBenefitsObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICorePrintedLordBenefitsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePrintedLordBenefitsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICorePrintedLordBenefitsCoreBlackGiftContestsOperations _coreBlackGiftContestsOperations;
+    private readonly ICorePrintedLordBenefitsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICorePrintedLordBenefitsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePrintedLordBenefitsCoreRecipientConsequencesReceiptsOperations _coreRecipientConsequencesReceiptsOperations;
+    private readonly ICorePrintedLordBenefitsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePrintedLordBenefitsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICorePrintedLordBenefitsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICorePrintedLordBenefitsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICorePrintedLordBenefitsCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICorePrintedLordBenefitsCorePrintedLordSkillQualificationsOperations _corePrintedLordSkillQualificationsOperations;
+    private readonly ICorePrintedLordBenefitsKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICorePrintedLordBenefitsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEnginePrintedLordBenefitsRuntime(ICorePrintedLordBenefitsContentRegistryOperations contentRegistryOperations, ICorePrintedLordBenefitsObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICorePrintedLordBenefitsResolutionStackOperations resolutionStackOperations, ICorePrintedLordBenefitsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICorePrintedLordBenefitsCoreBlackGiftContestsOperations coreBlackGiftContestsOperations, ICorePrintedLordBenefitsCoreNationalSkillsOperations coreNationalSkillsOperations, ICorePrintedLordBenefitsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePrintedLordBenefitsCoreRecipientConsequencesReceiptsOperations coreRecipientConsequencesReceiptsOperations, ICorePrintedLordBenefitsCoreRuntimeOperations coreRuntimeOperations, ICorePrintedLordBenefitsCoreSkillProgramsOperations coreSkillProgramsOperations, ICorePrintedLordBenefitsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICorePrintedLordBenefitsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICorePrintedLordBenefitsCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICorePrintedLordBenefitsCorePrintedLordSkillQualificationsOperations corePrintedLordSkillQualificationsOperations, ICorePrintedLordBenefitsKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICorePrintedLordBenefitsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreBlackGiftContestsOperations = coreBlackGiftContestsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecipientConsequencesReceiptsOperations = coreRecipientConsequencesReceiptsOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._corePrintedLordSkillQualificationsOperations = corePrintedLordSkillQualificationsOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

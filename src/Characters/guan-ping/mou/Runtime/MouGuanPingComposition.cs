@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 internal static class MouGuanPingComposition
 {
-    internal const string Skill = "mou:wuwei", Binding = "whole-color-slash", Activation = "color-hand-slash", Trigger = "paid-color-options";
+    internal const string Skill = "mou:wuwei",Binding = "whole-color-slash",Activation = "color-hand-slash",Trigger = "paid-color-options";
     [ProgramCatalogValidation(1720)]
     internal static void Validate(string path, SkillProgram p)
     {

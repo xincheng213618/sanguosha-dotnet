@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterDongZhaoOlRuntime
+{
+    internal ProgramSkillFrame? DongZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterDongZhaoOlOperations.DongZhaoFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(index));
+    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1560)]
+    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1670)]
+    internal bool HasDongZhaoDamageObserver(long id) => DongZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 220)]
+    internal bool IsDongZhaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DongZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 430)]
+    internal bool TryAdvanceDongZhaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DongZhaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
+    internal bool ValidIssuedZaowang(ProgramSkillFrame f)
+    {
+        if (f.ZaowangPaidTargetSeat is not { } seat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || f.SelectedTargetSeats is not [var selected] || selected != seat || f.TriggerId is not null || f.InstructionIndex is < 1 or > 3)
+            return false;
+        var program = _contentRegistryOperations._contentRegistry!.GetSkill(f.SkillId).Program;
+        var a = program is null ? null : ProgramInstructionResolver.Default.FindActivation(program, f.ActivationId);
+        if (a?.Effects is not [{ Op: SkillProgramEffectOp.ZaowangResolve }, { Op: SkillProgramEffectOp.Recover, Amount: 1 }, { Op: SkillProgramEffectOp.Draw, Amount: 3 }])
+            return false;
+        var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZaowangGrantedEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        return facts is [var e] && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == seat && e.SkillId == f.SkillId && e.SkillInstanceId == f.SkillInstanceId && e.GameplayHash == f.GameplayHash;
+    }
+
+    internal bool ZaowangFirstChild(ProgramSkillFrame root, ResolutionFrame child)
+    {
+        if (!ValidIssuedZaowang(root) || root.InstructionIndex != 2 || root.ZaowangPaidTargetSeat is not { } target)
+            return false;
+        var grant = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZaowangGrantedEvent>().Single(e => e.FrameId == root.Id);
+        if (child is HpChangedTriggerWindowFrame hp)
+            return hp.Continuation == PostEventContinuation.Program && hp.ResumeFrameId == root.Id && hp.Change.ParentFrameId == root.Id && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == root.OwnerSeat && hp.Change.TargetSeat == target && hp.Change.Amount == 1 && hp.Change.HpBefore == grant.HpBeforeRecovery && hp.Change.HpAfter == grant.HpBeforeRecovery + 1 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RecoveryAppliedEvent>().Any(e => e.SourceSeat == root.OwnerSeat && e.TargetSeat == target && e.Amount == 1 && e.RemainingHp == hp.Change.HpAfter);
+        if (child is RecoveryReplacementFrame recovery && _coreTypedRecoveryDamageCursorOperations.TypedRecoveryPausedEffect(root)is { } effect && effect.CompiledInstruction is RecoverProgramInstruction instruction)
+            return recovery.Attempt.Amount == 1 && recovery.Attempt.TargetSeat == target && _coreTypedRecoveryDamageCursorOperations.DirectProgramRecoveryReturnMatches(root, effect, instruction, recovery);
+        return false;
+    }
+
+    internal void RequireDongZhao(ProgramSkillFrame f)
+    {
+        if (f.ZaowangPaidTargetSeat is not null && !ValidIssuedZaowang(f) || f.XianluePending is { } r && (r.SkillId.Length > 0 ? !ValidIssuedXianlue(f) : r.Stage != XianlueStage.Record || f.TriggerId is null || f.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is not [{ Op: SkillProgramEffectOp.XianlueRecord }]))
+            throw new InvalidOperationException("Dong Zhao lost its native source, exact boundary or once-paid invoice.");
+    }
+
+    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 440)]
+    internal void AssertRegisteredDongZhao(ProgramSkillFrame frame)
+    {
+        if (frame.XianluePending is not null || frame.ZaowangPaidTargetSeat is not null)
+            RequireDongZhao(frame);
+    }
+}

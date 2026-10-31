@@ -1,0 +1,86 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineWenhePoisonRuntime
+{
+    private readonly ICoreWenhePoisonCharacterQinLangOlOperations _characterQinLangOlOperations;
+    private readonly ICoreWenhePoisonCharacterZhouYuMouOperations _characterZhouYuMouOperations;
+    private readonly ICoreWenhePoisonCharacterZhugeLiangMouOperations _characterZhugeLiangMouOperations;
+    private readonly ICoreWenhePoisonCardZonesOperations _cardZonesOperations;
+    private readonly ICoreWenhePoisonPendingCardsMovedBatchesOperations _pendingCardsMovedBatchesOperations;
+    private readonly ICoreWenhePoisonResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreWenhePoisonCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreWenhePoisonCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreWenhePoisonCoreActivityBattleRulesOperations _coreActivityBattleRulesOperations;
+    private readonly ICoreWenhePoisonCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreWenhePoisonCoreCardSupplyCompletionOperations _coreCardSupplyCompletionOperations;
+    private readonly ICoreWenhePoisonCoreCardUsePaymentsOperations _coreCardUsePaymentsOperations;
+    private readonly ICoreWenhePoisonCoreDeferredTurnEndPreludesOperations _coreDeferredTurnEndPreludesOperations;
+    private readonly ICoreWenhePoisonCoreDyingEntryProgramsOperations _coreDyingEntryProgramsOperations;
+    private readonly ICoreWenhePoisonCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreWenhePoisonCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreWenhePoisonCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreWenhePoisonCoreResponseCompletionOperations _coreResponseCompletionOperations;
+    private readonly ICoreWenhePoisonCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreWenhePoisonCoreSequentialTrickTargetsOperations _coreSequentialTrickTargetsOperations;
+    private readonly ICoreWenhePoisonCoreTieredRoundZeroReturnsOperations _coreTieredRoundZeroReturnsOperations;
+    private readonly ICoreWenhePoisonCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreWenhePoisonCoreNativeCardUseCompletionOperations _coreNativeCardUseCompletionOperations;
+    private readonly ICoreWenhePoisonCoreNativeDamageApplicationOperations _coreNativeDamageApplicationOperations;
+    private readonly ICoreWenhePoisonCoreNativeDyingOperations _coreNativeDyingOperations;
+    private readonly ICoreWenhePoisonCoreNativeFireAttackOperations _coreNativeFireAttackOperations;
+    private readonly ICoreWenhePoisonCoreNativeTrickUseOperations _coreNativeTrickUseOperations;
+    private readonly ICoreWenhePoisonCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreWenhePoisonCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreWenhePoisonCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreWenhePoisonKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreWenhePoisonKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionAccess _coreMatchDefinitionModeDefinitionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineWenhePoisonRuntime(ICoreWenhePoisonCharacterQinLangOlOperations characterQinLangOlOperations, ICoreWenhePoisonCharacterZhouYuMouOperations characterZhouYuMouOperations, ICoreWenhePoisonCharacterZhugeLiangMouOperations characterZhugeLiangMouOperations, ICoreWenhePoisonCardZonesOperations cardZonesOperations, ICoreWenhePoisonPendingCardsMovedBatchesOperations pendingCardsMovedBatchesOperations, ICoreWenhePoisonResolutionStackOperations resolutionStackOperations, ICoreWenhePoisonCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreWenhePoisonCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreWenhePoisonCoreActivityBattleRulesOperations coreActivityBattleRulesOperations, ICoreWenhePoisonCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreWenhePoisonCoreCardSupplyCompletionOperations coreCardSupplyCompletionOperations, ICoreWenhePoisonCoreCardUsePaymentsOperations coreCardUsePaymentsOperations, ICoreWenhePoisonCoreDeferredTurnEndPreludesOperations coreDeferredTurnEndPreludesOperations, ICoreWenhePoisonCoreDyingEntryProgramsOperations coreDyingEntryProgramsOperations, ICoreWenhePoisonCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreWenhePoisonCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreWenhePoisonCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreWenhePoisonCoreResponseCompletionOperations coreResponseCompletionOperations, ICoreWenhePoisonCoreRuntimeOperations coreRuntimeOperations, ICoreWenhePoisonCoreSequentialTrickTargetsOperations coreSequentialTrickTargetsOperations, ICoreWenhePoisonCoreTieredRoundZeroReturnsOperations coreTieredRoundZeroReturnsOperations, ICoreWenhePoisonCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreWenhePoisonCoreNativeCardUseCompletionOperations coreNativeCardUseCompletionOperations, ICoreWenhePoisonCoreNativeDamageApplicationOperations coreNativeDamageApplicationOperations, ICoreWenhePoisonCoreNativeDyingOperations coreNativeDyingOperations, ICoreWenhePoisonCoreNativeFireAttackOperations coreNativeFireAttackOperations, ICoreWenhePoisonCoreNativeTrickUseOperations coreNativeTrickUseOperations, ICoreWenhePoisonCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreWenhePoisonCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreWenhePoisonCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreWenhePoisonKernelCoreMainOperations kernelCoreMainOperations, ICoreWenhePoisonKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionAccess coreMatchDefinitionModeDefinitionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterQinLangOlOperations = characterQinLangOlOperations;
+        this._characterZhouYuMouOperations = characterZhouYuMouOperations;
+        this._characterZhugeLiangMouOperations = characterZhugeLiangMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreActivityBattleRulesOperations = coreActivityBattleRulesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardSupplyCompletionOperations = coreCardSupplyCompletionOperations;
+        this._coreCardUsePaymentsOperations = coreCardUsePaymentsOperations;
+        this._coreDeferredTurnEndPreludesOperations = coreDeferredTurnEndPreludesOperations;
+        this._coreDyingEntryProgramsOperations = coreDyingEntryProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreResponseCompletionOperations = coreResponseCompletionOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialTrickTargetsOperations = coreSequentialTrickTargetsOperations;
+        this._coreTieredRoundZeroReturnsOperations = coreTieredRoundZeroReturnsOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardUseCompletionOperations = coreNativeCardUseCompletionOperations;
+        this._coreNativeDamageApplicationOperations = coreNativeDamageApplicationOperations;
+        this._coreNativeDyingOperations = coreNativeDyingOperations;
+        this._coreNativeFireAttackOperations = coreNativeFireAttackOperations;
+        this._coreNativeTrickUseOperations = coreNativeTrickUseOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchDefinitionModeDefinitionAccess = coreMatchDefinitionModeDefinitionAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,46 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineProgramSelectionTransformsRuntime : global::CardGame.Core.IDuelSelectionQueries, global::CardGame.Core.IEquipmentPlacementSelectionQueries, global::CardGame.Core.IForeignSlashSelectionQueries, global::CardGame.Core.IMatchingRecastSelectionQueries, global::CardGame.Core.IPairObtainSelectionQueries, global::CardGame.Core.IPindianSelectionQueries, global::CardGame.Core.ISelectionParticipantQueries, global::CardGame.Core.ISelectionUsageQueries, global::CardGame.Core.ISourceCurseSelectionQueries
+{
+    private readonly ICoreProgramSelectionTransformsCoreAppliedDamageBenefitsOperations _coreAppliedDamageBenefitsOperations;
+    private readonly ICoreProgramSelectionTransformsCoreCapturedEquipmentDrawsOperations _coreCapturedEquipmentDrawsOperations;
+    private readonly ICoreProgramSelectionTransformsCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreProgramSelectionTransformsCoreEquipmentPlacementAndHpPairOperations _coreEquipmentPlacementAndHpPairOperations;
+    private readonly ICoreProgramSelectionTransformsCoreForeignSelectedCardSlashOperations _coreForeignSelectedCardSlashOperations;
+    private readonly ICoreProgramSelectionTransformsCoreMatchingRecastsOperations _coreMatchingRecastsOperations;
+    private readonly ICoreProgramSelectionTransformsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramSelectionTransformsCoreNextActualUsePindianAiOperations _coreNextActualUsePindianAiOperations;
+    private readonly ICoreProgramSelectionTransformsCorePairObtainShownGiftsOperations _corePairObtainShownGiftsOperations;
+    private readonly ICoreProgramSelectionTransformsCorePindianPoliciesOperations _corePindianPoliciesOperations;
+    private readonly ICoreProgramSelectionTransformsCoreProgramCategoryTargetLedgerOperations _coreProgramCategoryTargetLedgerOperations;
+    private readonly ICoreProgramSelectionTransformsCoreSourceCursesOperations _coreSourceCursesOperations;
+    private readonly ICoreProgramSelectionTransformsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramSelectionTransformsCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly ICoreProgramSelectionTransformsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramSelectionTransformsRuntime(ICoreProgramSelectionTransformsCoreAppliedDamageBenefitsOperations coreAppliedDamageBenefitsOperations, ICoreProgramSelectionTransformsCoreCapturedEquipmentDrawsOperations coreCapturedEquipmentDrawsOperations, ICoreProgramSelectionTransformsCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreProgramSelectionTransformsCoreEquipmentPlacementAndHpPairOperations coreEquipmentPlacementAndHpPairOperations, ICoreProgramSelectionTransformsCoreForeignSelectedCardSlashOperations coreForeignSelectedCardSlashOperations, ICoreProgramSelectionTransformsCoreMatchingRecastsOperations coreMatchingRecastsOperations, ICoreProgramSelectionTransformsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramSelectionTransformsCoreNextActualUsePindianAiOperations coreNextActualUsePindianAiOperations, ICoreProgramSelectionTransformsCorePairObtainShownGiftsOperations corePairObtainShownGiftsOperations, ICoreProgramSelectionTransformsCorePindianPoliciesOperations corePindianPoliciesOperations, ICoreProgramSelectionTransformsCoreProgramCategoryTargetLedgerOperations coreProgramCategoryTargetLedgerOperations, ICoreProgramSelectionTransformsCoreSourceCursesOperations coreSourceCursesOperations, ICoreProgramSelectionTransformsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramSelectionTransformsCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, ICoreProgramSelectionTransformsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._coreAppliedDamageBenefitsOperations = coreAppliedDamageBenefitsOperations;
+        this._coreCapturedEquipmentDrawsOperations = coreCapturedEquipmentDrawsOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreEquipmentPlacementAndHpPairOperations = coreEquipmentPlacementAndHpPairOperations;
+        this._coreForeignSelectedCardSlashOperations = coreForeignSelectedCardSlashOperations;
+        this._coreMatchingRecastsOperations = coreMatchingRecastsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNextActualUsePindianAiOperations = coreNextActualUsePindianAiOperations;
+        this._corePairObtainShownGiftsOperations = corePairObtainShownGiftsOperations;
+        this._corePindianPoliciesOperations = corePindianPoliciesOperations;
+        this._coreProgramCategoryTargetLedgerOperations = coreProgramCategoryTargetLedgerOperations;
+        this._coreSourceCursesOperations = coreSourceCursesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

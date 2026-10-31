@@ -23,7 +23,7 @@ internal static partial class WushuangCombatChecks
         var oldRevision = game.Revision;
         try
         {
-            typeof(GameEngine).GetMethod("BeginJudgment", BindingFlags.Instance | BindingFlags.NonPublic)!
+            global::FixtureRuntimeAccess.Engine.GetMethod("BeginJudgment", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .Invoke(game, [null, 0, "forged-parallel-judgment", 0L, null, JudgmentContinuationKind.ProgramSkill,
                     null, 0, "forged", SkillProgramCardSetVisibility.Public, null, null]);
             throw new InvalidOperationException("An unrelated parallel judgment bypassed its native guard.");
@@ -50,7 +50,7 @@ internal static partial class WushuangCombatChecks
         var frames = (FrameStore)typeof(GameEngine).GetField("_resolutionStack", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(forged)!;
         frames.Replace(inner with { ParentFrameId = outer.ParentFrameId });
         var rejected = false;
-        try { typeof(GameEngine).GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(forged, null); }
+        try { global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(forged, null); }
         catch (TargetInvocationException error) when (error.InnerException is InvalidOperationException) { rejected = true; }
         Require(rejected, "Cold state cannot reparent the inner judgment away from the exact paid damage response.");
         Answer(game, choice => choice.Cards.SequenceEqual([material]));

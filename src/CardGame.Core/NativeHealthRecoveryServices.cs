@@ -32,38 +32,4 @@ internal interface INativeHealthRecoveryProtocols : IProgramRuntimeOperations
 
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class NativeHealthRecoveryFacts(GameEngine engine) : INativeHealthRecoveryFacts
-    {
-        public int FrameCount => engine._resolutionStack.Count;
-        public ResolutionFrame FrameAt(int index) => engine._resolutionStack[index];
-        public int FrameIndex(long id) => engine._resolutionStack.FindIndex(frame => frame.Id == id);
-        public int FrameLastIndex(long id) => engine._resolutionStack.FindLastIndex(frame => frame.Id == id);
-        public IEnumerable<IGameEvent> CompleteProgramEventHistory() => engine.CompleteProgramEventHistory();
-        public int ResolveProgramParticipant(ProgramSkillFrame frame, ProgramParticipantReference reference) =>
-            engine.ResolveProgramParticipant(frame, reference);
-    }
-
-    [ProgramCapability]
-    private sealed class NativeHealthRecoveryProtocols(GameEngine engine) : INativeHealthRecoveryProtocols
-    {
-        public bool HulaoActivityFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) =>
-            engine.HulaoActivityFrameRidesOn(child, parent);
-        public bool RecoveryReplacementFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) =>
-            engine.RecoveryReplacementFrameRidesOn(child, parent);
-        public void ValidateHulaoPeachUse(CardUseFrame use) => engine.ValidateHulaoPeachUse(use);
-        public bool TypedRecoveryApplicationBoundsMatch(RecoveryReplacementFrame recovery, IReadOnlyList<IGameEvent> history) =>
-            engine.TypedRecoveryApplicationBoundsMatch(recovery, history);
-        public bool TypedDamagePostEventEdge(ResolutionFrame parent, ResolutionFrame child) =>
-            engine.TypedDamagePostEventEdge(parent, child);
-        public bool DamageProgramMatchesWindow(ProgramSkillFrame root, DamageTriggerWindowFrame window) =>
-            engine.DamageProgramMatchesWindow(root, window);
-        public bool ProgramRecoveryReplacementReceiptMatches(ProgramSkillFrame producer, RecoveryReplacementFrame recovery,
-            IReadOnlyList<IGameEvent> history) => engine.ProgramRecoveryReplacementReceiptMatches(producer, recovery, history);
-        public bool TypedRecoveryHpReturnMatches(RecoveryReplacementFrame recovery, HpChangedTriggerWindowFrame hp,
-            IReadOnlyList<IGameEvent> history) => engine.TypedRecoveryHpReturnMatches(recovery, hp, history);
-        public bool ProgramRecoveryReceiptMatches(ProgramSkillFrame producer, HpChangedTriggerWindowFrame hp,
-            IReadOnlyList<IGameEvent> history) => engine.ProgramRecoveryReceiptMatches(producer, hp, history);
-        public SkillProgramEffect? TypedRecoveryPausedEffect(ProgramSkillFrame producer) => engine.TypedRecoveryPausedEffect(producer);
-    }
 }

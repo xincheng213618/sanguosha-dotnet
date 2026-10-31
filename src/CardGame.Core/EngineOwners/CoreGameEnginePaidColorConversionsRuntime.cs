@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEnginePaidColorConversionsRuntime : global::CardGame.Core.IPaidColorDamageClaimProgramHost
+{
+    private readonly ICorePaidColorConversionsCardZonesOperations _cardZonesOperations;
+    private readonly ICorePaidColorConversionsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePaidColorConversionsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePaidColorConversionsTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly ICorePaidColorConversionsCoreActualTurnDamageClaimsOperations _coreActualTurnDamageClaimsOperations;
+    private readonly ICorePaidColorConversionsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICorePaidColorConversionsCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICorePaidColorConversionsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICorePaidColorConversionsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICorePaidColorConversionsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICorePaidColorConversionsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICorePaidColorConversionsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICorePaidColorConversionsCorePaidColorDamageClaimObserversOperations _corePaidColorDamageClaimObserversOperations;
+    private readonly ICorePaidColorConversionsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePaidColorConversionsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePaidColorConversionsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICorePaidColorConversionsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICorePaidColorConversionsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICorePaidColorConversionsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICorePaidColorConversionsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICorePaidColorConversionsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEnginePaidColorConversionsRuntime(ICorePaidColorConversionsCardZonesOperations cardZonesOperations, ICorePaidColorConversionsContentRegistryOperations contentRegistryOperations, ICorePaidColorConversionsResolutionStackOperations resolutionStackOperations, ICorePaidColorConversionsTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICorePaidColorConversionsCoreActualTurnDamageClaimsOperations coreActualTurnDamageClaimsOperations, ICorePaidColorConversionsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICorePaidColorConversionsCoreCardConversionsOperations coreCardConversionsOperations, ICorePaidColorConversionsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICorePaidColorConversionsCoreCardUseModulesOperations coreCardUseModulesOperations, ICorePaidColorConversionsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICorePaidColorConversionsCoreNationalSkillsOperations coreNationalSkillsOperations, ICorePaidColorConversionsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICorePaidColorConversionsCorePaidColorDamageClaimObserversOperations corePaidColorDamageClaimObserversOperations, ICorePaidColorConversionsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePaidColorConversionsCoreRuntimeOperations coreRuntimeOperations, ICorePaidColorConversionsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICorePaidColorConversionsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICorePaidColorConversionsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICorePaidColorConversionsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICorePaidColorConversionsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICorePaidColorConversionsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
+        this._coreActualTurnDamageClaimsOperations = coreActualTurnDamageClaimsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePaidColorDamageClaimObserversOperations = corePaidColorDamageClaimObserversOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

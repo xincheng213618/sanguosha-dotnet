@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreProgramTieredRoundConversionRuntime
+{
+    private readonly ICoreProgramTieredRoundConversionCharacterWoLongFengChuOlOperations _characterWoLongFengChuOlOperations;
+    private readonly ICoreProgramTieredRoundConversionContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramTieredRoundConversionResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramTieredRoundConversionSkillRuntimeStateOperations _skillRuntimeStateOperations;
+    private readonly ICoreProgramTieredRoundConversionCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreProgramTieredRoundConversionCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreProgramTieredRoundConversionCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreProgramTieredRoundConversionCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreProgramTieredRoundConversionCoreCurrentTurnUseKindsOperations _coreCurrentTurnUseKindsOperations;
+    private readonly ICoreProgramTieredRoundConversionCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramTieredRoundConversionCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreProgramTieredRoundConversionCoreTieredRoundZeroResponsesOperations _coreTieredRoundZeroResponsesOperations;
+    private readonly ICoreProgramTieredRoundConversionCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreProgramTieredRoundConversionCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreProgramTieredRoundConversionKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineConfiguredConversionsConfiguredConversionTiersAccess _coreGameEngineConfiguredConversionsConfiguredConversionTiersAccess;
+    internal CoreProgramTieredRoundConversionRuntime(ICoreProgramTieredRoundConversionCharacterWoLongFengChuOlOperations characterWoLongFengChuOlOperations, ICoreProgramTieredRoundConversionContentRegistryOperations contentRegistryOperations, ICoreProgramTieredRoundConversionResolutionStackOperations resolutionStackOperations, ICoreProgramTieredRoundConversionSkillRuntimeStateOperations skillRuntimeStateOperations, ICoreProgramTieredRoundConversionCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreProgramTieredRoundConversionCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreProgramTieredRoundConversionCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreProgramTieredRoundConversionCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreProgramTieredRoundConversionCoreCurrentTurnUseKindsOperations coreCurrentTurnUseKindsOperations, ICoreProgramTieredRoundConversionCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramTieredRoundConversionCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreProgramTieredRoundConversionCoreTieredRoundZeroResponsesOperations coreTieredRoundZeroResponsesOperations, ICoreProgramTieredRoundConversionCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreProgramTieredRoundConversionCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreProgramTieredRoundConversionKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineConfiguredConversionsConfiguredConversionTiersAccess coreGameEngineConfiguredConversionsConfiguredConversionTiersAccess)
+    {
+        this._characterWoLongFengChuOlOperations = characterWoLongFengChuOlOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._skillRuntimeStateOperations = skillRuntimeStateOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCurrentTurnUseKindsOperations = coreCurrentTurnUseKindsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreTieredRoundZeroResponsesOperations = coreTieredRoundZeroResponsesOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineConfiguredConversionsConfiguredConversionTiersAccess = coreGameEngineConfiguredConversionsConfiguredConversionTiersAccess;
+    }
+}

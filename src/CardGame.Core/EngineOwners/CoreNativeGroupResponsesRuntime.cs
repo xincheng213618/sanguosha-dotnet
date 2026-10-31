@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeGroupResponsesRuntime
+{
+    private readonly ICoreNativeGroupResponsesCharacterCaoZhiLeOperations _characterCaoZhiLeOperations;
+    private readonly ICoreNativeGroupResponsesCharacterLiuQiOlOperations _characterLiuQiOlOperations;
+    private readonly ICoreNativeGroupResponsesCharacterMaChaoAnniversaryGodOperations _characterMaChaoAnniversaryGodOperations;
+    private readonly ICoreNativeGroupResponsesCoreActionDiscardColorsOperations _coreActionDiscardColorsOperations;
+    private readonly ICoreNativeGroupResponsesCoreAlternativeViewAsCostsOperations _coreAlternativeViewAsCostsOperations;
+    private readonly ICoreNativeGroupResponsesCoreCardActionsOperations _coreCardActionsOperations;
+    private readonly ICoreNativeGroupResponsesCoreCardConversionsOperations _coreCardConversionsOperations;
+    private readonly ICoreNativeGroupResponsesCoreCardDeclarationsOperations _coreCardDeclarationsOperations;
+    private readonly ICoreNativeGroupResponsesCoreNativePublicPileOriginalCardsOperations _coreNativePublicPileOriginalCardsOperations;
+    private readonly ICoreNativeGroupResponsesCoreResponseCompletionZhangbaOperations _coreResponseCompletionZhangbaOperations;
+    private readonly ICoreNativeGroupResponsesCoreResponseUseCompletionOperations _coreResponseUseCompletionOperations;
+    private readonly ICoreNativeGroupResponsesCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeGroupResponsesCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreNativeGroupResponsesCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeGroupResponsesCoreNativeDamageApplicationOperations _coreNativeDamageApplicationOperations;
+    private readonly ICoreNativeGroupResponsesCoreNativeDodgeOperations _coreNativeDodgeOperations;
+    private readonly ICoreNativeGroupResponsesCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreNativeGroupResponsesCoreNativeResponseMaterialQueriesOperations _coreNativeResponseMaterialQueriesOperations;
+    private readonly ICoreNativeGroupResponsesCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreNativeGroupResponsesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    internal CoreNativeGroupResponsesRuntime(ICoreNativeGroupResponsesCharacterCaoZhiLeOperations characterCaoZhiLeOperations, ICoreNativeGroupResponsesCharacterLiuQiOlOperations characterLiuQiOlOperations, ICoreNativeGroupResponsesCharacterMaChaoAnniversaryGodOperations characterMaChaoAnniversaryGodOperations, ICoreNativeGroupResponsesCoreActionDiscardColorsOperations coreActionDiscardColorsOperations, ICoreNativeGroupResponsesCoreAlternativeViewAsCostsOperations coreAlternativeViewAsCostsOperations, ICoreNativeGroupResponsesCoreCardActionsOperations coreCardActionsOperations, ICoreNativeGroupResponsesCoreCardConversionsOperations coreCardConversionsOperations, ICoreNativeGroupResponsesCoreCardDeclarationsOperations coreCardDeclarationsOperations, ICoreNativeGroupResponsesCoreNativePublicPileOriginalCardsOperations coreNativePublicPileOriginalCardsOperations, ICoreNativeGroupResponsesCoreResponseCompletionZhangbaOperations coreResponseCompletionZhangbaOperations, ICoreNativeGroupResponsesCoreResponseUseCompletionOperations coreResponseUseCompletionOperations, ICoreNativeGroupResponsesCoreMatchLogOperations coreMatchLogOperations, ICoreNativeGroupResponsesCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreNativeGroupResponsesCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeGroupResponsesCoreNativeDamageApplicationOperations coreNativeDamageApplicationOperations, ICoreNativeGroupResponsesCoreNativeDodgeOperations coreNativeDodgeOperations, ICoreNativeGroupResponsesCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreNativeGroupResponsesCoreNativeResponseMaterialQueriesOperations coreNativeResponseMaterialQueriesOperations, ICoreNativeGroupResponsesCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeGroupResponsesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations)
+    {
+        this._characterCaoZhiLeOperations = characterCaoZhiLeOperations;
+        this._characterLiuQiOlOperations = characterLiuQiOlOperations;
+        this._characterMaChaoAnniversaryGodOperations = characterMaChaoAnniversaryGodOperations;
+        this._coreActionDiscardColorsOperations = coreActionDiscardColorsOperations;
+        this._coreAlternativeViewAsCostsOperations = coreAlternativeViewAsCostsOperations;
+        this._coreCardActionsOperations = coreCardActionsOperations;
+        this._coreCardConversionsOperations = coreCardConversionsOperations;
+        this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;
+        this._coreNativePublicPileOriginalCardsOperations = coreNativePublicPileOriginalCardsOperations;
+        this._coreResponseCompletionZhangbaOperations = coreResponseCompletionZhangbaOperations;
+        this._coreResponseUseCompletionOperations = coreResponseUseCompletionOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamageApplicationOperations = coreNativeDamageApplicationOperations;
+        this._coreNativeDodgeOperations = coreNativeDodgeOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativeResponseMaterialQueriesOperations = coreNativeResponseMaterialQueriesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+    }
+}

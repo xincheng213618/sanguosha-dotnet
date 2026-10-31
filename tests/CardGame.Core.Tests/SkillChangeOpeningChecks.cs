@@ -37,7 +37,7 @@ internal static class SkillChangeOpeningChecks
     {
         var s = Scene.Start("shared"); s.Reach(() => s.P?.SkillPrompt?.SkillId == Driver);
         var frame = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Last();
-        var method = typeof(GameEngine).GetMethod("PrepareProgramSkillChange", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+        var method = global::FixtureRuntimeAccess.Engine.GetMethod("PrepareProgramSkillChange", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
         var before = SnapshotJson.Serialize(s.G.CreateSnapshot(0)); var revision = s.G.Revision;
         foreach (var forged in new[] { frame with { OwnerSeat = 1 }, frame with { SkillInstanceId = "foreign-instance" }, frame with { InstructionIndex = frame.InstructionIndex + 1 } })
         {

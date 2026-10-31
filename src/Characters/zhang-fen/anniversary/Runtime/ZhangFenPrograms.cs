@@ -23,7 +23,7 @@ internal sealed class ZhangFenHandler(SkillProgramEffectOp op) : ISkillProgramEf
 }
 internal static class ZhangFenComposition
 {
-    internal const string Wanglu = "anniversary:wanglu", Xianzhu = "anniversary:xianzhu", Chaixie = "anniversary:chaixie", Cart = "anniversary:dagong-che";
+    internal const string Wanglu = "anniversary:wanglu",Xianzhu = "anniversary:xianzhu",Chaixie = "anniversary:chaixie",Cart = "anniversary:dagong-che";
     [ProgramCatalogValidation(43500)] internal static void Validate(string path, SkillProgram p)
     {
         var own = new[] { SkillProgramEffectOp.ResolveAnniversaryZhangFenWanglu, SkillProgramEffectOp.ResolveAnniversaryZhangFenXianzhu, SkillProgramEffectOp.ResolveAnniversaryDagongCheAttack, SkillProgramEffectOp.ResolveAnniversaryZhangFenChaixie };

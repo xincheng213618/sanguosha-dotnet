@@ -21,22 +21,4 @@ public sealed class CommitConversionPolarityHandler : ISkillProgramEffectHandler
 }
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class ConversionPolarityProgramCapability(GameEngine engine) : IConversionPolarityProgramHost
-    { public void CommitConversionPolarity(ProgramSkillFrame frame) => engine.CommitProgramConversionPolarity(frame); }
-    private SkillPolarity GetProgramConversionPolarity(int ownerSeat, string skillId) =>
-        _skillRuntimeState.GetConversionState(ownerSeat, skillId);
-    private SkillPolarity CommitProgramConversionPolarity(ProgramSkillFrame frame)
-    {
-        var active = GetActiveProgramFrame(frame.Id);
-        if (active.ConversionPreviousPolarity is { } committed) return committed;
-        var previous = GetProgramConversionPolarity(active.OwnerSeat, active.SkillId);
-        var parentId = _resolutionStack.Count > 1 ? (long?)_resolutionStack[^2].Id : null;
-        ReplaceRuntimeTop(active with { ConversionPreviousPolarity = previous });
-        var current = _skillRuntimeState.ToggleConversionState(active.OwnerSeat, active.SkillId);
-        AdvanceEventRulesAndQueueFact(new ProgramConversionPolarityCommittedEvent(active.Id, parentId,
-            active.OwnerSeat, active.SkillId, active.SkillInstanceId, GetProgramBindingId(active), previous,
-            current, _turnNumber, _cardUseDebitPhaseInstanceId));
-        return previous;
-    }
 }

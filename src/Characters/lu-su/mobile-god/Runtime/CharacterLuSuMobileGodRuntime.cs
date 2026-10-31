@@ -1,0 +1,70 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterLuSuMobileGodRuntime : global::CardGame.Core.IShenLuSuHost, global::CardGame.Core.IShenLuSuSelection
+{
+    private readonly ICharacterLuSuMobileGodCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterLuSuMobileGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterLuSuMobileGodRandomOperations _randomOperations;
+    private readonly ICharacterLuSuMobileGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterLuSuMobileGodCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterLuSuMobileGodCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterLuSuMobileGodCoreAfterTurnEndedProgramsOperations _coreAfterTurnEndedProgramsOperations;
+    private readonly ICharacterLuSuMobileGodCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICharacterLuSuMobileGodCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICharacterLuSuMobileGodCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICharacterLuSuMobileGodCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterLuSuMobileGodCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterLuSuMobileGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterLuSuMobileGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterLuSuMobileGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterLuSuMobileGodCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICharacterLuSuMobileGodCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterLuSuMobileGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterLuSuMobileGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterLuSuMobileGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterLuSuMobileGodCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterLuSuMobileGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterLuSuMobileGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionPlayerCountAccess _coreMatchDefinitionModeDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterLuSuMobileGodRuntime(ICharacterLuSuMobileGodCardZonesOperations cardZonesOperations, ICharacterLuSuMobileGodContentRegistryOperations contentRegistryOperations, ICharacterLuSuMobileGodRandomOperations randomOperations, ICharacterLuSuMobileGodResolutionStackOperations resolutionStackOperations, ICharacterLuSuMobileGodCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterLuSuMobileGodCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterLuSuMobileGodCoreAfterTurnEndedProgramsOperations coreAfterTurnEndedProgramsOperations, ICharacterLuSuMobileGodCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICharacterLuSuMobileGodCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICharacterLuSuMobileGodCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICharacterLuSuMobileGodCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterLuSuMobileGodCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterLuSuMobileGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLuSuMobileGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterLuSuMobileGodCoreRuntimeOperations coreRuntimeOperations, ICharacterLuSuMobileGodCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICharacterLuSuMobileGodCoreTableOrderOperations coreTableOrderOperations, ICharacterLuSuMobileGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterLuSuMobileGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterLuSuMobileGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterLuSuMobileGodCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterLuSuMobileGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterLuSuMobileGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionPlayerCountAccess coreMatchDefinitionModeDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAfterTurnEndedProgramsOperations = coreAfterTurnEndedProgramsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchDefinitionModeDefinitionPlayerCountAccess = coreMatchDefinitionModeDefinitionPlayerCountAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineSoleIncomingEffectRepeatRuntime : global::CardGame.Core.ISoleIncomingEffectRepeatHost
+{
+    private readonly ICoreSoleIncomingEffectRepeatCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCharacterFeiYiOlOperations _characterFeiYiOlOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCharacterHuangYueyingOlMouOperations _characterHuangYueyingOlMouOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCharacterSunQuanOlMagicOperations _characterSunQuanOlMagicOperations;
+    private readonly ICoreSoleIncomingEffectRepeatContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSoleIncomingEffectRepeatResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreDamageColorDuelProgramsOperations _coreDamageColorDuelProgramsOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreDesignatedExtraTargetsOperations _coreDesignatedExtraTargetsOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreNamedAmbushInvalidationOperations _coreNamedAmbushInvalidationOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreNextCardTargetAdjustmentsOperations _coreNextCardTargetAdjustmentsOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreProgramCardTargetEffectsOperations _coreProgramCardTargetEffectsOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreSequentialTrickTargetsOperations _coreSequentialTrickTargetsOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreSoleIncomingEffectRepeatCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreSoleIncomingEffectRepeatKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreSoleIncomingEffectRepeatKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSoleIncomingEffectRepeatRuntime(ICoreSoleIncomingEffectRepeatCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICoreSoleIncomingEffectRepeatCharacterFeiYiOlOperations characterFeiYiOlOperations, ICoreSoleIncomingEffectRepeatCharacterHuangYueyingOlMouOperations characterHuangYueyingOlMouOperations, ICoreSoleIncomingEffectRepeatCharacterSunQuanOlMagicOperations characterSunQuanOlMagicOperations, ICoreSoleIncomingEffectRepeatContentRegistryOperations contentRegistryOperations, ICoreSoleIncomingEffectRepeatResolutionStackOperations resolutionStackOperations, ICoreSoleIncomingEffectRepeatCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreSoleIncomingEffectRepeatCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreSoleIncomingEffectRepeatCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreSoleIncomingEffectRepeatCoreDamageColorDuelProgramsOperations coreDamageColorDuelProgramsOperations, ICoreSoleIncomingEffectRepeatCoreDesignatedExtraTargetsOperations coreDesignatedExtraTargetsOperations, ICoreSoleIncomingEffectRepeatCoreNamedAmbushInvalidationOperations coreNamedAmbushInvalidationOperations, ICoreSoleIncomingEffectRepeatCoreNextCardTargetAdjustmentsOperations coreNextCardTargetAdjustmentsOperations, ICoreSoleIncomingEffectRepeatCoreProgramCardTargetEffectsOperations coreProgramCardTargetEffectsOperations, ICoreSoleIncomingEffectRepeatCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSoleIncomingEffectRepeatCoreRuntimeOperations coreRuntimeOperations, ICoreSoleIncomingEffectRepeatCoreSequentialTrickTargetsOperations coreSequentialTrickTargetsOperations, ICoreSoleIncomingEffectRepeatCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreSoleIncomingEffectRepeatCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreSoleIncomingEffectRepeatCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreSoleIncomingEffectRepeatCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreSoleIncomingEffectRepeatCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreSoleIncomingEffectRepeatKernelCoreMainOperations kernelCoreMainOperations, ICoreSoleIncomingEffectRepeatKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
+        this._characterFeiYiOlOperations = characterFeiYiOlOperations;
+        this._characterHuangYueyingOlMouOperations = characterHuangYueyingOlMouOperations;
+        this._characterSunQuanOlMagicOperations = characterSunQuanOlMagicOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageColorDuelProgramsOperations = coreDamageColorDuelProgramsOperations;
+        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
+        this._coreNamedAmbushInvalidationOperations = coreNamedAmbushInvalidationOperations;
+        this._coreNextCardTargetAdjustmentsOperations = coreNextCardTargetAdjustmentsOperations;
+        this._coreProgramCardTargetEffectsOperations = coreProgramCardTargetEffectsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialTrickTargetsOperations = coreSequentialTrickTargetsOperations;
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

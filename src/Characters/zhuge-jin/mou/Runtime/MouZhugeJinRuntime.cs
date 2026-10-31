@@ -3,7 +3,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class MouZhugeJinRuntime(IMouZhugeJinFacts facts, IMouZhugeJinNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouZhugeJinRuntime
 {
-    internal const string Action = "mou-zhuge-jin", GiveReason = "skill-program.mou:taozhou.give", DrawReason = "skill-program.mou:taozhou.draw", DiscardReason = "skill-program.mou-zhuge-jin.discard";
+    internal const string Action = "mou-zhuge-jin",GiveReason = "skill-program.mou:taozhou.give",DrawReason = "skill-program.mou:taozhou.draw",DiscardReason = "skill-program.mou-zhuge-jin.discard";
     internal static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 35600, SkillProgramEffectOp.ResolveMouZhugeJinHoude, SkillProgramEffectOp.ResolveMouZhugeJinZijin)]
     private bool Qualifies(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => facts.Use(c, w,

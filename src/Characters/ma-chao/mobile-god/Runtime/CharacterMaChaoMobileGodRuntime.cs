@@ -1,0 +1,82 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterMaChaoMobileGodRuntime : global::CardGame.Core.IMobileShenMaChaoHost
+{
+    private readonly ICharacterMaChaoMobileGodCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterMaChaoMobileGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterMaChaoMobileGodRandomOperations _randomOperations;
+    private readonly ICharacterMaChaoMobileGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterMaChaoMobileGodCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterMaChaoMobileGodCoreAttributedMarkerEventsOperations _coreAttributedMarkerEventsOperations;
+    private readonly ICharacterMaChaoMobileGodCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterMaChaoMobileGodCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICharacterMaChaoMobileGodCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICharacterMaChaoMobileGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterMaChaoMobileGodCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterMaChaoMobileGodCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICharacterMaChaoMobileGodCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterMaChaoMobileGodCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterMaChaoMobileGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterMaChaoMobileGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterMaChaoMobileGodCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterMaChaoMobileGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterMaChaoMobileGodCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICharacterMaChaoMobileGodCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterMaChaoMobileGodCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICharacterMaChaoMobileGodCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICharacterMaChaoMobileGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterMaChaoMobileGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterMaChaoMobileGodCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterMaChaoMobileGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterMaChaoMobileGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterMaChaoMobileGodKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterMaChaoMobileGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess;
+    internal CharacterMaChaoMobileGodRuntime(ICharacterMaChaoMobileGodCardZonesOperations cardZonesOperations, ICharacterMaChaoMobileGodContentRegistryOperations contentRegistryOperations, ICharacterMaChaoMobileGodRandomOperations randomOperations, ICharacterMaChaoMobileGodResolutionStackOperations resolutionStackOperations, ICharacterMaChaoMobileGodCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterMaChaoMobileGodCoreAttributedMarkerEventsOperations coreAttributedMarkerEventsOperations, ICharacterMaChaoMobileGodCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterMaChaoMobileGodCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICharacterMaChaoMobileGodCoreEquipmentContentOperations coreEquipmentContentOperations, ICharacterMaChaoMobileGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterMaChaoMobileGodCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterMaChaoMobileGodCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICharacterMaChaoMobileGodCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterMaChaoMobileGodCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterMaChaoMobileGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterMaChaoMobileGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterMaChaoMobileGodCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterMaChaoMobileGodCoreRuntimeOperations coreRuntimeOperations, ICharacterMaChaoMobileGodCoreSkillProgramsOperations coreSkillProgramsOperations, ICharacterMaChaoMobileGodCoreTableOrderOperations coreTableOrderOperations, ICharacterMaChaoMobileGodCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICharacterMaChaoMobileGodCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICharacterMaChaoMobileGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterMaChaoMobileGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterMaChaoMobileGodCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterMaChaoMobileGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterMaChaoMobileGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterMaChaoMobileGodKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterMaChaoMobileGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAttributedMarkerEventsOperations = coreAttributedMarkerEventsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess = coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess;
+    }
+}

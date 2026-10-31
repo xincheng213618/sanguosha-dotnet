@@ -1,0 +1,61 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CharacterFeiYiOlEntries
+{
+    internal bool AdvanceFeiYiSubtree() => _resolve().AdvanceFeiYiSubtree();
+    internal global::CardGame.Core.PromptChoice AiFeiYi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiFeiYi(p, f);
+    internal bool AllowsFeiYiYanru(global::CardGame.Core.CharacterState actor) => _resolve().AllowsFeiYiYanru(actor);
+    internal void AnswerFeiYi(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerFeiYi(choice);
+    internal void AssertFeiYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertFeiYi(f);
+    internal void AssertFeiYiEffectRounds() => _resolve().AssertFeiYiEffectRounds();
+    internal global::CardGame.Core.SkillProgramStepOutcome BeginFeiYi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginFeiYi(supplied, op);
+    internal void BeginFeiYiDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginFeiYiDiscard(f);
+    internal void BeginFeiYiDraw(global::CardGame.Core.ProgramSkillFrame f, bool hezhong) => _resolve().BeginFeiYiDraw(f, hezhong);
+    internal void BindFeiYiRankEffects(long id, global::CardGame.Core.ProgramTrickContinuation trick) => _resolve().BindFeiYiRankEffects(id, trick);
+    internal bool CanOfferFeiYiSingleton(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferFeiYiSingleton(c, t, context);
+    internal global::CardGame.Core.CardMovementBatchContext CaptureFeiYiSingletonBatch(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureFeiYiSingletonBatch(batch);
+    internal void CaptureFeiYiTrickPaymentBatch(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureFeiYiTrickPaymentBatch(batch);
+    internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> CollectFeiYiSingletonCandidates(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CollectFeiYiSingletonCandidates(batch);
+    internal void CollectWindow_CollectFeiYiSingletonCandidates(global::CardGame.Core.CardMovementBatchContext batch, global::System.Collections.Generic.List<global::CardGame.Core.ProgramTriggerCandidate> result) => _resolve().CollectWindow_CollectFeiYiSingletonCandidates(batch, result);
+    internal void CompleteFeiYi(global::CardGame.Core.ProgramSkillFrame f, bool applied) => _resolve().CompleteFeiYi(f, applied);
+    internal global::CardGame.Core.CardMovementBatchContext CompleteMovementBatchCaptureFeiYiSingletonBatch(global::CardGame.Core.CardMovementBatchBuilder batch, global::CardGame.Core.CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureFeiYiSingletonBatch(batch, completed);
+    internal global::CardGame.Core.CardMovementBatchContext CompleteMovementBatchCaptureFeiYiTrickPaymentBatch(global::CardGame.Core.CardMovementBatchBuilder batch, global::CardGame.Core.CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureFeiYiTrickPaymentBatch(batch, completed);
+    internal void ContinueFeiYi(long id) => _resolve().ContinueFeiYi(id);
+    internal bool ContinuePaidFeiYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidFeiYi(f);
+    internal global::CardGame.Core.ProgramSkillWindowContext CreateFeiYiSingletonContext(global::CardGame.Core.CardsMovedTriggerWindowFrame frame, global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().CreateFeiYiSingletonContext(frame, c);
+    internal global::CardGame.Core.FeiYiSingletonTransition? CurrentFeiYiSingleton(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CurrentFeiYiSingleton(c, context);
+    internal bool DrainFeiYiChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainFeiYiChildren(f);
+    internal bool ExcludeOrdinaryMovement_IsFeiYiSingletonTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsFeiYiSingletonTrigger(candidate, trigger);
+    internal int? FeiYiAcceptedActor(global::CardGame.Core.CardUseFrame use) => _resolve().FeiYiAcceptedActor(use);
+    internal bool FeiYiCanDiscard(int owner, global::CardGame.Core.Card card) => _resolve().FeiYiCanDiscard(owner, card);
+    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> FeiYiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FeiYiChoices(f);
+    internal bool FeiYiDirectionAvailable(int owner, bool greater) => _resolve().FeiYiDirectionAvailable(owner, greater);
+    internal bool FeiYiFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().FeiYiFirstChild(root, child);
+    internal global::CardGame.Core.ProgramSkillFrame? FeiYiObserverRoot() => _resolve().FeiYiObserverRoot();
+    internal bool FeiYiSingletonIsWholeOperation(global::CardGame.Core.CardMovementBatchContext batch, global::CardGame.Core.FeiYiSingletonTransition transition) => _resolve().FeiYiSingletonIsWholeOperation(batch, transition);
+    internal global::CardGame.Core.CardConversionSource FeiYiSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FeiYiSource(f);
+    internal bool FeiYiSourceCurrent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FeiYiSourceCurrent(f);
+    internal bool FeiYiTrickPaymentMaterialsMatch(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().FeiYiTrickPaymentMaterialsMatch(use, batch);
+    internal bool FeiYiYanruAvailable(global::CardGame.Core.CharacterState actor) => _resolve().FeiYiYanruAvailable(actor);
+    internal bool HasFeiYiDamageObserver(long id) => _resolve().HasFeiYiDamageObserver(id);
+    internal bool HasFeiYiTrickPaymentTail(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.RecoveryPaidCardUseContinuation continuation) => _resolve().HasFeiYiTrickPaymentTail(use, continuation);
+    internal bool HasUnstartedFeiYiExtraEffect(long id) => _resolve().HasUnstartedFeiYiExtraEffect(id);
+    internal bool IsFeiYiAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsFeiYiAwaitedMovement(f, e, p);
+    internal bool IsFeiYiDying() => _resolve().IsFeiYiDying();
+    internal bool IsFeiYiExtraEffectRound(long id) => _resolve().IsFeiYiExtraEffectRound(id);
+    internal bool IsFeiYiSingletonTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsFeiYiSingletonTrigger(t);
+    internal bool IsFeiYiTrickPaymentBatch(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsFeiYiTrickPaymentBatch(use, batch);
+    internal int NativeExtraEffectRoundOrdinal(long id) => _resolve().NativeExtraEffectRoundOrdinal(id);
+    internal global::CardGame.Core.ExtraCardEffectState? NativeExtraEffectState(global::CardGame.Core.CardUseFrame use) => _resolve().NativeExtraEffectState(use);
+    internal void PayFeiYiDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayFeiYiDiscard(f);
+    internal void PayFeiYiYanru(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayFeiYiYanru(f);
+    internal bool? ProveFeiYiMovement(global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ProveFeiYiMovement(trigger, candidate, context);
+    internal void PublishFeiYiChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishFeiYiChoice(f);
+    internal void RecordFeiYiMovement(long id, long before, global::CardGame.Core.FeiYiStage stage, int minimum) => _resolve().RecordFeiYiMovement(id, before, stage, minimum);
+    internal bool ResumeFeiYi(long id) => _resolve().ResumeFeiYi(id);
+    internal bool ReturnFeiYiMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnFeiYiMovement(f);
+    internal bool TryBeginFeiYiExtraEffectRound(long id, bool afterAttack) => _resolve().TryBeginFeiYiExtraEffectRound(id, afterAttack);
+    internal global::CardGame.Core.ProgramSkillWindowContext? TryCreateFeiYiSingletonContext(global::CardGame.Core.CardsMovedTriggerWindowFrame frame, global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().TryCreateFeiYiSingletonContext(frame, candidate);
+    internal void UpdateNativeExtraEffectState(long id, global::System.Func<global::CardGame.Core.ExtraCardEffectState, global::CardGame.Core.ExtraCardEffectState> update) => _resolve().UpdateNativeExtraEffectState(id, update);
+    internal bool HasFeiYiHezhong { get => _resolve().HasFeiYiHezhong; }
+}

@@ -1,0 +1,78 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreHellMengpoProgramsRuntime : global::CardGame.Core.IHellMengpoProgramHost
+{
+    private readonly ICoreHellMengpoProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreHellMengpoProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreHellMengpoProgramsObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICoreHellMengpoProgramsRandomOperations _randomOperations;
+    private readonly ICoreHellMengpoProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHellMengpoProgramsCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICoreHellMengpoProgramsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreHellMengpoProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreHellMengpoProgramsCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreHellMengpoProgramsCoreHellSoulCardsOperations _coreHellSoulCardsOperations;
+    private readonly ICoreHellMengpoProgramsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreHellMengpoProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreHellMengpoProgramsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreHellMengpoProgramsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreHellMengpoProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreHellMengpoProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreHellMengpoProgramsCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreHellMengpoProgramsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreHellMengpoProgramsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreHellMengpoProgramsCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreHellMengpoProgramsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreHellMengpoProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreHellMengpoProgramsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreHellMengpoProgramsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreHellMengpoProgramsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreHellMengpoProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    internal CoreHellMengpoProgramsRuntime(ICoreHellMengpoProgramsCardZonesOperations cardZonesOperations, ICoreHellMengpoProgramsContentRegistryOperations contentRegistryOperations, ICoreHellMengpoProgramsObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICoreHellMengpoProgramsRandomOperations randomOperations, ICoreHellMengpoProgramsResolutionStackOperations resolutionStackOperations, ICoreHellMengpoProgramsCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICoreHellMengpoProgramsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreHellMengpoProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreHellMengpoProgramsCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreHellMengpoProgramsCoreHellSoulCardsOperations coreHellSoulCardsOperations, ICoreHellMengpoProgramsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreHellMengpoProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreHellMengpoProgramsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreHellMengpoProgramsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreHellMengpoProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreHellMengpoProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreHellMengpoProgramsCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreHellMengpoProgramsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreHellMengpoProgramsCoreTableOrderOperations coreTableOrderOperations, ICoreHellMengpoProgramsCoreMatchLogOperations coreMatchLogOperations, ICoreHellMengpoProgramsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreHellMengpoProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreHellMengpoProgramsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreHellMengpoProgramsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreHellMengpoProgramsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreHellMengpoProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._randomOperations = randomOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHellSoulCardsOperations = coreHellSoulCardsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess = coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeWinnerAccess = coreMatchOutcomeWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreMatchSetupSetupCompleteAccess = coreMatchSetupSetupCompleteAccess;
+        this._coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess = coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    }
+}

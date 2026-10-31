@@ -4,7 +4,7 @@ namespace CardGame.Core;
 
 internal static class MobileYuJinJieyue
 {
-    internal const string Skill = "mobile:jieyue", Ending = "ending-discard-and-other-choice", Preparation = "preparation-retrieve-jieyue";
+    internal const string Skill = "mobile:jieyue",Ending = "ending-discard-and-other-choice",Preparation = "preparation-retrieve-jieyue";
 
     [ProgramCatalogValidation(76300)]
     private static void Validate(string path, SkillProgram program)

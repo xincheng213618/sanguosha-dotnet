@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal static class BoundaryGuoHuaiComposition
 {
-    internal const string Skill = "boundary:jingce-mobile", Response = "record-native-response-materials", Ending = "actual-turn-discard-count";
+    internal const string Skill = "boundary:jingce-mobile",Response = "record-native-response-materials",Ending = "actual-turn-discard-count";
     [ProgramCatalogValidation(56400)]
     internal static void Validate(string path, SkillProgram p)
     {

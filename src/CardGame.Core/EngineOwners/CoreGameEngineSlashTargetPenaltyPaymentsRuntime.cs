@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineSlashTargetPenaltyPaymentsRuntime : global::CardGame.Core.ISlashTargetPenaltyProgramHost
+{
+    private readonly ICoreSlashTargetPenaltyPaymentsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreNativeRecastInvocationsOperations _coreNativeRecastInvocationsOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreSlashTargetPenaltyWindowsOperations _coreSlashTargetPenaltyWindowsOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreSlashTargetPenaltyPaymentsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSlashTargetPenaltyPaymentsRuntime(ICoreSlashTargetPenaltyPaymentsCardZonesOperations cardZonesOperations, ICoreSlashTargetPenaltyPaymentsContentRegistryOperations contentRegistryOperations, ICoreSlashTargetPenaltyPaymentsResolutionStackOperations resolutionStackOperations, ICoreSlashTargetPenaltyPaymentsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSlashTargetPenaltyPaymentsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreSlashTargetPenaltyPaymentsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreSlashTargetPenaltyPaymentsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreSlashTargetPenaltyPaymentsCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreSlashTargetPenaltyPaymentsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreSlashTargetPenaltyPaymentsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreSlashTargetPenaltyPaymentsCoreNativeRecastInvocationsOperations coreNativeRecastInvocationsOperations, ICoreSlashTargetPenaltyPaymentsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreSlashTargetPenaltyPaymentsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSlashTargetPenaltyPaymentsCoreRuntimeOperations coreRuntimeOperations, ICoreSlashTargetPenaltyPaymentsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreSlashTargetPenaltyPaymentsCoreSlashTargetPenaltyWindowsOperations coreSlashTargetPenaltyWindowsOperations, ICoreSlashTargetPenaltyPaymentsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreSlashTargetPenaltyPaymentsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSlashTargetPenaltyPaymentsCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreSlashTargetPenaltyPaymentsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreSlashTargetPenaltyPaymentsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreSlashTargetPenaltyPaymentsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreSlashTargetPenaltyPaymentsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreNativeRecastInvocationsOperations = coreNativeRecastInvocationsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreSlashTargetPenaltyWindowsOperations = coreSlashTargetPenaltyWindowsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

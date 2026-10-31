@@ -1,0 +1,72 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterHuaTuoMobileGodRuntime : global::CardGame.Core.IMobileHuaTuoHost
+{
+    private readonly ICharacterHuaTuoMobileGodCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterHuaTuoMobileGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterHuaTuoMobileGodObservedSkillGrantRevisionsOperations _observedSkillGrantRevisionsOperations;
+    private readonly ICharacterHuaTuoMobileGodResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreDamageTargetSkillRoundDrawOperations _coreDamageTargetSkillRoundDrawOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreNativeRecoveryFramesOperations _coreNativeRecoveryFramesOperations;
+    private readonly ICharacterHuaTuoMobileGodCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterHuaTuoMobileGodCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICharacterHuaTuoMobileGodCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICharacterHuaTuoMobileGodCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterHuaTuoMobileGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess _coreActualTurnProgressCurrentSeatAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICharacterHuaTuoMobileGodMobileWulingCoursesAccess _characterHuaTuoMobileGodMobileWulingCoursesAccess;
+    internal CharacterHuaTuoMobileGodRuntime(ICharacterHuaTuoMobileGodCardZonesOperations cardZonesOperations, ICharacterHuaTuoMobileGodContentRegistryOperations contentRegistryOperations, ICharacterHuaTuoMobileGodObservedSkillGrantRevisionsOperations observedSkillGrantRevisionsOperations, ICharacterHuaTuoMobileGodResolutionStackOperations resolutionStackOperations, ICharacterHuaTuoMobileGodCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterHuaTuoMobileGodCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICharacterHuaTuoMobileGodCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterHuaTuoMobileGodCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICharacterHuaTuoMobileGodCoreDamageTargetSkillRoundDrawOperations coreDamageTargetSkillRoundDrawOperations, ICharacterHuaTuoMobileGodCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterHuaTuoMobileGodCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterHuaTuoMobileGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterHuaTuoMobileGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterHuaTuoMobileGodCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterHuaTuoMobileGodCoreRuntimeOperations coreRuntimeOperations, ICharacterHuaTuoMobileGodCoreTableOrderOperations coreTableOrderOperations, ICharacterHuaTuoMobileGodCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterHuaTuoMobileGodCoreNativeRecoveryFramesOperations coreNativeRecoveryFramesOperations, ICharacterHuaTuoMobileGodCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterHuaTuoMobileGodCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICharacterHuaTuoMobileGodCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterHuaTuoMobileGodCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterHuaTuoMobileGodCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterHuaTuoMobileGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatAccess coreActualTurnProgressCurrentSeatAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICharacterHuaTuoMobileGodMobileWulingCoursesAccess characterHuaTuoMobileGodMobileWulingCoursesAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._observedSkillGrantRevisionsOperations = observedSkillGrantRevisionsOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreDamageTargetSkillRoundDrawOperations = coreDamageTargetSkillRoundDrawOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeRecoveryFramesOperations = coreNativeRecoveryFramesOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatAccess = coreActualTurnProgressCurrentSeatAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._characterHuaTuoMobileGodMobileWulingCoursesAccess = characterHuaTuoMobileGodMobileWulingCoursesAccess;
+    }
+}

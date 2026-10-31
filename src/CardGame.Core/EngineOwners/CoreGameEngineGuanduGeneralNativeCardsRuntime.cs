@@ -1,0 +1,54 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineGuanduGeneralNativeCardsRuntime
+{
+    private readonly ICoreGuanduGeneralNativeCardsCharacterHuangQuanOlOperations _characterHuangQuanOlOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreGuanduGeneralNativeCardsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreGuanduGeneralNativeCardsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCoreActualDiscardRecoveryPhasesOperations _coreActualDiscardRecoveryPhasesOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCoreEquipmentContentOperations _coreEquipmentContentOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCoreGuanduActivitiesOperations _coreGuanduActivitiesOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCoreGuanduGeneralChoicesOperations _coreGuanduGeneralChoicesOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCoreGuanduGeneralsOperations _coreGuanduGeneralsOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreGuanduGeneralNativeCardsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreGuanduGeneralNativeCardsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    internal CoreGameEngineGuanduGeneralNativeCardsRuntime(ICoreGuanduGeneralNativeCardsCharacterHuangQuanOlOperations characterHuangQuanOlOperations, ICoreGuanduGeneralNativeCardsCardZonesOperations cardZonesOperations, ICoreGuanduGeneralNativeCardsContentRegistryOperations contentRegistryOperations, ICoreGuanduGeneralNativeCardsResolutionStackOperations resolutionStackOperations, ICoreGuanduGeneralNativeCardsCoreActualDiscardRecoveryPhasesOperations coreActualDiscardRecoveryPhasesOperations, ICoreGuanduGeneralNativeCardsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreGuanduGeneralNativeCardsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreGuanduGeneralNativeCardsCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreGuanduGeneralNativeCardsCoreGuanduActivitiesOperations coreGuanduActivitiesOperations, ICoreGuanduGeneralNativeCardsCoreGuanduGeneralChoicesOperations coreGuanduGeneralChoicesOperations, ICoreGuanduGeneralNativeCardsCoreGuanduGeneralsOperations coreGuanduGeneralsOperations, ICoreGuanduGeneralNativeCardsCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreGuanduGeneralNativeCardsCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreGuanduGeneralNativeCardsCoreRuntimeOperations coreRuntimeOperations, ICoreGuanduGeneralNativeCardsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreGuanduGeneralNativeCardsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess)
+    {
+        this._characterHuangQuanOlOperations = characterHuangQuanOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActualDiscardRecoveryPhasesOperations = coreActualDiscardRecoveryPhasesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
+        this._coreGuanduActivitiesOperations = coreGuanduActivitiesOperations;
+        this._coreGuanduGeneralChoicesOperations = coreGuanduGeneralChoicesOperations;
+        this._coreGuanduGeneralsOperations = coreGuanduGeneralsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess = coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess;
+    }
+}

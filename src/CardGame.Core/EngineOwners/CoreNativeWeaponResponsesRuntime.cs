@@ -1,0 +1,48 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreNativeWeaponResponsesRuntime
+{
+    private readonly ICoreNativeWeaponResponsesCharacterCaoPiAnniversaryGodOperations _characterCaoPiAnniversaryGodOperations;
+    private readonly ICoreNativeWeaponResponsesCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreNativeWeaponResponsesCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly ICoreNativeWeaponResponsesCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreNativeWeaponResponsesCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly ICoreNativeWeaponResponsesCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreNativeWeaponResponsesCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreNativeWeaponResponsesCoreNativeEquipmentInvocationsOperations _coreNativeEquipmentInvocationsOperations;
+    private readonly ICoreNativeWeaponResponsesCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreNativeWeaponResponsesCoreNativeSlashUseOperations _coreNativeSlashUseOperations;
+    private readonly ICoreNativeWeaponResponsesCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeWeaponResponsesCorePhysicalDrawFacadesOperations _corePhysicalDrawFacadesOperations;
+    private readonly ICoreNativeWeaponResponsesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreNativeWeaponResponsesKernelCoreMainOperations _kernelCoreMainOperations;
+    private readonly ICoreNativeWeaponResponsesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativeWeaponResponsesRuntime(ICoreNativeWeaponResponsesCharacterCaoPiAnniversaryGodOperations characterCaoPiAnniversaryGodOperations, ICoreNativeWeaponResponsesCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativeWeaponResponsesCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreNativeWeaponResponsesCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreNativeWeaponResponsesCoreMatchLogOperations coreMatchLogOperations, ICoreNativeWeaponResponsesCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreNativeWeaponResponsesCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreNativeWeaponResponsesCoreNativeEquipmentInvocationsOperations coreNativeEquipmentInvocationsOperations, ICoreNativeWeaponResponsesCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreNativeWeaponResponsesCoreNativeSlashUseOperations coreNativeSlashUseOperations, ICoreNativeWeaponResponsesCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeWeaponResponsesCorePhysicalDrawFacadesOperations corePhysicalDrawFacadesOperations, ICoreNativeWeaponResponsesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreNativeWeaponResponsesKernelCoreMainOperations kernelCoreMainOperations, ICoreNativeWeaponResponsesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterCaoPiAnniversaryGodOperations = characterCaoPiAnniversaryGodOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAdvancedWeaponsOperations = coreAdvancedWeaponsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreMatchLogOperations = coreMatchLogOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._coreNativeEquipmentInvocationsOperations = coreNativeEquipmentInvocationsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._coreNativeSlashUseOperations = coreNativeSlashUseOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalDrawFacadesOperations = corePhysicalDrawFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._kernelCoreMainOperations = kernelCoreMainOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

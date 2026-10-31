@@ -1,0 +1,44 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineSimultaneousPindianObserversRuntime
+{
+    private readonly ICoreSimultaneousPindianObserversCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
+    private readonly ICoreSimultaneousPindianObserversCharacterPangJiOlOperations _characterPangJiOlOperations;
+    private readonly ICoreSimultaneousPindianObserversCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSimultaneousPindianObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSimultaneousPindianObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreSimultaneousPindianObserversCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreSimultaneousPindianObserversCoreObserverSubtreesOperations _coreObserverSubtreesOperations;
+    private readonly ICoreSimultaneousPindianObserversCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICoreSimultaneousPindianObserversCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreSimultaneousPindianObserversCoreSimultaneousPindianOperations _coreSimultaneousPindianOperations;
+    private readonly ICoreSimultaneousPindianObserversCoreSimultaneousPindianSelectionsOperations _coreSimultaneousPindianSelectionsOperations;
+    private readonly ICoreSimultaneousPindianObserversCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSimultaneousPindianObserversCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations2;
+    private readonly ICoreSimultaneousPindianObserversCoreSimultaneousPindianObserversOperations _coreSimultaneousPindianObserversOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineSimultaneousPindianObserversRuntime(ICoreSimultaneousPindianObserversCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICoreSimultaneousPindianObserversCharacterPangJiOlOperations characterPangJiOlOperations, ICoreSimultaneousPindianObserversCardZonesOperations cardZonesOperations, ICoreSimultaneousPindianObserversResolutionStackOperations resolutionStackOperations, ICoreSimultaneousPindianObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreSimultaneousPindianObserversCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreSimultaneousPindianObserversCoreObserverSubtreesOperations coreObserverSubtreesOperations, ICoreSimultaneousPindianObserversCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICoreSimultaneousPindianObserversCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreSimultaneousPindianObserversCoreSimultaneousPindianOperations coreSimultaneousPindianOperations, ICoreSimultaneousPindianObserversCoreSimultaneousPindianSelectionsOperations coreSimultaneousPindianSelectionsOperations, ICoreSimultaneousPindianObserversCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSimultaneousPindianObserversCoreObserverSubtreesOperations2 coreObserverSubtreesOperations2, ICoreSimultaneousPindianObserversCoreSimultaneousPindianObserversOperations coreSimultaneousPindianObserversOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;
+        this._characterPangJiOlOperations = characterPangJiOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreSimultaneousPindianOperations = coreSimultaneousPindianOperations;
+        this._coreSimultaneousPindianSelectionsOperations = coreSimultaneousPindianSelectionsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreSimultaneousPindianObserversOperations = coreSimultaneousPindianObserversOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

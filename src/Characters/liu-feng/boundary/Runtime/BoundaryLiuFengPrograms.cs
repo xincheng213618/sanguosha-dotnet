@@ -22,7 +22,7 @@ internal sealed class BoundaryLiuFengHandler(SkillProgramEffectOp op) : ISkillPr
 }
 internal static class BoundaryLiuFengComposition
 {
-    internal const string Xiansi = "boundary:xiansi", Qinling = "boundary:qinling", Activation = "discard-for-native-slash";
+    internal const string Xiansi = "boundary:xiansi",Qinling = "boundary:qinling",Activation = "discard-for-native-slash";
     [ProgramCatalogValidation(50200)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveBoundaryLiuFengXiansi or SkillProgramEffectOp.ResolveBoundaryLiuFengQinling)) return;
@@ -35,7 +35,7 @@ internal static class BoundaryLiuFengComposition
 public enum BoundaryLiuFengStage { Collect, Targets, Cost, MovementChildren, Issuing, NativeUse, NativeTail, Completed, RewardDraw }
 public sealed record BoundaryLiuFengReceipt(CardConversionSource Source, string Hash, SkillProgramEffectOp Op, long ParentId, int Turn, int TurnOwner, BoundaryLiuFengStage Stage)
 {
-    private IReadOnlyList<int> _cards = [], _targets = [];
+    private IReadOnlyList<int> _cards = [],_targets = [];
     private IReadOnlyList<CardLocation> _from = [];
     private IReadOnlyList<CardMovementRecord> _moves = [];
     private IReadOnlyList<long> _batches = [];

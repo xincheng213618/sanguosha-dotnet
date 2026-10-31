@@ -1,0 +1,80 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreHulaoActivityProgramsRuntime : global::CardGame.Core.IHulaoActivityProgramHost
+{
+    private readonly ICoreHulaoActivityProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreHulaoActivityProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreHulaoActivityProgramsCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreHulaoActivityProgramsCoreActualTurnDamageClaimsOperations _coreActualTurnDamageClaimsOperations;
+    private readonly ICoreHulaoActivityProgramsCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreHulaoActivityProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreHulaoActivityProgramsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreHulaoActivityProgramsCoreCardUseModulesOperations _coreCardUseModulesOperations;
+    private readonly ICoreHulaoActivityProgramsCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICoreHulaoActivityProgramsCoreHandComparisonOperations _coreHandComparisonOperations;
+    private readonly ICoreHulaoActivityProgramsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreHulaoActivityProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreHulaoActivityProgramsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreHulaoActivityProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreHulaoActivityProgramsCoreProgramTurnPhaseOperations _coreProgramTurnPhaseOperations;
+    private readonly ICoreHulaoActivityProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreHulaoActivityProgramsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreHulaoActivityProgramsCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICoreHulaoActivityProgramsCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreHulaoActivityProgramsCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreHulaoActivityProgramsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreHulaoActivityProgramsCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
+    private readonly ICoreHulaoActivityProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreHulaoActivityProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreHulaoActivityProgramsCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreHulaoActivityProgramsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreHulaoActivityProgramsCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly ICoreHulaoActivityProgramsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreHulaoActivityProgramsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreHulaoActivityProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess _coreMatchOutcomeStatusAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreHulaoActivityProgramsRuntime(ICoreHulaoActivityProgramsContentRegistryOperations contentRegistryOperations, ICoreHulaoActivityProgramsResolutionStackOperations resolutionStackOperations, ICoreHulaoActivityProgramsCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreHulaoActivityProgramsCoreActualTurnDamageClaimsOperations coreActualTurnDamageClaimsOperations, ICoreHulaoActivityProgramsCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreHulaoActivityProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreHulaoActivityProgramsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreHulaoActivityProgramsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreHulaoActivityProgramsCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICoreHulaoActivityProgramsCoreHandComparisonOperations coreHandComparisonOperations, ICoreHulaoActivityProgramsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreHulaoActivityProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreHulaoActivityProgramsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreHulaoActivityProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreHulaoActivityProgramsCoreProgramTurnPhaseOperations coreProgramTurnPhaseOperations, ICoreHulaoActivityProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreHulaoActivityProgramsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreHulaoActivityProgramsCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICoreHulaoActivityProgramsCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreHulaoActivityProgramsCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreHulaoActivityProgramsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreHulaoActivityProgramsCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations, ICoreHulaoActivityProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreHulaoActivityProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreHulaoActivityProgramsCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreHulaoActivityProgramsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreHulaoActivityProgramsCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, ICoreHulaoActivityProgramsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreHulaoActivityProgramsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreHulaoActivityProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusAccess coreMatchOutcomeStatusAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreActualTurnDamageClaimsOperations = coreActualTurnDamageClaimsOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreCardUseModulesOperations = coreCardUseModulesOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreHandComparisonOperations = coreHandComparisonOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramTurnPhaseOperations = coreProgramTurnPhaseOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreMatchOutcomeStatusAccess = coreMatchOutcomeStatusAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

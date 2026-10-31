@@ -15,7 +15,7 @@ public sealed record ShiLsReceipt(CardConversionSource Source, string Hash, int 
     public int FirstCount { get; init; }
     public int SecondCount { get; init; }
     public bool Paid { get; init; }
-    private readonly IReadOnlyList<int> _seats = [], _cards = [];
+    private readonly IReadOnlyList<int> _seats = [],_cards = [];
     public IReadOnlyList<int> Seats { get => _seats; init => _seats = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
 }

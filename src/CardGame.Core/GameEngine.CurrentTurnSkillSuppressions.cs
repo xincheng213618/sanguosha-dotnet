@@ -1,79 +1,13 @@
 namespace CardGame.Core;
-
 // Issued facts outlive their source. They qualify every present or future grant,
 // rather than changing local grant enablement or retaining a restore list.
-public sealed record CurrentTurnNonLockedSkillSuppression(int TurnNumber, int TurnOwnerSeat,
-    long ParentFrameId, int EffectIndex, CardUseEffectSource Source, int TargetSeat);
-public sealed record CurrentTurnNonLockedSkillSuppressionIssuedEvent(
-    CurrentTurnNonLockedSkillSuppression Suppression) : IGameEvent;
-public sealed record CurrentTurnNonLockedSkillSuppressionsExpiredEvent(
-    int TurnNumber, int TurnOwnerSeat) : IGameEvent;
-
+public sealed record CurrentTurnNonLockedSkillSuppression(int TurnNumber, int TurnOwnerSeat, long ParentFrameId, int EffectIndex, CardUseEffectSource Source, int TargetSeat);
+public sealed record CurrentTurnNonLockedSkillSuppressionIssuedEvent(CurrentTurnNonLockedSkillSuppression Suppression) : IGameEvent;
+public sealed record CurrentTurnNonLockedSkillSuppressionsExpiredEvent(int TurnNumber, int TurnOwnerSeat) : IGameEvent;
 public sealed partial class GameEngine
 {
-    private readonly List<CurrentTurnNonLockedSkillSuppression> _currentTurnSkillSuppressions = [];
-    private long _currentTurnSkillSuppressionRevision;
-    private long _currentTurnQualificationStamp;
-    private (long Projection, long Suppression) _currentTurnQualificationDependencies;
-
-    private void IssueCurrentTurnNonLockedSkillSuppression(ProgramSkillFrame frame, int targetSeat)
-    {
-        ValidateProgramTurnEffectGrant(frame);
-        var issued = _programPipelineHooks.AdmitTurnSuppression(frame, targetSeat);
-        if (!ReferenceEquals(frame, _resolutionStack.LastOrDefault()) ||
-            _turnProgression.OwnerSeat != _currentSeat || _turnProgression.TurnNumber != _turnNumber ||
-            !IsValidPlayerSeat(targetSeat) || targetSeat == frame.OwnerSeat && !issued || !_players[targetSeat].IsAlive ||
-            !issued && !HasRuntimeSkillInstance(_players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
-            throw new InvalidOperationException("Suppression requires its actual owned program frame and living other target.");
-        var fact = new CurrentTurnNonLockedSkillSuppression(_turnNumber, _currentSeat,
-            frame.Id, frame.InstructionIndex - 1, CreateProgramTurnEffectSource(frame), targetSeat);
-        var existing = _currentTurnSkillSuppressions.SingleOrDefault(s =>
-            s.ParentFrameId == fact.ParentFrameId && s.EffectIndex == fact.EffectIndex && s.TargetSeat == targetSeat);
-        if (existing is not null)
-        {
-            if (existing != fact) throw new InvalidOperationException("Suppression issue identity changed meaning.");
-            return;
-        }
-        _currentTurnSkillSuppressions.Add(fact);
-        _currentTurnSkillSuppressionRevision++;
-        AdvanceEventRulesAndQueueFact(new CurrentTurnNonLockedSkillSuppressionIssuedEvent(fact));
-    }
-
-    private bool IsCurrentTurnSkillGrantQualified(CharacterState owner, SkillGrant grant) =>
-        ShenwuFengdongQualifiesGrant(owner, grant) && MouCaoPiSkillsQualified(owner, grant) &&
-        IsCurrentTurnOwnSkillGrantQualified(owner, grant) &&
-        WushuangYashiGrantQualified(owner, grant) &&
-        (!IsLishiPhaseSuppressed(owner.Seat) || _contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked)) &&
-        (!IsYinzhiSkillSuppressed(owner.Seat) || _contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked)) &&
-        (!_currentTurnSkillSuppressions.Any(s => s.TurnNumber == _turnNumber &&
-            s.TurnOwnerSeat == _currentSeat && s.TargetSeat == owner.Seat) ||
-         _contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked)) &&
-        IsDyingWindowGrantQualified(owner, grant) && IsMiuyanGrantQualified(owner, grant) && YunzhengNonLockedGrantQualified(owner, grant) &&
-        IsMobileDuoruiGrantQualified(owner, grant) && IsMobileMaChaoTingweiGrantQualified(owner, grant) &&
-        IsAnniversaryXiahouJieGrantQualified(owner, grant) && IsAnniversaryCuiLieGrantQualified(owner, grant) &&
-        IsAnqiFeirenGrantQualified(owner, grant) && ShiZrFuanGrantQualified(owner, grant);
-
-    private long CaptureCurrentTurnQualificationStamp()
-    {
-        // Upstream owners affect derived grants only. Their separate shard stamp
-        // avoids scanning the whole table for every ordinary policy lookup.
-        var projection = CaptureShenwuFengdongStamp();
-        if (_currentTurnSkillSuppressionRevision == 0) return CaptureAnniversaryCuiLieQualificationStamp(CaptureAnniversaryXiahouJieQualificationStamp(CaptureYunzhengQualificationStamp(CaptureGuanduQualificationStamp(CaptureNativeFactionQualificationStamp(CaptureMiuyanQualificationStamp(CaptureDyingWindowQualificationStamp(projection)))))));
-        var current = (projection, _currentTurnSkillSuppressionRevision);
-        if (current != _currentTurnQualificationDependencies)
-        {
-            _currentTurnQualificationDependencies = current;
-            _currentTurnQualificationStamp++;
-        }
-        // Disjoint from the nonnegative legacy projection stamp.
-        return CaptureAnniversaryCuiLieQualificationStamp(CaptureAnniversaryXiahouJieQualificationStamp(CaptureYunzhengQualificationStamp(CaptureGuanduQualificationStamp(CaptureNativeFactionQualificationStamp(CaptureMiuyanQualificationStamp(CaptureDyingWindowQualificationStamp(-_currentTurnQualificationStamp)))))));
-    }
-
-    private void ExpireCurrentTurnNonLockedSkillSuppressions(int turnNumber, int turnOwnerSeat)
-    {
-        if (_currentTurnSkillSuppressions.RemoveAll(s => s.TurnNumber == turnNumber &&
-            s.TurnOwnerSeat == turnOwnerSeat) == 0) return;
-        _currentTurnSkillSuppressionRevision++;
-        AdvanceEventRulesAndQueueFact(new CurrentTurnNonLockedSkillSuppressionsExpiredEvent(turnNumber, turnOwnerSeat));
-    }
+    private ref readonly global::System.Collections.Generic.List<global::CardGame.Core.CurrentTurnNonLockedSkillSuppression> _currentTurnSkillSuppressions => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnSkillSuppressions;
+    private ref long _currentTurnSkillSuppressionRevision => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnSkillSuppressionRevision;
+    private ref long _currentTurnQualificationStamp => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnQualificationStamp;
+    private ref (long Projection, long Suppression) _currentTurnQualificationDependencies => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnQualificationDependencies;
 }

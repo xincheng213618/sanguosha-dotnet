@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CorePhysicalOwnedCardQueriesRuntime
+{
+    private readonly ICorePhysicalOwnedCardQueriesCharacterBaiLingYunAnniversaryOperations _characterBaiLingYunAnniversaryOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCharacterDuKuiAnniversaryOperations _characterDuKuiAnniversaryOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCharacterDuanJiongOlOperations _characterDuanJiongOlOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCharacterFuRongOlOperations _characterFuRongOlOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCharacterGongsunZanMouMobileOperations _characterGongsunZanMouMobileOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCharacterHuCheErMouOperations _characterHuCheErMouOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCharacterLuSuMobileShiOperations _characterLuSuMobileShiOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCharacterYaDanOlOperations _characterYaDanOlOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCardZonesOperations _cardZonesOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCoreCardDeclarationsOperations _coreCardDeclarationsOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCoreRequestedDeckBasicsOperations _coreRequestedDeckBasicsOperations;
+    private readonly ICorePhysicalOwnedCardQueriesCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    internal CorePhysicalOwnedCardQueriesRuntime(ICorePhysicalOwnedCardQueriesCharacterBaiLingYunAnniversaryOperations characterBaiLingYunAnniversaryOperations, ICorePhysicalOwnedCardQueriesCharacterDuKuiAnniversaryOperations characterDuKuiAnniversaryOperations, ICorePhysicalOwnedCardQueriesCharacterDuanJiongOlOperations characterDuanJiongOlOperations, ICorePhysicalOwnedCardQueriesCharacterFuRongOlOperations characterFuRongOlOperations, ICorePhysicalOwnedCardQueriesCharacterGongsunZanMouMobileOperations characterGongsunZanMouMobileOperations, ICorePhysicalOwnedCardQueriesCharacterHuCheErMouOperations characterHuCheErMouOperations, ICorePhysicalOwnedCardQueriesCharacterLuSuMobileShiOperations characterLuSuMobileShiOperations, ICorePhysicalOwnedCardQueriesCharacterYaDanOlOperations characterYaDanOlOperations, ICorePhysicalOwnedCardQueriesCardZonesOperations cardZonesOperations, ICorePhysicalOwnedCardQueriesCoreCardDeclarationsOperations coreCardDeclarationsOperations, ICorePhysicalOwnedCardQueriesCoreRequestedDeckBasicsOperations coreRequestedDeckBasicsOperations, ICorePhysicalOwnedCardQueriesCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations)
+    {
+        this._characterBaiLingYunAnniversaryOperations = characterBaiLingYunAnniversaryOperations;
+        this._characterDuKuiAnniversaryOperations = characterDuKuiAnniversaryOperations;
+        this._characterDuanJiongOlOperations = characterDuanJiongOlOperations;
+        this._characterFuRongOlOperations = characterFuRongOlOperations;
+        this._characterGongsunZanMouMobileOperations = characterGongsunZanMouMobileOperations;
+        this._characterHuCheErMouOperations = characterHuCheErMouOperations;
+        this._characterLuSuMobileShiOperations = characterLuSuMobileShiOperations;
+        this._characterYaDanOlOperations = characterYaDanOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;
+        this._coreRequestedDeckBasicsOperations = coreRequestedDeckBasicsOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+    }
+}

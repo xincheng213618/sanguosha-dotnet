@@ -23,8 +23,8 @@ internal interface IMouDongZhuoOlNative : IProgramRuntimeOperations
 internal sealed class MouDongZhuoOlRuntime(IMouDongZhuoOlFacts facts, IMouDongZhuoOlNative native,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMouDongZhuoOlRuntime
 {
-    internal const string Guanbian="mou-ol:guanbian", Xiongni="mou-ol:xiongni", Fengshang="mou-ol:fengshang", Zhibing="mou-ol:zhibing";
-    internal const string CostReason="skill-program.mou-ol:xiongni.discard", GiftReason="skill-program.mou-ol:fengshang.give";
+    internal const string Guanbian="mou-ol:guanbian",Xiongni="mou-ol:xiongni",Fengshang="mou-ol:fengshang",Zhibing="mou-ol:zhibing";
+    internal const string CostReason="skill-program.mou-ol:xiongni.discard",GiftReason="skill-program.mou-ol:fengshang.give";
     internal static CardConversionSource Source(ProgramSkillFrame f)=>new(f.SkillId,f.TriggerId??f.ActivationId,f.OwnerSeat,f.SkillInstanceId);
     private int BlackCount(int owner)=>facts.History<MouDongZhuoOlBlackUseEvent>().Count(e=>e.Actor!=owner&&e.Faction=="qun"&&e.Black);
     private bool Dying(ProgramSkillFrame f)=>f.WindowContext?.Window==SkillProgramTriggerWindow.DyingEntering;

@@ -1,0 +1,36 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreParticipantHandDamageRidesRuntime
+{
+    private readonly ICoreParticipantHandDamageRidesCharacterZhaoYunOlGod2016Operations _characterZhaoYunOlGod2016Operations;
+    private readonly ICoreParticipantHandDamageRidesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreParticipantHandDamageRidesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreParticipantHandDamageRidesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreParticipantHandDamageRidesCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreParticipantHandDamageRidesCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICoreParticipantHandDamageRidesCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreParticipantHandDamageRidesCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreParticipantHandDamageRidesCoreRequestedDeckBasicOwnershipOperations _coreRequestedDeckBasicOwnershipOperations;
+    private readonly ICoreParticipantHandDamageRidesCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICoreParticipantHandDamageRidesCoreParticipantHandProgramsOperations _coreParticipantHandProgramsOperations;
+    internal CoreParticipantHandDamageRidesRuntime(ICoreParticipantHandDamageRidesCharacterZhaoYunOlGod2016Operations characterZhaoYunOlGod2016Operations, ICoreParticipantHandDamageRidesCardZonesOperations cardZonesOperations, ICoreParticipantHandDamageRidesContentRegistryOperations contentRegistryOperations, ICoreParticipantHandDamageRidesResolutionStackOperations resolutionStackOperations, ICoreParticipantHandDamageRidesCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreParticipantHandDamageRidesCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICoreParticipantHandDamageRidesCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreParticipantHandDamageRidesCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreParticipantHandDamageRidesCoreRequestedDeckBasicOwnershipOperations coreRequestedDeckBasicOwnershipOperations, ICoreParticipantHandDamageRidesCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICoreParticipantHandDamageRidesCoreParticipantHandProgramsOperations coreParticipantHandProgramsOperations)
+    {
+        this._characterZhaoYunOlGod2016Operations = characterZhaoYunOlGod2016Operations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRequestedDeckBasicOwnershipOperations = coreRequestedDeckBasicOwnershipOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._coreParticipantHandProgramsOperations = coreParticipantHandProgramsOperations;
+    }
+}

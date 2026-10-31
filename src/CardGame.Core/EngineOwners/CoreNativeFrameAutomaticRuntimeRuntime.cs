@@ -1,0 +1,22 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreNativeFrameAutomaticRuntimeRuntime : global::CardGame.Core.INativeFrameAutomaticFacts, global::CardGame.Core.INativeFrameAutomaticRules
+{
+    private readonly ICoreNativeFrameAutomaticRuntimeCoreModeNativeFrameRuntimeOperations _coreModeNativeFrameRuntimeOperations;
+    private readonly ICoreNativeFrameAutomaticRuntimeCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreNativeFrameAutomaticRuntimeNativeSystemFuncCardGameCoreGameEngineCardGameCoreResolutionFrameBoolOperations _nativeSystemFuncCardGameCoreGameEngineCardGameCoreResolutionFrameBoolOperations;
+    private readonly ICoreNativeFrameAutomaticRuntimeKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    internal CoreNativeFrameAutomaticRuntimeRuntime(ICoreNativeFrameAutomaticRuntimeCoreModeNativeFrameRuntimeOperations coreModeNativeFrameRuntimeOperations, ICoreNativeFrameAutomaticRuntimeCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreNativeFrameAutomaticRuntimeNativeSystemFuncCardGameCoreGameEngineCardGameCoreResolutionFrameBoolOperations nativeSystemFuncCardGameCoreGameEngineCardGameCoreResolutionFrameBoolOperations, ICoreNativeFrameAutomaticRuntimeKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations)
+    {
+        this._coreModeNativeFrameRuntimeOperations = coreModeNativeFrameRuntimeOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._nativeSystemFuncCardGameCoreGameEngineCardGameCoreResolutionFrameBoolOperations = nativeSystemFuncCardGameCoreGameEngineCardGameCoreResolutionFrameBoolOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+    }
+}

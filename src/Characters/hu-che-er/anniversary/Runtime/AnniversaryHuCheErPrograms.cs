@@ -24,7 +24,7 @@ internal sealed class AnniversaryHuCheErHandler(SkillProgramEffectOp op) : ISkil
 }
 internal static class AnniversaryHuCheErComposition
 {
-    internal const string Daoji = "anniversary:daoji", Fuzhong = "anniversary:fuzhong";
+    internal const string Daoji = "anniversary:daoji",Fuzhong = "anniversary:fuzhong";
     [ProgramCatalogValidation(49500)] internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryHuCheErDaoji or SkillProgramEffectOp.RecordAnniversaryHuCheErFuzhongGain or SkillProgramEffectOp.SpendAnniversaryHuCheErFuzhong)) return;

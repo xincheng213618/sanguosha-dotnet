@@ -4,7 +4,7 @@ namespace CardGame.Core;
 internal sealed class MouJiangWeiAnniversaryRuntime(IMouJiangWeiAnniversaryFacts facts, IMouJiangWeiAnniversaryNative native, IProgramRuntimeFrames frames,
     IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouJiangWeiAnniversaryRuntime
 {
-    internal const string Juemou = "mou:juemou", Fuzhan = "mou:fuzhan", Action = "mou-jiang-wei-anniversary", CostReason = "skill-program.mou:juemou.discard", DrawReason = "skill-program.mou:juemou.draw";
+    internal const string Juemou = "mou:juemou",Fuzhan = "mou:fuzhan",Action = "mou-jiang-wei-anniversary",CostReason = "skill-program.mou:juemou.discard",DrawReason = "skill-program.mou:juemou.draw";
     private static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 35200, SkillProgramEffectOp.InitializeMouJiangWeiJuemou, SkillProgramEffectOp.ResolveMouJiangWeiJuemou, SkillProgramEffectOp.RestoreMouJiangWeiJuemou, SkillProgramEffectOp.ResolveMouJiangWeiFuzhan)]
     private bool Qualifies(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => facts.CanTrigger(c, w, t.Effects.Single().Op);

@@ -1,0 +1,80 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramCardUseRolesRuntime
+{
+    private readonly ICoreProgramCardUseRolesCharacterHuaManOlOperations _characterHuaManOlOperations;
+    private readonly ICoreProgramCardUseRolesCharacterLiuPanOlOperations _characterLiuPanOlOperations;
+    private readonly ICoreProgramCardUseRolesCharacterQuHuangOlOperations _characterQuHuangOlOperations;
+    private readonly ICoreProgramCardUseRolesCharacterRuanYuOlOperations _characterRuanYuOlOperations;
+    private readonly ICoreProgramCardUseRolesCharacterSunLuBanBoundaryMobileOperations _characterSunLuBanBoundaryMobileOperations;
+    private readonly ICoreProgramCardUseRolesCharacterWuJingOlOperations _characterWuJingOlOperations;
+    private readonly ICoreProgramCardUseRolesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramCardUseRolesContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreProgramCardUseRolesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramCardUseRolesCoreDirectedTurnCardPoliciesOperations _coreDirectedTurnCardPoliciesOperations;
+    private readonly ICoreProgramCardUseRolesCoreAdjacentRedTargetsOperations _coreAdjacentRedTargetsOperations;
+    private readonly ICoreProgramCardUseRolesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreProgramCardUseRolesCoreComparedBlackSlashPoliciesOperations _coreComparedBlackSlashPoliciesOperations;
+    private readonly ICoreProgramCardUseRolesCoreDamageTargetBudgetOperations _coreDamageTargetBudgetOperations;
+    private readonly ICoreProgramCardUseRolesCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreProgramCardUseRolesCoreDirectedCardPolicyQueriesOperations _coreDirectedCardPolicyQueriesOperations;
+    private readonly ICoreProgramCardUseRolesCoreDyingWindowSkillPoliciesOperations _coreDyingWindowSkillPoliciesOperations;
+    private readonly ICoreProgramCardUseRolesCoreIssuedPlayUsePoliciesOperations _coreIssuedPlayUsePoliciesOperations;
+    private readonly ICoreProgramCardUseRolesCoreOwnPublicPileConversionsOperations _coreOwnPublicPileConversionsOperations;
+    private readonly ICoreProgramCardUseRolesCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreProgramCardUseRolesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly ICoreProgramCardUseRolesCoreProgramCompoundCardTargetsOperations _coreProgramCompoundCardTargetsOperations;
+    private readonly ICoreProgramCardUseRolesCoreProvenanceCardPoliciesOperations _coreProvenanceCardPoliciesOperations;
+    private readonly ICoreProgramCardUseRolesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramCardUseRolesCoreSoleTargetProtectionOperations _coreSoleTargetProtectionOperations;
+    private readonly ICoreProgramCardUseRolesCoreNativeBorrowedSwordOperations _coreNativeBorrowedSwordOperations;
+    private readonly ICoreProgramCardUseRolesCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
+    private readonly ICoreProgramCardUseRolesCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
+    private readonly ICoreProgramCardUseRolesCoreNativeTargetLegalityOperations _coreNativeTargetLegalityOperations;
+    private readonly ICoreProgramCardUseRolesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramCardUseRolesCoreProgramFactionActionRewardOperations _coreProgramFactionActionRewardOperations;
+    private readonly ICoreProgramCardUseRolesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramCardUseRolesRuntime(ICoreProgramCardUseRolesCharacterHuaManOlOperations characterHuaManOlOperations, ICoreProgramCardUseRolesCharacterLiuPanOlOperations characterLiuPanOlOperations, ICoreProgramCardUseRolesCharacterQuHuangOlOperations characterQuHuangOlOperations, ICoreProgramCardUseRolesCharacterRuanYuOlOperations characterRuanYuOlOperations, ICoreProgramCardUseRolesCharacterSunLuBanBoundaryMobileOperations characterSunLuBanBoundaryMobileOperations, ICoreProgramCardUseRolesCharacterWuJingOlOperations characterWuJingOlOperations, ICoreProgramCardUseRolesCardZonesOperations cardZonesOperations, ICoreProgramCardUseRolesContentRegistryOperations contentRegistryOperations, ICoreProgramCardUseRolesResolutionStackOperations resolutionStackOperations, ICoreProgramCardUseRolesCoreDirectedTurnCardPoliciesOperations coreDirectedTurnCardPoliciesOperations, ICoreProgramCardUseRolesCoreAdjacentRedTargetsOperations coreAdjacentRedTargetsOperations, ICoreProgramCardUseRolesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreProgramCardUseRolesCoreComparedBlackSlashPoliciesOperations coreComparedBlackSlashPoliciesOperations, ICoreProgramCardUseRolesCoreDamageTargetBudgetOperations coreDamageTargetBudgetOperations, ICoreProgramCardUseRolesCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreProgramCardUseRolesCoreDirectedCardPolicyQueriesOperations coreDirectedCardPolicyQueriesOperations, ICoreProgramCardUseRolesCoreDyingWindowSkillPoliciesOperations coreDyingWindowSkillPoliciesOperations, ICoreProgramCardUseRolesCoreIssuedPlayUsePoliciesOperations coreIssuedPlayUsePoliciesOperations, ICoreProgramCardUseRolesCoreOwnPublicPileConversionsOperations coreOwnPublicPileConversionsOperations, ICoreProgramCardUseRolesCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreProgramCardUseRolesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreProgramCardUseRolesCoreProgramCompoundCardTargetsOperations coreProgramCompoundCardTargetsOperations, ICoreProgramCardUseRolesCoreProvenanceCardPoliciesOperations coreProvenanceCardPoliciesOperations, ICoreProgramCardUseRolesCoreRuntimeOperations coreRuntimeOperations, ICoreProgramCardUseRolesCoreSoleTargetProtectionOperations coreSoleTargetProtectionOperations, ICoreProgramCardUseRolesCoreNativeBorrowedSwordOperations coreNativeBorrowedSwordOperations, ICoreProgramCardUseRolesCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations, ICoreProgramCardUseRolesCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations, ICoreProgramCardUseRolesCoreNativeTargetLegalityOperations coreNativeTargetLegalityOperations, ICoreProgramCardUseRolesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramCardUseRolesCoreProgramFactionActionRewardOperations coreProgramFactionActionRewardOperations, ICoreProgramCardUseRolesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterHuaManOlOperations = characterHuaManOlOperations;
+        this._characterLiuPanOlOperations = characterLiuPanOlOperations;
+        this._characterQuHuangOlOperations = characterQuHuangOlOperations;
+        this._characterRuanYuOlOperations = characterRuanYuOlOperations;
+        this._characterSunLuBanBoundaryMobileOperations = characterSunLuBanBoundaryMobileOperations;
+        this._characterWuJingOlOperations = characterWuJingOlOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDirectedTurnCardPoliciesOperations = coreDirectedTurnCardPoliciesOperations;
+        this._coreAdjacentRedTargetsOperations = coreAdjacentRedTargetsOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreComparedBlackSlashPoliciesOperations = coreComparedBlackSlashPoliciesOperations;
+        this._coreDamageTargetBudgetOperations = coreDamageTargetBudgetOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreDirectedCardPolicyQueriesOperations = coreDirectedCardPolicyQueriesOperations;
+        this._coreDyingWindowSkillPoliciesOperations = coreDyingWindowSkillPoliciesOperations;
+        this._coreIssuedPlayUsePoliciesOperations = coreIssuedPlayUsePoliciesOperations;
+        this._coreOwnPublicPileConversionsOperations = coreOwnPublicPileConversionsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
+        this._coreProgramCompoundCardTargetsOperations = coreProgramCompoundCardTargetsOperations;
+        this._coreProvenanceCardPoliciesOperations = coreProvenanceCardPoliciesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSoleTargetProtectionOperations = coreSoleTargetProtectionOperations;
+        this._coreNativeBorrowedSwordOperations = coreNativeBorrowedSwordOperations;
+        this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;
+        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
+        this._coreNativeTargetLegalityOperations = coreNativeTargetLegalityOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreProgramFactionActionRewardOperations = coreProgramFactionActionRewardOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

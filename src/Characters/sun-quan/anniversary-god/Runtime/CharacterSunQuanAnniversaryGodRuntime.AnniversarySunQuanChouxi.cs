@@ -1,0 +1,51 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
+{
+    internal static CardKind AnniversaryChouxiName(CardKind kind) => kind is CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash ? CardKind.Slash : kind;
+    internal bool IsAnniversaryChouxiSource(CharacterState owner, CardConversionSource? source) => source is { SkillId: AnniversarySunQuanComposition.Chouxi } && source.OwnerSeat == owner.Seat && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, source.SkillId, source.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.ViewAs.Any(v => v.Id == source.BindingId);
+    internal bool AnniversaryChouxiAvailable(CharacterState owner, CardKind kind)
+    {
+        if (owner.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !owner.IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryChouxiNameUsedEvent>().Any(e => e.OwnerSeat == owner.Seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Name == AnniversaryChouxiName(kind)))
+            return false;
+        return AnniversaryMingPiles().SelectMany(p => _cardZonesOperations._cardZones.CardsAt(p.Location)).Any(c => c.Kind == kind);
+    }
+
+    [ProgramCardLegality(ProgramCardLegalityStage.ConfiguredConversionBan, 40500)]
+    internal bool BanUnavailableAnniversaryChouxi(ProgramConfiguredViewAsQuery q) => q.Instance.SkillId == AnniversarySunQuanComposition.Chouxi && !AnniversaryChouxiAvailable(q.Owner, q.Rule.OutputKind);
+    [ProgramCardLegality(ProgramCardLegalityStage.ViewAsBan, 40500)]
+    internal bool BanUnavailableAnniversaryChouxiSource(ProgramViewAsLegalityQuery q) => q.Source.SkillId == AnniversarySunQuanComposition.Chouxi && (!IsAnniversaryChouxiSource(q.Owner, q.Source) || q.CardIds.Count != 1 || !AnniversaryChouxiAvailable(q.Owner, q.Kind));
+    [ProgramCardLegality(ProgramCardLegalityStage.SubmittedUseValidation, 40500)]
+    internal void ValidateSubmittedAnniversaryChouxi(ProgramSubmittedUseQuery q)
+    {
+        foreach (var source in q.ConversionChain.Where(s => s.SkillId == AnniversarySunQuanComposition.Chouxi))
+        {
+            if (!IsAnniversaryChouxiSource(_coreMatchParticipantsPlayersAccess._players[q.ActorSeat], source) || q.CardIds.Count != 1 || !AnniversaryChouxiAvailable(_coreMatchParticipantsPlayersAccess._players[q.ActorSeat], q.Kind) || _corePlayCardHistoryOperations.ViewAsRule(source)is not { } rule || rule.OutputKind != q.Kind || _cardZonesOperations._cardZones.GetLocation(q.CardIds[0])is not { OwnerSeat: { } owner } location || owner != q.ActorSeat || !rule.SourceZones.Contains(location.Zone))
+                throw new InvalidOperationException("Chouxi requires its exact owned physical material, an existing private sea name, original source and unused actual-turn card name.");
+        }
+    }
+
+    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 40500)]
+    internal void CaptureAnniversaryChouxiUse(IGameEvent payload)
+    {
+        if (payload is not CardActionAcceptedEvent { Action: { } a } || a.ActorSeat != a.ProviderSeat || a.RequesterSeat is not null || a.Type == CardActionType.Response && a.EffectiveKind is not (CardKind.Dodge or CardKind.Nullification) || a.ConversionChain.SingleOrDefault(s => s.SkillId == AnniversarySunQuanComposition.Chouxi)is not { } source || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryChouxiNameUsedEvent>().Any(e => e.ActionId == a.ActionId))
+            return;
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryChouxiNameUsedEvent(a.ActionId, a.ActorSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, AnniversaryChouxiName(a.EffectiveKind), source));
+    }
+
+    internal bool AnniversaryChouxiIssuedUse(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } a } use && a.ActorSeat == actor && a.ProviderSeat == actor && a.RequesterSeat is null && a.PhysicalCards.Count == 1 && a.ConversionChain.SingleOrDefault(s => s.SkillId == AnniversarySunQuanComposition.Chouxi)is { } source && source.OwnerSeat == actor && !string.IsNullOrWhiteSpace(source.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.ViewAs.Any(v => v.Id == source.BindingId && v.OutputKind == use.CardKind) && (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryChouxiNameUsedEvent>().Any(e => e.ActionId == a.ActionId && e.OwnerSeat == actor && e.Name == AnniversaryChouxiName(use.CardKind) && e.Source == source) || IsAnniversaryChouxiSource(_coreMatchParticipantsPlayersAccess._players[actor], source));
+    [ProgramDistanceRule(ProgramDistanceStage.ConvertedSlashExemption, 40500)]
+    internal bool AnniversaryChouxiSlashDistance(ProgramSlashConversionDistanceQuery q) => IsAnniversaryChouxiSource(q.Owner, q.Source);
+    [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 40500)]
+    internal bool AnniversaryChouxiIssuedDistance(ProgramCardDistanceQuery q) => q.CardUseFrameId is { } id && AnniversaryChouxiIssuedUse(id, q.Actor.Seat);
+    [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 40500)]
+    [ProgramCardUsePayment(ProgramCardUsePaymentStage.AfterSlashDebitIdentity, 40500)]
+    [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 40500)]
+    [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeAlcoholDebit, 40500)]
+    internal bool AnniversaryChouxiCountExemption(long id, int actor) => AnniversaryChouxiIssuedUse(id, actor);
+}

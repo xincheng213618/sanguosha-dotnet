@@ -29,7 +29,7 @@ internal sealed class AnniversarySunQuanHandler(SkillProgramEffectOp operation) 
 }
 internal static class AnniversarySunQuanComposition
 {
-    internal const string Cangming = "anniversary:cangming", Chouxi = "anniversary:chouxi", Jichao = "anniversary:jichao";
+    internal const string Cangming = "anniversary:cangming",Chouxi = "anniversary:chouxi",Jichao = "anniversary:jichao";
     internal static bool Owns(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingSetup or SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingReturn or SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingColors or SkillProgramEffectOp.ResolveAnniversarySunQuanJichao;
     [ProgramCatalogValidation(40500)] internal static void Validate(string path, SkillProgram p)
     {

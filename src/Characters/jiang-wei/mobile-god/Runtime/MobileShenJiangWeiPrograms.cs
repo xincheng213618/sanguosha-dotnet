@@ -65,7 +65,7 @@ public sealed record MobileJiangWeiReceipt(CardConversionSource Source, string G
     public long Before { get; init; }
     public long After { get; init; }
     public MobileJiangWeiUseReturn? Use { get; init; }
-    private readonly IReadOnlyList<int> _top = [], _ordered = [], _exchanged = [], _targets = [], _hp = [];
+    private readonly IReadOnlyList<int> _top = [],_ordered = [],_exchanged = [],_targets = [],_hp = [];
     private readonly IReadOnlyList<MobileJiangWeiShownCard> _shown = [];
     private readonly IReadOnlyList<CardMovementRecord> _paid = [];
     public IReadOnlyList<int> Top { get => _top; init => _top = Array.AsReadOnly(value.ToArray()); }

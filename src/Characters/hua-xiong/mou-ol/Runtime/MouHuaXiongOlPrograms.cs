@@ -63,7 +63,7 @@ internal sealed class MouHxBojueHandler : ISkillProgramEffectHandler
 }
 internal static class MouHuaXiongOlComposition
 {
-    internal const string Bojue = "mou-ol:bojue", Yangwei = "mou-ol:yangwei";
+    internal const string Bojue = "mou-ol:bojue",Yangwei = "mou-ol:yangwei";
     [ProgramCatalogValidation(1550)]
     internal static void Validate(string path, SkillProgram p)
     {

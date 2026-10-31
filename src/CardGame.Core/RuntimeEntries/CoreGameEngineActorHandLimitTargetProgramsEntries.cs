@@ -1,0 +1,12 @@
+#nullable enable
+namespace CardGame.Core.RuntimeEntries;
+internal sealed partial class CoreGameEngineActorHandLimitTargetProgramsEntries
+{
+    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineActorHandLimitTargetProgramsRuntime> _resolve;
+    private CoreGameEngineActorHandLimitTargetProgramsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineActorHandLimitTargetProgramsRuntime> resolve)
+    {
+        _resolve = resolve;
+    }
+
+    internal static CoreGameEngineActorHandLimitTargetProgramsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineActorHandLimitTargetProgramsRuntime> resolve) => new(resolve);
+}

@@ -64,7 +64,7 @@ public sealed record AnniversaryLiuYongDrawReturnedEvent(long FrameId, long? Att
 
 internal static class AnniversaryLiuYongComposition
 {
-    internal const string Zhuning = "anniversary:zhuning", Fengxiang = "anniversary:fengxiang";
+    internal const string Zhuning = "anniversary:zhuning",Fengxiang = "anniversary:fengxiang";
     [ProgramCatalogValidation(43400)] internal static void Validate(string path, SkillProgram program)
     {
         if (!program.Activations.SelectMany(a => a.Effects).Concat(program.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryLiuYongZhuning or SkillProgramEffectOp.ResolveAnniversaryLiuYongFengxiang)) return;

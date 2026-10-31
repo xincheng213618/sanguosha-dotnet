@@ -18,7 +18,7 @@ public sealed record WeifuUseReceipt(long UseId, long ActionId, int ActorSeat, i
 {
     public int ProviderSeat { get; init; }
     private readonly IReadOnlyList<WeifuGrantedEvent> _grants = Array.AsReadOnly(Array.Empty<WeifuGrantedEvent>());
-    private readonly IReadOnlyList<int> _original = Array.AsReadOnly(Array.Empty<int>()), _added = Array.AsReadOnly(Array.Empty<int>());
+    private readonly IReadOnlyList<int> _original = Array.AsReadOnly(Array.Empty<int>()),_added = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<WeifuGrantedEvent> Grants { get => _grants; init => _grants = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> OriginalTargets { get => _original; init => _original = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> AddedTargets { get => _added; init => _added = Array.AsReadOnly(value.ToArray()); }

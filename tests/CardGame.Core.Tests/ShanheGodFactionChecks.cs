@@ -149,9 +149,9 @@ internal static class ShanheGodFactionChecks
         public PendingDecision? P => G.PendingDecision;
         public PlayerSnapshot V(int seat = 0) => G.CreateSnapshot(seat).Players[seat];
         public T[] Events<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
-        public CharacterState RuntimePlayer(int seat) => ((IReadOnlyList<CharacterState>)typeof(GameEngine)
+        public CharacterState RuntimePlayer(int seat) => ((IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine
             .GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(G)!)[seat];
-        public string? EffectiveFaction(int seat) => (string?)typeof(GameEngine).GetMethod("GetEffectiveFactionId", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(G, [RuntimePlayer(seat)]);
+        public string? EffectiveFaction(int seat) => (string?)global::FixtureRuntimeAccess.Engine.GetMethod("GetEffectiveFactionId", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(G, [RuntimePlayer(seat)]);
         public void Accept(GameCommand command) { var r = G.Submit(command); Need(r.Accepted, r.Error?.Message ?? "A real god-faction command was rejected."); }
         public void Answer(Func<PromptChoice, bool> choose) => Accept(new AnswerPromptCommand(0, P!.PromptId, P.Choices.First(choose).Id, G.Revision));
         public void Continue() => Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");

@@ -49,10 +49,4 @@ internal sealed class WeifuSelectionAi : IProgramSelectionAiDecorator
 
 public sealed partial class GameEngine
 {
-    [ProgramCapability]
-    private sealed class WeifuSelectionAiQuery(GameEngine e) : IWeifuSelectionAiQuery
-    {
-        public int UnusedGrants(int owner, SkillProgramCardCategory category) => e.ActiveWeifuGrants(owner,
-            category == SkillProgramCardCategory.Basic ? CardKind.Slash : CardKind.DrawTwo).Count;
-    }
 }

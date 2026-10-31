@@ -1,0 +1,86 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+using System.Text.Json.Serialization;
+
+namespace CardGame.Core.EngineOwners;
+internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
+{
+    internal bool TryHandleHappyQiaoRecoverTo(long frameId, int ownerSeat, int targetSeat, int value)
+    {
+        if (!HasHappyQiaoHealth(targetSeat))
+            return false;
+        var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
+        if (frame.OwnerSeat != ownerSeat || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || value < 0 || value > _coreMatchParticipantsPlayersAccess._players[targetSeat].MaxHp)
+            throw new InvalidOperationException("Qiao RecoverTo requires its exact native Program instruction and target HP.");
+        if (!_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+            return true;
+        var key = $"recover-to:{(frame.Id)}:{(frame.InstructionIndex)}:{(targetSeat)}";
+        if (frame.HappyQiaoHealth?.OccurrenceKey != key)
+        {
+            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || frame.HappyQiaoHealth is { Applied: false, Released: false })
+                throw new InvalidOperationException("RecoverTo cannot replace an unsettled health operation.");
+            var initialRequest = new HappyQiaoHealthReceipt(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, frame.Id, frame.Kind, targetSeat, ownerSeat, HpChangeKind.Recovery, value, HappyQiaoHealthReturnKind.RecoverTo, key, frame.InstructionIndex, _coreMatchParticipantsPlayersAccess._players[targetSeat].HappyQiaoHealth!);
+            _coreRuntimeOperations.ReplaceRuntimeTop(frame with { HappyQiaoHealth = initialRequest, HappyQiaoRecoverTo = new(frame.Id, frame.InstructionIndex, frame.GameplayHash, ownerSeat, targetSeat, value, initialRequest.Id, initialRequest.Before) });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyQiaoHealthRequestedEvent(initialRequest.Id, frame.Id, targetSeat, initialRequest.Kind, initialRequest.Amount, initialRequest.ReturnKind, initialRequest.OccurrenceKey));
+            var child = new HappyQiaoHealthChoiceFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, frame.Id, initialRequest.Id, targetSeat);
+            _coreRuntimeOperations.PushRuntimeFrame(child);
+            _coreRuntimeOperations.AdvanceRuntimeFrame(child.Id);
+            return true;
+        }
+
+        _ = TryBeginHappyQiaoHealthChoice(frame.Id, targetSeat, HpChangeKind.Recovery, value, HappyQiaoHealthReturnKind.RecoverTo, key, ownerSeat);
+        frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+        var receipt = frame.HappyQiaoHealth!;
+        var intent = frame.HappyQiaoRecoverTo ?? throw new InvalidOperationException("RecoverTo lost its original target-HP intent.");
+        if (intent.ProgramFrameId != frame.Id || intent.InstructionIndex != frame.InstructionIndex || intent.GameplayHash != frame.GameplayHash || intent.SourceSeat != ownerSeat || intent.TargetSeat != targetSeat || intent.TargetHp != value || intent.HealthRequestId != receipt.Id || intent.Before != receipt.Before || intent.RecoveryAttemptId is not null || intent.FinishedWithoutRecovery || receipt.ReturnKind != HappyQiaoHealthReturnKind.RecoverTo || receipt.Pool is not { } pool)
+            throw new InvalidOperationException("RecoverTo cannot change its target, chosen sister, instruction or settled intent.");
+        RequireHappyQiaoSelectedReceipt(frame, receipt);
+        var amount = Math.Max(0, checked(value - intent.Before.Hp(pool)));
+        if (amount == 0)
+        {
+            ReleaseHappyQiaoHealthSelection(frame.Id);
+            _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { HappyQiaoRecoverTo = intent with { FinishedWithoutRecovery = true } });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyQiaoRecoverToNoRecoveryEvent(frame.Id, receipt.Id, targetSeat, value, pool));
+            return true;
+        }
+
+        var origin = new HappyQiaoRecoverToOrigin(frame.Id, frame.InstructionIndex, frame.GameplayHash, ownerSeat, targetSeat, value, receipt.Id, pool, intent.Before, amount);
+        if (!_coreRecoveryReplacementOperations.TryQueueRecoveryReplacement(frame.Id, ownerSeat, targetSeat, amount, new(RecoveryAttemptProducer.Program, frame.InstructionIndex), origin))
+            throw new InvalidOperationException("A positive Qiao RecoverTo must queue its real native recovery.");
+        frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+        var request = frame.PendingRecoveryAttempts!.Single(a => a.HappyQiaoRecoverToOrigin == origin);
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { HappyQiaoRecoverTo = intent with { RecoveryAttemptId = request.Id } });
+        ReleaseHappyQiaoHealthSelection(frame.Id);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyQiaoRecoverToQueuedEvent(frame.Id, receipt.Id, request.Id, ownerSeat, targetSeat, value, pool, amount));
+        return true;
+    }
+
+    internal bool TryBindHappyQiaoRecoverToRequest(RecoveryReplacementFrame frame)
+    {
+        var origin = frame.Attempt.HappyQiaoRecoverToOrigin!;
+        RequireHappyQiaoRecoverToOrigin(frame, origin);
+        if (frame.HappyQiaoHealth is not null)
+            return false;
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || _coreMatchParticipantsPlayersAccess._players[origin.TargetSeat].HappyQiaoHealth != origin.Before)
+            throw new InvalidOperationException("RecoverTo's native recovery lost the unchanged original selected pool.");
+        var request = new HappyQiaoHealthReceipt(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, frame.Id, frame.Kind, origin.TargetSeat, origin.SourceSeat, HpChangeKind.Recovery, origin.Amount, HappyQiaoHealthReturnKind.RecoveryRequest, $"recovery-request:{(frame.Id)}:{(origin.TargetSeat)}", 0, origin.Before, Pool: origin.Pool);
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { HappyQiaoHealth = request });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyQiaoHealthRequestedEvent(request.Id, frame.Id, origin.TargetSeat, request.Kind, request.Amount, request.ReturnKind, request.OccurrenceKey));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyQiaoHealthPoolSelectedEvent(request.Id, frame.Id, origin.TargetSeat, origin.Pool, origin.Before.Hp(origin.Pool), origin.Before.MaximumHp));
+        // Resume with the newly owned receipt, never keep evaluating the stale
+        // pre-binding RecoveryReplacementFrame supplied by the caller.
+        _coreRuntimeOperations.AdvanceRuntimeFrame(frame.Id);
+        return true;
+    }
+
+    internal void RequireHappyQiaoRecoverToOrigin(RecoveryReplacementFrame frame, HappyQiaoRecoverToOrigin origin)
+    {
+        var attempt = frame.Attempt;
+        var parent = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == frame.ParentFrameId) as ProgramSkillFrame;
+        if (parent is null || parent.Id != origin.ProgramFrameId || parent.GameplayHash != origin.GameplayHash || parent.InstructionIndex != origin.InstructionIndex || parent.OwnerSeat != origin.SourceSeat || parent.HappyQiaoRecoverTo is not { } intent || intent.ProgramFrameId != parent.Id || intent.InstructionIndex != origin.InstructionIndex || intent.GameplayHash != origin.GameplayHash || intent.SourceSeat != origin.SourceSeat || intent.TargetSeat != origin.TargetSeat || intent.TargetHp != origin.TargetHp || intent.Before != origin.Before || intent.HealthRequestId != origin.HealthRequestId || intent.RecoveryAttemptId != frame.Id || intent.FinishedWithoutRecovery || parent.HappyQiaoHealth is not { ReturnKind: HappyQiaoHealthReturnKind.RecoverTo, Released: true, Applied: false } selected || selected.Id != origin.HealthRequestId || selected.ParentFrameId != parent.Id || selected.ParentKind != parent.Kind || selected.InstructionIndex != origin.InstructionIndex || selected.TargetSeat != origin.TargetSeat || selected.SourceSeat != origin.SourceSeat || selected.Kind != HpChangeKind.Recovery || selected.Amount != origin.TargetHp || selected.Pool != origin.Pool || selected.Before != origin.Before || selected.OccurrenceKey != $"recover-to:{(parent.Id)}:{(parent.InstructionIndex)}:{(origin.TargetSeat)}" || attempt.Id != frame.Id || attempt.SourceSeat != origin.SourceSeat || attempt.TargetSeat != origin.TargetSeat || attempt.HpBefore is not null || attempt.HappyQiaoBefore != origin.Before || attempt.Amount != origin.Amount || origin.Amount <= 0 || origin.TargetHp > origin.Before.MaximumHp || origin.Amount != Math.Max(0, checked(origin.TargetHp - origin.Before.Hp(origin.Pool))) || attempt.Completion != new RecoveryAttemptCompletion(RecoveryAttemptProducer.Program, origin.InstructionIndex) || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyQiaoHealthPoolSelectedEvent>().Count(e => e == new HappyQiaoHealthPoolSelectedEvent(origin.HealthRequestId, parent.Id, origin.TargetSeat, origin.Pool, origin.Before.Hp(origin.Pool), origin.Before.MaximumHp)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyQiaoHealthRequestedEvent>().Count(e => e == new HappyQiaoHealthRequestedEvent(selected.Id, parent.Id, origin.TargetSeat, selected.Kind, selected.Amount, selected.ReturnKind, selected.OccurrenceKey)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyQiaoHealthSelectionReleasedEvent>().Count(e => e == new HappyQiaoHealthSelectionReleasedEvent(selected.Id, parent.Id)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyQiaoRecoverToQueuedEvent>().Count(e => e == new HappyQiaoRecoverToQueuedEvent(parent.Id, selected.Id, frame.Id, origin.SourceSeat, origin.TargetSeat, origin.TargetHp, origin.Pool, origin.Amount)) != 1)
+            throw new InvalidOperationException("A native RecoverTo cannot borrow a query, a different pool, or a replayed recovery intent.");
+    }
+}

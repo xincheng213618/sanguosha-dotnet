@@ -33,12 +33,12 @@ internal static class ActualHandGainAndCategoryGiftChecks
         var batch = new CardMovementBatchContext(999999, null, null, turn,
             [new(900000, turn, id, CardKind.SilverLion, CardLocation.Hand(0), CardLocation.Processing, new("fixture.hop")),
              new(900001, turn, id, CardKind.SilverLion, CardLocation.Processing, CardLocation.Hand(0), new("fixture.hop"))], []);
-        var indexes = (int[])typeof(GameEngine).GetMethod("MatchingActualHandGainIndexes", Flags)!.Invoke(g, [batch, 0, CardLocation.Hand(0)])!;
+        var indexes = (int[])global::FixtureRuntimeAccess.Engine.GetMethod("MatchingActualHandGainIndexes", Flags)!.Invoke(g, [batch, 0, CardLocation.Hand(0)])!;
         Require(indexes.Length == 0, "Moving an existing hand entity through Processing and back is not a new hand acquisition.");
         var reacquired = batch with { Movements =
             [new(900002, turn, id, CardKind.SilverLion, CardLocation.Hand(0), CardLocation.Equipment(0), new("fixture.leave")),
              new(900003, turn, id, CardKind.SilverLion, CardLocation.Equipment(0), CardLocation.Hand(0), new("fixture.reacquire"))] };
-        var entities = (ActualHandGainEntity[])typeof(GameEngine).GetMethod("ActualHandGainEntities", Flags)!.Invoke(g, [reacquired, 0])!;
+        var entities = (ActualHandGainEntity[])global::FixtureRuntimeAccess.Engine.GetMethod("ActualHandGainEntities", Flags)!.Invoke(g, [reacquired, 0])!;
         Require(entities is [var regained] && regained.GainSequence == 900003, "An entity that genuinely leaves Hand and returns from Equipment has the new real acquisition identity.");
     }
     private static (GameEngine, ContentRegistry) Start(bool holdInitialDraw = false, bool foreign = false, bool killEndedActor = false, bool completedTargets = false, bool compoundTargets = false)

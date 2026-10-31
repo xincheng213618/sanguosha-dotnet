@@ -113,7 +113,7 @@ public sealed record HappyWeiYanBoneUseReturnedEvent(long FrameId, int Ordinal, 
 
 internal static class HappyWeiYanComposition
 {
-    internal const string Zigu = "happy:zigu", Ezhi = "happy:ezhi", Gujing = "happy:gujing";
+    internal const string Zigu = "happy:zigu",Ezhi = "happy:ezhi",Gujing = "happy:gujing";
     [ProgramCatalogValidation(42300)] internal static void Validate(string path, SkillProgram program)
     {
         var effects = program.Triggers.SelectMany(t => t.Effects).Concat(program.Activations.SelectMany(a => a.Effects)).ToArray();

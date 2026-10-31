@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime : global::CardGame.Core.ISequentialDiscardProgramHost
+{
+    private readonly ICoreSequentialDiscardProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSequentialDiscardProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSequentialDiscardProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreAllHandChallengesOperations _coreAllHandChallengesOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreSequentialDiscardReceiptsOperations _coreSequentialDiscardReceiptsOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreSequentialDiscardProgramsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSequentialDiscardProgramsCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreSequentialDiscardProgramsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess _coreMatchDefinitionPlayerCountAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSequentialDiscardProgramsRuntime(ICoreSequentialDiscardProgramsCardZonesOperations cardZonesOperations, ICoreSequentialDiscardProgramsContentRegistryOperations contentRegistryOperations, ICoreSequentialDiscardProgramsResolutionStackOperations resolutionStackOperations, ICoreSequentialDiscardProgramsCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICoreSequentialDiscardProgramsCoreAllHandChallengesOperations coreAllHandChallengesOperations, ICoreSequentialDiscardProgramsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreSequentialDiscardProgramsCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreSequentialDiscardProgramsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreSequentialDiscardProgramsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreSequentialDiscardProgramsCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICoreSequentialDiscardProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSequentialDiscardProgramsCoreRuntimeOperations coreRuntimeOperations, ICoreSequentialDiscardProgramsCoreSequentialDiscardReceiptsOperations coreSequentialDiscardReceiptsOperations, ICoreSequentialDiscardProgramsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreSequentialDiscardProgramsCoreTableOrderOperations coreTableOrderOperations, ICoreSequentialDiscardProgramsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreSequentialDiscardProgramsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSequentialDiscardProgramsCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreSequentialDiscardProgramsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionPlayerCountAccess coreMatchDefinitionPlayerCountAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAllHandChallengesOperations = coreAllHandChallengesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSequentialDiscardReceiptsOperations = coreSequentialDiscardReceiptsOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatTurnNumberAccess = coreActualTurnProgressCurrentSeatTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchDefinitionPlayerCountAccess = coreMatchDefinitionPlayerCountAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

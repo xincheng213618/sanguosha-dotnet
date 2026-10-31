@@ -1,0 +1,66 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineMovementRecordsRuntime : global::CardGame.Core.IMovementRecordFacts, global::CardGame.Core.IMovementRecordJournal, global::CardGame.Core.IMovementRecordMaterials, global::CardGame.Core.IMovementRecordMetadata, global::CardGame.Core.IMovementRecordNotifications, global::CardGame.Core.IMovementRecordObservers, global::CardGame.Core.IMovementRecordOrigins
+{
+    private readonly ICoreMovementRecordsCharacterBianFuRenOlOperations _characterBianFuRenOlOperations;
+    private readonly ICoreMovementRecordsCharacterDengAiAnniversaryGodOperations _characterDengAiAnniversaryGodOperations;
+    private readonly ICoreMovementRecordsCharacterDiaoChanLeOperations _characterDiaoChanLeOperations;
+    private readonly ICoreMovementRecordsCharacterDuFuRenOlOperations _characterDuFuRenOlOperations;
+    private readonly ICoreMovementRecordsCharacterGuoZhaoAnniversaryOperations _characterGuoZhaoAnniversaryOperations;
+    private readonly ICoreMovementRecordsCharacterHuaTuoHappyGodOperations _characterHuaTuoHappyGodOperations;
+    private readonly ICoreMovementRecordsCharacterJuShouMouOperations _characterJuShouMouOperations;
+    private readonly ICoreMovementRecordsCharacterZhangHengAnniversaryOperations _characterZhangHengAnniversaryOperations;
+    private readonly ICoreMovementRecordsCharacterZhongHuiAnniversaryGodOperations _characterZhongHuiAnniversaryGodOperations;
+    private readonly ICoreMovementRecordsCharacterZhugeLiangWumiaoOperations _characterZhugeLiangWumiaoOperations;
+    private readonly ICoreMovementRecordsCharacterZuoCiHappyGodOperations _characterZuoCiHappyGodOperations;
+    private readonly ICoreMovementRecordsModeRulesOperations _modeRulesOperations;
+    private readonly ICoreMovementRecordsCoreAdjacentDiscardStorageOperations _coreAdjacentDiscardStorageOperations;
+    private readonly ICoreMovementRecordsCoreDiscardedProvenanceOperations _coreDiscardedProvenanceOperations;
+    private readonly ICoreMovementRecordsCoreGainGiftProgramsOperations _coreGainGiftProgramsOperations;
+    private readonly ICoreMovementRecordsCoreOriginalHandEntitiesOperations _coreOriginalHandEntitiesOperations;
+    private readonly ICoreMovementRecordsCoreRequestedDeckBasicsOperations _coreRequestedDeckBasicsOperations;
+    private readonly ICoreMovementRecordsCoreShanheStartingResourcesOperations _coreShanheStartingResourcesOperations;
+    private readonly ICoreMovementRecordsCoreSourceCursesOperations _coreSourceCursesOperations;
+    private readonly ICoreMovementRecordsCoreWushuangShopCardsOperations _coreWushuangShopCardsOperations;
+    private readonly ICoreMovementRecordsCoreHappyWeiYanGainDestinationsOperations _coreHappyWeiYanGainDestinationsOperations;
+    private readonly ICoreMovementRecordsCoreProgramActualPlaySlashLossOperations _coreProgramActualPlaySlashLossOperations;
+    private readonly ICoreMovementRecordsCoreProgramParticipantPhaseOperationsOperations _coreProgramParticipantPhaseOperationsOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressStartedTurnNumberAccess _coreActualTurnProgressStartedTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStoragePendingNotificationsAccess _coreCommandJournalStoragePendingNotificationsAccess;
+    internal CoreGameEngineMovementRecordsRuntime(ICoreMovementRecordsCharacterBianFuRenOlOperations characterBianFuRenOlOperations, ICoreMovementRecordsCharacterDengAiAnniversaryGodOperations characterDengAiAnniversaryGodOperations, ICoreMovementRecordsCharacterDiaoChanLeOperations characterDiaoChanLeOperations, ICoreMovementRecordsCharacterDuFuRenOlOperations characterDuFuRenOlOperations, ICoreMovementRecordsCharacterGuoZhaoAnniversaryOperations characterGuoZhaoAnniversaryOperations, ICoreMovementRecordsCharacterHuaTuoHappyGodOperations characterHuaTuoHappyGodOperations, ICoreMovementRecordsCharacterJuShouMouOperations characterJuShouMouOperations, ICoreMovementRecordsCharacterZhangHengAnniversaryOperations characterZhangHengAnniversaryOperations, ICoreMovementRecordsCharacterZhongHuiAnniversaryGodOperations characterZhongHuiAnniversaryGodOperations, ICoreMovementRecordsCharacterZhugeLiangWumiaoOperations characterZhugeLiangWumiaoOperations, ICoreMovementRecordsCharacterZuoCiHappyGodOperations characterZuoCiHappyGodOperations, ICoreMovementRecordsModeRulesOperations modeRulesOperations, ICoreMovementRecordsCoreAdjacentDiscardStorageOperations coreAdjacentDiscardStorageOperations, ICoreMovementRecordsCoreDiscardedProvenanceOperations coreDiscardedProvenanceOperations, ICoreMovementRecordsCoreGainGiftProgramsOperations coreGainGiftProgramsOperations, ICoreMovementRecordsCoreOriginalHandEntitiesOperations coreOriginalHandEntitiesOperations, ICoreMovementRecordsCoreRequestedDeckBasicsOperations coreRequestedDeckBasicsOperations, ICoreMovementRecordsCoreShanheStartingResourcesOperations coreShanheStartingResourcesOperations, ICoreMovementRecordsCoreSourceCursesOperations coreSourceCursesOperations, ICoreMovementRecordsCoreWushuangShopCardsOperations coreWushuangShopCardsOperations, ICoreMovementRecordsCoreHappyWeiYanGainDestinationsOperations coreHappyWeiYanGainDestinationsOperations, ICoreMovementRecordsCoreProgramActualPlaySlashLossOperations coreProgramActualPlaySlashLossOperations, ICoreMovementRecordsCoreProgramParticipantPhaseOperationsOperations coreProgramParticipantPhaseOperationsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressStartedTurnNumberAccess coreActualTurnProgressStartedTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStoragePendingNotificationsAccess coreCommandJournalStoragePendingNotificationsAccess)
+    {
+        this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
+        this._characterDengAiAnniversaryGodOperations = characterDengAiAnniversaryGodOperations;
+        this._characterDiaoChanLeOperations = characterDiaoChanLeOperations;
+        this._characterDuFuRenOlOperations = characterDuFuRenOlOperations;
+        this._characterGuoZhaoAnniversaryOperations = characterGuoZhaoAnniversaryOperations;
+        this._characterHuaTuoHappyGodOperations = characterHuaTuoHappyGodOperations;
+        this._characterJuShouMouOperations = characterJuShouMouOperations;
+        this._characterZhangHengAnniversaryOperations = characterZhangHengAnniversaryOperations;
+        this._characterZhongHuiAnniversaryGodOperations = characterZhongHuiAnniversaryGodOperations;
+        this._characterZhugeLiangWumiaoOperations = characterZhugeLiangWumiaoOperations;
+        this._characterZuoCiHappyGodOperations = characterZuoCiHappyGodOperations;
+        this._modeRulesOperations = modeRulesOperations;
+        this._coreAdjacentDiscardStorageOperations = coreAdjacentDiscardStorageOperations;
+        this._coreDiscardedProvenanceOperations = coreDiscardedProvenanceOperations;
+        this._coreGainGiftProgramsOperations = coreGainGiftProgramsOperations;
+        this._coreOriginalHandEntitiesOperations = coreOriginalHandEntitiesOperations;
+        this._coreRequestedDeckBasicsOperations = coreRequestedDeckBasicsOperations;
+        this._coreShanheStartingResourcesOperations = coreShanheStartingResourcesOperations;
+        this._coreSourceCursesOperations = coreSourceCursesOperations;
+        this._coreWushuangShopCardsOperations = coreWushuangShopCardsOperations;
+        this._coreHappyWeiYanGainDestinationsOperations = coreHappyWeiYanGainDestinationsOperations;
+        this._coreProgramActualPlaySlashLossOperations = coreProgramActualPlaySlashLossOperations;
+        this._coreProgramParticipantPhaseOperationsOperations = coreProgramParticipantPhaseOperationsOperations;
+        this._coreActualTurnProgressStartedTurnNumberAccess = coreActualTurnProgressStartedTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreCommandJournalStoragePendingNotificationsAccess = coreCommandJournalStoragePendingNotificationsAccess;
+    }
+}

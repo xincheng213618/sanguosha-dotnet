@@ -1,0 +1,64 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZhangLiaoOlSpRuntime : global::CardGame.Core.ISpZhangLiaoProgramHost
+{
+    private readonly ICharacterZhangLiaoOlSpCharacterGuoJiaMobileGodOperations _characterGuoJiaMobileGodOperations;
+    private readonly ICharacterZhangLiaoOlSpCharacterHuangQuanMouOperations _characterHuangQuanMouOperations;
+    private readonly ICharacterZhangLiaoOlSpCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterZhangLiaoOlSpContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhangLiaoOlSpResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreDamagePreventionProgramsOperations _coreDamagePreventionProgramsOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterZhangLiaoOlSpCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterZhangLiaoOlSpCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterZhangLiaoOlSpCharacterZhangLiaoOlSpOperations _characterZhangLiaoOlSpOperations;
+    private readonly ICharacterZhangLiaoOlSpCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICharacterZhangLiaoOlSpKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterZhangLiaoOlSpRuntime(ICharacterZhangLiaoOlSpCharacterGuoJiaMobileGodOperations characterGuoJiaMobileGodOperations, ICharacterZhangLiaoOlSpCharacterHuangQuanMouOperations characterHuangQuanMouOperations, ICharacterZhangLiaoOlSpCardZonesOperations cardZonesOperations, ICharacterZhangLiaoOlSpContentRegistryOperations contentRegistryOperations, ICharacterZhangLiaoOlSpResolutionStackOperations resolutionStackOperations, ICharacterZhangLiaoOlSpCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterZhangLiaoOlSpCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterZhangLiaoOlSpCoreDamagePreventionProgramsOperations coreDamagePreventionProgramsOperations, ICharacterZhangLiaoOlSpCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterZhangLiaoOlSpCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICharacterZhangLiaoOlSpCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterZhangLiaoOlSpCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterZhangLiaoOlSpCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhangLiaoOlSpCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhangLiaoOlSpCoreRuntimeOperations coreRuntimeOperations, ICharacterZhangLiaoOlSpCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterZhangLiaoOlSpCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterZhangLiaoOlSpCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterZhangLiaoOlSpCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterZhangLiaoOlSpCharacterZhangLiaoOlSpOperations characterZhangLiaoOlSpOperations, ICharacterZhangLiaoOlSpCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICharacterZhangLiaoOlSpKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterGuoJiaMobileGodOperations = characterGuoJiaMobileGodOperations;
+        this._characterHuangQuanMouOperations = characterHuangQuanMouOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._characterZhangLiaoOlSpOperations = characterZhangLiaoOlSpOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

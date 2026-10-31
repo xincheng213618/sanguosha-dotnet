@@ -74,7 +74,7 @@ internal static class ModeAllegianceChecks
     }
 
     private static T Call<T>(GameEngine engine, string method, params object?[] arguments) =>
-        (T)(typeof(GameEngine).GetMethod(method, Native) ?? throw new InvalidOperationException(method)).Invoke(engine, arguments)!;
+        (T)(global::FixtureRuntimeAccess.Engine.GetMethod(method, Native) ?? throw new InvalidOperationException(method)).Invoke(engine, arguments)!;
 
     private sealed class OverridePackage : IGameContentPackage
     {

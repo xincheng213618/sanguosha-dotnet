@@ -1,0 +1,32 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineFinalizedJudgmentDamageChildrenRuntime
+{
+    private readonly ICoreFinalizedJudgmentDamageChildrenCharacterZhangFeiAnniversaryGodOperations _characterZhangFeiAnniversaryGodOperations;
+    private readonly ICoreFinalizedJudgmentDamageChildrenCardZonesOperations _cardZonesOperations;
+    private readonly ICoreFinalizedJudgmentDamageChildrenContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreFinalizedJudgmentDamageChildrenResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreFinalizedJudgmentDamageChildrenCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICoreFinalizedJudgmentDamageChildrenCoreJudgmentOutcomeClaimsOperations _coreJudgmentOutcomeClaimsOperations;
+    private readonly ICoreFinalizedJudgmentDamageChildrenCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreFinalizedJudgmentDamageChildrenCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreFinalizedJudgmentDamageChildrenCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    internal CoreGameEngineFinalizedJudgmentDamageChildrenRuntime(ICoreFinalizedJudgmentDamageChildrenCharacterZhangFeiAnniversaryGodOperations characterZhangFeiAnniversaryGodOperations, ICoreFinalizedJudgmentDamageChildrenCardZonesOperations cardZonesOperations, ICoreFinalizedJudgmentDamageChildrenContentRegistryOperations contentRegistryOperations, ICoreFinalizedJudgmentDamageChildrenResolutionStackOperations resolutionStackOperations, ICoreFinalizedJudgmentDamageChildrenCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICoreFinalizedJudgmentDamageChildrenCoreJudgmentOutcomeClaimsOperations coreJudgmentOutcomeClaimsOperations, ICoreFinalizedJudgmentDamageChildrenCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreFinalizedJudgmentDamageChildrenCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreFinalizedJudgmentDamageChildrenCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations)
+    {
+        this._characterZhangFeiAnniversaryGodOperations = characterZhangFeiAnniversaryGodOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreJudgmentOutcomeClaimsOperations = coreJudgmentOutcomeClaimsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+    }
+}

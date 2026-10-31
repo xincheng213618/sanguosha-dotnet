@@ -53,7 +53,7 @@ internal static class ModeDamagePipelineChecks
         Require(other.DamageRules.Single().Amount(factsSnapshot) == 1 && firstCalls == 1 && otherCalls == 1 &&
             typeof(ModeDamageFacts).GetProperties().All(property => property.PropertyType.IsValueType),
             "Installed damage facts expose scalar values only, while optional providers remain separate per match.");
-        var nativeOrder = GameEngine.NativeDamageHookCatalog.Phases[ProgramDamagePhase.AdditiveAmount].First().Order;
+        var nativeOrder = CardGame.Core.EngineOwners.CoreProgramDamageHooksRuntime.NativeDamageHookCatalog.Phases[ProgramDamagePhase.AdditiveAmount].First().Order;
         Reject(() => new MatchModeRuntime(new Feature([ModeDamageRuleRegistration.Additive(nativeOrder, _ => 0)]))
             .ValidateNativePorts());
         Reject(() => new MatchModeRuntime(new Feature([ModeDamageRuleRegistration.Additive(1000001, _ => 0),

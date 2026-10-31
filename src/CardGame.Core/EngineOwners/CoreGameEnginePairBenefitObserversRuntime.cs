@@ -1,0 +1,50 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEnginePairBenefitObserversRuntime
+{
+    private readonly ICorePairBenefitObserversContentRegistryOperations _contentRegistryOperations;
+    private readonly ICorePairBenefitObserversResolutionStackOperations _resolutionStackOperations;
+    private readonly ICorePairBenefitObserversCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICorePairBenefitObserversCoreFixedRecipientBenefitsOperations _coreFixedRecipientBenefitsOperations;
+    private readonly ICorePairBenefitObserversCoreHalfHandPhaseDebtDamageObserversOperations _coreHalfHandPhaseDebtDamageObserversOperations;
+    private readonly ICorePairBenefitObserversCorePairObtainFixedRecipientReceiptsOperations _corePairObtainFixedRecipientReceiptsOperations;
+    private readonly ICorePairBenefitObserversCorePairObtainShownGiftsOperations _corePairObtainShownGiftsOperations;
+    private readonly ICorePairBenefitObserversCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
+    private readonly ICorePairBenefitObserversCoreProgramChildResolutionOperations _coreProgramChildResolutionOperations;
+    private readonly ICorePairBenefitObserversCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICorePairBenefitObserversCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICorePairBenefitObserversCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICorePairBenefitObserversCoreUnrespondableCounterspellsOperations _coreUnrespondableCounterspellsOperations;
+    private readonly ICorePairBenefitObserversCoreParticipantHandDamageRidesOperations _coreParticipantHandDamageRidesOperations;
+    private readonly ICorePairBenefitObserversCoreParticipantHandProgramRescueRidesOperations _coreParticipantHandProgramRescueRidesOperations;
+    private readonly ICorePairBenefitObserversKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEnginePairBenefitObserversRuntime(ICorePairBenefitObserversContentRegistryOperations contentRegistryOperations, ICorePairBenefitObserversResolutionStackOperations resolutionStackOperations, ICorePairBenefitObserversCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICorePairBenefitObserversCoreFixedRecipientBenefitsOperations coreFixedRecipientBenefitsOperations, ICorePairBenefitObserversCoreHalfHandPhaseDebtDamageObserversOperations coreHalfHandPhaseDebtDamageObserversOperations, ICorePairBenefitObserversCorePairObtainFixedRecipientReceiptsOperations corePairObtainFixedRecipientReceiptsOperations, ICorePairBenefitObserversCorePairObtainShownGiftsOperations corePairObtainShownGiftsOperations, ICorePairBenefitObserversCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICorePairBenefitObserversCoreProgramChildResolutionOperations coreProgramChildResolutionOperations, ICorePairBenefitObserversCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePairBenefitObserversCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICorePairBenefitObserversCoreRuntimeOperations coreRuntimeOperations, ICorePairBenefitObserversCoreUnrespondableCounterspellsOperations coreUnrespondableCounterspellsOperations, ICorePairBenefitObserversCoreParticipantHandDamageRidesOperations coreParticipantHandDamageRidesOperations, ICorePairBenefitObserversCoreParticipantHandProgramRescueRidesOperations coreParticipantHandProgramRescueRidesOperations, ICorePairBenefitObserversKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreFixedRecipientBenefitsOperations = coreFixedRecipientBenefitsOperations;
+        this._coreHalfHandPhaseDebtDamageObserversOperations = coreHalfHandPhaseDebtDamageObserversOperations;
+        this._corePairObtainFixedRecipientReceiptsOperations = corePairObtainFixedRecipientReceiptsOperations;
+        this._corePairObtainShownGiftsOperations = corePairObtainShownGiftsOperations;
+        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
+        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreUnrespondableCounterspellsOperations = coreUnrespondableCounterspellsOperations;
+        this._coreParticipantHandDamageRidesOperations = coreParticipantHandDamageRidesOperations;
+        this._coreParticipantHandProgramRescueRidesOperations = coreParticipantHandProgramRescueRidesOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

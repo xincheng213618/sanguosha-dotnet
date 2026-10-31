@@ -46,7 +46,7 @@ internal sealed class AnniversaryYuanYinHandler(SkillProgramEffectOp op) : ISkil
 }
 internal static class AnniversaryYuanYinComposition
 {
-    internal const string Moshou = "anniversary:moshou", Yunjiu = "anniversary:yunjiu";
+    internal const string Moshou = "anniversary:moshou",Yunjiu = "anniversary:yunjiu";
     [ProgramCatalogValidation(49300)] internal static void Validate(string path, SkillProgram p)
     {
         var owns = p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryYuanYinMoshou or SkillProgramEffectOp.ResolveAnniversaryYuanYinYunjiu);

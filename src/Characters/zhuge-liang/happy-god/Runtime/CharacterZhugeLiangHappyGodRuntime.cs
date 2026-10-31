@@ -1,0 +1,38 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterZhugeLiangHappyGodRuntime : global::CardGame.Core.IHappyZhugeLiangHost
+{
+    private readonly ICharacterZhugeLiangHappyGodContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterZhugeLiangHappyGodCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICharacterZhugeLiangHappyGodCoreProgramBooleanStateExpirationOperations _coreProgramBooleanStateExpirationOperations;
+    private readonly ICharacterZhugeLiangHappyGodCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterZhugeLiangHappyGodCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterZhugeLiangHappyGodCoreProgramPersistentStateOperations _coreProgramPersistentStateOperations;
+    private readonly ICharacterZhugeLiangHappyGodCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICharacterZhugeLiangHappyGodCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
+    private readonly ICharacterZhugeLiangHappyGodKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineProgramBooleanStateExpirationProgramBooleanStateLeasesAccess _coreGameEngineProgramBooleanStateExpirationProgramBooleanStateLeasesAccess;
+    internal CharacterZhugeLiangHappyGodRuntime(ICharacterZhugeLiangHappyGodContentRegistryOperations contentRegistryOperations, ICharacterZhugeLiangHappyGodCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterZhugeLiangHappyGodCoreProgramBooleanStateExpirationOperations coreProgramBooleanStateExpirationOperations, ICharacterZhugeLiangHappyGodCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhugeLiangHappyGodCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterZhugeLiangHappyGodCoreProgramPersistentStateOperations coreProgramPersistentStateOperations, ICharacterZhugeLiangHappyGodCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICharacterZhugeLiangHappyGodCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICharacterZhugeLiangHappyGodKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineProgramBooleanStateExpirationProgramBooleanStateLeasesAccess coreGameEngineProgramBooleanStateExpirationProgramBooleanStateLeasesAccess)
+    {
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreProgramBooleanStateExpirationOperations = coreProgramBooleanStateExpirationOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramPersistentStateOperations = coreProgramPersistentStateOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreNativeCardClassificationsOperations = coreNativeCardClassificationsOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressTurnNumberAccess = coreActualTurnProgressTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreGameEngineProgramBooleanStateExpirationProgramBooleanStateLeasesAccess = coreGameEngineProgramBooleanStateExpirationProgramBooleanStateLeasesAccess;
+    }
+}

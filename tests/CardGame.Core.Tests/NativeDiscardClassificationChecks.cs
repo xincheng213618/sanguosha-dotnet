@@ -44,7 +44,7 @@ internal static class NativeDiscardClassificationChecks
             , "skill-program.fixture:demand.same-name-hand.discard"
             , "skill-program.fixture:reveal.completed-undamaged-target.discard"
         })
-            Require(GameEngine.IsDiscardMovementReason(new(reason)), $"Actual discard producer must qualify: {reason}");
+            Require(CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardTopPlacementRuntime.IsDiscardMovementReason(new(reason)), $"Actual discard producer must qualify: {reason}");
         foreach (var reason in new[]
         {
             "skill-program.huaman.draw",
@@ -129,7 +129,7 @@ internal static class NativeDiscardClassificationChecks
             "player.death-discard",
             "card.harvest-discard"
         })
-            Require(!GameEngine.IsDiscardMovementReason(new(reason)), $"Adjacent gain, recast and cleanup must stay excluded: {reason}");
+            Require(!CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardTopPlacementRuntime.IsDiscardMovementReason(new(reason)), $"Adjacent gain, recast and cleanup must stay excluded: {reason}");
     }
     private static void Require(bool condition, string message)
     {

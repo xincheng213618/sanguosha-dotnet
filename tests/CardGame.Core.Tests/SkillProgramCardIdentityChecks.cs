@@ -105,7 +105,7 @@ internal static class SkillProgramCardIdentityChecks
             "Grant fixture could not select its owner.");
         AdvanceToHumanPlay(game);
 
-        var players = (IReadOnlyList<CharacterState>)(typeof(GameEngine)
+        var players = (IReadOnlyList<CharacterState>)(global::FixtureRuntimeAccess.Engine
             .GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!
             .GetValue(game) ?? throw new InvalidOperationException("Grant fixture players are unavailable."));
         var owner = players[0];

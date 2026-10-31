@@ -28,8 +28,8 @@ internal static class BoundaryZhuZhiChecks
         public PlayerSnapshot V(int seat)=>G.CreateSnapshot(seat).Players.Single(p=>p.Seat==seat);
         public int Limit(int seat)
         {
-            var players=(System.Collections.IList)typeof(GameEngine).GetField("_players",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(G)!;
-            return(int)typeof(GameEngine).GetMethod("GetHandLimit",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(G,[players[seat]])!;
+            var players=(System.Collections.IList)global::FixtureRuntimeAccess.Engine.GetField("_players",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(G)!;
+            return(int)global::FixtureRuntimeAccess.Engine.GetMethod("GetHandLimit",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(G,[players[seat]])!;
         }
         public T[] E<T>()=>G.Events.Select(e=>e.Payload).OfType<T>().ToArray();
         public bool Marked(int seat)=>(V(seat).Markers??[]).Any(m=>m.Kind==PlayerMarkerKind.MobileBoundaryAnguo&&m.Count>0);

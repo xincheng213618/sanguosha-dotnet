@@ -1,0 +1,32 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreProgramPopulationAndArrowBarrageOperationsRuntime : global::CardGame.Core.IPopulationAndArrowBarrageProgramHost
+{
+    private readonly ICoreProgramPopulationAndArrowBarrageOperationsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreProgramPopulationAndArrowBarrageOperationsCoreAttributedMarkerEventsOperations _coreAttributedMarkerEventsOperations;
+    private readonly ICoreProgramPopulationAndArrowBarrageOperationsCoreLordSkillProjectionsOperations _coreLordSkillProjectionsOperations;
+    private readonly ICoreProgramPopulationAndArrowBarrageOperationsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreProgramPopulationAndArrowBarrageOperationsCoreProgramCardUseRolesOperations _coreProgramCardUseRolesOperations;
+    private readonly ICoreProgramPopulationAndArrowBarrageOperationsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramPopulationAndArrowBarrageOperationsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramPopulationAndArrowBarrageOperationsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreProgramPopulationAndArrowBarrageOperationsRuntime(ICoreProgramPopulationAndArrowBarrageOperationsResolutionStackOperations resolutionStackOperations, ICoreProgramPopulationAndArrowBarrageOperationsCoreAttributedMarkerEventsOperations coreAttributedMarkerEventsOperations, ICoreProgramPopulationAndArrowBarrageOperationsCoreLordSkillProjectionsOperations coreLordSkillProjectionsOperations, ICoreProgramPopulationAndArrowBarrageOperationsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreProgramPopulationAndArrowBarrageOperationsCoreProgramCardUseRolesOperations coreProgramCardUseRolesOperations, ICoreProgramPopulationAndArrowBarrageOperationsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramPopulationAndArrowBarrageOperationsCoreRuntimeOperations coreRuntimeOperations, ICoreProgramPopulationAndArrowBarrageOperationsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAttributedMarkerEventsOperations = coreAttributedMarkerEventsOperations;
+        this._coreLordSkillProjectionsOperations = coreLordSkillProjectionsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

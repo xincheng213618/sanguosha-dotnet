@@ -71,7 +71,7 @@ internal sealed class MoLuBuHandler(SkillProgramEffectOp op) : ISkillProgramEffe
 }
 internal static class MoLuBuComposition
 {
-    internal const string Duoqi = "ol:mo-duoqi", Kuangmo = "ol:mo-kuangmo", Gangquan = "ol:mo-gangquan";
+    internal const string Duoqi = "ol:mo-duoqi",Kuangmo = "ol:mo-kuangmo",Gangquan = "ol:mo-gangquan";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.InitializeMoLuBuQiAndOpeningPlay or SkillProgramEffectOp.ResolveMoLuBuDuoqi or SkillProgramEffectOp.EnterMoLuBuKuangmo or SkillProgramEffectOp.ResolveMoLuBuKuangmoDeath;
     [ProgramCatalogValidation(1100)]
     internal static void ValidateProgram(string path, SkillProgram p)

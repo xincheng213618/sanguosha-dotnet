@@ -21,7 +21,7 @@ internal sealed class HappyQiaoHandler(SkillProgramEffectOp operation) : ISkillP
 }
 internal static class HappyQiaoComposition
 {
-    internal const string Shuangshu = "happy:shuangshu", Shutu = "happy:shutu", Tongxin = "happy:tongxin";
+    internal const string Shuangshu = "happy:shuangshu",Shutu = "happy:shutu",Tongxin = "happy:tongxin";
     [ProgramCatalogValidation(42400)] internal static void Validate(string path, SkillProgram program)
     {
         if (!program.Triggers.SelectMany(t => t.Effects).Any(e => e.Op is SkillProgramEffectOp.ResolveHappyQiaoShutu or SkillProgramEffectOp.ResolveHappyQiaoTongxin)) return;
@@ -38,7 +38,7 @@ internal static class HappyQiaoComposition
 public enum HappyQiaoStage { SuitChoice, GainChildren, UseChoice, IssuingUse, Declaration, NativeUse, ReturnedUse, HealChoice, HealChildren, DiscardChoice, TargetChoice, DiscardChildren, Damage, DamageChildren, Finished }
 public sealed record HappyQiaoPlan(string Form, LegalAction Action, CardKind Kind)
 {
-    private IReadOnlyList<int> _cards = [], _targets = [];
+    private IReadOnlyList<int> _cards = [],_targets = [];
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
 }

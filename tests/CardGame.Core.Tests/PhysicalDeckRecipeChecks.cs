@@ -18,7 +18,7 @@ internal static class PhysicalDeckRecipeChecks
         Require(deck.Cards.Count == 0 && deck.PhysicalCards!.SequenceEqual(physical),
             "The registry must preserve the ordered physical-card recipe.");
 
-        var createDeck = typeof(GameEngine).GetMethod(
+        var createDeck = global::FixtureRuntimeAccess.Engine.GetMethod(
             "CreateDeckFromRegistry", BindingFlags.Static | BindingFlags.NonPublic)!;
         var cards = (IReadOnlyList<Card>)createDeck.Invoke(null, [registry, deck])!;
         Require(cards.Select(card => (card.Id, card.Kind, card.Suit, card.Rank)).SequenceEqual(new[]

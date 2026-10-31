@@ -1,0 +1,42 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineProgramEquipmentExchangesRuntime
+{
+    private readonly ICoreProgramEquipmentExchangesCharacterWuGuoTaiBoundaryMobileOperations _characterWuGuoTaiBoundaryMobileOperations;
+    private readonly ICoreProgramEquipmentExchangesCardZonesOperations _cardZonesOperations;
+    private readonly ICoreProgramEquipmentExchangesCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreProgramEquipmentExchangesCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreProgramEquipmentExchangesCoreEquipmentPairPaymentsOperations _coreEquipmentPairPaymentsOperations;
+    private readonly ICoreProgramEquipmentExchangesCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
+    private readonly ICoreProgramEquipmentExchangesCoreFieldEquipmentOperations _coreFieldEquipmentOperations;
+    private readonly ICoreProgramEquipmentExchangesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreProgramEquipmentExchangesCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreProgramEquipmentExchangesCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly ICoreProgramEquipmentExchangesCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreProgramEquipmentExchangesCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreProgramEquipmentExchangesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineProgramEquipmentExchangesRuntime(ICoreProgramEquipmentExchangesCharacterWuGuoTaiBoundaryMobileOperations characterWuGuoTaiBoundaryMobileOperations, ICoreProgramEquipmentExchangesCardZonesOperations cardZonesOperations, ICoreProgramEquipmentExchangesCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreProgramEquipmentExchangesCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreProgramEquipmentExchangesCoreEquipmentPairPaymentsOperations coreEquipmentPairPaymentsOperations, ICoreProgramEquipmentExchangesCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreProgramEquipmentExchangesCoreFieldEquipmentOperations coreFieldEquipmentOperations, ICoreProgramEquipmentExchangesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramEquipmentExchangesCoreRuntimeOperations coreRuntimeOperations, ICoreProgramEquipmentExchangesCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, ICoreProgramEquipmentExchangesCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreProgramEquipmentExchangesCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreProgramEquipmentExchangesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterWuGuoTaiBoundaryMobileOperations = characterWuGuoTaiBoundaryMobileOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._coreEquipmentPairPaymentsOperations = coreEquipmentPairPaymentsOperations;
+        this._coreEquipmentSkillsOperations = coreEquipmentSkillsOperations;
+        this._coreFieldEquipmentOperations = coreFieldEquipmentOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

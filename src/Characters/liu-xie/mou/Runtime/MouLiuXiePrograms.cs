@@ -18,7 +18,7 @@ public sealed record MouLiuXieReceipt(CardConversionSource Source, string Gamepl
     public long Before { get; init; }
     public long After { get; init; }
     public NativeDrawOutcome? Draw { get; init; }
-    private IReadOnlyList<int> _participants = [], _lordCandidates = [], _excluded = [], _selected = [], _paying = [];
+    private IReadOnlyList<int> _participants = [],_lordCandidates = [],_excluded = [],_selected = [],_paying = [];
     private IReadOnlyList<MouLiuXieAdjustment> _adjustments = [];
     public IReadOnlyList<int> Participants { get => _participants; init => _participants = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> LordCandidates { get => _lordCandidates; init => _lordCandidates = Array.AsReadOnly(value.ToArray()); }

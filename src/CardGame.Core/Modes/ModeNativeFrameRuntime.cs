@@ -52,8 +52,3 @@ internal sealed class ModeNativeFrameRuntime
         return false;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ModeNativeFrameRuntime ModeNativeFrames => _modeRuntime.NativeFrames;
-}

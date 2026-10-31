@@ -1,0 +1,96 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CharacterJiKangMobileRuntime : global::CardGame.Core.IMobileJiKangHost
+{
+    private readonly ICharacterJiKangMobileCharacterDaQiaoXiaoQiaoHappyGodOperations _characterDaQiaoXiaoQiaoHappyGodOperations;
+    private readonly ICharacterJiKangMobileCardZonesOperations _cardZonesOperations;
+    private readonly ICharacterJiKangMobileContentRegistryOperations _contentRegistryOperations;
+    private readonly ICharacterJiKangMobileResolutionStackOperations _resolutionStackOperations;
+    private readonly ICharacterJiKangMobileCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICharacterJiKangMobileCoreForeignEquipmentDiscardPoliciesOperations _coreForeignEquipmentDiscardPoliciesOperations;
+    private readonly ICharacterJiKangMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICharacterJiKangMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICharacterJiKangMobileCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICharacterJiKangMobileCoreObserverSubtreesOperations2 _coreObserverSubtreesOperations;
+    private readonly ICharacterJiKangMobileCorePrepPoisonOutcomesOperations _corePrepPoisonOutcomesOperations;
+    private readonly ICharacterJiKangMobileCorePrivateOfferReturnsOperations _corePrivateOfferReturnsOperations;
+    private readonly ICharacterJiKangMobileCoreProgramAtomicCardMovesOperations _coreProgramAtomicCardMovesOperations;
+    private readonly ICharacterJiKangMobileCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICharacterJiKangMobileCoreProgramContinuationsOperations _coreProgramContinuationsOperations;
+    private readonly ICharacterJiKangMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICharacterJiKangMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICharacterJiKangMobileCoreProgramNativeDrawOperations _coreProgramNativeDrawOperations;
+    private readonly ICharacterJiKangMobileCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICharacterJiKangMobileCoreRecoveryReplacementDamageRidesOperations2 _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICharacterJiKangMobileCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICharacterJiKangMobileCoreTableOrderOperations _coreTableOrderOperations;
+    private readonly ICharacterJiKangMobileCoreTurnHandCategoryRestrictionsOperations _coreTurnHandCategoryRestrictionsOperations;
+    private readonly ICharacterJiKangMobileCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICharacterJiKangMobileCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICharacterJiKangMobileCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICharacterJiKangMobileCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICharacterJiKangMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICharacterJiKangMobileCharacterJiKangMobileOperations _characterJiKangMobileOperations;
+    private readonly ICharacterJiKangMobileCharacterYanPuOlOperations _characterYanPuOlOperations;
+    private readonly ICharacterJiKangMobileResolutionStackOperations2 _resolutionStackOperations2;
+    private readonly ICharacterJiKangMobileCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICharacterJiKangMobileCoreObserverSubtreesOperations _coreObserverSubtreesOperations2;
+    private readonly ICharacterJiKangMobileCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations2;
+    private readonly ICharacterJiKangMobileCoreSameNameHandDiscardOrDamageObserversOperations _coreSameNameHandDiscardOrDamageObserversOperations;
+    private readonly ICharacterJiKangMobileKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICharacterJiKangMobileKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess _coreCardMovementJournalMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterJiKangMobileRuntime(ICharacterJiKangMobileCharacterDaQiaoXiaoQiaoHappyGodOperations characterDaQiaoXiaoQiaoHappyGodOperations, ICharacterJiKangMobileCardZonesOperations cardZonesOperations, ICharacterJiKangMobileContentRegistryOperations contentRegistryOperations, ICharacterJiKangMobileResolutionStackOperations resolutionStackOperations, ICharacterJiKangMobileCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICharacterJiKangMobileCoreForeignEquipmentDiscardPoliciesOperations coreForeignEquipmentDiscardPoliciesOperations, ICharacterJiKangMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterJiKangMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterJiKangMobileCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICharacterJiKangMobileCoreObserverSubtreesOperations2 coreObserverSubtreesOperations, ICharacterJiKangMobileCorePrepPoisonOutcomesOperations corePrepPoisonOutcomesOperations, ICharacterJiKangMobileCorePrivateOfferReturnsOperations corePrivateOfferReturnsOperations, ICharacterJiKangMobileCoreProgramAtomicCardMovesOperations coreProgramAtomicCardMovesOperations, ICharacterJiKangMobileCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICharacterJiKangMobileCoreProgramContinuationsOperations coreProgramContinuationsOperations, ICharacterJiKangMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterJiKangMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterJiKangMobileCoreProgramNativeDrawOperations coreProgramNativeDrawOperations, ICharacterJiKangMobileCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICharacterJiKangMobileCoreRecoveryReplacementDamageRidesOperations2 coreRecoveryReplacementDamageRidesOperations, ICharacterJiKangMobileCoreRuntimeOperations coreRuntimeOperations, ICharacterJiKangMobileCoreTableOrderOperations coreTableOrderOperations, ICharacterJiKangMobileCoreTurnHandCategoryRestrictionsOperations coreTurnHandCategoryRestrictionsOperations, ICharacterJiKangMobileCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICharacterJiKangMobileCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICharacterJiKangMobileCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICharacterJiKangMobileCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICharacterJiKangMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICharacterJiKangMobileCharacterJiKangMobileOperations characterJiKangMobileOperations, ICharacterJiKangMobileCharacterYanPuOlOperations characterYanPuOlOperations, ICharacterJiKangMobileResolutionStackOperations2 resolutionStackOperations2, ICharacterJiKangMobileCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICharacterJiKangMobileCoreObserverSubtreesOperations coreObserverSubtreesOperations2, ICharacterJiKangMobileCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations2, ICharacterJiKangMobileCoreSameNameHandDiscardOrDamageObserversOperations coreSameNameHandDiscardOrDamageObserversOperations, ICharacterJiKangMobileKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICharacterJiKangMobileKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalMovementSequenceAccess coreCardMovementJournalMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreForeignEquipmentDiscardPoliciesOperations = coreForeignEquipmentDiscardPoliciesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
+        this._corePrepPoisonOutcomesOperations = corePrepPoisonOutcomesOperations;
+        this._corePrivateOfferReturnsOperations = corePrivateOfferReturnsOperations;
+        this._coreProgramAtomicCardMovesOperations = coreProgramAtomicCardMovesOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramContinuationsOperations = coreProgramContinuationsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramNativeDrawOperations = coreProgramNativeDrawOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreTableOrderOperations = coreTableOrderOperations;
+        this._coreTurnHandCategoryRestrictionsOperations = coreTurnHandCategoryRestrictionsOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._characterJiKangMobileOperations = characterJiKangMobileOperations;
+        this._characterYanPuOlOperations = characterYanPuOlOperations;
+        this._resolutionStackOperations2 = resolutionStackOperations2;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreObserverSubtreesOperations2 = coreObserverSubtreesOperations2;
+        this._coreRecoveryReplacementDamageRidesOperations2 = coreRecoveryReplacementDamageRidesOperations2;
+        this._coreSameNameHandDiscardOrDamageObserversOperations = coreSameNameHandDiscardOrDamageObserversOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualTurnProgressCurrentSeatPhaseAccess = coreActualTurnProgressCurrentSeatPhaseAccess;
+        this._coreCardMovementJournalMovementSequenceAccess = coreCardMovementJournalMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

@@ -11,7 +11,7 @@ public sealed record MouXuHuangShipoReceipt(CardConversionSource Source, string 
     public long Before { get; init; }
     public long After { get; init; }
     public int? TransferRecipient { get; init; }
-    private readonly IReadOnlyList<int> _targets = Array.AsReadOnly(Array.Empty<int>()), _selected = Array.AsReadOnly(Array.Empty<int>());
+    private readonly IReadOnlyList<int> _targets = Array.AsReadOnly(Array.Empty<int>()),_selected = Array.AsReadOnly(Array.Empty<int>());
     private readonly IReadOnlyList<MouXuHuangGiftReceipt> _gifts = Array.AsReadOnly(Array.Empty<MouXuHuangGiftReceipt>());
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> SelectedCardIds { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }

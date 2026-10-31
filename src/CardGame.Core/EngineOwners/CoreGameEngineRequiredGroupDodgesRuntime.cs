@@ -1,0 +1,28 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineRequiredGroupDodgesRuntime
+{
+    private readonly ICoreRequiredGroupDodgesCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
+    private readonly ICoreRequiredGroupDodgesCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreRequiredGroupDodgesCoreNativeCardUseFramesOperations _coreNativeCardUseFramesOperations;
+    private readonly ICoreRequiredGroupDodgesCoreNativeEquipmentAndFactionQueriesOperations _coreNativeEquipmentAndFactionQueriesOperations;
+    private readonly ICoreRequiredGroupDodgesCoreNativeGroupAttackOperations _coreNativeGroupAttackOperations;
+    private readonly ICoreRequiredGroupDodgesKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineRequiredGroupDodgesRuntime(ICoreRequiredGroupDodgesCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations, ICoreRequiredGroupDodgesCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreRequiredGroupDodgesCoreNativeCardUseFramesOperations coreNativeCardUseFramesOperations, ICoreRequiredGroupDodgesCoreNativeEquipmentAndFactionQueriesOperations coreNativeEquipmentAndFactionQueriesOperations, ICoreRequiredGroupDodgesCoreNativeGroupAttackOperations coreNativeGroupAttackOperations, ICoreRequiredGroupDodgesKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseFramesOperations = coreNativeCardUseFramesOperations;
+        this._coreNativeEquipmentAndFactionQueriesOperations = coreNativeEquipmentAndFactionQueriesOperations;
+        this._coreNativeGroupAttackOperations = coreNativeGroupAttackOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

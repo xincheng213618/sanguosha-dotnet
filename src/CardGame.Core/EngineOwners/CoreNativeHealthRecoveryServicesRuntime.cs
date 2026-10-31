@@ -1,0 +1,30 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreNativeHealthRecoveryServicesRuntime : global::CardGame.Core.INativeHealthRecoveryFacts, global::CardGame.Core.INativeHealthRecoveryProtocols
+{
+    private readonly ICoreNativeHealthRecoveryServicesResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreNativeHealthRecoveryServicesCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICoreNativeHealthRecoveryServicesCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreNativeHealthRecoveryServicesCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreNativeHealthRecoveryServicesCoreProgramRecoveryReceiptsOperations _coreProgramRecoveryReceiptsOperations;
+    private readonly ICoreNativeHealthRecoveryServicesCoreRecoveryReplacementDamageRidesOperations _coreRecoveryReplacementDamageRidesOperations;
+    private readonly ICoreNativeHealthRecoveryServicesCoreTypedRecoveryDamageCursorOperations _coreTypedRecoveryDamageCursorOperations;
+    private readonly ICoreNativeHealthRecoveryServicesCoreHulaoActivityProgramsOperations _coreHulaoActivityProgramsOperations;
+    internal CoreNativeHealthRecoveryServicesRuntime(ICoreNativeHealthRecoveryServicesResolutionStackOperations resolutionStackOperations, ICoreNativeHealthRecoveryServicesCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICoreNativeHealthRecoveryServicesCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreNativeHealthRecoveryServicesCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreNativeHealthRecoveryServicesCoreProgramRecoveryReceiptsOperations coreProgramRecoveryReceiptsOperations, ICoreNativeHealthRecoveryServicesCoreRecoveryReplacementDamageRidesOperations coreRecoveryReplacementDamageRidesOperations, ICoreNativeHealthRecoveryServicesCoreTypedRecoveryDamageCursorOperations coreTypedRecoveryDamageCursorOperations, ICoreNativeHealthRecoveryServicesCoreHulaoActivityProgramsOperations coreHulaoActivityProgramsOperations)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramRecoveryReceiptsOperations = coreProgramRecoveryReceiptsOperations;
+        this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
+        this._coreTypedRecoveryDamageCursorOperations = coreTypedRecoveryDamageCursorOperations;
+        this._coreHulaoActivityProgramsOperations = coreHulaoActivityProgramsOperations;
+    }
+}

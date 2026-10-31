@@ -6,8 +6,7 @@ internal sealed partial class MouQiaobianRuntime(IProgramRuntimeFrames frames,IP
     IProgramRuntimePrompts prompts,IMouZhangHeFacts facts,IMouZhangHeNative native,IProgramOperationDraws draws):IMouZhangHeHost
 {
     internal const string Qiaobian="mou-mobile:qiaobian",Liaoshi="mou-mobile:liaoshi",Action="mou-zhang-he";
-    internal const string CostReason="skill-program.mou-mobile:qiaobian.cost",ObtainReason="skill-program.mou-mobile:qiaobian.obtain",
-        FieldReason="skill-program.mou-mobile:qiaobian.field",DrawReason="skill-program.mou-mobile:qiaobian.draw";
+    internal const string CostReason="skill-program.mou-mobile:qiaobian.cost",ObtainReason="skill-program.mou-mobile:qiaobian.obtain",        FieldReason="skill-program.mou-mobile:qiaobian.field",DrawReason="skill-program.mou-mobile:qiaobian.draw";
     private static CardConversionSource Source(ProgramSkillFrame f)=>new(f.SkillId,f.TriggerId!,f.OwnerSeat,f.SkillInstanceId);
     public SkillProgramStepOutcome Start(ProgramSkillFrame f,SkillProgramEffectOp operation)
     {

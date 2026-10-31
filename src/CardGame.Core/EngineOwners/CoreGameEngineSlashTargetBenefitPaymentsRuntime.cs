@@ -1,0 +1,62 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime : global::CardGame.Core.ISlashTargetBenefitProgramHost
+{
+    private readonly ICoreSlashTargetBenefitPaymentsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreProgramCardPaymentsOperations _coreProgramCardPaymentsOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreSkillProgramsOperations _coreSkillProgramsOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreSlashTargetBenefitObserversOperations _coreSlashTargetBenefitObserversOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreSlashTargetBenefitWindowsOperations _coreSlashTargetBenefitWindowsOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreSlashTargetBenefitPaymentsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreGameEngineSlashTargetBenefitPaymentsRuntime(ICoreSlashTargetBenefitPaymentsCardZonesOperations cardZonesOperations, ICoreSlashTargetBenefitPaymentsContentRegistryOperations contentRegistryOperations, ICoreSlashTargetBenefitPaymentsResolutionStackOperations resolutionStackOperations, ICoreSlashTargetBenefitPaymentsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreSlashTargetBenefitPaymentsCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreSlashTargetBenefitPaymentsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreSlashTargetBenefitPaymentsCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreSlashTargetBenefitPaymentsCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreSlashTargetBenefitPaymentsCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreSlashTargetBenefitPaymentsCoreProgramCardPaymentsOperations coreProgramCardPaymentsOperations, ICoreSlashTargetBenefitPaymentsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreSlashTargetBenefitPaymentsCoreRuntimeOperations coreRuntimeOperations, ICoreSlashTargetBenefitPaymentsCoreSkillProgramsOperations coreSkillProgramsOperations, ICoreSlashTargetBenefitPaymentsCoreSlashTargetBenefitObserversOperations coreSlashTargetBenefitObserversOperations, ICoreSlashTargetBenefitPaymentsCoreSlashTargetBenefitWindowsOperations coreSlashTargetBenefitWindowsOperations, ICoreSlashTargetBenefitPaymentsCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreSlashTargetBenefitPaymentsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreSlashTargetBenefitPaymentsCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreSlashTargetBenefitPaymentsCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreSlashTargetBenefitPaymentsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._coreProgramCardPaymentsOperations = coreProgramCardPaymentsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreSkillProgramsOperations = coreSkillProgramsOperations;
+        this._coreSlashTargetBenefitObserversOperations = coreSlashTargetBenefitObserversOperations;
+        this._coreSlashTargetBenefitWindowsOperations = coreSlashTargetBenefitWindowsOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreAiBrainsAiBrainsAccess = coreAiBrainsAiBrainsAccess;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+    }
+}

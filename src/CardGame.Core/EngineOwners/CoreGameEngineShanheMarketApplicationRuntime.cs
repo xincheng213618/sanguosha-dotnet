@@ -1,0 +1,58 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineShanheMarketApplicationRuntime : global::CardGame.Core.IShanheMarketPurchaseHost
+{
+    private readonly ICoreShanheMarketApplicationCardZonesOperations _cardZonesOperations;
+    private readonly ICoreShanheMarketApplicationResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreShanheMarketApplicationShanheMarketOperations _shanheMarketOperations;
+    private readonly ICoreShanheMarketApplicationCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreShanheMarketApplicationCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreShanheMarketApplicationCoreCharacterStateProgramsOperations _coreCharacterStateProgramsOperations;
+    private readonly ICoreShanheMarketApplicationCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreShanheMarketApplicationCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreShanheMarketApplicationCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreShanheMarketApplicationCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
+    private readonly ICoreShanheMarketApplicationCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreShanheMarketApplicationCoreShanheMarketOperations _coreShanheMarketOperations;
+    private readonly ICoreShanheMarketApplicationCoreShanheMarketOpeningOperations _coreShanheMarketOpeningOperations;
+    private readonly ICoreShanheMarketApplicationCoreSkillOwnershipWindowsOperations _coreSkillOwnershipWindowsOperations;
+    private readonly ICoreShanheMarketApplicationCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreShanheMarketApplicationCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreShanheMarketApplicationCoreTrustedCardZoneDiagnosticsOperations _coreTrustedCardZoneDiagnosticsOperations;
+    private readonly ICoreShanheMarketApplicationKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreShanheMarketApplicationKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    internal CoreGameEngineShanheMarketApplicationRuntime(ICoreShanheMarketApplicationCardZonesOperations cardZonesOperations, ICoreShanheMarketApplicationResolutionStackOperations resolutionStackOperations, ICoreShanheMarketApplicationShanheMarketOperations shanheMarketOperations, ICoreShanheMarketApplicationCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreShanheMarketApplicationCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreShanheMarketApplicationCoreCharacterStateProgramsOperations coreCharacterStateProgramsOperations, ICoreShanheMarketApplicationCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreShanheMarketApplicationCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheMarketApplicationCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheMarketApplicationCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICoreShanheMarketApplicationCoreRuntimeOperations coreRuntimeOperations, ICoreShanheMarketApplicationCoreShanheMarketOperations coreShanheMarketOperations, ICoreShanheMarketApplicationCoreShanheMarketOpeningOperations coreShanheMarketOpeningOperations, ICoreShanheMarketApplicationCoreSkillOwnershipWindowsOperations coreSkillOwnershipWindowsOperations, ICoreShanheMarketApplicationCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreShanheMarketApplicationCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreShanheMarketApplicationCoreTrustedCardZoneDiagnosticsOperations coreTrustedCardZoneDiagnosticsOperations, ICoreShanheMarketApplicationKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreShanheMarketApplicationKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._shanheMarketOperations = shanheMarketOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCharacterStateProgramsOperations = coreCharacterStateProgramsOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreShanheMarketOperations = coreShanheMarketOperations;
+        this._coreShanheMarketOpeningOperations = coreShanheMarketOpeningOperations;
+        this._coreSkillOwnershipWindowsOperations = coreSkillOwnershipWindowsOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreTrustedCardZoneDiagnosticsOperations = coreTrustedCardZoneDiagnosticsOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess = coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess;
+    }
+}

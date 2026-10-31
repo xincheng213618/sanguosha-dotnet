@@ -1,0 +1,30 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule]
+internal sealed partial class CoreGameEngineConditionalDiscardDuelReturnsRuntime
+{
+    private readonly ICoreConditionalDiscardDuelReturnsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreConditionalDiscardDuelReturnsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreConditionalDiscardDuelReturnsCoreCardAttackStateOperations _coreCardAttackStateOperations;
+    private readonly ICoreConditionalDiscardDuelReturnsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreConditionalDiscardDuelReturnsCoreConditionalDiscardDuelsOperations _coreConditionalDiscardDuelsOperations;
+    private readonly ICoreConditionalDiscardDuelReturnsCoreEphemeralCardMaterialsOperations _coreEphemeralCardMaterialsOperations;
+    private readonly ICoreConditionalDiscardDuelReturnsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineConditionalDiscardDuelReturnsRuntime(ICoreConditionalDiscardDuelReturnsResolutionStackOperations resolutionStackOperations, ICoreConditionalDiscardDuelReturnsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreConditionalDiscardDuelReturnsCoreCardAttackStateOperations coreCardAttackStateOperations, ICoreConditionalDiscardDuelReturnsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreConditionalDiscardDuelReturnsCoreConditionalDiscardDuelsOperations coreConditionalDiscardDuelsOperations, ICoreConditionalDiscardDuelReturnsCoreEphemeralCardMaterialsOperations coreEphemeralCardMaterialsOperations, ICoreConditionalDiscardDuelReturnsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    {
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardAttackStateOperations = coreCardAttackStateOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreConditionalDiscardDuelsOperations = coreConditionalDiscardDuelsOperations;
+        this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
+    }
+}

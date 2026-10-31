@@ -18,7 +18,7 @@ public sealed record MouLuSuAnniversaryReceipt(CardConversionSource Source, stri
     public PendingDecision? OriginalDecision { get; init; }
     public MouLuSuAnniversaryPlayedPlan? Played { get; init; }
     public CardActionContext? Response { get; init; }
-    private readonly IReadOnlyList<int> _cards = [], _targets = [];
+    private readonly IReadOnlyList<int> _cards = [],_targets = [];
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
 }

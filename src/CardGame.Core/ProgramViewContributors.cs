@@ -163,9 +163,7 @@ internal sealed class ProgramViewContributors
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramViewContributionCatalog> ViewContributionMetadata = new(() =>
-        ProgramViewContributionCatalog.Discover(RuntimeModuleMethods), true);
     private ProgramViewContributors? _viewContributors;
-    private ProgramViewContributors ViewContributors => _viewContributors ??= new(ViewContributionMetadata.Value,
+    private ProgramViewContributors ViewContributors => _viewContributors ??= new(global::CardGame.Core.EngineOwners.CoreProgramViewContributorsDefinitions.ViewContributionMetadata.Value,
         row => BindRuntimeHandler(row.Method, row.DelegateType));
 }

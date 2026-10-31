@@ -1,0 +1,32 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreAvailableBoundSubsetProgramsRuntime : global::CardGame.Core.IAvailableBoundSubsetProgramEffectHost
+{
+    private readonly ICoreAvailableBoundSubsetProgramsCardZonesOperations _cardZonesOperations;
+    private readonly ICoreAvailableBoundSubsetProgramsContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreAvailableBoundSubsetProgramsResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreAvailableBoundSubsetProgramsCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
+    private readonly ICoreAvailableBoundSubsetProgramsCoreDamageObserverCursorQueriesOperations _coreDamageObserverCursorQueriesOperations;
+    private readonly ICoreAvailableBoundSubsetProgramsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
+    private readonly ICoreAvailableBoundSubsetProgramsCoreDeckEquipmentProgramsOperations _coreDeckEquipmentProgramsOperations;
+    private readonly ICoreAvailableBoundSubsetProgramsCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreAvailableBoundSubsetProgramsCorePublicPileEquipmentSequencesOperations _corePublicPileEquipmentSequencesOperations;
+    internal CoreAvailableBoundSubsetProgramsRuntime(ICoreAvailableBoundSubsetProgramsCardZonesOperations cardZonesOperations, ICoreAvailableBoundSubsetProgramsContentRegistryOperations contentRegistryOperations, ICoreAvailableBoundSubsetProgramsResolutionStackOperations resolutionStackOperations, ICoreAvailableBoundSubsetProgramsCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreAvailableBoundSubsetProgramsCoreDamageObserverCursorQueriesOperations coreDamageObserverCursorQueriesOperations, ICoreAvailableBoundSubsetProgramsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreAvailableBoundSubsetProgramsCoreDeckEquipmentProgramsOperations coreDeckEquipmentProgramsOperations, ICoreAvailableBoundSubsetProgramsCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreAvailableBoundSubsetProgramsCorePublicPileEquipmentSequencesOperations corePublicPileEquipmentSequencesOperations)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreDamageCursorRuntimeOperations = coreDamageCursorRuntimeOperations;
+        this._coreDamageObserverCursorQueriesOperations = coreDamageObserverCursorQueriesOperations;
+        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
+        this._coreDeckEquipmentProgramsOperations = coreDeckEquipmentProgramsOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._corePublicPileEquipmentSequencesOperations = corePublicPileEquipmentSequencesOperations;
+    }
+}

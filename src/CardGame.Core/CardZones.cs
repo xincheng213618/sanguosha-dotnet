@@ -1,5 +1,4 @@
 namespace CardGame.Core;
-
 /// <summary>
 /// A physical card is always in exactly one zone. Owned zones require a seat;
 /// shared zones must not carry one.
@@ -58,41 +57,29 @@ public readonly record struct CardLocation
     }
 
     public CardZoneKind Zone { get; }
-
     public int? OwnerSeat { get; }
 
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string? PublicPileId { get; }
+
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public PrivateTurnHoldIdentity? PrivateTurnHold { get; }
-
     public static CardLocation DrawPile => new(CardZoneKind.DrawPile);
-
     public static CardLocation Processing => new(CardZoneKind.Processing);
-
     public static CardLocation DiscardPile => new(CardZoneKind.DiscardPile);
-
     public static CardLocation OutsideGame => new(CardZoneKind.OutsideGame);
     public static CardLocation Benevolence => new(CardZoneKind.Benevolence);
 
     public static CardLocation Hand(int seat) => new(CardZoneKind.Hand, seat);
-
     public static CardLocation Equipment(int seat) => new(CardZoneKind.Equipment, seat);
-
     public static CardLocation Judgment(int seat) => new(CardZoneKind.Judgment, seat);
-
     public static CardLocation WoodenOxGrain(int seat) => new(CardZoneKind.WoodenOxGrain, seat);
     public static CardLocation Grain(int seat) => WoodenOxGrain(seat);
-
     public static CardLocation BuquWound(int seat) => new(CardZoneKind.BuquWound, seat);
-
     public static CardLocation Authority(int seat) => new(CardZoneKind.Authority, seat);
-
     public static CardLocation Chunlao(int seat) => new(CardZoneKind.Chunlao, seat);
-
     public static CardLocation PojunHold(int seat) => new(CardZoneKind.PojunHold, seat);
     public static CardLocation RoundHold(int seat) => new(CardZoneKind.RoundHold, seat);
-
     public override string ToString() => OwnerSeat is { } seat ? $"{Zone}[{seat}]" : Zone.ToString();
 }
 
@@ -100,12 +87,7 @@ public readonly record struct CardLocation
 /// Trusted-host diagnostic projection. It is deliberately separate from GameSnapshot
 /// because deck order and hidden card locations must not be sent to a player client.
 /// </summary>
-public sealed record CardZoneDiagnostic(
-    int CardId,
-    CardKind CardKind,
-    CardLocation Location,
-    int ZoneIndex);
-
+public sealed record CardZoneDiagnostic(int CardId, CardKind CardKind, CardLocation Location, int ZoneIndex);
 /// <summary>A stable, namespaced reason identifier suitable for movement rules and replay.</summary>
 public readonly record struct CardMoveReason
 {
@@ -237,26 +219,22 @@ public static class CardMoveReasons
     public static CardMoveReason Reshuffle { get; } = new("deck.reshuffle");
 }
 
-public sealed partial record CardMovementRecord(
-    int Sequence,
-    int TurnNumber,
-    int CardId,
-    CardKind CardKind,
-    CardLocation From,
-    CardLocation To,
-    CardMoveReason Reason);
+public sealed partial record CardMovementRecord(int Sequence, int TurnNumber, int CardId, CardKind CardKind, CardLocation From, CardLocation To, CardMoveReason Reason);
+internal readonly record struct CardTransfer(int CardId, CardLocation From, CardLocation To);
+// Trusted rule queries read the existing physical zones through this contract.
+// It exposes no movement operations and creates no second card store.
+internal interface ICardZoneQueries : IProgramSelectionQuery
+{
+    int Count(CardLocation location);
+    IReadOnlyList<Card> CardsAt(CardLocation location);
+    CardLocation GetLocation(int cardId);
+}
 
-internal readonly record struct CardTransfer(
-    int CardId,
-    CardLocation From,
-    CardLocation To);
-
-internal sealed class CardZoneStore
+internal sealed class CardZoneStore : IAtomicCardMovementZones, ICardZoneQueries, ICardDrawPileOrder
 {
     private readonly Dictionary<CardLocation, List<Card>> _zones = [];
     private readonly Dictionary<CardLocation, IReadOnlyList<Card>> _zoneViews = [];
     private readonly Dictionary<int, CardLocation> _locations = [];
-
     public CardZoneStore(int playerCount)
     {
         if (playerCount <= 0)
@@ -269,7 +247,6 @@ internal sealed class CardZoneStore
         AddZone(CardLocation.DiscardPile);
         AddZone(CardLocation.OutsideGame);
         AddZone(CardLocation.Benevolence);
-
         for (var seat = 0; seat < playerCount; seat++)
         {
             AddZone(CardLocation.Hand(seat));
@@ -288,33 +265,41 @@ internal sealed class CardZoneStore
     }
 
     public int TotalCards => _locations.Count;
+
     internal bool HasPrivatePersistentCards(int? ownerSeat = null)
     {
-        foreach (var (location, cards) in _zones)
-            if (location.Zone == CardZoneKind.PrivatePersistentPile && cards.Count > 0 &&
-                (ownerSeat is null || location.OwnerSeat == ownerSeat)) return true;
+        foreach (var(location, cards)in _zones)
+            if (location.Zone == CardZoneKind.PrivatePersistentPile && cards.Count > 0 && (ownerSeat is null || location.OwnerSeat == ownerSeat))
+                return true;
         return false;
     }
+
     internal IReadOnlyList<CardLocation> PrivateTurnHoldLocations => Array.AsReadOnly(_zones.Keys.Where(l => l.Zone == CardZoneKind.PrivateTurnHold && _zones[l].Count > 0).OrderBy(l => l.PrivateTurnHold!.HoldId).ToArray());
+
     internal void EnsurePrivateTurnHold(CardLocation location)
     {
-        if (location.Zone != CardZoneKind.PrivateTurnHold || location.OwnerSeat is not { } seat || !_zones.ContainsKey(CardLocation.Hand(seat))) throw new ArgumentException("Invalid private hold owner.");
-        if (!_zones.ContainsKey(location)) AddZone(location);
+        if (location.Zone != CardZoneKind.PrivateTurnHold || location.OwnerSeat is not { } seat || !_zones.ContainsKey(CardLocation.Hand(seat)))
+            throw new ArgumentException("Invalid private hold owner.");
+        if (!_zones.ContainsKey(location))
+            AddZone(location);
     }
+
     internal void EnsurePublicPersistentPile(CardLocation location)
     {
-        if (location.Zone != CardZoneKind.PublicPersistentPile || location.OwnerSeat is not { } seat ||
-            !_zones.ContainsKey(CardLocation.Hand(seat)))
+        if (location.Zone != CardZoneKind.PublicPersistentPile || location.OwnerSeat is not { } seat || !_zones.ContainsKey(CardLocation.Hand(seat)))
             throw new ArgumentException("Named public pile requires an existing owner.", nameof(location));
-        if (!_zones.ContainsKey(location)) AddZone(location);
+        if (!_zones.ContainsKey(location))
+            AddZone(location);
     }
+
     internal void EnsurePrivatePersistentPile(CardLocation location)
     {
-        if (location.Zone != CardZoneKind.PrivatePersistentPile || location.OwnerSeat is not { } seat ||
-            string.IsNullOrWhiteSpace(location.PublicPileId) || !_zones.ContainsKey(CardLocation.Hand(seat)))
+        if (location.Zone != CardZoneKind.PrivatePersistentPile || location.OwnerSeat is not { } seat || string.IsNullOrWhiteSpace(location.PublicPileId) || !_zones.ContainsKey(CardLocation.Hand(seat)))
             throw new ArgumentException("Named private pile requires an existing owner and source.", nameof(location));
-        if (!_zones.ContainsKey(location)) AddZone(location);
+        if (!_zones.ContainsKey(location))
+            AddZone(location);
     }
+
     internal void AddGeneratedCard(Card card)
     {
         if (card.Id <= 0 || _locations.ContainsKey(card.Id))
@@ -329,10 +314,15 @@ internal sealed class CardZoneStore
     {
         ArgumentNullException.ThrowIfNull(expected);
         ArgumentNullException.ThrowIfNull(replacement);
-        if (expected.Id <= 0 || replacement.Id != expected.Id ||
-            (replacement with { Kind = expected.Kind, Suit = expected.Suit, Rank = expected.Rank,
-                PrintedName = expected.PrintedName }) != expected ||
-            !_locations.TryGetValue(expected.Id, out var location))
+        if (expected.Id <= 0 || replacement.Id != expected.Id || (replacement with
+        {
+            Kind = expected.Kind,
+            Suit = expected.Suit,
+            Rank = expected.Rank,
+            PrintedName = expected.PrintedName
+        }
+
+        ) != expected || !_locations.TryGetValue(expected.Id, out var location))
             throw new InvalidOperationException("A generated face change must retain its physical identity and non-face attributes.");
         var cards = GetZone(location);
         var index = cards.FindIndex(card => card.Id == expected.Id);
@@ -341,11 +331,7 @@ internal sealed class CardZoneStore
         cards[index] = replacement;
     }
 
-    public IReadOnlyList<Card> CardsAt(CardLocation location) =>
-        _zoneViews.TryGetValue(location, out var cards)
-            ? cards
-            : throw new ArgumentOutOfRangeException(nameof(location), location, "The card zone is not registered for this game.");
-
+    public IReadOnlyList<Card> CardsAt(CardLocation location) => _zoneViews.TryGetValue(location, out var cards) ? cards : throw new ArgumentOutOfRangeException(nameof(location), location, "The card zone is not registered for this game.");
     public bool Contains(CardLocation location, int cardId)
     {
         // Preserve zone validation even when the physical ID is unknown.
@@ -354,12 +340,7 @@ internal sealed class CardZoneStore
     }
 
     public int Count(CardLocation location) => GetZone(location).Count;
-
-    public CardLocation GetLocation(int cardId) =>
-        _locations.TryGetValue(cardId, out var location)
-            ? location
-            : throw new InvalidOperationException($"Card {cardId} is not registered in any zone.");
-
+    public CardLocation GetLocation(int cardId) => _locations.TryGetValue(cardId, out var location) ? location : throw new InvalidOperationException($"Card {cardId} is not registered in any zone.");
     public void LoadInitialDeck(IEnumerable<Card> cards)
     {
         ArgumentNullException.ThrowIfNull(cards);
@@ -369,9 +350,7 @@ internal sealed class CardZoneStore
         }
 
         var initialCards = cards.ToArray();
-        var duplicate = initialCards
-            .GroupBy(card => card.Id)
-            .FirstOrDefault(group => group.Count() > 1);
+        var duplicate = initialCards.GroupBy(card => card.Id).FirstOrDefault(group => group.Count() > 1);
         if (duplicate is not null)
         {
             throw new InvalidOperationException($"Duplicate physical card id {duplicate.Key}.");
@@ -388,8 +367,7 @@ internal sealed class CardZoneStore
     internal void RebuildPristineDrawPile(IReadOnlyList<Card> cards)
     {
         ArgumentNullException.ThrowIfNull(cards);
-        if (_zones.Any(pair => pair.Key != CardLocation.DrawPile && pair.Value.Count != 0) ||
-            _locations.Count != Count(CardLocation.DrawPile))
+        if (_zones.Any(pair => pair.Key != CardLocation.DrawPile && pair.Value.Count != 0) || _locations.Count != Count(CardLocation.DrawPile))
             throw new InvalidOperationException("A setup deck can be rebuilt only while every registered entity remains in the draw pile.");
         if (cards.Any(card => card.Id <= 0) || cards.Select(card => card.Id).Distinct().Count() != cards.Count)
             throw new InvalidOperationException("A setup deck needs distinct positive physical card identities.");
@@ -400,15 +378,13 @@ internal sealed class CardZoneStore
         LoadInitialDeck(cards);
     }
 
+    void IAtomicCardMovementZones.Move(int cardId, CardLocation from, CardLocation to) => Move(cardId, from, to);
     public Card Move(int cardId, CardLocation from, CardLocation to)
     {
         return MoveBatch([new CardTransfer(cardId, from, to)])[0];
     }
 
-    public IReadOnlyList<Card> MoveMany(
-        IEnumerable<int> cardIds,
-        CardLocation from,
-        CardLocation to)
+    public IReadOnlyList<Card> MoveMany(IEnumerable<int> cardIds, CardLocation from, CardLocation to)
     {
         ArgumentNullException.ThrowIfNull(cardIds);
         _ = GetZone(from);
@@ -431,29 +407,21 @@ internal sealed class CardZoneStore
             var transfer = batch[index];
             if (transfer.From == transfer.To)
             {
-                throw new InvalidOperationException(
-                    $"Card {transfer.CardId} cannot move from {transfer.From} to the same zone.");
+                throw new InvalidOperationException($"Card {transfer.CardId} cannot move from {transfer.From} to the same zone.");
             }
 
             var source = GetZone(transfer.From);
             _ = GetZone(transfer.To);
             if (!_locations.TryGetValue(transfer.CardId, out var actual) || actual != transfer.From)
             {
-                throw new InvalidOperationException(
-                    $"Card {transfer.CardId} is in {actual}, not expected zone {transfer.From}.");
+                throw new InvalidOperationException($"Card {transfer.CardId} is in {actual}, not expected zone {transfer.From}.");
             }
 
-            cards[index] = source.FirstOrDefault(card => card.Id == transfer.CardId) ??
-                throw new InvalidOperationException(
-                    $"Card {transfer.CardId} location index is inconsistent with zone {transfer.From}.");
+            cards[index] = source.FirstOrDefault(card => card.Id == transfer.CardId) ?? throw new InvalidOperationException($"Card {transfer.CardId} location index is inconsistent with zone {transfer.From}.");
         }
 
-        var movedIdsBySource = batch
-            .GroupBy(transfer => transfer.From)
-            .ToDictionary(
-                group => group.Key,
-                group => group.Select(transfer => transfer.CardId).ToHashSet());
-        foreach (var (sourceLocation, movedIds) in movedIdsBySource)
+        var movedIdsBySource = batch.GroupBy(transfer => transfer.From).ToDictionary(group => group.Key, group => group.Select(transfer => transfer.CardId).ToHashSet());
+        foreach (var(sourceLocation, movedIds)in movedIdsBySource)
         {
             GetZone(sourceLocation).RemoveAll(card => movedIds.Contains(card.Id));
         }
@@ -485,16 +453,19 @@ internal sealed class CardZoneStore
         return MoveMany(cards.Select(card => card.Id), from, to);
     }
 
+    void ICardDrawPileOrder.ShuffleDrawPile(IMatchRandomSource random)
+    {
+        ArgumentNullException.ThrowIfNull(random);
+        random.Shuffle(GetZone(CardLocation.DrawPile));
+    }
+
     public void Shuffle(CardLocation location, DeterministicRandom random)
     {
         ArgumentNullException.ThrowIfNull(random);
         random.Shuffle(GetZone(location));
     }
 
-    public void ShuffleKeepingSingleKindAtBottom(
-        CardLocation location,
-        DeterministicRandom random,
-        CardKind deferredKind)
+    public void ShuffleKeepingSingleKindAtBottom(CardLocation location, DeterministicRandom random, CardKind deferredKind)
     {
         ArgumentNullException.ThrowIfNull(random);
         var zone = GetZone(location);
@@ -513,12 +484,13 @@ internal sealed class CardZoneStore
     /// <summary>Orders only surviving viewed entities after an obtaining child may have changed the pile.</summary>
     public void ReorderDrawPileSubsetToTop(IReadOnlyList<int> viewedIds, IReadOnlyList<int> topFirst)
     {
-        if (viewedIds.Distinct().Count() != viewedIds.Count || topFirst.Distinct().Count() != topFirst.Count ||
-            !viewedIds.Order().SequenceEqual(topFirst.Order()) || viewedIds.Any(id => GetLocation(id) != CardLocation.DrawPile))
+        if (viewedIds.Distinct().Count() != viewedIds.Count || topFirst.Distinct().Count() != topFirst.Count || !viewedIds.Order().SequenceEqual(topFirst.Order()) || viewedIds.Any(id => GetLocation(id) != CardLocation.DrawPile))
             throw new InvalidOperationException("Top ordering requires an exact live draw-pile entity partition.");
         var pile = GetZone(CardLocation.DrawPile);
         var cards = topFirst.Select(id => pile.Single(card => card.Id == id)).Reverse().ToArray();
-        var ids = viewedIds.ToHashSet(); pile.RemoveAll(card => ids.Contains(card.Id)); pile.AddRange(cards);
+        var ids = viewedIds.ToHashSet();
+        pile.RemoveAll(card => ids.Contains(card.Id));
+        pile.AddRange(cards);
     }
 
     /// <summary>
@@ -527,42 +499,30 @@ internal sealed class CardZoneStore
     /// deepest card in the pile. No card changes zone, so this operation does
     /// not create a movement record.
     /// </summary>
-    public void ReorderDrawPileTop(
-        IReadOnlyList<int> viewedTopFirst,
-        IReadOnlyList<int> newTopFirst,
-        IReadOnlyList<int> newBottomFirst)
+    public void ReorderDrawPileTop(IReadOnlyList<int> viewedTopFirst, IReadOnlyList<int> newTopFirst, IReadOnlyList<int> newBottomFirst)
     {
         ArgumentNullException.ThrowIfNull(viewedTopFirst);
         ArgumentNullException.ThrowIfNull(newTopFirst);
         ArgumentNullException.ThrowIfNull(newBottomFirst);
-
         var drawPile = GetZone(CardLocation.DrawPile);
         if (viewedTopFirst.Count > drawPile.Count)
         {
             throw new InvalidOperationException("The viewed draw-pile slice is larger than the draw pile.");
         }
 
-        var actualTopFirst = drawPile
-            .TakeLast(viewedTopFirst.Count)
-            .Reverse()
-            .Select(card => card.Id)
-            .ToArray();
+        var actualTopFirst = drawPile.TakeLast(viewedTopFirst.Count).Reverse().Select(card => card.Id).ToArray();
         if (!actualTopFirst.SequenceEqual(viewedTopFirst))
         {
             throw new InvalidOperationException("The viewed draw-pile slice is no longer current.");
         }
 
         var rearranged = newTopFirst.Concat(newBottomFirst).ToArray();
-        if (rearranged.Length != viewedTopFirst.Count ||
-            rearranged.Distinct().Count() != rearranged.Length ||
-            !rearranged.OrderBy(id => id).SequenceEqual(viewedTopFirst.OrderBy(id => id)))
+        if (rearranged.Length != viewedTopFirst.Count || rearranged.Distinct().Count() != rearranged.Length || !rearranged.OrderBy(id => id).SequenceEqual(viewedTopFirst.OrderBy(id => id)))
         {
             throw new InvalidOperationException("The reordered draw-pile cards must be an exact partition of the viewed slice.");
         }
 
-        var viewedCards = drawPile
-            .TakeLast(viewedTopFirst.Count)
-            .ToDictionary(card => card.Id);
+        var viewedCards = drawPile.TakeLast(viewedTopFirst.Count).ToDictionary(card => card.Id);
         drawPile.RemoveRange(drawPile.Count - viewedTopFirst.Count, viewedTopFirst.Count);
         drawPile.InsertRange(0, newBottomFirst.Select(id => viewedCards[id]));
         drawPile.AddRange(newTopFirst.Reverse().Select(id => viewedCards[id]));
@@ -573,7 +533,8 @@ internal sealed class CardZoneStore
     {
         ArgumentNullException.ThrowIfNull(cardIds);
         var drawPile = GetZone(CardLocation.DrawPile);
-        if (cardIds.Count == 0) return;
+        if (cardIds.Count == 0)
+            return;
         if (!drawPile.TakeLast(cardIds.Count).Select(card => card.Id).SequenceEqual(cardIds))
             throw new InvalidOperationException("The bottom placement must use the exact most recently moved cards.");
         var moved = drawPile.TakeLast(cardIds.Count).ToArray();
@@ -590,7 +551,8 @@ internal sealed class CardZoneStore
     {
         ArgumentNullException.ThrowIfNull(cardIds);
         var drawPile = GetZone(CardLocation.DrawPile);
-        if (cardIds.Count == 0) return;
+        if (cardIds.Count == 0)
+            return;
         if (!drawPile.TakeLast(cardIds.Count).Select(card => card.Id).SequenceEqual(cardIds))
             throw new InvalidOperationException("The top placement must use the exact most recently moved cards.");
         var moved = drawPile.TakeLast(cardIds.Count).ToArray();
@@ -599,18 +561,12 @@ internal sealed class CardZoneStore
         drawPile.AddRange(moved.Reverse());
     }
 
-    public IReadOnlyList<CardZoneDiagnostic> CreateDiagnostics() =>
-        _zones
-            .SelectMany(pair => pair.Value.Select((card, index) =>
-                new CardZoneDiagnostic(card.Id, card.Kind, pair.Key, index)))
-            .OrderBy(card => card.CardId)
-            .ToArray();
-
+    public IReadOnlyList<CardZoneDiagnostic> CreateDiagnostics() => _zones.SelectMany(pair => pair.Value.Select((card, index) => new CardZoneDiagnostic(card.Id, card.Kind, pair.Key, index))).OrderBy(card => card.CardId).ToArray();
     public void AssertInvariants(int expectedCardCount)
     {
         var observed = new HashSet<int>(_locations.Count);
         var observedCount = 0;
-        foreach (var (location, cards) in _zones)
+        foreach (var(location, cards)in _zones)
         {
             foreach (var card in cards)
             {
@@ -629,8 +585,7 @@ internal sealed class CardZoneStore
 
         if (observedCount != _locations.Count || observedCount != expectedCardCount)
         {
-            throw new InvalidOperationException(
-                $"Card conservation failed: zones={observedCount}, index={_locations.Count}, expected={expectedCardCount}.");
+            throw new InvalidOperationException($"Card conservation failed: zones={observedCount}, index={_locations.Count}, expected={expectedCardCount}.");
         }
     }
 
@@ -641,8 +596,5 @@ internal sealed class CardZoneStore
         _zoneViews.Add(location, cards.AsReadOnly());
     }
 
-    private List<Card> GetZone(CardLocation location) =>
-        _zones.TryGetValue(location, out var cards)
-            ? cards
-            : throw new ArgumentOutOfRangeException(nameof(location), location, "The card zone is not registered for this game.");
+    private List<Card> GetZone(CardLocation location) => _zones.TryGetValue(location, out var cards) ? cards : throw new ArgumentOutOfRangeException(nameof(location), location, "The card zone is not registered for this game.");
 }

@@ -1,0 +1,88 @@
+#nullable enable
+using global::System;
+using global::System.Collections.Generic;
+using global::System.Linq;
+using global::CardGame.Core;
+
+namespace CardGame.Core.EngineOwners;
+[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
+internal sealed partial class CoreGameEngineWushuangSkillsBRuntime : global::CardGame.Core.IWushuangSkillsBHost
+{
+    private readonly ICoreWushuangSkillsBCardZonesOperations _cardZonesOperations;
+    private readonly ICoreWushuangSkillsBContentRegistryOperations _contentRegistryOperations;
+    private readonly ICoreWushuangSkillsBResolutionStackOperations _resolutionStackOperations;
+    private readonly ICoreWushuangSkillsBCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
+    private readonly ICoreWushuangSkillsBCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
+    private readonly ICoreWushuangSkillsBCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
+    private readonly ICoreWushuangSkillsBCoreCardMovementProgramsOperations _coreCardMovementProgramsOperations;
+    private readonly ICoreWushuangSkillsBCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
+    private readonly ICoreWushuangSkillsBCoreHpChangeProgramsOperations _coreHpChangeProgramsOperations;
+    private readonly ICoreWushuangSkillsBCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly ICoreWushuangSkillsBCoreNativeLogicalDiscardsOperations _coreNativeLogicalDiscardsOperations;
+    private readonly ICoreWushuangSkillsBCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
+    private readonly ICoreWushuangSkillsBCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
+    private readonly ICoreWushuangSkillsBCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly ICoreWushuangSkillsBCoreProgramOrdinaryTrickUsesOperations _coreProgramOrdinaryTrickUsesOperations;
+    private readonly ICoreWushuangSkillsBCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly ICoreWushuangSkillsBCoreWushuangSkillsBAuditOperations _coreWushuangSkillsBAuditOperations;
+    private readonly ICoreWushuangSkillsBCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly ICoreWushuangSkillsBCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
+    private readonly ICoreWushuangSkillsBCoreNativeCardUseOperations _coreNativeCardUseOperations;
+    private readonly ICoreWushuangSkillsBCoreNativeNullificationOperations _coreNativeNullificationOperations;
+    private readonly ICoreWushuangSkillsBCoreNativePromptBoundaryOperations _coreNativePromptBoundaryOperations;
+    private readonly ICoreWushuangSkillsBCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
+    private readonly ICoreWushuangSkillsBCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
+    private readonly ICoreWushuangSkillsBCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly ICoreWushuangSkillsBCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
+    private readonly ICoreWushuangSkillsBCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
+    private readonly ICoreWushuangSkillsBCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
+    private readonly ICoreWushuangSkillsBCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly ICoreWushuangSkillsBKernelCoreGameEngineAdvancedLifecycleHostOperations _kernelCoreGameEngineAdvancedLifecycleHostOperations;
+    private readonly ICoreWushuangSkillsBKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess _coreCardMovementJournalCardMovementsMovementSequenceAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess _coreMatchOutcomeStatusWinnerAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess _coreGameEngineCardActionsCardActionSequenceAccess;
+    internal CoreGameEngineWushuangSkillsBRuntime(ICoreWushuangSkillsBCardZonesOperations cardZonesOperations, ICoreWushuangSkillsBContentRegistryOperations contentRegistryOperations, ICoreWushuangSkillsBResolutionStackOperations resolutionStackOperations, ICoreWushuangSkillsBCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreWushuangSkillsBCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICoreWushuangSkillsBCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICoreWushuangSkillsBCoreCardMovementProgramsOperations coreCardMovementProgramsOperations, ICoreWushuangSkillsBCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreWushuangSkillsBCoreHpChangeProgramsOperations coreHpChangeProgramsOperations, ICoreWushuangSkillsBCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreWushuangSkillsBCoreNativeLogicalDiscardsOperations coreNativeLogicalDiscardsOperations, ICoreWushuangSkillsBCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICoreWushuangSkillsBCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreWushuangSkillsBCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreWushuangSkillsBCoreProgramOrdinaryTrickUsesOperations coreProgramOrdinaryTrickUsesOperations, ICoreWushuangSkillsBCoreRuntimeOperations coreRuntimeOperations, ICoreWushuangSkillsBCoreWushuangSkillsBAuditOperations coreWushuangSkillsBAuditOperations, ICoreWushuangSkillsBCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, ICoreWushuangSkillsBCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations, ICoreWushuangSkillsBCoreNativeCardUseOperations coreNativeCardUseOperations, ICoreWushuangSkillsBCoreNativeNullificationOperations coreNativeNullificationOperations, ICoreWushuangSkillsBCoreNativePromptBoundaryOperations coreNativePromptBoundaryOperations, ICoreWushuangSkillsBCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreWushuangSkillsBCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreWushuangSkillsBCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, ICoreWushuangSkillsBCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICoreWushuangSkillsBCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreWushuangSkillsBCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations, ICoreWushuangSkillsBCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreWushuangSkillsBKernelCoreGameEngineAdvancedLifecycleHostOperations kernelCoreGameEngineAdvancedLifecycleHostOperations, ICoreWushuangSkillsBKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsMovementSequenceAccess coreCardMovementJournalCardMovementsMovementSequenceAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeStatusWinnerAccess coreMatchOutcomeStatusWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess coreGameEngineCardActionsCardActionSequenceAccess)
+    {
+        this._cardZonesOperations = cardZonesOperations;
+        this._contentRegistryOperations = contentRegistryOperations;
+        this._resolutionStackOperations = resolutionStackOperations;
+        this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
+        this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
+        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
+        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
+        this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
+        this._coreHpChangeProgramsOperations = coreHpChangeProgramsOperations;
+        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
+        this._coreNativeLogicalDiscardsOperations = coreNativeLogicalDiscardsOperations;
+        this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;
+        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
+        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
+        this._coreProgramOrdinaryTrickUsesOperations = coreProgramOrdinaryTrickUsesOperations;
+        this._coreRuntimeOperations = coreRuntimeOperations;
+        this._coreWushuangSkillsBAuditOperations = coreWushuangSkillsBAuditOperations;
+        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
+        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
+        this._coreNativeCardUseOperations = coreNativeCardUseOperations;
+        this._coreNativeNullificationOperations = coreNativeNullificationOperations;
+        this._coreNativePromptBoundaryOperations = coreNativePromptBoundaryOperations;
+        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
+        this._corePhysicalMovementFacadesOperations = corePhysicalMovementFacadesOperations;
+        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
+        this._coreRecoveryReplacementOperations = coreRecoveryReplacementOperations;
+        this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
+        this._coreSnapshotValueProjectionOperations = coreSnapshotValueProjectionOperations;
+        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
+        this._kernelCoreGameEngineAdvancedLifecycleHostOperations = kernelCoreGameEngineAdvancedLifecycleHostOperations;
+        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
+        this._coreActualRoundProgressRoundNumberAccess = coreActualRoundProgressRoundNumberAccess;
+        this._coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess = coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess;
+        this._coreCardMovementJournalCardMovementsMovementSequenceAccess = coreCardMovementJournalCardMovementsMovementSequenceAccess;
+        this._coreMatchOutcomeStatusWinnerAccess = coreMatchOutcomeStatusWinnerAccess;
+        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
+        this._coreGameEngineCardActionsCardActionSequenceAccess = coreGameEngineCardActionsCardActionSequenceAccess;
+    }
+}

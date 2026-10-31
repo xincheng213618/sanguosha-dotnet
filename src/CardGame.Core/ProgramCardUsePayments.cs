@@ -174,21 +174,7 @@ internal sealed class ProgramCardUsePayments
 
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramCardUsePaymentCatalog> CardUsePaymentMetadata = new(() =>
-        ProgramCardUsePaymentCatalog.Discover(RuntimeModuleMethods), true);
     private ProgramCardUsePayments? _cardUsePayments;
-    private ProgramCardUsePayments CardUsePayments => _cardUsePayments ??= new(CardUsePaymentMetadata.Value,
+    private ProgramCardUsePayments CardUsePayments => _cardUsePayments ??= new(global::CardGame.Core.EngineOwners.CoreProgramCardUsePaymentsDefinitions.CardUsePaymentMetadata.Value,
         row => BindRuntimeHandler(row.Method, row.DelegateType));
-
-    // The built-in committed-Slash test stays between the two registered groups
-    // to retain its original short-circuit position at movement-return sites.
-    private bool HasPaidCardUseMovementTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) =>
-        CardUsePayments.AllowsTail(ProgramCardUsePaymentStage.LeadingTail, use, continuation) ||
-        continuation.Kind == RecoveryPaidCardUseKind.CommittedSlash ||
-        CardUsePayments.AllowsTail(ProgramCardUsePaymentStage.TrailingTail, use, continuation);
-
-    private bool ObservesPaidCardUseChildren(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) =>
-        continuation.Kind == RecoveryPaidCardUseKind.CommittedSlash && OwnsGenericSlashPaymentTail(use) ||
-        CardUsePayments.AllowsTail(ProgramCardUsePaymentStage.LeadingTail, use, continuation) ||
-        CardUsePayments.AllowsTail(ProgramCardUsePaymentStage.TrailingTail, use, continuation);
 }

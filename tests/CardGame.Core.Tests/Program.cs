@@ -89,6 +89,19 @@ if (unknownArguments.Length > 0)
 // Default/manual discard validation and complete-match coverage live in ManualDiscardChecks.
 var tests = new (string Name, Action Body)[]
 {
+    ("typed deferred capabilities preserve cycles ref out and match identity", DeferredCapabilityChecks.TypedFactoriesDeferCyclesAndRetainRefOutAndMatchIdentity),
+    ("SP Pang Tong runtime: Guolun original paid exchange and gain child cold", CardGame.Core.Tests.SpPangTongRuntimeChecks.GuolunExchangeReturnsOriginalPaidChildrenCold),
+    ("SP Pang Tong runtime: Songsang branches grant Zhanji without own draw recursion", CardGame.Core.Tests.SpPangTongRuntimeChecks.SongsangHealthBranchesGrantZhanjiAndExcludeItsOwnDraw),
+    ("Ding Shang Wan runtime: Fengyan original paid draw and gift branches cold", DingShangWanRuntimeChecks.FengyanDamageBranchesKeepOriginalPaidDrawAndGiftCold),
+    ("Qu Huang runtime: Qiejian paid draw field discard and round block cold", QuHuangRuntimeChecks.QiejianPaidDrawFieldDiscardAndRoundBlockCold),
+    ("Qu Huang runtime: Nishou issued phase swap and native Lightning return cold", QuHuangRuntimeChecks.NishouIssuedPhaseSwapAndNativeLightningReturnCold),
+    ("skill grant observations preserve payment baseline and consume changes once", CharacterSkillSetChecks.ObservationsPreservePaidBaselineAndConsumeChangesOnce),
+    ("card movement pipeline preserves ordered providers and handled-empty indexes", CardMovementPipelineChecks.OrderedProvidersPreserveFirstMatchAndHandledEmptyIndexes),
+    ("independent event history tracks pending replacement and committed identities", ProgramEventHistoryIndexChecks.IndependentIndexTracksPendingReplacementAndCommittedIdentities),
+    ("independent command sessions isolate execution gates and recovery", CommandSessionChecks.IndependentSessionsIsolateExecutionAndRecovery),
+    ("match runtime composition defers bindings and retries failed dependencies", ProgramRuntimeModuleChecks.MatchCompositionDefersBindingsAndRetriesFailedDependencies),
+    ("match execution loop preserves human child and safety boundaries", MatchExecutionBoundaryChecks.IndependentLoopPreservesHumanChildAndSafetyBoundaries),
+    ("resolution scheduler preserves issued parents and lifecycle order", MatchExecutionBoundaryChecks.IndependentSchedulerPreservesIssuedParentsAndLifecycleOrder),
     ("Wushuang balance: opening quality and mode exclusions preserve native rules cold", WushuangModeChecks.OpeningQualityAndBalanceExclusionsPreserveNativeRulesCold),
     ("Feng Lin Kuai AI: private Shenshi observation and exact gift cold", FengLinKuaiChecks.ShenshiAiRoutesPrivateObservationAndExactGiftCold),
     ("Duan Jiong: purchased equipment keeps exact discarded payment and child cold", WushuangModeChecks.SaoguPurchasedEquipmentKeepsOriginalDiscardAndPaidChildCold),
@@ -946,6 +959,8 @@ var tests = new (string Name, Action Body)[]
     ("program rule observer registration preserves ordered recursive boundaries", ProgramRuleObserverChecks.RegistrationPreservesOrderReentrancyAndIsolation),
     ("program rule observer registration rejects invalid metadata", ProgramRuleObserverChecks.InvalidRegistrationsFailBeforeDispatch),
     ("program legality registration preserves ordered capability gates", ProgramLegalityChecks.RegistrationAndDispatchPreserveBoundaries),
+    ("program issued trigger decisions preserve ordered admission boundaries", ProgramIssuedTriggerChecks.OrderedDecisionsPreserveIssuedBoundary),
+    ("program trigger native proofs preserve staged first decisions", ProgramTriggerProofChecks.StagedNativeDecisionsPreserveShortCircuit),
     ("Table order: moved participant ring preserves damage and judgment trigger priorities", TableOrderChecks.TriggerPrioritiesUseMovedParticipantOrder),
     ("Table order: native move changes distance cold replay and next normal turn", TableOrderChecks.NativeMoveChangesDistanceAndNextNormalTurn),
     ("program interaction registration preserves dispatch boundaries", ProgramInteractionChecks.RegistrationAndDispatchPreserveBoundaries),
@@ -1114,6 +1129,11 @@ var tests = new (string Name, Action Body)[]
     ("mandatory card identity suppresses native use, ignores Slash distance and replays", SkillProgramCardIdentityChecks.MandatoryIdentityDistanceAndReplay),
     ("turn card-use effects union order consume and expire by action semantics", CardUseModuleEffectChecks.TurnStateUsesActionSemanticsStableOrderAndExpiration),
     ("active programs suspend into Pindian and branch from the frozen result", PindianModuleChecks.ActiveProgramPindianSuspendsConditionsAndReplays),
+    ("program pindian runtime preserves native sources and exact phase frames", ProgramPindianRuntimeChecks.NativeEntryPreservesEventSourcesAndExactPhaseFrames),
+    ("foreign turn contest preserves original result paid child and typed Slash return cold", ForeignTurnContestRuntimeChecks.OriginalResultPaidChildAndTypedSlashReturnStayExactCold),
+    ("program random acquisition preserves shared generator and ordered physical areas", ProgramRandomCardAcquisitionChecks.SharedRandomOwnerAndOrderedPhysicalAcquisitions),
+    ("Physical card draws: shared owners selection actual gains and recycling order", PhysicalCardDrawRuntimeChecks.SharedOwnersPreserveSelectionActualGainsAndRecyclingOrder),
+    ("actual phase queries preserve journal order and action-scope null cache", ActualDiscardRecoveryPhaseRuntimeChecks.OriginalJournalAndActionScopesPreserveLatestPhaseAndCachedNull),
     ("Private reserve: ending skill order payments expiry and replay", PrivateReserveOrderChecks.EndSkillsChooseOrderPayOnceAndReplay),
     ("turn-ending boundary orders Jushou Jujian Biyue and replays", TurnEndingBoundaryChecks.OrdersJushouJujianBiyueAndReplays),
     ("public Nightmare markers count each Wuhun damage point before dying and replay", PublicMarkerChecks.WuhunDamageOrderAndReplay),
@@ -3519,7 +3539,7 @@ static void UnknownPhaseFailsFast()
     game.DriveStart();
     game.DriveHumanEndPlay(advanceToHumanBoundary: false);
 
-    var phaseField = typeof(GameEngine).GetField("_phase", BindingFlags.Instance | BindingFlags.NonPublic);
+    var phaseField = global::FixtureRuntimeAccess.Engine.GetField("_phase", BindingFlags.Instance | BindingFlags.NonPublic);
     NotNull(phaseField);
     phaseField!.SetValue(game, (TurnPhase)999);
 

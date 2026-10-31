@@ -106,8 +106,8 @@ internal static class Ol2016ShenSimaYiChecks
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
         public int Ren => V(0).Markers?.SingleOrDefault(m => m.Kind == PlayerMarkerKind.Ren)?.Count ?? 0;
         public bool Has(string id) => V(0).Skills?.Any(k => k.Id == id) == true;
-        public int Limit() => (int)typeof(GameEngine).GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G,
-            [((System.Collections.IList)typeof(GameEngine).GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!)[0]])!;
+        public int Limit() => (int)global::FixtureRuntimeAccess.Engine.GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G,
+            [((System.Collections.IList)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!)[0]])!;
         public void End() => Accept(new EndPlayPhaseCommand(0, G.Revision, P!.PromptId));
         public void Play() => Reach(() => P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         public void Use(string skill, string binding, IReadOnlyList<int> cards, IReadOnlyList<int> targets) => Accept(new UseProgramSkillCommand(0, skill, binding, cards, targets, G.Revision, P!.PromptId));

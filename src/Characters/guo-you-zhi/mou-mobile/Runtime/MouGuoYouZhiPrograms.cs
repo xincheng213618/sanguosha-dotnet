@@ -16,7 +16,7 @@ public sealed record MouGuoYouZhiReceipt(CardConversionSource Source, string Gam
     public int DistinctNames { get; init; }
     public int CardId { get; init; }
     public int Requested { get; init; }
-    private IReadOnlyList<int> _watched = [], _selected = [];
+    private IReadOnlyList<int> _watched = [],_selected = [];
     private IReadOnlyList<MouGuoYouZhiGift> _gifts = [];
     public IReadOnlyList<int> WatchedHand { get => _watched; init => _watched = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> Selected { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }

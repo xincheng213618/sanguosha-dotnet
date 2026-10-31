@@ -13,7 +13,7 @@ internal static class WushuangAiDuelEvaluation
     private const double DrawUtility = WushuangMode.DrawEvaluationScore;
     private static readonly string[] SmokeGenerals = ["classic:zhao-yun", "classic:zhang-fei", "classic:guo-jia", "classic:zhang-liao"];
     private static readonly FieldInfo Brains = Field("_aiBrains"), Generated = Field("_generatedPhysicalCardIds"), Random = Field("_random");
-    private static FieldInfo Field(string name) => typeof(GameEngine).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)
+    private static FieldInfo Field(string name) => global::FixtureRuntimeAccess.Engine.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)
         ?? throw new InvalidOperationException("Wushuang evaluation cannot find engine " + name);
 
     internal static int Run(string output, int pairs, int baseline, int? candidatePolicy, int firstPair, string profile, string? generalPoolSnapshot = null)
@@ -262,7 +262,7 @@ internal static class WushuangAiDuelEvaluation
         {
             result = result with { Error = Bounded(ex.ToString()), FailureKind = watch.Stage == "Constructing" ? "SetupException" :
                 watch.Stage == "FinalAudit" ? "AuditException" : "NativeCommandException", Status = game is null ? "NotCreated" :
-                typeof(GameEngine).GetField("_status", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(game)?.ToString() ?? "Unknown" };
+                global::FixtureRuntimeAccess.Engine.GetField("_status", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(game)?.ToString() ?? "Unknown" };
             if (game is not null)
                 try
                 {
