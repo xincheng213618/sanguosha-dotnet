@@ -10,30 +10,42 @@ internal sealed class SkillAvailability(
     Func<CharacterState, SkillGrant, bool>? additionalPrintedLordQualification,
     EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants = null, CardZoneStore? cards = null,
     IActualDiscardRecoveryPhaseQueries? phases = null, IProgramRuntimeFrames? frames = null,
-    RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null)
+    RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null,
+    EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState = null,
+    IProgramHealthChildQueries? healthChildren = null)
 {
     internal SkillAvailabilitySnapshot Query(CharacterState owner)
     {
         var owned = new List<SkillGrant>();
         var effective = new List<SkillGrant>();
         var definitions = new Dictionary<string, ContentSkillDefinition>(StringComparer.Ordinal);
-        var restrictions = ActiveRestrictions(owner, participants, cards, phases, frames, health).ToArray();
+        var restrictions = ActiveRestrictions(owner, participants, cards, phases, frames, health, turnState, healthChildren).ToArray();
         foreach (var grant in owner.SkillGrants.Grants)
         {
-            if (!grant.IsEnabled || !CanOwnSource(owner, grant.SourceId)) continue;
+            var source = RawSourceAdmission(owner, grant);
+            if (!source.Owned) continue;
             if (!definitions.TryGetValue(grant.SkillId, out var definition))
                 definitions[grant.SkillId] = definition = resolveDefinition(grant.SkillId);
             if (!OwnsPrintedLord(owner, grant, definition)) continue;
             var state = InterpretRestrictions(owner, grant, definition, restrictions);
             if (!state.Owned) continue;
             owned.Add(grant);
-            if (state.Effective && IsSourceRevealed(owner, grant.SourceId) &&
+            if (state.Effective && source.Effective &&
                 effectiveQualification?.Invoke(owner, grant) != false) effective.Add(grant);
         }
         var effectiveDefinitions = effective.Select(grant => grant.SkillId).Distinct(StringComparer.Ordinal)
             .ToDictionary(id => id, id => definitions[id], StringComparer.Ordinal);
         return new(Array.AsReadOnly(owned.ToArray()), Array.AsReadOnly(effective.ToArray()),
             new ReadOnlyDictionary<string, ContentSkillDefinition>(effectiveDefinitions));
+    }
+
+    /// <summary>Enabled and selected/revealed origin. Printed-lord rights and derived relationships have their own stages.</summary>
+    internal bool IsRawSourceAdmitted(CharacterState owner, SkillGrant grant) => RawSourceAdmission(owner, grant).Effective;
+
+    private (bool Owned, bool Effective) RawSourceAdmission(CharacterState owner, SkillGrant grant)
+    {
+        var owned = grant.IsEnabled && CanOwnSource(owner, grant.SourceId);
+        return (owned, owned && IsSourceRevealed(owner, grant.SourceId));
     }
 
     private bool CanOwnSource(CharacterState owner, string source) => source switch
@@ -56,15 +68,20 @@ internal sealed class SkillAvailability(
 
     internal bool IsGrantEffectiveUnderStates(CharacterState owner, SkillGrant grant) =>
         InterpretRestrictions(owner, grant, resolveDefinition(grant.SkillId),
-            ActiveRestrictions(owner, participants, cards, phases, frames, health)).Effective;
+            ActiveRestrictions(owner, participants, cards, phases, frames, health, turnState, healthChildren)).Effective;
+
+    internal SkillStateConditionWorld CreateConditionWorld(SkillStateConditionContext context, CharacterState owner) =>
+        new(context, owner, participants, cards, phases, frames, health, turnState, healthChildren);
 
     private static IEnumerable<SkillStateRestriction> ActiveRestrictions(CharacterState owner,
         EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants, CardZoneStore? cards,
         IActualDiscardRecoveryPhaseQueries? phases, IProgramRuntimeFrames? frames,
-        RuntimeEntries.CoreGameEngineHealthQueriesEntries? health) =>
+        RuntimeEntries.CoreGameEngineHealthQueriesEntries? health,
+        EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState,
+        IProgramHealthChildQueries? healthChildren) =>
         owner.SkillGrants.Restrictions.Where(restriction => restriction.While is null ||
             ProgramExpressions.EvaluateBool(restriction.While,
-                new SkillStateConditionWorld(restriction.Context, owner, participants, cards, phases, frames, health)) == true);
+                new SkillStateConditionWorld(restriction.Context, owner, participants, cards, phases, frames, health, turnState, healthChildren)) == true);
 
     private static (bool Owned, bool Effective) InterpretRestrictions(CharacterState owner, SkillGrant grant,
         ContentSkillDefinition skill, IEnumerable<SkillStateRestriction> restrictions)

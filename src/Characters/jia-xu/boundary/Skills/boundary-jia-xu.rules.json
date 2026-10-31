@@ -5,9 +5,16 @@
       "id": "boundary:wansha", "revision": 1,
       "cardPolicies": [
         { "id": "exclusive-dying-peach", "kind": "exclusiveDyingPeachRescue", "cardKinds": ["peach"] },
-        { "id": "exclusive-own-turn-peach-use", "kind": "exclusiveTurnPeachUse", "cardKinds": ["peach"] },
-        { "id": "dying-window-nonlocked-suppression", "kind": "suppressOthersNonLockedDuringDying" }
-      ]
+        { "id": "exclusive-own-turn-peach-use", "kind": "exclusiveTurnPeachUse", "cardKinds": ["peach"] }
+      ],
+      "skillStates": [{
+        "on": { "event": "dyingStarted", "timing": "before" },
+        "when": ["isTurnOwner", "owner"],
+        "action": "suppress", "target": "all",
+        "match": { "filter": ["==", ["number", "skill.locked"], 0] },
+        "while": ["and", ["inIssuedDying", "eventTarget"], ["not", ["same", "owner", "target"]], ["not", ["same", "eventTarget", "target"]]],
+        "until": [{ "event": "dyingEnded", "timing": "after" }]
+      }]
     },
     {
       "id": "boundary:weimu", "revision": 1,

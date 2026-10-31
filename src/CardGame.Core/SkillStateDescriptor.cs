@@ -65,38 +65,39 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
         return new(ids, filter);
     }
 
-    private static IReadOnlyList<SkillStateBoundarySpec> ParseUntil(JsonElement node, string path)
+    internal static IReadOnlyList<SkillStateBoundarySpec> ParseUntil(JsonElement node, string path) =>
+        Array.AsReadOnly(node.EnumerateArray().Select((item, index) => ParseBoundary(item, $"{path}[{index}]")).ToArray());
+
+    internal static SkillStateBoundarySpec ParseBoundary(JsonElement item, string at)
     {
-        var boundaries = new List<SkillStateBoundarySpec>();
-        foreach (var item in node.EnumerateArray())
+        ObjectShape(item, at, "event", "participant", "timing", "skipIssued", "phase");
+        var kind = EnumValue<SkillStateBoundaryEvent>(Required(item, "event", JsonValueKind.String, at), at + ".event");
+        SkillStateSubject? subject = null;
+        if (item.TryGetProperty("participant", out var participant))
         {
-            var at = $"{path}[{boundaries.Count}]";
-            ObjectShape(item, at, "event", "participant", "timing", "skipIssued", "phase");
-            var kind = EnumValue<SkillStateBoundaryEvent>(Required(item, "event", JsonValueKind.String, at), at + ".event");
-            SkillStateSubject? subject = null;
-            if (item.TryGetProperty("participant", out var participant))
-            {
-                ObjectShape(participant, at + ".participant", "kind");
-                subject = EnumValue<SkillStateSubject>(Required(participant, "kind", JsonValueKind.String, at + ".participant"), at + ".participant.kind");
-            }
-            if ((kind == SkillStateBoundaryEvent.RoundAdvanced) == (subject is not null))
-                Fail(at + ".participant", kind == SkillStateBoundaryEvent.RoundAdvanced ? "is unavailable for a global round boundary" : "is required for a participant boundary");
-            var timing = item.TryGetProperty("timing", out var timingNode)
-                ? EnumValue<SkillStateBoundaryTiming>(timingNode, at + ".timing") : SkillStateBoundaryTiming.After;
-            var skip = item.TryGetProperty("skipIssued", out var skipNode) && Bool(skipNode, at + ".skipIssued");
-            var phase = item.TryGetProperty("phase", out var phaseNode)
-                ? EnumValue<ActualDiscardRecoveryPhaseKind>(phaseNode, at + ".phase") : (ActualDiscardRecoveryPhaseKind?)null;
-            if ((kind is SkillStateBoundaryEvent.PhaseStarted or SkillStateBoundaryEvent.PhaseEnded) != (phase is not null))
-                Fail(at + ".phase", "is required exactly for phaseStarted and phaseEnded boundaries");
-            boundaries.Add(new(kind, subject, timing, skip, phase));
+            ObjectShape(participant, at + ".participant", "kind");
+            subject = EnumValue<SkillStateSubject>(Required(participant, "kind", JsonValueKind.String, at + ".participant"), at + ".participant.kind");
         }
-        return Array.AsReadOnly(boundaries.ToArray());
+        var global = kind is SkillStateBoundaryEvent.RoundAdvanced or SkillStateBoundaryEvent.DyingStarted or SkillStateBoundaryEvent.DyingEnded;
+        if (global == (subject is not null))
+            Fail(at + ".participant", global ? "is unavailable for a global boundary" : "is required for a participant boundary");
+        var timing = item.TryGetProperty("timing", out var timingNode)
+            ? EnumValue<SkillStateBoundaryTiming>(timingNode, at + ".timing") : SkillStateBoundaryTiming.After;
+        var skip = item.TryGetProperty("skipIssued", out var skipNode) && Bool(skipNode, at + ".skipIssued");
+        if (skip && kind is SkillStateBoundaryEvent.DyingStarted or SkillStateBoundaryEvent.DyingEnded)
+            Fail(at + ".skipIssued", "is unavailable for a specific dying window");
+        var phase = item.TryGetProperty("phase", out var phaseNode)
+            ? EnumValue<ActualDiscardRecoveryPhaseKind>(phaseNode, at + ".phase") : (ActualDiscardRecoveryPhaseKind?)null;
+        if ((kind is SkillStateBoundaryEvent.PhaseStarted or SkillStateBoundaryEvent.PhaseEnded) != (phase is not null))
+            Fail(at + ".phase", "is required exactly for phaseStarted and phaseEnded boundaries");
+        return new(kind, subject, timing, skip, phase);
     }
 
     internal static bool IsPersistentCondition(ProgramExpression expression) => expression.Nodes().All(node => node.Op is
         "bool" or "int" or "and" or "or" or "not" or "<" or "<=" or ">" or ">=" or "==" or "!=" or "+" or "-" or
-        "min" or "max" or "floorDiv" or "when" or "same" or "alive" or "hasHp" or "faceDown" or "chained" or "inIssuedPhase" or "inUpcomingTurnPrelude" or "hp" or "maxHp" or
-        "lostHp" or "handCount" or "equipmentCount" or "all" or "any" or "count" or "owner" or "selectedTarget" or "it" or "living" or "livingOthers");
+        "min" or "max" or "floorDiv" or "when" or "same" or "alive" or "hasHp" or "faceDown" or "chained" or "inIssuedPhase" or "inUpcomingTurnPrelude" or
+        "isTurnOwner" or "inIssuedTurn" or "inIssuedDying" or "hp" or "maxHp" or
+        "lostHp" or "handCount" or "equipmentCount" or "all" or "any" or "count" or "owner" or "selectedTarget" or "eventTarget" or "it" or "living" or "livingOthers");
 
     private static IReadOnlyList<string> Identifiers(JsonElement node, string path)
     {

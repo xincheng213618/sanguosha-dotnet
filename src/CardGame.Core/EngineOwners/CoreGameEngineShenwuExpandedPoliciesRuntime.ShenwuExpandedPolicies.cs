@@ -6,23 +6,6 @@ internal sealed partial class CoreGameEngineShenwuExpandedPoliciesRuntime
     [ProgramTargetRule(ProgramTargetRulePoint.TargetCountContributions, 20)]
     internal RuleQueryContribution? ShenwuJuyuanTargetCountContribution(ProgramTargetCountQuery query) => ShenwuJuyuanExtraTarget(query.Actor, query.Kind) ? new FiniteRuleQueryContribution($"turn:{(query.Actor.Seat)}:shenwu:juyuan", SkillRuleOperation.Add, 1) : null;
     internal int ShenwuReplacementDrawBonus(int seat) => _coreShenwuActivitiesOperations.Value.ShenwuBattleRules?.ReplacementDrawBonus(seat) ?? 0;
-    internal long CaptureShenwuFengdongStamp()
-    {
-        if (!_contentRegistryOperations._contentRegistry.Skills.ContainsKey("shenwu:fengdong") || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat) || _coreMatchParticipantsPlayersAccess._players.Count <= _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)
-            return 0;
-        var current = _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat];
-        var hasSource = current.SkillGrants.Grants.Any(grant => grant.SkillId == "shenwu:fengdong");
-        var dependencies = hasSource ? (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase, current.SkillGrants.Revision, current.IsAlive, current.GeneralRevealed) : (0, -1, TurnPhase.NotStarted, 0L, false, false);
-        if (_coreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess._shenwuFengdongDependencies != dependencies)
-        {
-            _coreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess._shenwuFengdongDependencies = dependencies;
-            _coreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess._shenwuFengdongStamp++;
-        }
-
-        return _coreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess._shenwuFengdongStamp;
-    }
-
-    internal bool ShenwuFengdongQualifiesGrant(CharacterState owner, SkillGrant grant) => !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.ShenwuOwnTurnFreezeNonLocked) || owner.Seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase is TurnPhase.NotStarted or TurnPhase.Finished || _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !_coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat], SkillProgramCardPolicyKind.ShenwuOwnTurnFreezeNonLocked);
     internal bool ShenwuZhaohuoDisablesArmor(int targetSeat) => _coreMatchParticipantsPlayersAccess._players.Count > _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && targetSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase is not (TurnPhase.NotStarted or TurnPhase.Finished) && _coreShenwuNpcProgramsOperations.ShenwuEnabled(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat], "shenwu:zhaohuo");
     internal bool ShenwuSipuForbidsAction(int actorSeat)
     {

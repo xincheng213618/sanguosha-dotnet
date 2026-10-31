@@ -1,22 +1,10 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreGameEngineCurrentTurnSkillSuppressionsState : Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess, Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess
+internal sealed class CoreGameEngineCurrentTurnSkillSuppressionsState : Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess
 {
-    private (long Projection, long Suppression) _currentTurnQualificationDependencies = default !;
-    internal ref (long Projection, long Suppression) ReferenceToCurrentTurnQualificationDependencies => ref _currentTurnQualificationDependencies;
-
-    private long _currentTurnQualificationStamp = default !;
-    internal ref long ReferenceToCurrentTurnQualificationStamp => ref _currentTurnQualificationStamp;
-
     private long _currentTurnSkillSuppressionRevision = default !;
     internal ref long ReferenceToCurrentTurnSkillSuppressionRevision => ref _currentTurnSkillSuppressionRevision;
 
     ref long Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision => ref _currentTurnSkillSuppressionRevision;
-
-    ref long Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressionRevision => ref _currentTurnSkillSuppressionRevision;
-
-    ref (long Projection, long Suppression) Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnQualificationDependencies => ref _currentTurnQualificationDependencies;
-
-    ref long Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnQualificationStamp => ref _currentTurnQualificationStamp;
 
 }

@@ -237,13 +237,13 @@
     {
       "id": "shenwu:fengdong",
       "revision": 1,
-      "cardPolicies": [
-        {
-          "id": "continuous-rule",
-          "kind": "shenwuOwnTurnFreezeNonLocked",
-          "cardKinds": []
-        }
-      ]
+      "skillStates": [{
+        "on": { "event": "turnStarted", "participant": { "kind": "owner" }, "timing": "before" },
+        "action": "suppress", "target": "all",
+        "match": { "filter": ["==", ["number", "skill.locked"], 0] },
+        "while": ["and", ["not", ["same", "owner", "target"]], ["inIssuedTurn", "owner"]],
+        "until": [{ "event": "turnEnded", "participant": { "kind": "owner" }, "timing": "after" }]
+      }]
     },
     {
       "id": "shenwu:sipu",

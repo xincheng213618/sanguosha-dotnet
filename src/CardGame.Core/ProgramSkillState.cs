@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
 public enum SkillStateAction { Suppress, Lose, Transfer }
-public enum SkillStateBoundaryEvent { TurnCleanup, TurnStarted, TurnEnded, RoundAdvanced, PhaseStarted, PhaseEnded, Death }
+public enum SkillStateBoundaryEvent { TurnCleanup, TurnStarted, TurnEnded, RoundAdvanced, PhaseStarted, PhaseEnded, Death, DyingStarted, DyingEnded }
 public enum SkillStateBoundaryTiming { Before, After }
 public enum SkillStateSubject { Owner, Target, TurnOwner }
 
@@ -48,7 +48,8 @@ public sealed class SkillStateLifetime(SkillStateOrigin? origin, IReadOnlyList<S
     public IReadOnlyList<SkillStateBoundaryEnd> Until { get; } = Array.AsReadOnly(until.ToArray());
 }
 
-public sealed record SkillStateConditionContext(int OwnerSeat, int TargetSeat, ActualDiscardRecoveryPhaseKey? IssuedPhase = null);
+public sealed record SkillStateConditionContext(int OwnerSeat, int TargetSeat, ActualDiscardRecoveryPhaseKey? IssuedPhase = null,
+    int? IssuedTurnNumber = null, long? IssuedDyingFrameId = null, int? EventTargetSeat = null);
 public sealed record SkillStateDeclarationSource(string SkillId, string GrantId, int DeclarationIndex,
     SkillStateDeclaration Declaration);
 public sealed record SkillStateRestriction(string Id, string SourceId, SkillStateAction Action,

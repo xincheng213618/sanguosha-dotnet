@@ -11,7 +11,6 @@ internal sealed partial class CharacterZhangLiaoMobileGodEntries
     internal bool DrainMobileShenZhangLiao(long id) => _resolve().DrainMobileShenZhangLiao(id);
     internal void ExpireMobileDuorui(IGameEvent fact) => _resolve().ExpireMobileDuorui(fact);
     internal void FinishMobileShenZhangLiao(ProgramSkillFrame f) => _resolve().FinishMobileShenZhangLiao(f);
-    internal bool IsMobileDuoruiGrantQualified(CharacterState owner, SkillGrant grant) => _resolve().IsMobileDuoruiGrantQualified(owner, grant);
     internal bool IsMobileZhitiContestSubtree(ResolutionFrame parent) => _resolve().IsMobileZhitiContestSubtree(parent);
     internal bool MobileDuoruiActive(MobileDuoruiIssuedEvent e) => _resolve().MobileDuoruiActive(e);
     internal string[] MobileDuoruiSkills(int seat) => _resolve().MobileDuoruiSkills(seat);

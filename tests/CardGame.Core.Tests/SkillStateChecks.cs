@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Reflection;
 using CardGame.Content.Standard;
 using CardGame.Core;
@@ -18,6 +18,8 @@ internal static class SkillStateChecks
             ("suppression", SuppressionKeepsOwnershipAndExemptsLockedSkills),
             ("chosen return", ChosenLossReturnsToOrdinaryDrawCold),
             ("overlapping expiry", OverlappingExpiryPreservesTheExistingInstance),
+            ("explicit origin revocation", ExplicitOriginRevocationKeepsIndependentRestrictions),
+            ("event declarations", EventDeclarationsAdmitCurrentWindowsAndKeepNestedDyingIdentity),
             ("next owner turn expiry", AfterCurrentTurnWaitsForTheNextOwnerTurnEnd),
             ("current round expiry", CurrentRoundExpiresWithoutRoundEndingTracking),
             ("next turn start expiry", UntilTurnStartOfWaitsForTheSpecifiedOwnersNextTurn),
@@ -58,6 +60,110 @@ internal static class SkillStateChecks
         s.Play(1); s.Play(0);
         Require(s.CanUse(0, Counter, "pulse") && s.CanUse(0, Driver, "choose") && s.CounterState(0).SkillInstanceId == instance,
             "Actual turn-end expiry restores the existing skill instance and its activations.");
+    }
+
+    private static void ExplicitOriginRevocationKeepsIndependentRestrictions()
+    {
+        var s = Scene.Start();
+        var issuer = s.Player(0);
+        var grant = s.RealGrants(0).Single(value => value.SkillId == Driver);
+        var origin = new SkillStateOrigin(90039950, 0, new(Driver, "explicit", 0, grant.SkillInstanceId));
+        var other = origin with { EffectIndex = 1 };
+        var changes = s.G.ProgramSkillChangesEntries;
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!;
+        var history = capabilities.Get<IProgramEventHistoryQueries>();
+        changes.IssueSkillState(origin, 1, new(SkillStateAction.Suppress, SkillStateMatch.ForSkills([Counter])));
+        changes.IssueSkillState(origin, 2, new(SkillStateAction.Suppress, SkillStateMatch.ForSkills([Counter])));
+        changes.IssueSkillState(other, 1, new(SkillStateAction.Suppress, SkillStateMatch.ForSkills([Counter])));
+        issuer.SkillGrants.RemoveGrant(grant.GrantId); issuer.IsAlive = false;
+        try
+        {
+            Require(!s.Effective(1, Counter) && !s.Effective(2, Counter),
+                "An already issued restriction survives its issuer's death and loss of the original source skill.");
+            foreach (var wrong in new[] { origin with { FrameId = origin.FrameId + 1 },
+                origin with { EffectIndex = 2 }, origin with { Source = origin.Source with { SkillInstanceId = "another-instance" } } })
+                changes.RevokeSkillStateOrigin(wrong);
+            Require(s.StateLeases(1) == 2 && s.StateLeases(2) == 1 && history.Read<SkillStateExpiredEvent>().Count == 0,
+                "Another frame, instruction or source instance cannot revoke the accepted origin's restrictions.");
+            changes.RevokeSkillStateOrigin(origin);
+            Require(!s.Effective(1, Counter) && s.Effective(2, Counter) && s.StateLeases(1) == 1 && s.StateLeases(2) == 0 &&
+                history.Read<SkillStateExpiredEvent>().Count(e => e.Origin is { EffectIndex: 0 } issued && issued.FrameId == origin.FrameId) == 2,
+                "Explicit lease cleanup clears that origin's recipients together and retains an independent overlapping restriction.");
+            changes.RevokeSkillStateOrigin(origin);
+            Require(history.Read<SkillStateExpiredEvent>().Count == 2, "Repeating completed origin cleanup does not publish another expiry.");
+            changes.RevokeSkillStateOrigin(other);
+            Require(s.Effective(1, Counter) && s.StateLeases(1) == 0,
+                "The final independent lease restores the original real skill without requiring its issuing source to remain alive.");
+        }
+        finally { issuer.IsAlive = true; issuer.SkillGrants.Grant(grant); }
+    }
+
+    private static void EventDeclarationsAdmitCurrentWindowsAndKeepNestedDyingIdentity()
+    {
+        var s = Scene.Start();
+        var players = Enumerable.Range(0, 4).Select(s.Player).ToArray();
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!;
+        var index = (MatchSkillBindingIndex)FixtureRuntimeAccess.Engine.GetField("_skillBindingIndex", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!;
+        var frames = capabilities.Get<IProgramRuntimeFrames>();
+        var changes = s.G.GetRuntimeModule<ProgramSkillChangeRuntime>();
+        ProgramExpression Expression(string json)
+        { using var document = JsonDocument.Parse(json); return ProgramExpressions.Parse(document.RootElement, "fixture.state"); }
+        SkillStateApplications Bind(SkillStateDeclaration declaration)
+        {
+            var templates = new Dictionary<string, IReadOnlyList<SkillStateDeclaration>> { [Driver] = [declaration] };
+            var applications = new SkillStateApplications(templates, players, index.Availability, changes,
+                capabilities.Get<IProgramEventJournalQueries>(), frames);
+            players[0].SkillGrants.BindSkillStates(0, templates, players, applications);
+            return applications;
+        }
+        var turn = s.G.State.TurnNumber;
+        var applications = Bind(new(SkillStateTarget.All,
+            new(SkillStateAction.Suppress, SkillStateMatch.ForSkills([Counter]),
+                [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Owner)],
+                Expression("[\"inIssuedTurn\",\"owner\"]")),
+            new(SkillStateBoundaryEvent.TurnStarted, SkillStateSubject.Owner, SkillStateBoundaryTiming.Before)));
+        Require(!s.Effective(1, Counter) && s.StateLeases(1) == 1,
+            "A newly accepted source immediately applies its declared state inside the current real turn window.");
+        applications.ApplyEvent(new TurnStartedEvent(turn, 0), SkillStateBoundaryTiming.Before);
+        Require(s.StateLeases(1) == 1, "The same accepted turn occurrence cannot apply the same source twice.");
+        applications.ApplyEvent(new TurnEndedEvent(turn, 0), SkillStateBoundaryTiming.Before);
+        Require(!s.Effective(1, Counter), "An after-turn deadline remains active before the real ending boundary.");
+        applications.ApplyEvent(new TurnEndedEvent(turn, 0), SkillStateBoundaryTiming.After);
+        Require(s.Effective(1, Counter) && s.StateLeases(1) == 0, "The matching after-turn boundary clears the signed turn state.");
+
+        var source = players[0].SkillGrants.Grants.Single(grant => grant.SkillId == Driver);
+        players[0].SkillGrants.RemoveGrant(source.GrantId);
+        applications = Bind(new(SkillStateTarget.All,
+            new(SkillStateAction.Suppress, SkillStateMatch.ForSkills([Counter]),
+                [new(SkillStateBoundaryEvent.DyingEnded, null)],
+                Expression("[\"and\",[\"inIssuedDying\",\"eventTarget\"],[\"not\",[\"same\",\"target\",\"eventTarget\"]]]")),
+            new(SkillStateBoundaryEvent.DyingStarted, null, SkillStateBoundaryTiming.Before), Expression("[\"isTurnOwner\",\"owner\"]")));
+        var outer = new DyingFrame(900100, 0, 1, null, [0, 1, 2, 3], 0, DyingContinuationKind.Damage);
+        var inner = new DyingFrame(900101, outer.Id, 2, null, [0, 1, 2, 3], 0, DyingContinuationKind.Damage);
+        frames.Push(outer);
+        try
+        {
+            players[0].SkillGrants.Grant(source);
+            applications.ApplyEvent(new PlayerDyingEvent(outer.Id, 1, null), SkillStateBoundaryTiming.Before);
+            Require(s.StateLeases(2) == 1 && !s.Effective(2, Counter) && s.Effective(1, Counter),
+                "A source gained in an open dying window immediately signs one frame-bound state and exempts the frozen victim.");
+            frames.Push(inner);
+            try
+            {
+                applications.ApplyEvent(new PlayerDyingEvent(inner.Id, 2, null), SkillStateBoundaryTiming.Before);
+                Require(s.StateLeases(1) == 2 && !s.Effective(1, Counter) && s.Effective(2, Counter),
+                    "The active inner dying frame pauses the outer restriction and uses its own frozen victim.");
+                applications.ApplyEvent(new DyingResolvedEvent(inner.Id, 2, true), SkillStateBoundaryTiming.After);
+                Require(s.StateLeases(1) == 1, "Ending an inner frame cannot consume the outer frame's longer-lived state.");
+            }
+            finally { frames.Pop(inner.Id, ResolutionFrameKind.Dying); }
+            Require(!s.Effective(2, Counter) && s.Effective(1, Counter), "Returning to the authoritative outer frame resumes its original restriction.");
+            players[0].SkillGrants.RemoveGrant(source.GrantId);
+            Require(!s.Effective(2, Counter), "Removing the issuing source stops future applications without retracting its accepted dying state.");
+            applications.ApplyEvent(new DyingResolvedEvent(outer.Id, 1, true), SkillStateBoundaryTiming.After);
+            Require(s.Effective(2, Counter) && s.StateLeases(1) == 0, "Only the exact outer dying end retires its final signed state.");
+        }
+        finally { frames.Pop(outer.Id, ResolutionFrameKind.Dying); }
     }
 
     private static void ChosenLossReturnsToOrdinaryDrawCold()
@@ -290,12 +396,12 @@ internal static class SkillStateChecks
         }
     }
 
-    private static void LoadFilter(string filter, bool captureThreshold = false, string? legacyProperty = null, string? declaration = null)
+    private static SkillProgramCatalog LoadFilter(string filter, bool captureThreshold = false, string? legacyProperty = null, string? declaration = null)
     {
         var capture = captureThreshold ? "{\"op\":\"captureNumber\",\"target\":\"owner\",\"resultBind\":\"threshold\",\"valueExpr\":0}," : "";
         var legacy = legacyProperty is null ? "" : "," + legacyProperty;
         var declared = declaration is null ? "" : ",\"skillStates\":[" + declaration + "]";
-        _ = SkillProgramCatalog.Load($$$"""
+        return SkillProgramCatalog.Load($$$"""
             {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[{"id":"{{{Driver}}}","revision":1{{{declared}}},
               "activations":[{"id":"filter","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
                 "effects":[{{{capture}}}{"op":"skillState","target":"owner","action":"suppress","match":{"filter":{{{filter}}}},"until":[{"event":"turnCleanup","participant":{"kind":"turnOwner"},"timing":"before"}]{{{legacy}}}}]}]}]}
@@ -391,13 +497,38 @@ internal static class SkillStateChecks
             """{"target":"owner","action":"suppress","match":{},"until":[],"while":true}""",
             """{"target":"owner","action":"suppress","match":{"filter":["==",["number","threshold"],0]},"while":true}""",
             """{"target":"owner","action":"suppress","match":{},"while":["==",["boundCount","cards"],0]}""",
-            """{"target":"owner","action":"suppress","match":{}}"""
+            """{"target":"owner","action":"suppress","match":{}}""",
+            """{"target":"all","action":"suppress","match":{},"on":{"event":"dyingStarted","participant":{"kind":"owner"}}}""",
+            """{"target":"all","action":"suppress","match":{},"on":{"event":"turnStarted"}}""",
+            """{"target":"all","action":"suppress","match":{},"on":{"event":"dyingStarted"},"when":["==",["boundCount","cards"],0]}""",
+            """{"target":"all","action":"suppress","match":{},"on":{"event":"turnStarted","participant":{"kind":"owner"},"timing":"before","skipIssued":true},"until":[{"event":"turnEnded","participant":{"kind":"owner"},"timing":"after"}]}""",
+            """{"target":"all","action":"suppress","match":{},"on":{"event":"dyingStarted","timing":"before"},"until":[{"event":"dyingEnded"},{"event":"dyingEnded","skipIssued":true}]}""",
+            """{"target":"all","action":"suppress","match":{},"on":{"event":"turnStarted","participant":{"kind":"owner"},"timing":"after"},"until":[{"event":"turnEnded","participant":{"kind":"owner"},"timing":"after"}]}""",
+            """{"target":"all","action":"suppress","match":{},"on":{"event":"dyingStarted","timing":"before"},"until":[{"event":"turnEnded","participant":{"kind":"owner"},"timing":"after"}]}"""
         })
         {
             var rejected = false;
             try { LoadFilter("true", declaration: declaration); } catch (InvalidOperationException) { rejected = true; }
-            Require(rejected, "The existing rules loader rejects declarations that require a frame, transient binding, choice or expiry.");
+            Require(rejected, "The rules loader rejects frame-bound declarations, acquisition expiry and malformed event participants.");
         }
+        var turnDeclaration = LoadFilter("true", declaration: """
+            {"target":"all","action":"suppress","match":{},
+             "on":{"event":"turnStarted","participant":{"kind":"owner"},"timing":"before"},
+             "while":["inIssuedTurn","owner"],
+             "until":[{"event":"turnEnded","participant":{"kind":"owner"},"timing":"after"},{"event":"death","participant":{"kind":"target"},"timing":"before"}]}
+            """).Programs[Driver].SkillStates.Single();
+        var dyingDeclaration = LoadFilter("true", declaration: """
+            {"target":"all","action":"suppress","match":{},
+             "on":{"event":"dyingStarted","timing":"before"},"when":["isTurnOwner","owner"],
+             "while":["inIssuedDying","eventTarget"],"until":[{"event":"dyingEnded","timing":"after"}]}
+            """).Programs[Driver].SkillStates.Single();
+        Require(turnDeclaration.On is { Event: SkillStateBoundaryEvent.TurnStarted, Participant: SkillStateSubject.Owner, Timing: SkillStateBoundaryTiming.Before } &&
+            turnDeclaration.State.Until.Count == 2 && turnDeclaration.State.Until[0] is { Event: SkillStateBoundaryEvent.TurnEnded, Timing: SkillStateBoundaryTiming.After } &&
+            turnDeclaration.State.Until[1] is { Event: SkillStateBoundaryEvent.Death, Participant: SkillStateSubject.Target, Timing: SkillStateBoundaryTiming.Before } &&
+            dyingDeclaration.On is { Event: SkillStateBoundaryEvent.DyingStarted, Participant: null } &&
+            dyingDeclaration.When?.Op == "isTurnOwner" && dyingDeclaration.State.While?.Args.Single().Op == "eventTarget" &&
+            dyingDeclaration.State.Until.Single() is { Event: SkillStateBoundaryEvent.DyingEnded, Participant: null },
+            "Event declarations reuse typed boundary parsing and persistent admission/window expressions without a program-frame binding.");
         const string legacy = """{"formatVersion":1,"packageId":"fixture:retired-suppression","characterId":null,"skills":[{"registrationOrder":1,"programBundle":null,"includeProgramPresentation":false,"definition":{"id":"fixture:retired-suppression","name":"Old","description":"Old","suppressionRule":{"ownerHpEquals":1}}}],"generals":[]}""";
         var loader = typeof(StandardContentPackage).Assembly.GetType("CardGame.Content.Standard.CharacterContentCatalog", true)!
             .GetMethod("Load", BindingFlags.Static | BindingFlags.NonPublic)!;
@@ -450,7 +581,8 @@ internal static class SkillStateChecks
         probe.Actual = capabilities.Get<IProgramSkillChangeOperations>();
         var runtime = new ProgramSkillChangeRuntime(capabilities.Get<IProgramSkillChangeFacts>(), operations,
             capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
-            capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>());
+            capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(),
+            capabilities.Get<IProgramHealthChildQueries>());
         var token = s.E<ActualDiscardRecoveryPhaseStartedEvent>().Last().Phase.Token;
         var source = s.RealGrants(0).Single(grant => grant.SkillId == Driver);
         var permanent = s.CounterGrants(0).Single().GrantId;
@@ -530,7 +662,8 @@ internal static class SkillStateChecks
         var probe = (ExpiryOperationsProbe)facts; probe.Actual = capabilities.Get<IProgramSkillChangeFacts>();
         var runtime = new ProgramSkillChangeRuntime(facts, capabilities.Get<IProgramSkillChangeOperations>(),
             capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
-            capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>());
+            capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(),
+            capabilities.Get<IProgramHealthChildQueries>());
         var source = s.RealGrants(0).Single(grant => grant.SkillId == Driver);
         var nested = new NestedPhaseIssuer { Runtime = runtime,
             Origin = new(900200, 0, new(Driver, "transfer", 0, source.SkillInstanceId)),
@@ -569,6 +702,7 @@ internal static class SkillStateChecks
 
     private sealed class FactSink : IRuleProgressionOperations
     {
+        public void ApplySkillStateDeclarations(IGameEvent payload, SkillStateBoundaryTiming timing) { }
         public void QueueFact(IGameEvent payload) { }
         public bool BeginCharacterStateWindow() => false;
         public bool BeginHpChangedWindow() => false;

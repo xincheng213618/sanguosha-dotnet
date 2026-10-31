@@ -41,8 +41,6 @@ public sealed partial class GameEngine
     private ref long _giftHandRetentionSequence => ref _convertingGifts.ReferenceToGiftHandRetentionSequence;
     private ref readonly List<CurrentTurnDirectedHeartSlashBonus> _currentTurnHeartSlashBonuses => ref _currentTurnShownCardBenefits.ReferenceToCurrentTurnHeartSlashBonuses;
     private ref long _currentTurnSkillSuppressionRevision => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnSkillSuppressionRevision;
-    private ref long _currentTurnQualificationStamp => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnQualificationStamp;
-    private ref (long Projection, long Suppression) _currentTurnQualificationDependencies => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnQualificationDependencies;
     private ref readonly List<BeneficiarySuitShield> _beneficiarySuitShields => ref _deckEquipmentPrograms.ReferenceToBeneficiarySuitShields;
     private ref long _beneficiarySuitShieldSequence => ref _deckEquipmentPrograms.ReferenceToBeneficiarySuitShieldSequence;
     private ref readonly List<ProgramNextTurnRuleModifier> _programNextTurnRuleModifiers => ref _deferredBenefitsPrograms.ReferenceToProgramNextTurnRuleModifiers;
@@ -51,8 +49,6 @@ public sealed partial class GameEngine
     private ref readonly List<DeferredHandAlignment> _deferredHandAlignments => ref _deferredHandAlignments2.ReferenceToDeferredHandAlignments;
     private ref long _deferredHandAlignmentSequence => ref _deferredHandAlignments2.ReferenceToDeferredHandAlignmentSequence;
     private ref bool _synchronizingDragonBoatGrants => ref _dragonBoatGenerals.ReferenceToSynchronizingDragonBoatGrants;
-    private ref (long Base, long Frame, int Victim, int Turn, int TurnOwner, long SourceRevision, int SourceHp, bool SourceAlive) _dyingQualificationDependencies => ref _dyingWindowSkillPolicies.ReferenceToDyingQualificationDependencies;
-    private ref long _dyingQualificationStamp => ref _dyingWindowSkillPolicies.ReferenceToDyingQualificationStamp;
     private ref readonly Dictionary<(int Seat, string Instance), FriendPredictionPolicy> _friendPredictions => ref _friendTrio.ReferenceToFriendPredictions;
     private ref readonly Dictionary<(int Seat, string Instance), int> _friendPredictionCounts => ref _friendTrio.ReferenceToFriendPredictionCounts;
     private ref readonly HashSet<(int Seat, string Instance)> _friendFangqiuSpent => ref _friendTrio.ReferenceToFriendFangqiuSpent;
@@ -117,8 +113,6 @@ public sealed partial class GameEngine
     private ref int _turnRedDiscardTurn => ref _redDiscardRecovery.ReferenceToTurnRedDiscardTurn;
     private ref RuleProgressionRuntime? _ruleProgression => ref _ruleProgression2.ReferenceToRuleProgression;
     private ref ShenwuDraftSetup? _shenwuDraft => ref _shenwuActivities.ReferenceToShenwuDraft;
-    private ref (int Turn, int Seat, TurnPhase Phase, long Grants, bool Alive, bool Revealed)? _shenwuFengdongDependencies => ref _shenwuExpandedPolicies.ReferenceToShenwuFengdongDependencies;
-    private ref long _shenwuFengdongStamp => ref _shenwuExpandedPolicies.ReferenceToShenwuFengdongStamp;
     // The journal rebuilds these counters through accepted commands. They are
     // keyed by content identities, never by translated presentation text.
     private ref readonly Dictionary<(int Seat, string Skill, string Activation), int> _programUses => ref _skillPrograms.ReferenceToProgramUses;

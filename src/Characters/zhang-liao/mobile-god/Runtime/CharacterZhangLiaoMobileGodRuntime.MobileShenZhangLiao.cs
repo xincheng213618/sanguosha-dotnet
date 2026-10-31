@@ -27,15 +27,6 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
         _ => throw new InvalidOperationException("Unknown equipment slot.")};
     internal string[] MobileDuoruiSkills(int seat) => _contentRegistryOperations._contentRegistry.Generals[_coreMatchParticipantsPlayersAccess._players[seat].General.Id].SkillIds.Concat(_coreMatchParticipantsPlayersAccess._players[seat].SecondaryGeneral is { } second ? _contentRegistryOperations._contentRegistry.Generals[second.Id].SkillIds : []).Distinct(StringComparer.Ordinal).Where(id => (_contentRegistryOperations._contentRegistry.GetSkill(id).Tags & (SkillTag.Limited | SkillTag.Awakening | SkillTag.Lord)) == 0 && id is not ("mobile-god:powei" or "mou-mobile:jieyin")).Order(StringComparer.Ordinal).ToArray();
     internal bool MobileZhitiOpponent(int owner, int opponent) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(opponent) && owner != opponent && _coreMatchParticipantsPlayersAccess._players[opponent].IsAlive && _coreTreatedWoundedOperations.IsRuleWounded(_coreMatchParticipantsPlayersAccess._players[opponent]) && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(owner, opponent);
-    internal bool IsMobileDuoruiGrantQualified(CharacterState owner, SkillGrant grant)
-    {
-        if (!HasMobileShenZhangLiao)
-            return true;
-        if (grant.SourceId.StartsWith("mobile-duorui:", StringComparison.Ordinal) && !MobileDuoruiLeases.Any(e => e.Source.OwnerSeat == owner.Seat && e.BorrowGrantId == grant.GrantId && e.BorrowInstanceId == grant.SkillInstanceId && e.SelectedSkillId == grant.SkillId))
-            return false;
-        return !MobileDuoruiLeases.Any(e => e.TargetSeat == owner.Seat && e.SelectedSkillId == grant.SkillId);
-    }
-
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 39950)]
     internal void ExpireMobileDuorui(IGameEvent fact)
     {
@@ -46,8 +37,9 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
         {
             var owner = _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat];
             owner.SkillGrants.RemoveGrant(e.BorrowGrantId);
+            _coreProgramSkillChangesOperations.RevokeSkillStateOrigin(new(e.FrameId, 0,
+                new(e.Source.SkillId, e.Source.BindingId, e.Source.OwnerSeat, e.Source.SkillInstanceId)));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileDuoruiExpiredEvent(e.FrameId, e.TargetSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, fact is PlayerDiedEvent));
-            _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
         }
     }
 
@@ -123,7 +115,9 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
             owner.SkillGrants.Grant(new(grant, value, instance, source));
             _coreConversionStatesOperations.RegisterTaggedConversionSkill(owner, value);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileDuoruiIssuedEvent(f.Id, r.Source, r.GameplayHash, r.TargetSeat, value, grant, instance, _coreActualTurnProgressTurnNumberAccess._turnNumber, r.PaidSlot.Value));
-            _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
+            _coreProgramSkillChangesOperations.IssueSkillState(new(f.Id, 0,
+                new(r.Source.SkillId, r.Source.BindingId, r.Source.OwnerSeat, r.Source.SkillInstanceId)),
+                r.TargetSeat, new(SkillStateAction.Suppress, SkillStateMatch.ForSkills([value])));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SkillsAcquiredEvent(f.OwnerSeat, f.SkillId, Array.AsReadOnly(new[] { value })));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { MobileShenZhangLiao = r with { SelectedSkillId = value, Stage = MobileShenZhangLiaoStage.RestoreChildren } });
         }

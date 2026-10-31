@@ -14,11 +14,7 @@ internal sealed partial class CoreGameEnginePrivateGeneralLibrariesRuntime
         if (!owner.IsAlive)
             return false;
         var grant = owner.SkillGrants.Grants.FirstOrDefault(g => g.GrantId == source.CapabilityGrantId && g.SkillId == source.CapabilitySkillId && g.SkillInstanceId == source.CapabilitySkillInstanceId);
-        if (grant is null || !grant.IsEnabled || grant.GeneralLibraryProjection is not null)
-            return false;
-        if (grant.SourceId == CharacterState.PrimarySkillSource && _coreNativeDamageHandlesOperations.Value.IsNationalWarMode && (!owner.GeneralSelected || !owner.GeneralRevealed))
-            return false;
-        if (grant.SourceId == CharacterState.SecondarySkillSource && (!_coreNativeDamageHandlesOperations.Value.IsDualGeneralMode || !owner.SecondaryGeneralSelected || !owner.SecondaryGeneralRevealed))
+        if (grant is null || !_coreNationalSkillsOperations.IsRawSkillSourceAdmitted(owner, grant) || grant.GeneralLibraryProjection is not null)
             return false;
         return grant.LordProjection is null || LibraryBaseLordProjectionLive(owner, grant);
     }
@@ -32,7 +28,7 @@ internal sealed partial class CoreGameEnginePrivateGeneralLibrariesRuntime
         return _coreNationalSkillsOperations.IsSkillGrantStateEffective(owner, cap);
     }
 
-    internal bool LibraryBaseGrantLive(CharacterState owner, SkillGrant grant) => owner.IsAlive && grant.IsEnabled && (grant.SourceId != CharacterState.PrimarySkillSource || !_coreNativeDamageHandlesOperations.Value.IsNationalWarMode || owner.GeneralSelected && owner.GeneralRevealed) && (grant.SourceId != CharacterState.SecondarySkillSource || _coreNativeDamageHandlesOperations.Value.IsDualGeneralMode && owner.SecondaryGeneralSelected && owner.SecondaryGeneralRevealed) && (grant.SourceId is not (CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource) || !_contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Lord) || owner.Role == Role.Lord || _corePrintedLordSkillQualificationsOperations.IsPrintedLordGrantQualified(owner, grant));
+    internal bool LibraryBaseGrantLive(CharacterState owner, SkillGrant grant) => owner.IsAlive && _coreNationalSkillsOperations.IsRawSkillSourceAdmitted(owner, grant) && (grant.SourceId is not (CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource) || !_contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Lord) || owner.Role == Role.Lord || _corePrintedLordSkillQualificationsOperations.IsPrintedLordGrantQualified(owner, grant));
     internal bool LibraryBaseLordProjectionLive(CharacterState owner, SkillGrant grant)
     {
         if (grant.LordProjection is not { } p)

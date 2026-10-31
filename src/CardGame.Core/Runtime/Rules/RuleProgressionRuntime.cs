@@ -2,6 +2,7 @@ namespace CardGame.Core;
 
 internal interface IRuleProgressionOperations
 {
+    void ApplySkillStateDeclarations(IGameEvent payload, SkillStateBoundaryTiming timing);
     void QueueFact(IGameEvent payload);
     bool BeginCharacterStateWindow();
     bool BeginHpChangedWindow();
@@ -27,9 +28,11 @@ internal sealed class RuleProgressionRuntime(ProgramRuleObservers observers, IRu
         _advancingFacts.Add(payload);
         try
         {
+            operations.ApplySkillStateDeclarations(payload, SkillStateBoundaryTiming.Before);
             observers.BeforeEvent(payload);
             operations.QueueFact(payload);
             observers.AfterEvent(payload);
+            operations.ApplySkillStateDeclarations(payload, SkillStateBoundaryTiming.After);
         }
         finally { _advancingFacts.RemoveAt(_advancingFacts.Count - 1); }
     }

@@ -83,7 +83,7 @@
 | 阶段控制 | `skipTurnPhases` 10、`insertPhase` 4 | 28 | 半成品 |
 | **获得 / 交给** | `giveSelected` 9、`takeRandomHandCardFromSelectedTargets` 7 | **140** | **缺失**：“获得一张牌”“交给某人”没有统一动作 |
 | **使用 / 响应合法性** | 动作 `grantTurnCardActionProhibition` 9 等 4 个 | 21 | **缺失单一查询**：Core 有 98 个 `CanUse*/*Prohibited` 和 18 个响应限制查询，人物侧另有 29 个 |
-| **技能状态（失效 / 失去 / 夺取）** | `skillState`；`ProgramSkillChangeRuntime`、`SkillAvailability` | 不同期限、持续条件和调用授权尚存 | **部分完成**：普通状态统一，旧条件族和刻铭授权仍待迁移，见下文 |
+| **技能状态（失效 / 失去 / 夺取）** | `skillState`；`ProgramSkillChangeRuntime`、`SkillAvailability` | 韵筝及正向派生来源资格尚存 | **部分完成**：普通期限、缠怨、阴鸷、封冻、界完杀及移动夺锐负限制已统一；刻铭调用授权已独立，见下文 |
 | **无效 / 取消目标** | `nullifyCurrentCardEffect` 7 | 15 | **缺失** |
 | **觉醒 / 限定技** | 无 | 20 | **缺失** |
 | **装备（置入 / 废除栏位 / 移动装备）** | `grantArmor` 5 | 54 | **缺失** |
@@ -148,8 +148,8 @@
 
 | 标准 | 本批结果 |
 | --- | --- |
-| 一个概念，一个归属 | 普通状态解释归 `SkillAvailability`、变更归 `ProgramSkillChangeRuntime`；持续条件和调用授权尚未收口，整体部分完成 |
-| 依赖方向单一 | 新共享状态不认识具体人物；旧资格链及刻铭例外仍有反向依赖，列为后续工作 |
+| 一个概念，一个归属 | 状态解释归 `SkillAvailability`、期限/显式解除归 `ProgramSkillChangeRuntime`，声明施加复用同一受体表；仍有韵筝与派生来源，整体部分完成 |
+| 依赖方向单一 | 新共享状态不认识具体人物；刻铭已退出持有查询，剩余韵筝及正向来源资格继续迁移 |
 | 层次分明 | 状态变更是 effect，有效性是查询，酒杀资格留触发阶段，选择游标留原帧；尚缺持续条件声明 |
 | JSON 对照规则 | 7 份 JSON 直接写失效/失去及范围期限；原生复合动作保留自己的其他规则步骤 |
 | 改动局部 | 普通同类新技能仅需 JSON；未覆盖期限/光环/调用授权仍需补概念，不能称所有新技能均无需 C# |
@@ -342,7 +342,7 @@ Issue、Candidates、Matches 重复 Mode/人物来源/印刷来源/Locked。Filt
 
 ### 持续状态与调用授权的落地结果
 
-本批完成两版缠怨、阴鸷和刻铭窗口授权的共同边界；“技能状态”整体仍为**部分完成**，封冻、完杀、昀政及正向来源资格链尚未退役。
+这一批完成两版缠怨、阴鸷和刻铭窗口授权的共同边界；当时“技能状态”整体仍为**部分完成**。后续的封冻、界完杀及移动夺锐结果见下节。
 
 | 检查维度 | 本批结果与边界 |
 | --- | --- |
@@ -365,3 +365,45 @@ Issue、Candidates、Matches 重复 Mode/人物来源/印刷来源/Locked。Filt
 | bao-xin | 650 | 54,900 |
 | liao-hua | 159 | 13,546 |
 | xun-yu | 1,130 | 127,104 |
+
+### 按事件施加的限制（已确认并落地）
+
+永久附着的缠怨与“每次窗口接受一次”的封冻/界完杀不是同一种施加时机。后两者不能在取得源技能时挂一个永久 while，否则临时源技能移除后，未来回合仍会重新生效；也不能塞进现有普通 trigger 窗口，因为那些窗口晚于部分资格查询。现有 `selectedTargets` 还没有在 skillState handler 中批量签发，不能把枚举存在当作已实现能力。
+
+用户已确认扩充现有 `skillStates` 声明，不加解释器或人物回调：可选 `on` 复用期限的事件、主体和前/后结构；可选 `when` 是本次施加的表达式资格；`while` 只控制已施加状态何时生效；`until` 仍复用现有结束边界。没有 on 的已接受写法继续表示在真实取得声明时施加，不引入旧 suppressionRule 别名。
+
+```json
+{"skillStates":[{
+  "on":{"event":"turnStarted","participant":{"kind":"owner"},"timing":"before"},
+  "action":"suppress","target":"all",
+  "match":{"filter":["==",["number","skill.locked"],0]},
+  "while":["and",["not",["same","owner","target"]],["inIssuedTurn","owner"]],
+  "until":[{"event":"turnEnded","participant":{"kind":"owner"},"timing":"after"}]
+}]}
+```
+
+界完杀采用 `on: {"event":"dyingStarted","timing":"before"}`，`when: ["isTurnOwner","owner"]`；本次原生濒死身份和受害者冻结在已施加上下文，`while` 用 `inIssuedDying` 暂停挂起的外层窗口，并豁免施加者和该次受害者。`until: [{"event":"dyingEnded","timing":"after"}]` 接现有 `DyingResolvedEvent`，精确结束签发时的原生窗口，覆盖救回和死亡；不按“后来任一濒死结束”解除。
+
+共享应用边界先接受真实合格来源，再写受体 Restrictions，后续查询不回看原源技能；同一 grant、声明序号和真实事件 occurrence 幂等。源技能仍存在时，后续真实事件可以接受新的施加；源技能消失后只保留本次已施加状态，不产生未来窗口的授权。回合或濒死中途获得/明置来源，需要在同一个共享变更边界接受当前匹配窗口，不能等延迟 skillsChanged drain。不得在 while 内调用 GetShard/HasRuntimeSkill 或用新的谓词注册表处理。
+
+第一版 `on` 只接受上述两个 before 入口，且须含对应 after 结束边界，可附加现有 OR 结束条件。加载器拒绝尚未支持的应用时点、on.skipIssued 及特定濒死身份上的 skipIssued；公共 skillState 的其余期限组合没有收窄。现有回放仍用配置与命令前缀，没有新增玩法 epoch 或覆盖不可恢复的旧存档。
+
+### 事件声明、夺锐与原始来源准入的本批结果
+
+| 七项判断 | 落地证据与剩余范围 |
+| --- | --- |
+| 一个概念，一个归属 | 实际已施加状态仍是受体 Restrictions，期限与 origin 显式解除仍由 ProgramSkillChangeRuntime 执行；SkillStateApplications 只接纳声明并写同一张表。 |
+| 依赖方向单一 | 封冻/界完杀已从资格回调迁为 JSON；共享层没有人物 ID、谓词注册表或接口列表。来源资格只决定新的施加，不回查以撤销旧状态。 |
+| 基础概念可组合 | on/when/while/until 复用同一边界和表达式；同时覆盖本人回合和嵌套濒死，未添加复合人物指令或第二解释器。 |
+| 等价消费者一起收口 | 两种旧 policy、专属 stamp/state/contracts/转发全部退役；所有依赖通用资格的角色、模式、主公/私库/HP 等消费者统一读状态表。完杀用桃门禁是另一规则，保留。 |
+| 状态与原生执行统一 | 回合/濒死 before 声明在普通观察者之前施加，after 期限在该事件观察者完成后处理；濒死沿权威 ActiveDying 暂停/恢复，原始窗口精确到期。没有额外 pending 或事件账本。 |
+| 旧路径真实删除 | 移动夺锐的正/负资格证明方法删除：真实借入 grant 由原租约创建/删除；具名负限制用共享签发，并在原 AfterEvent39950 显式按 origin 撤销，保留真实租约限次、截止、死亡和付款续接。 |
+| 行为与边界可验证 | 27 项相关 Core 检查及 4 项例行检查通过，含真实生产声明、回合中途获得/移除、救回/死亡、冷恢复、嵌套濒死及 origin 精确解除；命令恢复和提交事件集合检查通过，没有全量或剪测试。 |
+
+原始 enabled/选择/明置准入已由 Availability 的同一实现复用到查询、私库和主公来源读取；Alive 仍由原规则调用者处理，Owned/Effective 的形成阶段没有换序。印刷主公权利尚不能宣称收口：官渡指挥官实际是 TeamA/TeamB，CorePrintedLord 包含该模式例外，但 Availability 的额外资格目前只有山河。保留这项真实差异，未加 bool override 隐藏，也未擅自改变答案；正向主公、私库、HP、装备花色、落雁与官渡派生关系继续审计。
+
+本批**未完成**的负条件只剩当前资格链中的韵筝。其物理牌标记、失效状态及仅给技能持有者的手牌上限豁免须分别处理；不能把私有 UI 标记文本当共享事实，或顺带把手牌豁免扩给所有持标记者。
+
+计量相对本批基线：人物 Runtime throw **5498 → 5498**、history accessor **4839 → 4839**、直接 IGameEvent record **3535 → 3535**。人物 C# +6/-12，净 **−6 行**；共享 C# +273/-245，净 **+28 行**；src C# +279/-257，净 **+22 行**、字节净 **−4,551**。三个样本（Git blob）：bao-xin **650 行/54,900 字节**，liao-hua **159/13,546**，xun-yu **1,130/127,104**。
+
+验证分两组：首组 12 项，构建 24.004 秒、依赖验证 1.291 秒、检查进程 27.178 秒；相邻规则组 15 项，构建 2.827 秒、依赖验证 0.204 秒、检查进程 18.682 秒；例行 4 项，构建 2.947 秒、依赖验证 0.210 秒、检查进程 1.276 秒。验证使用隔离的本批改动，未吸收并行装备实现。

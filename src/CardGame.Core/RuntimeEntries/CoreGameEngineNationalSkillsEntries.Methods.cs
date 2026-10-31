@@ -11,6 +11,7 @@ internal sealed partial class CoreGameEngineNationalSkillsEntries
     internal string GetRuntimeSkillInstanceId(CharacterState player, string skillId) => _resolve().GetRuntimeSkillInstanceId(player, skillId);
     internal SkillBindingShard GetSkillBindingShard(CharacterState player) => _resolve().GetSkillBindingShard(player);
     internal bool IsSkillGrantStateEffective(CharacterState player, SkillGrant grant) => _resolve().IsSkillGrantStateEffective(player, grant);
+    internal bool IsRawSkillSourceAdmitted(CharacterState player, SkillGrant grant) => _resolve().IsRawSkillSourceAdmitted(player, grant);
     internal IReadOnlyList<SkillGrant> GetOwnedSkillGrants(CharacterState player) => _resolve().GetOwnedSkillGrants(player);
     internal bool HasOwnedRuntimeSkill(CharacterState player, string skillId) => _resolve().HasOwnedRuntimeSkill(player, skillId);
     internal bool HasOwnedRuntimeSkillInstance(CharacterState player, string skillId, string skillInstanceId) => _resolve().HasOwnedRuntimeSkillInstance(player, skillId, skillInstanceId);

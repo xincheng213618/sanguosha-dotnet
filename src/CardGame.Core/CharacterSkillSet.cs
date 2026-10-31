@@ -32,6 +32,7 @@ public sealed class CharacterSkillSet
     private int _skillStateOwnerSeat;
     private IReadOnlyDictionary<string, IReadOnlyList<SkillStateDeclaration>>? _skillStateTemplates;
     private IReadOnlyList<CharacterState>? _skillStateRecipients;
+    private SkillStateApplications? _skillStateApplications;
     private long _restrictionsSnapshotRevision = -1;
     private long _restrictionRevision;
     private IReadOnlyList<SkillStateRestriction> _restrictionsSnapshot = [];
@@ -82,9 +83,11 @@ public sealed class CharacterSkillSet
     }
 
     internal void BindSkillStates(int ownerSeat,
-        IReadOnlyDictionary<string, IReadOnlyList<SkillStateDeclaration>> templates, IReadOnlyList<CharacterState> recipients)
+        IReadOnlyDictionary<string, IReadOnlyList<SkillStateDeclaration>> templates, IReadOnlyList<CharacterState> recipients,
+        SkillStateApplications? applications = null)
     {
         _skillStateOwnerSeat = ownerSeat; _skillStateTemplates = templates; _skillStateRecipients = recipients;
+        _skillStateApplications = applications;
         AdmitSkillStates();
     }
 
@@ -92,13 +95,19 @@ public sealed class CharacterSkillSet
     {
         if (_skillStateTemplates is not null)
             foreach (var grant in Grants)
-                SkillStateApplications.Apply(_skillStateOwnerSeat, grant, _skillStateTemplates, _skillStateRecipients!);
+                AdmitSkillState(grant);
     }
 
     internal void BindSkillStatesFrom(CharacterSkillSet previous)
     {
         if (previous._skillStateTemplates is not null)
-            BindSkillStates(previous._skillStateOwnerSeat, previous._skillStateTemplates, previous._skillStateRecipients!);
+            BindSkillStates(previous._skillStateOwnerSeat, previous._skillStateTemplates, previous._skillStateRecipients!, previous._skillStateApplications);
+    }
+
+    private void AdmitSkillState(SkillGrant grant)
+    {
+        if (_skillStateApplications is { } applications) applications.Admit(_skillStateOwnerSeat, grant);
+        else SkillStateApplications.Apply(_skillStateOwnerSeat, grant, _skillStateTemplates!, _skillStateRecipients!);
     }
 
     public bool Grant(SkillGrant grant)
@@ -132,9 +141,9 @@ public sealed class CharacterSkillSet
             throw new InvalidOperationException($"Skill grant '{grant.GrantId}' conflicts with an existing grant.");
         }
         _grants.Add(grant.GrantId, grant);
-        if (_skillStateTemplates is not null)
-            SkillStateApplications.Apply(_skillStateOwnerSeat, grant, _skillStateTemplates, _skillStateRecipients!);
         GrantsChanged();
+        if (_skillStateTemplates is not null)
+            AdmitSkillState(grant);
         return true;
     }
 
@@ -169,9 +178,9 @@ public sealed class CharacterSkillSet
         if (grant.IsEnabled == enabled) return false;
         var updated = grant with { IsEnabled = enabled };
         _grants[grantId] = updated;
-        if (enabled && _skillStateTemplates is not null)
-            SkillStateApplications.Apply(_skillStateOwnerSeat, updated, _skillStateTemplates, _skillStateRecipients!);
         GrantsChanged();
+        if (enabled && _skillStateTemplates is not null)
+            AdmitSkillState(updated);
         return true;
     }
 

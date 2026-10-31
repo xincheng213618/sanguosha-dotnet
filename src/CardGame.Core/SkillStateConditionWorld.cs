@@ -5,7 +5,9 @@ namespace CardGame.Core;
 internal sealed class SkillStateConditionWorld(SkillStateConditionContext context, CharacterState owner,
     EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants = null, CardZoneStore? cards = null,
     IActualDiscardRecoveryPhaseQueries? phases = null, IProgramRuntimeFrames? frames = null,
-    RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null) : IProgramExpressionWorld
+    RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null,
+    EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState = null,
+    IProgramHealthChildQueries? healthChildren = null) : IProgramExpressionWorld
 {
     public int? Participant(string name)
     {
@@ -13,6 +15,7 @@ internal sealed class SkillStateConditionWorld(SkillStateConditionContext contex
         {
             "owner" => context.OwnerSeat,
             "target" or "selectedTarget" => context.TargetSeat,
+            "eventTarget" => context.EventTargetSeat,
             _ => null
         };
         return seat is { } value && Player(value) is not null ? value : null;
@@ -49,6 +52,12 @@ internal sealed class SkillStateConditionWorld(SkillStateConditionContext contex
             "inIssuedPhase" => context.IssuedPhase is { } issued && issued.ActorSeat == seat && phases?.Current() == issued,
             "inUpcomingTurnPrelude" => frames is null ? null :
                 frames.OfType<ResolutionFrame>().FirstOrDefault()?.UpcomingTurnPrelude?.OwnerSeat == seat,
+            "isTurnOwner" => turnState is null ? null : turnState._turnNumber > 0 &&
+                turnState._phase is not (TurnPhase.NotStarted or TurnPhase.Finished) && turnState._currentSeat == seat,
+            "inIssuedTurn" => turnState is null ? null : context.IssuedTurnNumber == turnState._turnNumber &&
+                turnState._phase is not (TurnPhase.NotStarted or TurnPhase.Finished) && turnState._currentSeat == seat,
+            "inIssuedDying" => healthChildren is null ? null : healthChildren.ActiveDying is { } dying &&
+                dying.Id == context.IssuedDyingFrameId && dying.VictimSeat == seat,
             _ => null
         };
     }

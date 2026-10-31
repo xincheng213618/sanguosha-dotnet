@@ -123,6 +123,57 @@ internal static class CharacterSkillSetChecks
         owner.SkillGrants.SetRestriction(Restriction("empty", SkillStateAction.Suppress, SkillStateMatch.All.Freeze([]), owner.Seat));
         Require(index.GetShard(owner).HasInstance("fixture:plain", "printed-instance"), "An explicitly empty skill selection must not become an all-skills restriction.");
         owner.SkillGrants.RemoveRestriction("empty");
+        RawSourceAdmissionPreservesSelectionVisibilityAndQualificationStages();
+    }
+
+    private static void RawSourceAdmissionPreservesSelectionVisibilityAndQualificationStages()
+    {
+        const string plain = "fixture:raw-source", lord = "fixture:raw-lord";
+        var definitions = new Dictionary<string, ContentSkillDefinition>
+        { [plain] = new(plain, "Source", ""), [lord] = new(lord, "Lord source", "") { Tags = SkillTag.Lord } };
+        var owner = Character(new GeneralDefinition("fixture:raw-owner", "Owner", "", []));
+        var primary = new SkillGrant("primary", plain, "primary-instance", CharacterState.PrimarySkillSource);
+        owner.SkillGrants.Grant(primary);
+        var hidden = new SkillAvailability(id => definitions[id], true, false, null, null);
+        foreach (var selected in new[] { false, true })
+        foreach (var revealed in new[] { false, true })
+        {
+            owner.GeneralSelected = selected; owner.GeneralRevealed = revealed;
+            var answer = hidden.Query(owner);
+            Require(hidden.IsRawSourceAdmitted(owner, primary) == (selected && revealed) &&
+                    answer.HasOwnedInstance(plain, primary.SkillInstanceId) == selected &&
+                    answer.HasEffectiveInstance(plain, primary.SkillInstanceId) == (selected && revealed),
+                "Hidden primary origins require actual selection and reveal for admission, while possession remains independent of reveal.");
+        }
+        owner.SecondaryGeneral = new GeneralDefinition("fixture:raw-secondary", "Secondary", "", []);
+        var secondary = primary with { GrantId = "secondary", SkillInstanceId = "secondary-instance", SourceId = CharacterState.SecondarySkillSource };
+        foreach (var (nationalWar, dualGenerals) in new[] { (false, false), (true, false), (false, true) })
+        {
+            var availability = new SkillAvailability(id => definitions[id], nationalWar, dualGenerals, null, null);
+            foreach (var selected in new[] { false, true })
+            foreach (var revealed in new[] { false, true })
+            {
+                owner.SecondaryGeneralSelected = selected; owner.SecondaryGeneralRevealed = revealed;
+                Require(availability.IsRawSourceAdmitted(owner, secondary) == ((nationalWar || dualGenerals) && selected && revealed),
+                    "Secondary origins use the same selection/reveal rule and require a mode with a second general.");
+            }
+        }
+        var ordinary = new SkillAvailability(id => definitions[id], false, false, null, null);
+        owner.GeneralSelected = false; owner.GeneralRevealed = false;
+        Require(ordinary.IsRawSourceAdmitted(owner, primary) && !ordinary.IsRawSourceAdmitted(owner, primary with { IsEnabled = false }),
+            "Ordinary primary origins retain their established pre-reveal admission, while disabled grants never qualify.");
+        owner.IsAlive = false;
+        var independent = primary with { SourceId = "equipment:raw-source" };
+        var raw = new SkillAvailability(_ => throw new InvalidOperationException("Raw admission resolved a definition."), true, false,
+            (_, _) => throw new InvalidOperationException("Raw admission entered derived qualification."),
+            (_, _) => throw new InvalidOperationException("Raw admission entered printed-lord qualification."));
+        Require(raw.IsRawSourceAdmitted(owner, independent) && raw.IsRawSourceAdmitted(owner, independent with { SourceId = "acquired:raw-source" }),
+            "Raw origin admission reads no final availability, derived relation or printed-lord callback; source-owner survival remains a caller rule.");
+        owner.IsAlive = true;
+        var printedLord = primary with { GrantId = "lord", SkillId = lord, SkillInstanceId = "lord-instance" };
+        owner.SkillGrants.Grant(printedLord);
+        Require(ordinary.IsRawSourceAdmitted(owner, printedLord) && !ordinary.Query(owner).HasOwnedInstance(lord, printedLord.SkillInstanceId),
+            "Raw admission does not replace the existing printed-lord ownership decision or grant its rights to a non-lord.");
     }
 
     private static SkillStateRestriction Restriction(string id, SkillStateAction action, SkillStateMatch match, int seat) =>

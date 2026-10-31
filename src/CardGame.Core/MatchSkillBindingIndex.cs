@@ -227,11 +227,13 @@ internal sealed class MatchSkillBindingIndex
         Func<CharacterState, SkillGrant, bool>? additionalPrintedLordQualification = null,
         EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants = null, CardZoneStore? cards = null,
         IActualDiscardRecoveryPhaseQueries? phases = null, IProgramRuntimeFrames? frames = null,
-        RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null)
+        RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null,
+        EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState = null,
+        IProgramHealthChildQueries? healthChildren = null)
     {
         ArgumentNullException.ThrowIfNull(resolveDefinition);
         _availability = new(resolveDefinition, isNationalWarMode, dualGenerals,
-            grantQualification, additionalPrintedLordQualification, participants, cards, phases, frames, health);
+            grantQualification, additionalPrintedLordQualification, participants, cards, phases, frames, health, turnState, healthChildren);
         _hasHpSensitiveSources = hasHpSensitiveSources;
         _health = health;
         _projectionStamp = projectionStamp;

@@ -522,6 +522,7 @@ var tests = new (string Name, Action Body)[]
     ("character skills retain separate sources and stable ownership", CharacterSkillSetChecks.GrantsRetainSourcesAndStableOwnership),
     ("skill availability separates possession from effective sources", CharacterSkillSetChecks.AvailabilitySeparatesPossessionFromEffectiveSources),
     ("Skill state: ownership choices instances and expiry cold", SkillStateChecks.StateChangesPreserveOwnershipChoicesInstancesAndExpiryCold),
+    ("Skill state events: native turn and dying declarations cold", SkillStateEventChecks.NativeTurnAndDyingDeclarationsFollowOriginalWindowsCold),
     ("character skills reject conflicting grants without partial state", CharacterSkillSetChecks.InvalidGrantsAndConflictsLeaveStateUnchanged),
     ("current turn nonlocked suppression host lifecycle audit", CurrentTurnSkillSuppressionChecks.HostLifecycleQualificationAudit),
     ("program card legality preserves ordered stages and live queries", ProgramCardLegalityChecks.OrderedStagesAndLiveQueries),

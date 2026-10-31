@@ -5,6 +5,7 @@ internal sealed partial class CoreGameEngineProgramSkillChangesEntries
     internal void ProcessSkillStateBoundary(SkillStateBoundary boundary) => _resolve().ProcessSkillStateBoundary(boundary);
     internal void ApplyProgramSkillState(ProgramSkillFrame frame, int seat, SkillStateSpec spec, string? resultBind = null) => _resolve().ApplyProgramSkillState(frame, seat, spec, resultBind);
     internal int IssueSkillState(SkillStateOrigin origin, int seat, SkillStateSpec spec) => _resolve().IssueSkillState(origin, seat, spec);
+    internal void RevokeSkillStateOrigin(SkillStateOrigin origin) => _resolve().RevokeSkillStateOrigin(origin);
     internal IReadOnlyList<string> AcquireProgramSkillChange(GameEngine.ProgramSkillChangeContext context, IReadOnlyList<string> skillIds, bool announceAwakening) => _resolve().AcquireProgramSkillChange(context, skillIds, announceAwakening);
     internal bool CommitConfiguredConversionTier(CharacterState owner, string state, int tier) => _resolve().CommitConfiguredConversionTier(owner, state, tier);
     internal SkillGrant CommitProgramExplicitSkillSource(ProgramSkillFrame frame, SkillGrant grant, IReadOnlyList<string>? revokedGrantIds = default) => _resolve().CommitProgramExplicitSkillSource(frame, grant, revokedGrantIds);

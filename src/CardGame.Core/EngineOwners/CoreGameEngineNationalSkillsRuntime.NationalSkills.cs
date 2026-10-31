@@ -73,6 +73,8 @@ internal sealed partial class CoreGameEngineNationalSkillsRuntime
     internal SkillBindingShard GetSkillBindingShard(CharacterState player) => _coreGameEngineActionQueriesActionQueryAccess._actionQuery is { } query ? query.Bindings[player.Seat] ??= _skillBindingIndexOperations._skillBindingIndex.GetShard(player) : _skillBindingIndexOperations._skillBindingIndex.GetShard(player);
     internal bool IsSkillGrantStateEffective(CharacterState player, SkillGrant grant) =>
         _skillBindingIndexOperations._skillBindingIndex.Availability.IsGrantEffectiveUnderStates(player, grant);
+    internal bool IsRawSkillSourceAdmitted(CharacterState player, SkillGrant grant) =>
+        _skillBindingIndexOperations._skillBindingIndex.Availability.IsRawSourceAdmitted(player, grant);
     internal IReadOnlyList<string> EnabledPrintedContentSkillIds(CharacterState player)
     {
         return EnabledRuntimeSkillGrants(player).Where(grant => grant.SourceId is CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource).Select(grant => grant.SkillId).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();

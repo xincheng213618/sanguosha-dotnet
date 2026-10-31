@@ -29,6 +29,7 @@ internal sealed partial class CoreGameEngineProgramSkillChangesRuntime
     internal SkillGrant CommitProgramExplicitSkillSource(ProgramSkillFrame frame, SkillGrant grant, IReadOnlyList<string>? revokedGrantIds = null) => ProgramSkillChanges.CommitExplicitSource(frame, grant, revokedGrantIds);
     internal void RemoveProgramExplicitSkillSources(ProgramSkillFrame frame, IReadOnlyList<string> grantIds) => ProgramSkillChanges.RemoveExplicitSources(frame, grantIds);
     internal int IssueSkillState(SkillStateOrigin origin, int seat, SkillStateSpec spec) => ProgramSkillChanges.IssueSkillState(origin, seat, spec);
+    internal void RevokeSkillStateOrigin(SkillStateOrigin origin) => ProgramSkillChanges.RevokeSkillStateOrigin(origin);
     internal void ProcessSkillStateBoundary(SkillStateBoundary boundary) => ProgramSkillChanges.ProcessSkillStateBoundary(boundary);
     ProgramSkillFrame IProgramSkillChangeFacts.ActiveFrame(long id) => _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
     bool IProgramSkillChangeFacts.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);

@@ -62,7 +62,6 @@ public sealed partial class GameEngine
     private readonly EngineStates.CoreGameEngineDeferredCardsState _deferredCards = new();
     private readonly EngineStates.CoreGameEngineDeferredHandAlignmentsState _deferredHandAlignments2 = new();
     private readonly EngineStates.CoreGameEngineDragonBoatGeneralsState _dragonBoatGenerals = new();
-    private readonly EngineStates.CoreGameEngineDyingWindowSkillPoliciesState _dyingWindowSkillPolicies = new();
     private readonly EngineStates.CoreGameEngineFriendTrioState _friendTrio = new();
     private readonly EngineStates.CoreGameEngineGuanduActivitiesState _guanduActivities = new();
     private readonly EngineStates.CoreGameEngineHpChangeProgramsState _hpChangePrograms = new();
@@ -89,7 +88,6 @@ public sealed partial class GameEngine
     private readonly EngineStates.CoreGameEngineRedDiscardRecoveryState _redDiscardRecovery = new();
     private readonly EngineStates.CoreGameEngineRuleProgressionState _ruleProgression2 = new();
     private readonly EngineStates.CoreGameEngineShenwuActivitiesState _shenwuActivities = new();
-    private readonly EngineStates.CoreGameEngineShenwuExpandedPoliciesState _shenwuExpandedPolicies = new();
     private readonly EngineStates.CoreGameEngineSkillProgramsState _skillPrograms = new();
     private readonly EngineStates.CoreGameEngineSourceCursesState _sourceCurses2 = new();
     private readonly EngineStates.CoreGameEngineStrategicProgramsState _strategicPrograms = new();
@@ -225,7 +223,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICoreGameEngineConvertingGiftsGiftHandRetentionObligationsGiftHandRetentionSequenceAccess), _convertingGifts),
         new(typeof(EngineStates.Contracts.ICoreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess), _currentTurnShownCardBenefits),
         new(typeof(EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess), _currentTurnSkillSuppressions2),
-        new(typeof(EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess), _currentTurnSkillSuppressions2),
         new(typeof(EngineStates.Contracts.ICoreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldSequenceBeneficiarySuitShieldsAccess), _deckEquipmentPrograms),
         new(typeof(EngineStates.Contracts.ICoreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldsAccess), _deckEquipmentPrograms),
         new(typeof(EngineStates.Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramNextTurnRuleModifiersAccess), _deferredBenefitsPrograms),
@@ -233,7 +230,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICoreGameEngineDeferredCardsDeferredPublicPileDepositsAccess), _deferredCards),
         new(typeof(EngineStates.Contracts.ICoreGameEngineDeferredHandAlignmentsDeferredHandAlignmentSequenceDeferredHandAlignmentsAccess), _deferredHandAlignments2),
         new(typeof(EngineStates.Contracts.ICoreGameEngineDragonBoatGeneralsSynchronizingDragonBoatGrantsAccess), _dragonBoatGenerals),
-        new(typeof(EngineStates.Contracts.ICoreGameEngineDyingWindowSkillPoliciesDyingQualificationDependenciesDyingQualificationStampAccess), _dyingWindowSkillPolicies),
         new(typeof(EngineStates.Contracts.ICoreGameEngineFriendTrioFriendFangqiuSpentFriendPredictionCountsFriendPredictionsFriendQihuiUnlimitedAccess), _friendTrio),
         new(typeof(EngineStates.Contracts.ICoreGameEngineFriendTrioFriendQihuiUnlimitedAccess), _friendTrio),
         new(typeof(EngineStates.Contracts.ICoreGameEngineGuanduActivitiesGuanduInitialConfigurationGuanduQualificationDependenciesGuanduQualificationStampAccess), _guanduActivities),
@@ -266,7 +262,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICoreGameEngineRedAdditionalTargetsRedAdditionalTargetGrantsSelectedRedAdditionalTargetSourceAccess), _redAdditionalTargets),
         new(typeof(EngineStates.Contracts.ICoreGameEngineRedDiscardRecoveryTurnRedDiscardCountTurnRedDiscardTurnAccess), _redDiscardRecovery),
         new(typeof(EngineStates.Contracts.ICoreGameEngineRuleProgressionRuleProgressionAccess), _ruleProgression2),
-        new(typeof(EngineStates.Contracts.ICoreGameEngineShenwuExpandedPoliciesShenwuFengdongDependenciesShenwuFengdongStampAccess), _shenwuExpandedPolicies),
         new(typeof(EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesAccess), _skillPrograms),
         new(typeof(EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramPhaseUsesProgramUsesAccess), _skillPrograms),
         new(typeof(EngineStates.Contracts.ICoreGameEngineSkillProgramsProgramContributionUsesProgramPhaseUsesProgramUsesAccess), _skillPrograms),
