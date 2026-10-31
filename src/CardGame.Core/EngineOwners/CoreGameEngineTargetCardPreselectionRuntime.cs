@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineTargetCardPreselectionRuntime
+internal sealed partial class CoreGameEngineTargetCardPreselectionRuntime(EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess)
 {
-    private readonly EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
-    internal CoreGameEngineTargetCardPreselectionRuntime(EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
-    {
-        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
-    }
 }

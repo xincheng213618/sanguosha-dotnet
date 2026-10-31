@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineTurnEndingOrderRuntime
+internal sealed partial class CoreGameEngineTurnEndingOrderRuntime(ICoreTurnEndingOrderProgramPhaseBoundaryOperations _programPhaseBoundaryOperations)
 {
-    private readonly ICoreTurnEndingOrderProgramPhaseBoundaryOperations _programPhaseBoundaryOperations;
-    internal CoreGameEngineTurnEndingOrderRuntime(ICoreTurnEndingOrderProgramPhaseBoundaryOperations programPhaseBoundaryOperations)
-    {
-        this._programPhaseBoundaryOperations = programPhaseBoundaryOperations;
-    }
 }

@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CharacterLuJiMobileRuntime
+internal sealed partial class CharacterLuJiMobileRuntime(RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations;
-    internal CharacterLuJiMobileRuntime(RuntimeEntries.CoreGameEngineNationalSkillsEntries coreNationalSkillsOperations)
-    {
-        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
-    }
 }

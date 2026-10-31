@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEnginePersistentPrivateWhirlRuntime
+internal sealed partial class CoreGameEnginePersistentPrivateWhirlRuntime(IKernelContentRegistryAccess _contentRegistryOperations)
 {
-    private readonly IKernelContentRegistryAccess _contentRegistryOperations;
-    internal CoreGameEnginePersistentPrivateWhirlRuntime(IKernelContentRegistryAccess contentRegistryOperations)
-    {
-        this._contentRegistryOperations = contentRegistryOperations;
-    }
 }

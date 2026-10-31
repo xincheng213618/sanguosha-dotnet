@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreSnapshotValueProjectionRuntime
+internal sealed partial class CoreSnapshotValueProjectionRuntime(ICoreSnapshotValueProjectionCardSnapshotProjectorOperations _cardSnapshotProjectorOperations)
 {
-    private readonly ICoreSnapshotValueProjectionCardSnapshotProjectorOperations _cardSnapshotProjectorOperations;
-    internal CoreSnapshotValueProjectionRuntime(ICoreSnapshotValueProjectionCardSnapshotProjectorOperations cardSnapshotProjectorOperations)
-    {
-        this._cardSnapshotProjectorOperations = cardSnapshotProjectorOperations;
-    }
 }

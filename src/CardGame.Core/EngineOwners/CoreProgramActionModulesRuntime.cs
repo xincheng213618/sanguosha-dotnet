@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreProgramActionModulesRuntime
+internal sealed partial class CoreProgramActionModulesRuntime(IKernelProgramActionsAccess _programActionsOperations, IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations)
 {
-    private readonly IKernelProgramActionsAccess _programActionsOperations;
-    private readonly IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations;
-    internal CoreProgramActionModulesRuntime(IKernelProgramActionsAccess programActionsOperations, IKernelBindRuntimeHandlerOperations kernelCoreProgramRuntimeModulesOperations)
-    {
-        this._programActionsOperations = programActionsOperations;
-        this._kernelCoreProgramRuntimeModulesOperations = kernelCoreProgramRuntimeModulesOperations;
-    }
 }

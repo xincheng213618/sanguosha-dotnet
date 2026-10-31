@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineModeCardRecastsRuntime
+internal sealed partial class CoreGameEngineModeCardRecastsRuntime(IKernelMatchModeRulesAccess _modeRulesOperations, ICoreModeCardRecastsCoreEquipmentContentOperations _coreEquipmentContentOperations)
 {
-    private readonly IKernelMatchModeRulesAccess _modeRulesOperations;
-    private readonly ICoreModeCardRecastsCoreEquipmentContentOperations _coreEquipmentContentOperations;
-    internal CoreGameEngineModeCardRecastsRuntime(IKernelMatchModeRulesAccess modeRulesOperations, ICoreModeCardRecastsCoreEquipmentContentOperations coreEquipmentContentOperations)
-    {
-        this._modeRulesOperations = modeRulesOperations;
-        this._coreEquipmentContentOperations = coreEquipmentContentOperations;
-    }
 }

@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreResolutionIdentityBoundaryRuntime
+internal sealed partial class CoreResolutionIdentityBoundaryRuntime(IKernelResolutionSchedulerAccess _resolutionSchedulerOperations)
 {
-    private readonly IKernelResolutionSchedulerAccess _resolutionSchedulerOperations;
-    internal CoreResolutionIdentityBoundaryRuntime(IKernelResolutionSchedulerAccess resolutionSchedulerOperations)
-    {
-        this._resolutionSchedulerOperations = resolutionSchedulerOperations;
-    }
 }

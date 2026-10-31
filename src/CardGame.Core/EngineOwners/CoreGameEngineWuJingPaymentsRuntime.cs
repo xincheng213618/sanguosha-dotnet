@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineWuJingPaymentsRuntime
+internal sealed partial class CoreGameEngineWuJingPaymentsRuntime(RuntimeEntries.CharacterWuJingOlEntries _characterWuJingOlOperations, IKernelFrameStoreAccess _resolutionStackOperations, RuntimeEntries.CoreGameEngineCardUsePaymentsEntries _coreCardUsePaymentsOperations)
 {
-    private readonly RuntimeEntries.CharacterWuJingOlEntries _characterWuJingOlOperations;
-    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
-    private readonly RuntimeEntries.CoreGameEngineCardUsePaymentsEntries _coreCardUsePaymentsOperations;
-    internal CoreGameEngineWuJingPaymentsRuntime(RuntimeEntries.CharacterWuJingOlEntries characterWuJingOlOperations, IKernelFrameStoreAccess resolutionStackOperations, RuntimeEntries.CoreGameEngineCardUsePaymentsEntries coreCardUsePaymentsOperations)
-    {
-        this._characterWuJingOlOperations = characterWuJingOlOperations;
-        this._resolutionStackOperations = resolutionStackOperations;
-        this._coreCardUsePaymentsOperations = coreCardUsePaymentsOperations;
-    }
 }

@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineEquipmentSuitHandLimitRuntime
+internal sealed partial class CoreGameEngineEquipmentSuitHandLimitRuntime(RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations, RuntimeEntries.CoreNativeCardAppearanceEntries _coreNativeCardAppearanceOperations, RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
-    private readonly RuntimeEntries.CoreNativeCardAppearanceEntries _coreNativeCardAppearanceOperations;
-    private readonly RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
-    internal CoreGameEngineEquipmentSuitHandLimitRuntime(RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations, RuntimeEntries.CoreNativeCardAppearanceEntries coreNativeCardAppearanceOperations, RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations)
-    {
-        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
-        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
-        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
-    }
 }

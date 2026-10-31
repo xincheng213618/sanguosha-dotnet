@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreNativeCardAppearanceRuntime
+internal sealed partial class CoreNativeCardAppearanceRuntime(RuntimeEntries.CharacterZhangFeiAnniversaryGodEntries _characterZhangFeiAnniversaryGodOperations, RuntimeEntries.CoreGameEngineCardDeclarationsEntries _coreCardDeclarationsOperations, RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations)
 {
-    private readonly RuntimeEntries.CharacterZhangFeiAnniversaryGodEntries _characterZhangFeiAnniversaryGodOperations;
-    private readonly RuntimeEntries.CoreGameEngineCardDeclarationsEntries _coreCardDeclarationsOperations;
-    private readonly RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
-    internal CoreNativeCardAppearanceRuntime(RuntimeEntries.CharacterZhangFeiAnniversaryGodEntries characterZhangFeiAnniversaryGodOperations, RuntimeEntries.CoreGameEngineCardDeclarationsEntries coreCardDeclarationsOperations, RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations)
-    {
-        this._characterZhangFeiAnniversaryGodOperations = characterZhangFeiAnniversaryGodOperations;
-        this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;
-        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
-    }
 }

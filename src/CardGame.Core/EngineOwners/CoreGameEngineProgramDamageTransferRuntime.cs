@@ -2,27 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineProgramDamageTransferRuntime
+internal sealed partial class CoreGameEngineProgramDamageTransferRuntime(IKernelFrameStoreAccess _resolutionStackOperations, RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries _coreProgramAttackAttemptOperations, RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations, RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries _coreRecipientScopedDamageOperations, RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations, RuntimeEntries.CoreMatchLogEntries _coreMatchLogOperations, RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations, IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess)
 {
-    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
-    private readonly RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries _coreProgramAttackAttemptOperations;
-    private readonly RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
-    private readonly RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries _coreRecipientScopedDamageOperations;
-    private readonly RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
-    private readonly RuntimeEntries.CoreMatchLogEntries _coreMatchLogOperations;
-    private readonly RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations;
-    private readonly IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
-    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineProgramDamageTransferRuntime(IKernelFrameStoreAccess resolutionStackOperations, RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries coreProgramAttackAttemptOperations, RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries coreRecipientScopedDamageOperations, RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, RuntimeEntries.CoreMatchLogEntries coreMatchLogOperations, RuntimeEntries.CoreTableSeatQueriesEntries coreTableSeatQueriesOperations, IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
-    {
-        this._resolutionStackOperations = resolutionStackOperations;
-        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
-        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
-        this._coreRecipientScopedDamageOperations = coreRecipientScopedDamageOperations;
-        this._coreRuntimeOperations = coreRuntimeOperations;
-        this._coreMatchLogOperations = coreMatchLogOperations;
-        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
-        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
-        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
-    }
 }

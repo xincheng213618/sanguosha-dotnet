@@ -2,21 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineActionQueriesRuntime
+internal sealed partial class CoreGameEngineActionQueriesRuntime(RuntimeEntries.CoreGameEngineCardConversionsEntries _coreCardConversionsOperations, RuntimeEntries.CoreGameEngineRuleQueriesEntries _coreRuleQueriesOperations, RuntimeEntries.CoreNativeLegalActionsEntries _coreNativeLegalActionsOperations, IKernelCreateActionQueryScopeOperations _kernelCoreGameEngineActionQueriesOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess, EngineStates.Contracts.ICoreGameEngineActionQueriesActionQueryAccess _coreGameEngineActionQueriesActionQueryAccess)
 {
-    private readonly RuntimeEntries.CoreGameEngineCardConversionsEntries _coreCardConversionsOperations;
-    private readonly RuntimeEntries.CoreGameEngineRuleQueriesEntries _coreRuleQueriesOperations;
-    private readonly RuntimeEntries.CoreNativeLegalActionsEntries _coreNativeLegalActionsOperations;
-    private readonly IKernelCreateActionQueryScopeOperations _kernelCoreGameEngineActionQueriesOperations;
-    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    private readonly EngineStates.Contracts.ICoreGameEngineActionQueriesActionQueryAccess _coreGameEngineActionQueriesActionQueryAccess;
-    internal CoreGameEngineActionQueriesRuntime(RuntimeEntries.CoreGameEngineCardConversionsEntries coreCardConversionsOperations, RuntimeEntries.CoreGameEngineRuleQueriesEntries coreRuleQueriesOperations, RuntimeEntries.CoreNativeLegalActionsEntries coreNativeLegalActionsOperations, IKernelCreateActionQueryScopeOperations kernelCoreGameEngineActionQueriesOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, EngineStates.Contracts.ICoreGameEngineActionQueriesActionQueryAccess coreGameEngineActionQueriesActionQueryAccess)
-    {
-        this._coreCardConversionsOperations = coreCardConversionsOperations;
-        this._coreRuleQueriesOperations = coreRuleQueriesOperations;
-        this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;
-        this._kernelCoreGameEngineActionQueriesOperations = kernelCoreGameEngineActionQueriesOperations;
-        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
-        this._coreGameEngineActionQueriesActionQueryAccess = coreGameEngineActionQueriesActionQueryAccess;
-    }
 }

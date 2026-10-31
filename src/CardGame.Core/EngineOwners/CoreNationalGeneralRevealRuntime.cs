@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreNationalGeneralRevealRuntime
+internal sealed partial class CoreNationalGeneralRevealRuntime(RuntimeEntries.CoreMatchLogEntries _coreMatchLogOperations, RuntimeEntries.CoreNativeDamageHandlesEntries _coreNativeDamageHandlesOperations, IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations)
 {
-    private readonly RuntimeEntries.CoreMatchLogEntries _coreMatchLogOperations;
-    private readonly RuntimeEntries.CoreNativeDamageHandlesEntries _coreNativeDamageHandlesOperations;
-    private readonly IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
-    internal CoreNationalGeneralRevealRuntime(RuntimeEntries.CoreMatchLogEntries coreMatchLogOperations, RuntimeEntries.CoreNativeDamageHandlesEntries coreNativeDamageHandlesOperations, IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations)
-    {
-        this._coreMatchLogOperations = coreMatchLogOperations;
-        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
-        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
-    }
 }

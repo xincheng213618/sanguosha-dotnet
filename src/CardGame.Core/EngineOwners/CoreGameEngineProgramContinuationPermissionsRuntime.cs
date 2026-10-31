@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineProgramContinuationPermissionsRuntime
+internal sealed partial class CoreGameEngineProgramContinuationPermissionsRuntime(ICoreProgramContinuationPermissionsCoreProgramRuntimeHooksOperations _coreProgramRuntimeHooksOperations)
 {
-    private readonly ICoreProgramContinuationPermissionsCoreProgramRuntimeHooksOperations _coreProgramRuntimeHooksOperations;
-    internal CoreGameEngineProgramContinuationPermissionsRuntime(ICoreProgramContinuationPermissionsCoreProgramRuntimeHooksOperations coreProgramRuntimeHooksOperations)
-    {
-        this._coreProgramRuntimeHooksOperations = coreProgramRuntimeHooksOperations;
-    }
 }

@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineModeAllegianceRuntime
+internal sealed partial class CoreGameEngineModeAllegianceRuntime(IKernelAllegiancePolicyAccess _allegiancePolicyOperations, IKernelMatchModeRuntimeAccess _modeRuntimeOperations)
 {
-    private readonly IKernelAllegiancePolicyAccess _allegiancePolicyOperations;
-    private readonly IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
-    internal CoreGameEngineModeAllegianceRuntime(IKernelAllegiancePolicyAccess allegiancePolicyOperations, IKernelMatchModeRuntimeAccess modeRuntimeOperations)
-    {
-        this._allegiancePolicyOperations = allegiancePolicyOperations;
-        this._modeRuntimeOperations = modeRuntimeOperations;
-    }
 }

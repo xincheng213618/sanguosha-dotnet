@@ -2,27 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule, Core.ProgramCapability]
-internal sealed partial class CharacterBuLianShiMobileRuntime : IMobileBuLianShiAnxuHost
+internal sealed partial class CharacterBuLianShiMobileRuntime(IKernelActiveCardMovementBatchIdsAccess _activeCardMovementBatchIdsOperations, IKernelFrameStoreAccess _resolutionStackOperations, RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations, RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations, RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations, RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations, IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations, EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess) : IMobileBuLianShiAnxuHost
 {
-    private readonly IKernelActiveCardMovementBatchIdsAccess _activeCardMovementBatchIdsOperations;
-    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
-    private readonly RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations;
-    private readonly RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
-    private readonly RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
-    private readonly RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
-    private readonly IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
-    private readonly EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
-    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CharacterBuLianShiMobileRuntime(IKernelActiveCardMovementBatchIdsAccess activeCardMovementBatchIdsOperations, IKernelFrameStoreAccess resolutionStackOperations, RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations, RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations, IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations, EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
-    {
-        this._activeCardMovementBatchIdsOperations = activeCardMovementBatchIdsOperations;
-        this._resolutionStackOperations = resolutionStackOperations;
-        this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
-        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
-        this._coreRuntimeOperations = coreRuntimeOperations;
-        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
-        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
-        this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
-        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
-    }
 }

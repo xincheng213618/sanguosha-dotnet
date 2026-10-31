@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineDyingRescueContinuationsRuntime
+internal sealed partial class CoreGameEngineDyingRescueContinuationsRuntime(RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries _coreAlternatingBenefitsOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries _coreAlternatingBenefitsOperations;
-    internal CoreGameEngineDyingRescueContinuationsRuntime(RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations)
-    {
-        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
-    }
 }

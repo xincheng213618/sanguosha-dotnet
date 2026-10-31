@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineSkillOwnershipWindowsRuntime
+internal sealed partial class CoreGameEngineSkillOwnershipWindowsRuntime(ICoreSkillOwnershipWindowsSkillOwnershipWindowOperations _skillOwnershipWindowOperations)
 {
-    private readonly ICoreSkillOwnershipWindowsSkillOwnershipWindowOperations _skillOwnershipWindowOperations;
-    internal CoreGameEngineSkillOwnershipWindowsRuntime(ICoreSkillOwnershipWindowsSkillOwnershipWindowOperations skillOwnershipWindowOperations)
-    {
-        this._skillOwnershipWindowOperations = skillOwnershipWindowOperations;
-    }
 }

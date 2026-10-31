@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineScenarioPrintedLordQualificationsRuntime
+internal sealed partial class CoreGameEngineScenarioPrintedLordQualificationsRuntime(EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess)
 {
-    private readonly EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
-    internal CoreGameEngineScenarioPrintedLordQualificationsRuntime(EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess)
-    {
-        this._coreMatchDefinitionOptionsAccess = coreMatchDefinitionOptionsAccess;
-    }
 }

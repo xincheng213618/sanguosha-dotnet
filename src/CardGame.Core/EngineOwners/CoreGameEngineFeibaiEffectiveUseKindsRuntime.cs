@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineFeibaiEffectiveUseKindsRuntime
+internal sealed partial class CoreGameEngineFeibaiEffectiveUseKindsRuntime(RuntimeEntries.CharacterCaiYongLeEntries _characterCaiYongLeOperations, RuntimeEntries.CoreGameEngineSlashUseOrdinalsEntries _coreSlashUseOrdinalsOperations)
 {
-    private readonly RuntimeEntries.CharacterCaiYongLeEntries _characterCaiYongLeOperations;
-    private readonly RuntimeEntries.CoreGameEngineSlashUseOrdinalsEntries _coreSlashUseOrdinalsOperations;
-    internal CoreGameEngineFeibaiEffectiveUseKindsRuntime(RuntimeEntries.CharacterCaiYongLeEntries characterCaiYongLeOperations, RuntimeEntries.CoreGameEngineSlashUseOrdinalsEntries coreSlashUseOrdinalsOperations)
-    {
-        this._characterCaiYongLeOperations = characterCaiYongLeOperations;
-        this._coreSlashUseOrdinalsOperations = coreSlashUseOrdinalsOperations;
-    }
 }

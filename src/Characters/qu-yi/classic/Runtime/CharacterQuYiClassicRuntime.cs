@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CharacterQuYiClassicRuntime
+internal sealed partial class CharacterQuYiClassicRuntime(RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess)
 {
-    private readonly RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations;
-    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CharacterQuYiClassicRuntime(RuntimeEntries.CoreGameEngineNationalSkillsEntries coreNationalSkillsOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
-    {
-        this._coreNationalSkillsOperations = coreNationalSkillsOperations;
-        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
-    }
 }

@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreProgramCardUsePaymentsRuntime
+internal sealed partial class CoreProgramCardUsePaymentsRuntime(IKernelCardUsePaymentsAccess _cardUsePaymentsOperations, IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations)
 {
-    private readonly IKernelCardUsePaymentsAccess _cardUsePaymentsOperations;
-    private readonly IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations;
-    internal CoreProgramCardUsePaymentsRuntime(IKernelCardUsePaymentsAccess cardUsePaymentsOperations, IKernelBindRuntimeHandlerOperations kernelCoreProgramRuntimeModulesOperations)
-    {
-        this._cardUsePaymentsOperations = cardUsePaymentsOperations;
-        this._kernelCoreProgramRuntimeModulesOperations = kernelCoreProgramRuntimeModulesOperations;
-    }
 }

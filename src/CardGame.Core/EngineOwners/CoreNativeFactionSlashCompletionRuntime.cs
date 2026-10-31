@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreNativeFactionSlashCompletionRuntime
+internal sealed partial class CoreNativeFactionSlashCompletionRuntime(IKernelFrameStoreAccess _resolutionStackOperations, RuntimeEntries.CoreNativeCardContinuationCursorsEntries _coreNativeCardContinuationCursorsOperations)
 {
-    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
-    private readonly RuntimeEntries.CoreNativeCardContinuationCursorsEntries _coreNativeCardContinuationCursorsOperations;
-    internal CoreNativeFactionSlashCompletionRuntime(IKernelFrameStoreAccess resolutionStackOperations, RuntimeEntries.CoreNativeCardContinuationCursorsEntries coreNativeCardContinuationCursorsOperations)
-    {
-        this._resolutionStackOperations = resolutionStackOperations;
-        this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;
-    }
 }

@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreNativeDamageCompletionRuntime
+internal sealed partial class CoreNativeDamageCompletionRuntime(RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries _coreProgramAttackAttemptOperations, RuntimeEntries.CoreNativeAttackCompletionEntries _coreNativeAttackCompletionOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries _coreProgramAttackAttemptOperations;
-    private readonly RuntimeEntries.CoreNativeAttackCompletionEntries _coreNativeAttackCompletionOperations;
-    internal CoreNativeDamageCompletionRuntime(RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries coreProgramAttackAttemptOperations, RuntimeEntries.CoreNativeAttackCompletionEntries coreNativeAttackCompletionOperations)
-    {
-        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
-        this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;
-    }
 }

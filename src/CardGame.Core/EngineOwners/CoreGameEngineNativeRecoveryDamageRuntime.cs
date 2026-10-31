@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineNativeRecoveryDamageRuntime
+internal sealed partial class CoreGameEngineNativeRecoveryDamageRuntime(ICoreNativeRecoveryDamageNativeHealthRecoveryOperations _nativeHealthRecoveryOperations)
 {
-    private readonly ICoreNativeRecoveryDamageNativeHealthRecoveryOperations _nativeHealthRecoveryOperations;
-    internal CoreGameEngineNativeRecoveryDamageRuntime(ICoreNativeRecoveryDamageNativeHealthRecoveryOperations nativeHealthRecoveryOperations)
-    {
-        this._nativeHealthRecoveryOperations = nativeHealthRecoveryOperations;
-    }
 }

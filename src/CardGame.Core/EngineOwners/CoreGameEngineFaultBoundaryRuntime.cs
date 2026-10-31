@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineFaultBoundaryRuntime
+internal sealed partial class CoreGameEngineFaultBoundaryRuntime(IKernelCommandSessionAccess _commandSessionOperations, IKernelCommandRuntimeAccess _kernelCoreGameEngineCommandSessionOperations)
 {
-    private readonly IKernelCommandSessionAccess _commandSessionOperations;
-    private readonly IKernelCommandRuntimeAccess _kernelCoreGameEngineCommandSessionOperations;
-    internal CoreGameEngineFaultBoundaryRuntime(IKernelCommandSessionAccess commandSessionOperations, IKernelCommandRuntimeAccess kernelCoreGameEngineCommandSessionOperations)
-    {
-        this._commandSessionOperations = commandSessionOperations;
-        this._kernelCoreGameEngineCommandSessionOperations = kernelCoreGameEngineCommandSessionOperations;
-    }
 }

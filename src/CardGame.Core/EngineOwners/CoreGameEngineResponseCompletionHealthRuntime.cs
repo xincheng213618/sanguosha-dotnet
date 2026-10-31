@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineResponseCompletionHealthRuntime
+internal sealed partial class CoreGameEngineResponseCompletionHealthRuntime(ICoreResponseCompletionHealthResponseCompletionOperations _responseCompletionOperations)
 {
-    private readonly ICoreResponseCompletionHealthResponseCompletionOperations _responseCompletionOperations;
-    internal CoreGameEngineResponseCompletionHealthRuntime(ICoreResponseCompletionHealthResponseCompletionOperations responseCompletionOperations)
-    {
-        this._responseCompletionOperations = responseCompletionOperations;
-    }
 }

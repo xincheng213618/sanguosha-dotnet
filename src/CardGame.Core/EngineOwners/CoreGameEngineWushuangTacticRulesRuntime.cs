@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineWushuangTacticRulesRuntime
+internal sealed partial class CoreGameEngineWushuangTacticRulesRuntime(RuntimeEntries.CoreGameEngineWushuangEntries _coreWushuangOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineWushuangEntries _coreWushuangOperations;
-    internal CoreGameEngineWushuangTacticRulesRuntime(RuntimeEntries.CoreGameEngineWushuangEntries coreWushuangOperations)
-    {
-        this._coreWushuangOperations = coreWushuangOperations;
-    }
 }

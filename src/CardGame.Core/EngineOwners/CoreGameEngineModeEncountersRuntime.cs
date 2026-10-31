@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineModeEncountersRuntime
+internal sealed partial class CoreGameEngineModeEncountersRuntime(IKernelCreateModeEncounterHostOperations _kernelCoreGameEngineModeEncountersOperations)
 {
-    private readonly IKernelCreateModeEncounterHostOperations _kernelCoreGameEngineModeEncountersOperations;
-    internal CoreGameEngineModeEncountersRuntime(IKernelCreateModeEncounterHostOperations kernelCoreGameEngineModeEncountersOperations)
-    {
-        this._kernelCoreGameEngineModeEncountersOperations = kernelCoreGameEngineModeEncountersOperations;
-    }
 }

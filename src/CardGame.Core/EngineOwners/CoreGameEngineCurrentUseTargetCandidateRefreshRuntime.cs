@@ -2,25 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineCurrentUseTargetCandidateRefreshRuntime
+internal sealed partial class CoreGameEngineCurrentUseTargetCandidateRefreshRuntime(IKernelContentRegistryAccess _contentRegistryOperations, IKernelFrameStoreAccess _resolutionStackOperations, RuntimeEntries.CoreGameEngineCardActionsEntries _coreCardActionsOperations, RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries _coreDesignatedExtraTargetsOperations, RuntimeEntries.CoreGameEngineProgramCardUseRolesEntries _coreProgramCardUseRolesOperations, RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations, RuntimeEntries.CoreGameEngineTableOrderEntries _coreTableOrderOperations, ICoreCurrentUseTargetCandidateRefreshCoreProgramTargetWindowProtocolsOperations _coreProgramTargetWindowProtocolsOperations)
 {
-    private readonly IKernelContentRegistryAccess _contentRegistryOperations;
-    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
-    private readonly RuntimeEntries.CoreGameEngineCardActionsEntries _coreCardActionsOperations;
-    private readonly RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries _coreDesignatedExtraTargetsOperations;
-    private readonly RuntimeEntries.CoreGameEngineProgramCardUseRolesEntries _coreProgramCardUseRolesOperations;
-    private readonly RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
-    private readonly RuntimeEntries.CoreGameEngineTableOrderEntries _coreTableOrderOperations;
-    private readonly ICoreCurrentUseTargetCandidateRefreshCoreProgramTargetWindowProtocolsOperations _coreProgramTargetWindowProtocolsOperations;
-    internal CoreGameEngineCurrentUseTargetCandidateRefreshRuntime(IKernelContentRegistryAccess contentRegistryOperations, IKernelFrameStoreAccess resolutionStackOperations, RuntimeEntries.CoreGameEngineCardActionsEntries coreCardActionsOperations, RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries coreDesignatedExtraTargetsOperations, RuntimeEntries.CoreGameEngineProgramCardUseRolesEntries coreProgramCardUseRolesOperations, RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, RuntimeEntries.CoreGameEngineTableOrderEntries coreTableOrderOperations, ICoreCurrentUseTargetCandidateRefreshCoreProgramTargetWindowProtocolsOperations coreProgramTargetWindowProtocolsOperations)
-    {
-        this._contentRegistryOperations = contentRegistryOperations;
-        this._resolutionStackOperations = resolutionStackOperations;
-        this._coreCardActionsOperations = coreCardActionsOperations;
-        this._coreDesignatedExtraTargetsOperations = coreDesignatedExtraTargetsOperations;
-        this._coreProgramCardUseRolesOperations = coreProgramCardUseRolesOperations;
-        this._coreRuntimeOperations = coreRuntimeOperations;
-        this._coreTableOrderOperations = coreTableOrderOperations;
-        this._coreProgramTargetWindowProtocolsOperations = coreProgramTargetWindowProtocolsOperations;
-    }
 }

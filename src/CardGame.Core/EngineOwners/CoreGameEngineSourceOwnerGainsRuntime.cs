@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineSourceOwnerGainsRuntime
+internal sealed partial class CoreGameEngineSourceOwnerGainsRuntime(RuntimeEntries.CoreGameEngineCardMovementProgramsEntries _coreCardMovementProgramsOperations, RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess)
 {
-    private readonly RuntimeEntries.CoreGameEngineCardMovementProgramsEntries _coreCardMovementProgramsOperations;
-    private readonly RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations;
-    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineSourceOwnerGainsRuntime(RuntimeEntries.CoreGameEngineCardMovementProgramsEntries coreCardMovementProgramsOperations, RuntimeEntries.CoreTableSeatQueriesEntries coreTableSeatQueriesOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
-    {
-        this._coreCardMovementProgramsOperations = coreCardMovementProgramsOperations;
-        this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;
-        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
-    }
 }

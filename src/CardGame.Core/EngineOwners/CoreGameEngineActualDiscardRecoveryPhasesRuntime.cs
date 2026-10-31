@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineActualDiscardRecoveryPhasesRuntime
+internal sealed partial class CoreGameEngineActualDiscardRecoveryPhasesRuntime(ICoreActualDiscardRecoveryPhasesActualDiscardRecoveryPhaseOperations _actualDiscardRecoveryPhaseOperations)
 {
-    private readonly ICoreActualDiscardRecoveryPhasesActualDiscardRecoveryPhaseOperations _actualDiscardRecoveryPhaseOperations;
-    internal CoreGameEngineActualDiscardRecoveryPhasesRuntime(ICoreActualDiscardRecoveryPhasesActualDiscardRecoveryPhaseOperations actualDiscardRecoveryPhaseOperations)
-    {
-        this._actualDiscardRecoveryPhaseOperations = actualDiscardRecoveryPhaseOperations;
-    }
 }

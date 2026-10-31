@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineProgramContinuationsRuntime
+internal sealed partial class CoreGameEngineProgramContinuationsRuntime(ICoreProgramContinuationsProgramChildWindowOperations _programChildWindowOperations)
 {
-    private readonly ICoreProgramContinuationsProgramChildWindowOperations _programChildWindowOperations;
-    internal CoreGameEngineProgramContinuationsRuntime(ICoreProgramContinuationsProgramChildWindowOperations programChildWindowOperations)
-    {
-        this._programChildWindowOperations = programChildWindowOperations;
-    }
 }

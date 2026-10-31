@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineNativeDrawOrdinalsRuntime
+internal sealed partial class CoreGameEngineNativeDrawOrdinalsRuntime(ICoreNativeDrawOrdinalsNativeDrawOrdinalTriggerOperations _nativeDrawOrdinalTriggerOperations)
 {
-    private readonly ICoreNativeDrawOrdinalsNativeDrawOrdinalTriggerOperations _nativeDrawOrdinalTriggerOperations;
-    internal CoreGameEngineNativeDrawOrdinalsRuntime(ICoreNativeDrawOrdinalsNativeDrawOrdinalTriggerOperations nativeDrawOrdinalTriggerOperations)
-    {
-        this._nativeDrawOrdinalTriggerOperations = nativeDrawOrdinalTriggerOperations;
-    }
 }

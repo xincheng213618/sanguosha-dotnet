@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreModeNativeFrameRuntimeRuntime
+internal sealed partial class CoreModeNativeFrameRuntimeRuntime(IKernelMatchModeRuntimeAccess _modeRuntimeOperations)
 {
-    private readonly IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
-    internal CoreModeNativeFrameRuntimeRuntime(IKernelMatchModeRuntimeAccess modeRuntimeOperations)
-    {
-        this._modeRuntimeOperations = modeRuntimeOperations;
-    }
 }

@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineTreatedWoundedRuntime
+internal sealed partial class CoreGameEngineTreatedWoundedRuntime(RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries _characterDaQiaoXiaoQiaoHappyGodOperations, RuntimeEntries.CharacterSunHaoOlEntries _characterSunHaoOlOperations, IKernelContentRegistryAccess _contentRegistryOperations)
 {
-    private readonly RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries _characterDaQiaoXiaoQiaoHappyGodOperations;
-    private readonly RuntimeEntries.CharacterSunHaoOlEntries _characterSunHaoOlOperations;
-    private readonly IKernelContentRegistryAccess _contentRegistryOperations;
-    internal CoreGameEngineTreatedWoundedRuntime(RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries characterDaQiaoXiaoQiaoHappyGodOperations, RuntimeEntries.CharacterSunHaoOlEntries characterSunHaoOlOperations, IKernelContentRegistryAccess contentRegistryOperations)
-    {
-        this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;
-        this._characterSunHaoOlOperations = characterSunHaoOlOperations;
-        this._contentRegistryOperations = contentRegistryOperations;
-    }
 }

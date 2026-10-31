@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineDistanceNativeQueriesRuntime
+internal sealed partial class CoreGameEngineDistanceNativeQueriesRuntime(ICoreDistanceNativeQueriesCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations)
 {
-    private readonly ICoreDistanceNativeQueriesCoreNativeRuleQueriesOperations _coreNativeRuleQueriesOperations;
-    internal CoreGameEngineDistanceNativeQueriesRuntime(ICoreDistanceNativeQueriesCoreNativeRuleQueriesOperations coreNativeRuleQueriesOperations)
-    {
-        this._coreNativeRuleQueriesOperations = coreNativeRuleQueriesOperations;
-    }
 }

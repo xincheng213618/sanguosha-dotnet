@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineCharacterHostRuntime
+internal sealed partial class CoreGameEngineCharacterHostRuntime(IKernelContentRegistryAccess _contentRegistryOperations, RuntimeEntries.CoreGameEngineProgramSkillChangesEntries _coreProgramSkillChangesOperations, RuntimeEntries.CoreNativeDamageHandlesEntries _coreNativeDamageHandlesOperations)
 {
-    private readonly IKernelContentRegistryAccess _contentRegistryOperations;
-    private readonly RuntimeEntries.CoreGameEngineProgramSkillChangesEntries _coreProgramSkillChangesOperations;
-    private readonly RuntimeEntries.CoreNativeDamageHandlesEntries _coreNativeDamageHandlesOperations;
-    internal CoreGameEngineCharacterHostRuntime(IKernelContentRegistryAccess contentRegistryOperations, RuntimeEntries.CoreGameEngineProgramSkillChangesEntries coreProgramSkillChangesOperations, RuntimeEntries.CoreNativeDamageHandlesEntries coreNativeDamageHandlesOperations)
-    {
-        this._contentRegistryOperations = contentRegistryOperations;
-        this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;
-        this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;
-    }
 }

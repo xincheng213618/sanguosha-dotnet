@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreDamageObserverCursorQueriesRuntime
+internal sealed partial class CoreDamageObserverCursorQueriesRuntime(RuntimeEntries.CoreDamageAdjacencyServicesEntries _coreDamageAdjacencyServicesOperations)
 {
-    private readonly RuntimeEntries.CoreDamageAdjacencyServicesEntries _coreDamageAdjacencyServicesOperations;
-    internal CoreDamageObserverCursorQueriesRuntime(RuntimeEntries.CoreDamageAdjacencyServicesEntries coreDamageAdjacencyServicesOperations)
-    {
-        this._coreDamageAdjacencyServicesOperations = coreDamageAdjacencyServicesOperations;
-    }
 }

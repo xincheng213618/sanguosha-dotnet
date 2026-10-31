@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CharacterXuChuHappyGodRuntime
+internal sealed partial class CharacterXuChuHappyGodRuntime(RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries _coreAlternatingBenefitsOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries _coreAlternatingBenefitsOperations;
-    internal CharacterXuChuHappyGodRuntime(RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations)
-    {
-        this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
-    }
 }

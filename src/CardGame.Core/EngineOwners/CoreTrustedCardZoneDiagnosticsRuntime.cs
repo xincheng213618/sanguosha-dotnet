@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreTrustedCardZoneDiagnosticsRuntime
+internal sealed partial class CoreTrustedCardZoneDiagnosticsRuntime(IKernelCardZoneStoreAccess _cardZonesOperations)
 {
-    private readonly IKernelCardZoneStoreAccess _cardZonesOperations;
-    internal CoreTrustedCardZoneDiagnosticsRuntime(IKernelCardZoneStoreAccess cardZonesOperations)
-    {
-        this._cardZonesOperations = cardZonesOperations;
-    }
 }

@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineRuleProgressionRuntime
+internal sealed partial class CoreGameEngineRuleProgressionRuntime(IKernelProgramRuleObserversAccess _programRuleObserversOperations, IKernelCreateRuleProgressionOperationsOperations _kernelCoreGameEngineRuleProgressionOperations, EngineStates.Contracts.ICoreGameEngineRuleProgressionRuleProgressionAccess _coreGameEngineRuleProgressionRuleProgressionAccess)
 {
-    private readonly IKernelProgramRuleObserversAccess _programRuleObserversOperations;
-    private readonly IKernelCreateRuleProgressionOperationsOperations _kernelCoreGameEngineRuleProgressionOperations;
-    private readonly EngineStates.Contracts.ICoreGameEngineRuleProgressionRuleProgressionAccess _coreGameEngineRuleProgressionRuleProgressionAccess;
-    internal CoreGameEngineRuleProgressionRuntime(IKernelProgramRuleObserversAccess programRuleObserversOperations, IKernelCreateRuleProgressionOperationsOperations kernelCoreGameEngineRuleProgressionOperations, EngineStates.Contracts.ICoreGameEngineRuleProgressionRuleProgressionAccess coreGameEngineRuleProgressionRuleProgressionAccess)
-    {
-        this._programRuleObserversOperations = programRuleObserversOperations;
-        this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;
-        this._coreGameEngineRuleProgressionRuleProgressionAccess = coreGameEngineRuleProgressionRuleProgressionAccess;
-    }
 }

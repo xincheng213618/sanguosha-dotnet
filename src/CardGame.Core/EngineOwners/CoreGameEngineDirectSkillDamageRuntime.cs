@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineDirectSkillDamageRuntime
+internal sealed partial class CoreGameEngineDirectSkillDamageRuntime(IKernelFrameStoreAccess _resolutionStackOperations)
 {
-    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
-    internal CoreGameEngineDirectSkillDamageRuntime(IKernelFrameStoreAccess resolutionStackOperations)
-    {
-        this._resolutionStackOperations = resolutionStackOperations;
-    }
 }

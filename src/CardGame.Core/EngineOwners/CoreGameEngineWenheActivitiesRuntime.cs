@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineWenheActivitiesRuntime
+internal sealed partial class CoreGameEngineWenheActivitiesRuntime(RuntimeEntries.CoreGameEngineActivityBattleRulesEntries _coreActivityBattleRulesOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineActivityBattleRulesEntries _coreActivityBattleRulesOperations;
-    internal CoreGameEngineWenheActivitiesRuntime(RuntimeEntries.CoreGameEngineActivityBattleRulesEntries coreActivityBattleRulesOperations)
-    {
-        this._coreActivityBattleRulesOperations = coreActivityBattleRulesOperations;
-    }
 }

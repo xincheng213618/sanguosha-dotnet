@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineNativeLogicalDiscardsRuntime
+internal sealed partial class CoreGameEngineNativeLogicalDiscardsRuntime(ICoreNativeLogicalDiscardsNativeLogicalDiscardOperations _nativeLogicalDiscardOperations)
 {
-    private readonly ICoreNativeLogicalDiscardsNativeLogicalDiscardOperations _nativeLogicalDiscardOperations;
-    internal CoreGameEngineNativeLogicalDiscardsRuntime(ICoreNativeLogicalDiscardsNativeLogicalDiscardOperations nativeLogicalDiscardOperations)
-    {
-        this._nativeLogicalDiscardOperations = nativeLogicalDiscardOperations;
-    }
 }

@@ -2,19 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule, Core.ProgramCapability]
-internal sealed partial class CoreProgramDamageInsertionRuntimeRuntime : IProgramDamageInsertionFacts
+internal sealed partial class CoreProgramDamageInsertionRuntimeRuntime(IKernelFrameStoreAccess _resolutionStackOperations, RuntimeEntries.CoreDyingCursorRuntimeEntries _coreDyingCursorRuntimeOperations, RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries _coreProgramAttackAttemptOperations, RuntimeEntries.CoreGameEngineProgramChildResolutionEntries _coreProgramChildResolutionOperations, ICoreProgramDamageInsertionRuntimeProgramDamageInsertionOperations _programDamageInsertionOperations) : IProgramDamageInsertionFacts
 {
-    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
-    private readonly RuntimeEntries.CoreDyingCursorRuntimeEntries _coreDyingCursorRuntimeOperations;
-    private readonly RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries _coreProgramAttackAttemptOperations;
-    private readonly RuntimeEntries.CoreGameEngineProgramChildResolutionEntries _coreProgramChildResolutionOperations;
-    private readonly ICoreProgramDamageInsertionRuntimeProgramDamageInsertionOperations _programDamageInsertionOperations;
-    internal CoreProgramDamageInsertionRuntimeRuntime(IKernelFrameStoreAccess resolutionStackOperations, RuntimeEntries.CoreDyingCursorRuntimeEntries coreDyingCursorRuntimeOperations, RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries coreProgramAttackAttemptOperations, RuntimeEntries.CoreGameEngineProgramChildResolutionEntries coreProgramChildResolutionOperations, ICoreProgramDamageInsertionRuntimeProgramDamageInsertionOperations programDamageInsertionOperations)
-    {
-        this._resolutionStackOperations = resolutionStackOperations;
-        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
-        this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
-        this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
-        this._programDamageInsertionOperations = programDamageInsertionOperations;
-    }
 }

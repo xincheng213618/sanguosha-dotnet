@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineActualPhaseEndsRuntime
+internal sealed partial class CoreGameEngineActualPhaseEndsRuntime(ICoreActualPhaseEndsActualPhaseEndOperations _actualPhaseEndOperations)
 {
-    private readonly ICoreActualPhaseEndsActualPhaseEndOperations _actualPhaseEndOperations;
-    internal CoreGameEngineActualPhaseEndsRuntime(ICoreActualPhaseEndsActualPhaseEndOperations actualPhaseEndOperations)
-    {
-        this._actualPhaseEndOperations = actualPhaseEndOperations;
-    }
 }

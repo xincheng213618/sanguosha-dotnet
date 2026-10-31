@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreHandCardGuidanceProjectionRuntime
+internal sealed partial class CoreHandCardGuidanceProjectionRuntime(RuntimeEntries.CoreGameEngineHandGuidanceEntries _coreHandGuidanceOperations, ICoreHandCardGuidanceProjectionCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineHandGuidanceEntries _coreHandGuidanceOperations;
-    private readonly ICoreHandCardGuidanceProjectionCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
-    internal CoreHandCardGuidanceProjectionRuntime(RuntimeEntries.CoreGameEngineHandGuidanceEntries coreHandGuidanceOperations, ICoreHandCardGuidanceProjectionCoreNativeLegalActionsOperations coreNativeLegalActionsOperations)
-    {
-        this._coreHandGuidanceOperations = coreHandGuidanceOperations;
-        this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;
-    }
 }

@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CharacterGuanPingBoundaryRuntime
+internal sealed partial class CharacterGuanPingBoundaryRuntime(IKernelCardZoneStoreAccess _cardZonesOperations, RuntimeEntries.CoreNativeCardAppearanceEntries _coreNativeCardAppearanceOperations, RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations)
 {
-    private readonly IKernelCardZoneStoreAccess _cardZonesOperations;
-    private readonly RuntimeEntries.CoreNativeCardAppearanceEntries _coreNativeCardAppearanceOperations;
-    private readonly RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
-    internal CharacterGuanPingBoundaryRuntime(IKernelCardZoneStoreAccess cardZonesOperations, RuntimeEntries.CoreNativeCardAppearanceEntries coreNativeCardAppearanceOperations, RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations)
-    {
-        this._cardZonesOperations = cardZonesOperations;
-        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
-        this._corePhysicalOwnedCardQueriesOperations = corePhysicalOwnedCardQueriesOperations;
-    }
 }

@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineDiscardRuntime
+internal sealed partial class CoreGameEngineDiscardRuntime(ICoreDiscardManualDiscardOperations _manualDiscardOperations)
 {
-    private readonly ICoreDiscardManualDiscardOperations _manualDiscardOperations;
-    internal CoreGameEngineDiscardRuntime(ICoreDiscardManualDiscardOperations manualDiscardOperations)
-    {
-        this._manualDiscardOperations = manualDiscardOperations;
-    }
 }

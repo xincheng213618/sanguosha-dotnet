@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule, Core.ProgramCapability]
-internal sealed partial class CoreProgramExpressionBindingsRuntime : IProgramExpressionCaptureHost
+internal sealed partial class CoreProgramExpressionBindingsRuntime(RuntimeEntries.CoreGameEngineProgramExpressionsEntries _coreProgramExpressionsOperations, RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations, IKernelCreateProgramExpressionWorldOperations _kernelCoreGameEngineProgramExpressionsOperations) : IProgramExpressionCaptureHost
 {
-    private readonly RuntimeEntries.CoreGameEngineProgramExpressionsEntries _coreProgramExpressionsOperations;
-    private readonly RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
-    private readonly IKernelCreateProgramExpressionWorldOperations _kernelCoreGameEngineProgramExpressionsOperations;
-    internal CoreProgramExpressionBindingsRuntime(RuntimeEntries.CoreGameEngineProgramExpressionsEntries coreProgramExpressionsOperations, RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, IKernelCreateProgramExpressionWorldOperations kernelCoreGameEngineProgramExpressionsOperations)
-    {
-        this._coreProgramExpressionsOperations = coreProgramExpressionsOperations;
-        this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
-        this._kernelCoreGameEngineProgramExpressionsOperations = kernelCoreGameEngineProgramExpressionsOperations;
-    }
 }

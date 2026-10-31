@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineConvertedSlashResponseRuntime
+internal sealed partial class CoreGameEngineConvertedSlashResponseRuntime(RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations, RuntimeEntries.CoreNativeCardAppearanceEntries _coreNativeCardAppearanceOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess)
 {
-    private readonly RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
-    private readonly RuntimeEntries.CoreNativeCardAppearanceEntries _coreNativeCardAppearanceOperations;
-    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineConvertedSlashResponseRuntime(RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations, RuntimeEntries.CoreNativeCardAppearanceEntries coreNativeCardAppearanceOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
-    {
-        this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
-        this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;
-        this._coreMatchParticipantsPlayersAccess = coreMatchParticipantsPlayersAccess;
-    }
 }

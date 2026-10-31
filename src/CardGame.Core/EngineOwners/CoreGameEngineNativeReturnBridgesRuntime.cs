@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineNativeReturnBridgesRuntime
+internal sealed partial class CoreGameEngineNativeReturnBridgesRuntime(RuntimeEntries.CoreGameEngineQinglongInsertionEntries _coreQinglongInsertionOperations, RuntimeEntries.CoreNativeDyingEntries _coreNativeDyingOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineQinglongInsertionEntries _coreQinglongInsertionOperations;
-    private readonly RuntimeEntries.CoreNativeDyingEntries _coreNativeDyingOperations;
-    internal CoreGameEngineNativeReturnBridgesRuntime(RuntimeEntries.CoreGameEngineQinglongInsertionEntries coreQinglongInsertionOperations, RuntimeEntries.CoreNativeDyingEntries coreNativeDyingOperations)
-    {
-        this._coreQinglongInsertionOperations = coreQinglongInsertionOperations;
-        this._coreNativeDyingOperations = coreNativeDyingOperations;
-    }
 }

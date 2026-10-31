@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreProgramPipelineHooksRuntime
+internal sealed partial class CoreProgramPipelineHooksRuntime(IKernelProgramPipelineHooksAccess _programPipelineHooksOperations)
 {
-    private readonly IKernelProgramPipelineHooksAccess _programPipelineHooksOperations;
-    internal CoreProgramPipelineHooksRuntime(IKernelProgramPipelineHooksAccess programPipelineHooksOperations)
-    {
-        this._programPipelineHooksOperations = programPipelineHooksOperations;
-    }
 }

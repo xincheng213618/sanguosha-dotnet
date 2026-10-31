@@ -2,17 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineResponseCompletionZhangbaRuntime
+internal sealed partial class CoreGameEngineResponseCompletionZhangbaRuntime(RuntimeEntries.CharacterZhaoYunMobileShiEntries _characterZhaoYunMobileShiOperations, IKernelContentRegistryAccess _contentRegistryOperations, RuntimeEntries.CoreGameEngineActionDiscardColorsEntries _coreActionDiscardColorsOperations, RuntimeEntries.CoreNativeOwnedCardQueriesEntries _coreNativeOwnedCardQueriesOperations)
 {
-    private readonly RuntimeEntries.CharacterZhaoYunMobileShiEntries _characterZhaoYunMobileShiOperations;
-    private readonly IKernelContentRegistryAccess _contentRegistryOperations;
-    private readonly RuntimeEntries.CoreGameEngineActionDiscardColorsEntries _coreActionDiscardColorsOperations;
-    private readonly RuntimeEntries.CoreNativeOwnedCardQueriesEntries _coreNativeOwnedCardQueriesOperations;
-    internal CoreGameEngineResponseCompletionZhangbaRuntime(RuntimeEntries.CharacterZhaoYunMobileShiEntries characterZhaoYunMobileShiOperations, IKernelContentRegistryAccess contentRegistryOperations, RuntimeEntries.CoreGameEngineActionDiscardColorsEntries coreActionDiscardColorsOperations, RuntimeEntries.CoreNativeOwnedCardQueriesEntries coreNativeOwnedCardQueriesOperations)
-    {
-        this._characterZhaoYunMobileShiOperations = characterZhaoYunMobileShiOperations;
-        this._contentRegistryOperations = contentRegistryOperations;
-        this._coreActionDiscardColorsOperations = coreActionDiscardColorsOperations;
-        this._coreNativeOwnedCardQueriesOperations = coreNativeOwnedCardQueriesOperations;
-    }
 }

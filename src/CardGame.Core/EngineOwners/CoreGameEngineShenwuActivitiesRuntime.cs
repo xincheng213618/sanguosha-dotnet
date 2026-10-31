@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineShenwuActivitiesRuntime
+internal sealed partial class CoreGameEngineShenwuActivitiesRuntime(IKernelMatchModeRuntimeAccess _modeRuntimeOperations)
 {
-    private readonly IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
-    internal CoreGameEngineShenwuActivitiesRuntime(IKernelMatchModeRuntimeAccess modeRuntimeOperations)
-    {
-        this._modeRuntimeOperations = modeRuntimeOperations;
-    }
 }

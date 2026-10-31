@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineProgramRecoveryReceiptsRuntime
+internal sealed partial class CoreGameEngineProgramRecoveryReceiptsRuntime(RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries _coreTypedRecoveryDamageCursorOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries _coreTypedRecoveryDamageCursorOperations;
-    internal CoreGameEngineProgramRecoveryReceiptsRuntime(RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries coreTypedRecoveryDamageCursorOperations)
-    {
-        this._coreTypedRecoveryDamageCursorOperations = coreTypedRecoveryDamageCursorOperations;
-    }
 }

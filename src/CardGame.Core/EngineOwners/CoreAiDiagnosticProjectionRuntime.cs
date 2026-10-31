@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreAiDiagnosticProjectionRuntime
+internal sealed partial class CoreAiDiagnosticProjectionRuntime(EngineStates.Contracts.ICoreAiDiagnosticsAiGeneralThoughtsAiThoughtsAccess _coreAiDiagnosticsAiGeneralThoughtsAiThoughtsAccess)
 {
-    private readonly EngineStates.Contracts.ICoreAiDiagnosticsAiGeneralThoughtsAiThoughtsAccess _coreAiDiagnosticsAiGeneralThoughtsAiThoughtsAccess;
-    internal CoreAiDiagnosticProjectionRuntime(EngineStates.Contracts.ICoreAiDiagnosticsAiGeneralThoughtsAiThoughtsAccess coreAiDiagnosticsAiGeneralThoughtsAiThoughtsAccess)
-    {
-        this._coreAiDiagnosticsAiGeneralThoughtsAiThoughtsAccess = coreAiDiagnosticsAiGeneralThoughtsAiThoughtsAccess;
-    }
 }

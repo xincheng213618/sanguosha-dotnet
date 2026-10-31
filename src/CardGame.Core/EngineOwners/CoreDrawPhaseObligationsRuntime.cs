@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreDrawPhaseObligationsRuntime
+internal sealed partial class CoreDrawPhaseObligationsRuntime(ICoreDrawPhaseObligationsOwnedDrawPhaseOperations _ownedDrawPhaseOperations)
 {
-    private readonly ICoreDrawPhaseObligationsOwnedDrawPhaseOperations _ownedDrawPhaseOperations;
-    internal CoreDrawPhaseObligationsRuntime(ICoreDrawPhaseObligationsOwnedDrawPhaseOperations ownedDrawPhaseOperations)
-    {
-        this._ownedDrawPhaseOperations = ownedDrawPhaseOperations;
-    }
 }

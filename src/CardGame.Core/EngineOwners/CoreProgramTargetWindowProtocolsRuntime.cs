@@ -2,13 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreProgramTargetWindowProtocolsRuntime
+internal sealed partial class CoreProgramTargetWindowProtocolsRuntime(IKernelTargetWindowProtocolsAccess _targetWindowProtocolsOperations, IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations)
 {
-    private readonly IKernelTargetWindowProtocolsAccess _targetWindowProtocolsOperations;
-    private readonly IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations;
-    internal CoreProgramTargetWindowProtocolsRuntime(IKernelTargetWindowProtocolsAccess targetWindowProtocolsOperations, IKernelBindRuntimeHandlerOperations kernelCoreProgramRuntimeModulesOperations)
-    {
-        this._targetWindowProtocolsOperations = targetWindowProtocolsOperations;
-        this._kernelCoreProgramRuntimeModulesOperations = kernelCoreProgramRuntimeModulesOperations;
-    }
 }

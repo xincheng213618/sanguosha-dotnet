@@ -2,15 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CorePhysicalMovementFacadesRuntime
+internal sealed partial class CorePhysicalMovementFacadesRuntime(RuntimeEntries.CoreGameEngineAtomicCardMovementEntries _coreAtomicCardMovementOperations, ICorePhysicalMovementFacadesMovementEquipmentEffectsOperations _movementEquipmentEffectsOperations, ICorePhysicalMovementFacadesMovementRecordOperations _movementRecordOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineAtomicCardMovementEntries _coreAtomicCardMovementOperations;
-    private readonly ICorePhysicalMovementFacadesMovementEquipmentEffectsOperations _movementEquipmentEffectsOperations;
-    private readonly ICorePhysicalMovementFacadesMovementRecordOperations _movementRecordOperations;
-    internal CorePhysicalMovementFacadesRuntime(RuntimeEntries.CoreGameEngineAtomicCardMovementEntries coreAtomicCardMovementOperations, ICorePhysicalMovementFacadesMovementEquipmentEffectsOperations movementEquipmentEffectsOperations, ICorePhysicalMovementFacadesMovementRecordOperations movementRecordOperations)
-    {
-        this._coreAtomicCardMovementOperations = coreAtomicCardMovementOperations;
-        this._movementEquipmentEffectsOperations = movementEquipmentEffectsOperations;
-        this._movementRecordOperations = movementRecordOperations;
-    }
 }

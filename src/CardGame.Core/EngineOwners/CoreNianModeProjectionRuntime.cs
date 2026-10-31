@@ -2,11 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreNianModeProjectionRuntime
+internal sealed partial class CoreNianModeProjectionRuntime(RuntimeEntries.CoreGameEngineNianChallengeHostEntries _coreNianChallengeHostOperations)
 {
-    private readonly RuntimeEntries.CoreGameEngineNianChallengeHostEntries _coreNianChallengeHostOperations;
-    internal CoreNianModeProjectionRuntime(RuntimeEntries.CoreGameEngineNianChallengeHostEntries coreNianChallengeHostOperations)
-    {
-        this._coreNianChallengeHostOperations = coreNianChallengeHostOperations;
-    }
 }
