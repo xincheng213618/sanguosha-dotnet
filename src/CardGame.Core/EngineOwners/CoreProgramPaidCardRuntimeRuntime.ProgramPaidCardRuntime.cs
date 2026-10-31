@@ -7,6 +7,7 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     bool IProgramPaidCardFacts.CanContinueAfterSkillLoss(ProgramSkillFrame frame) => _continuationPermissions.Value.CanContinueProgramAfterSkillLoss(frame);
     bool? IProgramPaidCardFacts.EvaluateOptionExpression(ProgramSkillFrame frame, ProgramExpression expression) => ProgramExpressions.EvaluateBool(expression, _expressionWorld.CreateProgramExpressionWorld(frame));
     int IProgramPaidCardFacts.PlayerCount => _coreMatchDefinitionPlayerCountAccess._playerCount;
+    long IProgramPaidCardFacts.ActiveMovementBatchId => _activeCardMovementBatchIdsOperations._activeCardMovementBatchIds.Peek();
 
     IReadOnlyList<int> IProgramPaidCardFacts.Seats => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Select(player => player.Seat).ToArray());
 
@@ -49,11 +50,11 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     bool IProgramPaidCardFacts.BoundCardsMatchCategories(ProgramSkillFrame frame, string bind, IReadOnlyList<SkillProgramCardCategory> categories) => _coreProgramCategoryChallengesOperations.DoProgramBoundCardsMatchCategories(frame, bind, categories);
     void IProgramPaidCardOperations.Cancel(ProgramSkillFrame frame, string reason) => _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, reason);
     void IProgramPaidCardOperations.SetCardSet(long frameId, string bind, IReadOnlyList<int> ids, SkillProgramCardSetVisibility visibility, IReadOnlyList<CardLocation>? locations, Suit? frozenSuit) => _coreProgramLifecycleOperations.SetProgramCardSet(frameId, bind, ids, visibility, locations, frozenSuit);
-    void IProgramPaidCardOperations.Move(Card card, CardLocation source, CardLocation destination, CardMoveReason reason, CardMovementDisclosure disclosure) => _corePhysicalMovementFacadesOperations.MoveCard(card, source, destination, reason, disclosure: disclosure);
-    bool IProgramPaidCardOperations.MoveToProcessing(ProgramSkillFrame frame, Card card, CardLocation source, CardMoveReason reason, CardMovementDisclosure disclosure)
+    void IProgramPaidCardOperations.Move(Card card, CardLocation source, CardLocation destination, CardMoveReason reason, CardMovementDisclosure disclosure, Action<CardMovementRecord>? beforeFact) => _corePhysicalMovementFacadesOperations.MoveCard(card, source, destination, reason, beforeFact, disclosure: disclosure);
+    bool IProgramPaidCardOperations.MoveToProcessing(ProgramSkillFrame frame, Card card, CardLocation source, CardMoveReason reason, CardMovementDisclosure disclosure, Action<CardMovementRecord>? beforeFact)
     {
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-        _corePhysicalMovementFacadesOperations.MoveCard(card, source, CardLocation.Processing, reason, disclosure: disclosure);
+        _corePhysicalMovementFacadesOperations.MoveCard(card, source, CardLocation.Processing, reason, beforeFact, disclosure: disclosure);
         if (_cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Processing)
             return true;
         // A generated field entity can be destroyed by this exact first
@@ -65,14 +66,14 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     }
 
     bool IProgramPaidCardOperations.SettleRetainedGain(ProgramSkillFrame frame, Card card, CardLocation source, CardLocation destination, CardMoveReason reason) => _coreHappyWeiYanGainDestinationsOperations.TrySettleHappyWeiYanRetainedGain(card, source, destination, reason, frame.Id);
-    void IProgramPaidCardOperations.Give(ProgramSkillFrame frame, int giver, Card card, CardLocation source, CardLocation destination, CardMoveReason reason, bool throughProcessing, CardMovementDisclosure disclosure)
+    void IProgramPaidCardOperations.Give(ProgramSkillFrame frame, int giver, Card card, CardLocation source, CardLocation destination, CardMoveReason reason, bool throughProcessing, CardMovementDisclosure disclosure, Action<CardMovementRecord>? beforeFact)
     {
         if (((IProgramPaidCardOperations)this).SettleRetainedGain(frame, card, source, destination, reason))
             return;
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-        if (throughProcessing && !((IProgramPaidCardOperations)this).MoveToProcessing(frame, card, source, reason, disclosure))
+        if (throughProcessing && !((IProgramPaidCardOperations)this).MoveToProcessing(frame, card, source, reason, disclosure, beforeFact))
             return;
-        _corePhysicalMovementFacadesOperations.MoveCard(card, throughProcessing ? CardLocation.Processing : source, destination, reason, _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, giver, destination.OwnerSeat!.Value, [card.Id], before), disclosure: disclosure);
+        _corePhysicalMovementFacadesOperations.MoveCard(card, throughProcessing ? CardLocation.Processing : source, destination, reason, _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, giver, destination.OwnerSeat!.Value, [card.Id], before, beforeFact), disclosure: disclosure);
     }
 
     bool IProgramPaidCardOperations.BeginMovementWindow() => _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow();

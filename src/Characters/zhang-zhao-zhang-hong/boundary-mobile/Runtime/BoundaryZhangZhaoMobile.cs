@@ -5,7 +5,6 @@ namespace CardGame.Core;
 public sealed record BoundaryZhangZhaoPhaseDiscardEvent(ActualDiscardRecoveryPhaseKey Phase, int CardId, long MovementSequence, CardLocation OriginalFrom) : IGameEvent;
 public sealed record BoundaryZhangZhaoReturnedEvent(long FrameId, int PhaseOwnerSeat, int CardId, long MovementSequence) : IGameEvent;
 public sealed record BoundaryZhangZhaoClaimFinishedEvent(long FrameId, bool Taken, int Count, long Before, long After) : IGameEvent;
-public sealed record BoundaryZhangZhaoZhijianPaidEvent(long FrameId, CardConversionSource Source, string Hash, int TargetSeat, int CardId, long MovementSequence) : IGameEvent;
 public sealed record BoundaryZhangZhaoPhaseReceipt(ActualDiscardRecoveryPhaseKey Phase, int PhaseOwnerSeat, string Stage,
     IReadOnlyList<DiscardRecoveryEntity> OriginalEntities, int? ReturnedCardId = null, long ReturnMovementSequence = 0)
 {

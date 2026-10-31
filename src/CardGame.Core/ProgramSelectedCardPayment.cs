@@ -17,7 +17,13 @@ public sealed record ProgramSelectedCardPayment(
     public CardLocation? PlacementSourceLocation { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public HappyWeiYanGainRequestSettlement? GainRequestSettlement { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramStepMovementResult? Movement { get; init; }
 }
+
+/// <summary>The actual last transfer of a selected entity, captured before movement observers run.</summary>
+public sealed record ProgramStepMovementResult(int CardId, CardLocation From, CardLocation To,
+    long BatchId, long Sequence, bool Delivered);
 
 /// <summary>The result returned to the parent after its movement windows finish.</summary>
 public sealed record ProgramSelectedCardPaymentResult(

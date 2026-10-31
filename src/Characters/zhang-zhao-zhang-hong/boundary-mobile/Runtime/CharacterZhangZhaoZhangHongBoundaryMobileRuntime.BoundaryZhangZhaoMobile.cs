@@ -4,28 +4,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
 {
     internal const string BoundaryZhangZhaoGuzheng = "boundary:guzheng-mobile", BoundaryZhangZhaoZhijian = "boundary:zhijian-mobile";
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 66601)]
-    internal void ObserveBoundaryZhangZhaoPlacement(CardMovedEvent e)
-    {
-        if (e.Reason.Value != "skill-program.boundary:zhijian-mobile.SelectAndMoveOwnedCard" || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.SkillId == BoundaryZhangZhaoZhijian && f.TriggerId is null && f.InstructionIndex == 1)is not { } f || f.SelectedTargetSeats is not [var target] || e.From != CardLocation.Hand(f.OwnerSeat) || e.To != CardLocation.Equipment(target))
-            return;
-        var m = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == e.CardId && m.From == e.From && m.To == e.To && m.Reason == e.Reason);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryZhangZhaoZhijianPaidEvent(f.Id, new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, target, e.CardId, m.Sequence));
-    }
-
-    internal bool BoundaryZhangZhaoPlacementPaid(ProgramSkillFrame f) => f.SkillId == BoundaryZhangZhaoZhijian && f.TriggerId is null && f.InstructionIndex is 1 or 2 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhangZhaoZhijianPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var e] && e.Source == new CardConversionSource(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId) && e.Hash == f.GameplayHash && f.SelectedTargetSeats.SequenceEqual([e.TargetSeat]) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Equipment(e.TargetSeat) && m.Reason.Value == "skill-program.boundary:zhijian-mobile.SelectAndMoveOwnedCard");
-    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 66601)]
-    internal bool KeepBoundaryZhangZhaoPlacement(ProgramSkillFrame f) => BoundaryZhangZhaoPlacementPaid(f);
-    [ProgramContinuation(ProgramContinuationKind.Movement, 66601)]
-    internal bool ReturnBoundaryZhangZhaoPlacement(ProgramSkillFrame f)
-    {
-        if (!BoundaryZhangZhaoPlacementPaid(f) || f.InstructionIndex != 1 || f.PendingMovementContinuation is not { SubjectSeat: var seat, BeforeCount: 0, CoverageResultBind: null } || seat != f.OwnerSeat)
-            return false;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = null });
-        _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
-        return true;
-    }
-
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 66600)]
     internal void ObserveBoundaryZhangZhaoPhaseDiscard(CardMovedEvent e)
     {

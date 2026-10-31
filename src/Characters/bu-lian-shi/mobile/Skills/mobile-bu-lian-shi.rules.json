@@ -5,12 +5,12 @@
     "activations": [{
       "id": "donor-gives-to-lower-hand", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,
       "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": 1,
+      "continueAfterSkillLossAfter": "mobile-anxu-gift",
       "effects": [
         { "op": "selectTargets", "target": "owner", "targetKind": "otherLivingUnequalHandPair", "minimumTargets": 2, "maximumTargets": 2, "targetAiOrder": "supportFirstThenOpposeSecond" },
         { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "selectedSecond" }, "cardOwnerRef": { "kind": "selectedSecond" }, "zones": ["hand"], "count": 1,
           "destination": "selectedTargetHand", "targetRef": { "kind": "selectedFirst" }, "resultBind": "mobile-anxu-gift", "awaitMovementTriggers": true },
-        { "op": "prepareMobileBuLianShiAnxu", "target": "owner" },
-        { "op": "chooseOption", "target": "owner", "resultBind": "mobile-anxu-benefit", "condition": { "kind": "choiceIs", "sourceBind": "mobile-anxu-equality", "optionId": "equal" },
+        { "op": "chooseOption", "target": "owner", "resultBind": "mobile-anxu-benefit", "condition": { "kind": "expression", "expr": ["and", ["alive", "selectedFirst"], ["alive", "selectedSecond"], ["==", ["handCount", "selectedFirst"], ["handCount", "selectedSecond"]]] },
           "options": [{ "id": "draw" }, { "id": "recover", "condition": { "kind": "wounded" } }] },
         { "op": "draw", "target": "owner", "amount": 1, "condition": { "kind": "choiceIs", "sourceBind": "mobile-anxu-benefit", "optionId": "draw" } },
         { "op": "recover", "target": "owner", "amount": 1, "condition": { "kind": "choiceIs", "sourceBind": "mobile-anxu-benefit", "optionId": "recover" } }

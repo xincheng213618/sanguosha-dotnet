@@ -45,7 +45,7 @@ internal static class ProgramExpressions
 {
     public const int MaximumDepth = 8;
     public const string Iterator = "it";
-    public static readonly string[] Participants = ["owner", "selectedTarget", "eventSource", "eventTarget"];
+    public static readonly string[] Participants = ["owner", "selectedTarget", "selectedFirst", "selectedSecond", "eventSource", "eventTarget"];
     public static readonly string[] Sets = ["living", "livingOthers"];
     private static readonly string[] Stats = ["hp", "maxHp", "lostHp", "handCount", "handLimit", "equipmentCount"];
     private static readonly string[] Flags = ["alive", "hasHp", "faceDown", "chained"];

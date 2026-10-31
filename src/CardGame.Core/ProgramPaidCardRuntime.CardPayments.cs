@@ -333,7 +333,9 @@ internal sealed partial class ProgramPaidCardRuntime
         _prompts.Clear();
         var frozenMovedSuit = effect.FreezeMovedCardSuit ? _facts.EffectiveSuit(ownerSeat, card) : (Suit?)null;
         var beforeCoverage = effect.CoverageResultBind is null ? 0 : _facts.CountLivingInAttackRange(ownerSeat);
-        if (effect.AwaitMovementTriggers)
+        var recordMovement = effect.AwaitMovementTriggers
+            ? BeginSelectedMovementPayment(frame, effect, card, source, destination) : null;
+        if (effect.AwaitMovementTriggers && recordMovement is null)
         {
             _frames.ReplaceTop(frame with
             {
@@ -359,13 +361,13 @@ internal sealed partial class ProgramPaidCardRuntime
         var disclosure = effect.RevealBeforeMove || destination.Zone is CardZoneKind.DiscardPile or CardZoneKind.Equipment or CardZoneKind.Judgment
             ? CardMovementDisclosure.FaceUp : CardMovementDisclosure.FaceDown;
         if (destination.Zone == CardZoneKind.Hand && NativeGiveSemantics.Selected(frame, effect))
-            _operations.Give(frame, ownerSeat, card, source, destination, reason, effect.Destination == SkillProgramCardDestination.SelectedTargetHand, disclosure);
+            _operations.Give(frame, ownerSeat, card, source, destination, reason, effect.Destination == SkillProgramCardDestination.SelectedTargetHand, disclosure, recordMovement);
         else if (effect.Destination == SkillProgramCardDestination.SelectedTargetHand)
         {
-            if (_operations.MoveToProcessing(frame, card, source, reason, disclosure))
-                _operations.Move(card, CardLocation.Processing, destination, reason, disclosure: disclosure);
+            if (_operations.MoveToProcessing(frame, card, source, reason, disclosure, recordMovement))
+                _operations.Move(card, CardLocation.Processing, destination, reason, disclosure, recordMovement);
         }
-        else _operations.Move(card, source, destination, reason, disclosure: disclosure);
+        else _operations.Move(card, source, destination, reason, disclosure, recordMovement);
         _logicalDiscards.Complete(discardInvocation);
         if (effect.Destination == SkillProgramCardDestination.SelectedTargetEquipment)
         {
@@ -462,6 +464,33 @@ internal sealed partial class ProgramPaidCardRuntime
     internal static SkillProgramCardCategory GetProgramCardCategory(CardKind kind) =>
         RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.GetProgramCardCategory(kind);
 
+    private Action<CardMovementRecord>? BeginSelectedMovementPayment(ProgramSkillFrame frame,
+        SkillProgramEffect effect, Card card, CardLocation source, CardLocation destination)
+    {
+        if (frame.TriggerId is not null || effect.ResultBind is not { } bind ||
+            _facts.Skill(frame.SkillId).Program!.Activations.Single(a => a.Id == frame.ActivationId)
+                .ContinueAfterSkillLossAfter != bind) return null;
+        var active = _frames.ActiveProgram(frame.Id);
+        if (active.SelectedCardPayment is not null && active.SelectedCardPaymentResult is null)
+            throw new InvalidOperationException("The selected movement already has an unfinished payment.");
+        _frames.ReplaceTop(active with
+        {
+            SelectedCardPayment = new(frame.InstructionIndex, effect.Op,
+                Array.AsReadOnly(new[] { card.Id }), destination.OwnerSeat!.Value) { PlacementSourceLocation = source },
+            SelectedCardPaymentResult = null
+        });
+        return movement =>
+        {
+            var paid = _frames.ActiveProgram(frame.Id);
+            _frames.ReplaceTop(paid with { SelectedCardPayment = paid.SelectedCardPayment! with
+            {
+                MovementCommitted = true,
+                Movement = new(movement.CardId, movement.From, movement.To,
+                    _facts.ActiveMovementBatchId, movement.Sequence, movement.To == destination)
+            } });
+        };
+    }
+
     private bool TryCompleteRetainedSelectedCard(ProgramSkillFrame frame, SkillProgramEffect effect,
         Card card, CardLocation source, CardLocation destination, CardMoveReason reason,
         int ownerSeat, int beforeCoverage, Suit? frozenMovedSuit)
@@ -469,6 +498,13 @@ internal sealed partial class ProgramPaidCardRuntime
         if (destination.Zone != CardZoneKind.Hand ||
             !_operations.SettleRetainedGain(frame, card, source, destination, reason)) return false;
         var active = _frames.ActiveProgram(frame.Id);
+        if (active.SelectedCardPayment is { Operation: SkillProgramEffectOp.SelectAndMoveOwnedCard } payment &&
+            active.SelectedCardPaymentResult is null)
+        {
+            _frames.ReplaceTop(active with { SelectedCardPayment = payment with { MovementCommitted = true } });
+            _operations.ReturnMovement(frame.Id);
+            return true;
+        }
         _frames.ReplaceTop(active with { PendingMovementContinuation = null });
         if (effect.ResultBind is { } bind)
             _operations.SetCardSet(frame.Id, bind, [card.Id], effect.RevealBeforeMove

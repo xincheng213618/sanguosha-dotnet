@@ -168,6 +168,7 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
     bool IProgramCompletionFacts.CanContinueEquipmentSuit(ProgramSkillFrame frame) => _characterHeQiOlOperations.CanContinueEquipmentSuitProgram(frame);
     bool IProgramCompletionFacts.CanContinueHpConditional(ProgramSkillFrame frame) => _coreHpConditionalSkillGrantsOperations.Value.CanContinueHpConditionalProgram(frame);
     bool IProgramCompletionFacts.CanContinuePhaseAlcohol(ProgramSkillFrame frame) => _coreForcedPhaseAlcoholOperations.CanContinuePhaseAlcohol(frame);
+    bool IProgramCompletionFacts.CanContinueSelectedCardPayment(ProgramSkillFrame frame) => frame.SelectedCardPayment?.Operation == SkillProgramEffectOp.SelectAndMoveOwnedCard && _coreProgramRuntimeHooksOperations.RuntimeHooks.CanContinue(ProgramRuntimePhase.AfterSkillLoss, frame);
     bool IProgramCompletionFacts.ValidDamageTargetObtain(ProgramSkillFrame frame) => _coreDamageTargetObtainProgramsOperations.IsValidDamageTargetObtain(frame);
     bool IProgramCompletionFacts.ValidDamageTargetMount(ProgramSkillFrame frame) => _coreDamageTargetMountProgramsOperations.IsValidDamageTargetMount(frame);
     int IProgramCompletionFacts.LivingInAttackRange(int seat) => _coreProgramCardPaymentsOperations.CountLivingInAttackRange(seat);

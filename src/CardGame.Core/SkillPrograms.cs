@@ -376,7 +376,6 @@ public enum SkillProgramEffectOp
     RewriteBoundaryXiaoQiaoJudgment = 66700,
     DrawMobileLiDianWangxi = 71000,
     ResolveMobileSpXuShuJianyan = 71700,
-    PrepareMobileBuLianShiAnxu = 72400,
     ResolveMobileZhuHuanPingkou = 72500,
     ReduceMobileMaDaiDamageTargetMaximumHp = 72901,
     ConsumeMobileCaoZhenSidi = 74010,
@@ -3235,6 +3234,8 @@ public sealed partial class SkillProgramActivation
     /// </summary>
     public bool TargetRequiresEmptyEquipmentSlot { get; }
     public bool ContinueAfterOwnerDeath { get; internal init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ContinueAfterSkillLossAfter { get; internal init; }
     public bool SelectedCardsDistinctSuits { get; internal init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramCardCountExpression? CardCountExpression { get; internal init; }
@@ -4862,7 +4863,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
         RequireObject(node, path);
         CheckProperties(node, path, "id", "minCards", "maxCards", "sourceZones", "minTargets", "maxTargets",
             "targetKind", "usesPerTurn", "usesPerPhase", "usesPerGame", "condition", "effects",
-            "selectedCardsSameSuit", "equipmentSlots", "usageGroup", "targetRequiresEmptyEquipmentSlot", "markerCost", "continueAfterOwnerDeath", "selectedCardsDistinctSuits", "cardCountExpression", "cardKinds", "cardSuits", "cardCategories", "categoryTargetLedgerId", "targetPhaseLedgerId", "otherCharactersOnly", "pindianHandReturn", "usesPerPhaseExpression");
+            "selectedCardsSameSuit", "equipmentSlots", "usageGroup", "targetRequiresEmptyEquipmentSlot", "markerCost", "continueAfterOwnerDeath", "continueAfterSkillLossAfter", "selectedCardsDistinctSuits", "cardCountExpression", "cardKinds", "cardSuits", "cardCategories", "categoryTargetLedgerId", "targetPhaseLedgerId", "otherCharactersOnly", "pindianHandReturn", "usesPerPhaseExpression");
         var id = Identifier(node, "id", path);
         var minCards = NonNegativeInt(node, "minCards", path);
         var allAvailableCards = node.TryGetProperty("maxCards", out var maximumNode) &&
@@ -5084,11 +5085,18 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             node.TryGetProperty("usageGroup", out _) ? Identifier(node, "usageGroup", path) : null,
             targetRequiresEmptyEquipmentSlot) { TargetPhaseLedgerId = node.TryGetProperty("targetPhaseLedgerId", out _) ? Identifier(node, "targetPhaseLedgerId", path) : null, CategoryTargetLedgerId = node.TryGetProperty("categoryTargetLedgerId", out _) ? Identifier(node, "categoryTargetLedgerId", path) : null, MarkerCost = ParseMarkerCost(node, path),
                 ContinueAfterOwnerDeath = node.TryGetProperty("continueAfterOwnerDeath", out _) && RequiredBool(node, "continueAfterOwnerDeath", path),
+                ContinueAfterSkillLossAfter = node.TryGetProperty("continueAfterSkillLossAfter", out _) ? Identifier(node, "continueAfterSkillLossAfter", path) : null,
                 SelectedCardsDistinctSuits = node.TryGetProperty("selectedCardsDistinctSuits", out _) && RequiredBool(node, "selectedCardsDistinctSuits", path),
                 CardCountExpression = cardCountExpression, CardKinds = cardKinds, CardSuits = cardSuits, CardCategories = cardCategories,
                 OtherCharactersOnly = node.TryGetProperty("otherCharactersOnly", out _) && RequiredBool(node, "otherCharactersOnly", path),
                 PindianHandReturn = node.TryGetProperty("pindianHandReturn", out _) ? RequiredBool(node, "pindianHandReturn", path) : null,
                 UsesPerPhaseExpression = node.TryGetProperty("usesPerPhaseExpression", out _) ? EnumValue<SkillProgramPhaseUsageExpression>(node, "usesPerPhaseExpression", path) : null };
+        if (activation.ContinueAfterSkillLossAfter is { } paidBind && !effects.Any(effect => effect.ResultBind == paidBind &&
+            effect is { Op: SkillProgramEffectOp.SelectAndMoveOwnedCard, AwaitMovementTriggers: true, RevealBeforeMove: false,
+                CoverageResultBind: null, Condition.Kind: SkillProgramConditionKind.Always } &&
+            (effect.Destination is SkillProgramCardDestination.SelectedTargetHand or SkillProgramCardDestination.SelectedTargetEquipment ||
+             effect.Destination == SkillProgramCardDestination.SelectedTargetCorrespondingZone && effect.ProhibitReplacingEquipment)))
+            Fail(path + ".continueAfterSkillLossAfter", "requires an unconditional awaited hand or non-replacing equipment delivery binding");
         if (activation.UsesPerPhaseExpression is not null &&
             (activation.UsesPerPhase is not null || activation.UsesPerTurn is not null || activation.UsesPerGame is not null ||
              activation.Effects is not [{ Op: SkillProgramEffectOp.UseSelectedActorDuel, ParticipantMode: SelectedActorDuelParticipantMode.OwnerToSelectedTarget }]))

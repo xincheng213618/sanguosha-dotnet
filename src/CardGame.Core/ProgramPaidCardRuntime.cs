@@ -5,6 +5,7 @@ namespace CardGame.Core;
 internal interface IProgramPaidCardFacts : IProgramSelectionQuery
 {
     int PlayerCount { get; }
+    long ActiveMovementBatchId { get; }
     IReadOnlyList<int> Seats { get; }
     int Seat(int seat);
     bool IsValidSeat(int seat);
@@ -54,12 +55,12 @@ internal interface IProgramPaidCardOperations : IProgramRuntimeOperations
     void SetCardSet(long frameId, string bind, IReadOnlyList<int> ids, SkillProgramCardSetVisibility visibility,
         IReadOnlyList<CardLocation>? locations = null, Suit? frozenSuit = null);
     void Move(Card card, CardLocation source, CardLocation destination, CardMoveReason reason,
-        CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified);
+        CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified, Action<CardMovementRecord>? beforeFact = null);
     bool MoveToProcessing(ProgramSkillFrame frame, Card card, CardLocation source, CardMoveReason reason,
-        CardMovementDisclosure disclosure);
+        CardMovementDisclosure disclosure, Action<CardMovementRecord>? beforeFact = null);
     bool SettleRetainedGain(ProgramSkillFrame frame, Card card, CardLocation source,
         CardLocation destination, CardMoveReason reason);
-    void Give(ProgramSkillFrame frame, int giver, Card card, CardLocation source, CardLocation destination, CardMoveReason reason, bool throughProcessing, CardMovementDisclosure disclosure);
+    void Give(ProgramSkillFrame frame, int giver, Card card, CardLocation source, CardLocation destination, CardMoveReason reason, bool throughProcessing, CardMovementDisclosure disclosure, Action<CardMovementRecord>? beforeFact = null);
     bool BeginMovementWindow();
     bool BeginPublicHandReveal(long frameId, string returnKey);
     void ReturnMovement(long frameId);

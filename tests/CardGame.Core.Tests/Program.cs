@@ -404,6 +404,7 @@ var tests = new (string Name, Action Body)[]
     ("Table order: native move changes distance cold replay and next normal turn", TableOrderChecks.NativeMoveChangesDistanceAndNextNormalTurn),
     ("program interaction AI preserves published choices and conditional policies", ProgramInteractionChecks.AiSelectionPreservesPublishedOrderAndConditionalPolicies),
     ("composed paid effects preserve native HP children draw facts and source leases", ProgramComposedConsumerChecks.PaidMingceWaitsForHpChildrenAndResumesOrdinaryEffects),
+    ("step receipts distinguish delivery source-loss rights and original child return cold", ProgramStepReceiptChecks.DeliveredStepsRetainPaidReturnsWithoutRepeatingMovement),
     ("composed choices read expressions and resume original paid draw cursors", ProgramLifecycleChecks.ComposedChoicesReadExpressionsAndResumePaidDraws),
     ("Happy first draw preserves accepted Ren and decline across cold source loss", ProgramLifecycleChecks.HappyFirstDrawKeepsAcceptedPaymentAndDecline),
     ("composed Liangzhu records help at native draw return including replacement zero", ProgramLiangzhuCompositionChecks.HelpedIsRecordedAtNativeDrawReturnIncludingReplacementZero),

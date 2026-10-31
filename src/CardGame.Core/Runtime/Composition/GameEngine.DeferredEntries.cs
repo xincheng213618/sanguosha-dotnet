@@ -109,8 +109,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterBuLianShiBoundaryMobileRuntime> BuLianShiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterBuLianShiBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterBuLianShiMobileRuntime> BuLianShiMobileEntries => GetDeferredModule<EngineOwners.CharacterBuLianShiMobileRuntime>();
-
     internal Core.RuntimeEntries.CharacterBuZhiOlEntries BuZhiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterBuZhiOlEntries, EngineOwners.CharacterBuZhiOlRuntime>(Core.RuntimeEntries.CharacterBuZhiOlEntries.Create);
 
     internal Core.RuntimeEntries.CharacterCaiFuRenOlEntries CaiFuRenOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaiFuRenOlEntries, EngineOwners.CharacterCaiFuRenOlRuntime>(Core.RuntimeEntries.CharacterCaiFuRenOlEntries.Create);

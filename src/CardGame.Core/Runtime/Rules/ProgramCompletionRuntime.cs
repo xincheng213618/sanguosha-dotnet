@@ -70,9 +70,11 @@ internal sealed class ProgramCompletionRuntime(IProgramRuntimeFrames frames, IPr
             if (frame.PendingMovementContinuation is not null || !payment.MovementCommitted ||
                 payment.ActiveChildFrameId is not null)
                 throw new InvalidOperationException("A selected-card payment cannot return before its movement children finish.");
-            var valid = facts.Alive(frame.OwnerSeat) &&
+            var valid = (payment.Operation != SkillProgramEffectOp.SelectAndMoveOwnedCard || payment.Movement is { Delivered: true }) &&
+                facts.Alive(frame.OwnerSeat) &&
                 (facts.HasSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId) ||
-                 facts.CanContinueEquipmentSuit(frame) || facts.CanContinueHpConditional(frame) || facts.CanContinuePhaseAlcohol(frame));
+                 facts.CanContinueEquipmentSuit(frame) || facts.CanContinueHpConditional(frame) || facts.CanContinuePhaseAlcohol(frame) ||
+                 facts.CanContinueSelectedCardPayment(frame));
             frames.ReplaceTop(frame with
             {
                 SelectedCardPaymentResult = new ProgramSelectedCardPaymentResult(
@@ -132,6 +134,7 @@ internal interface IProgramCompletionFacts : IProgramSelectionQuery
     bool CanContinueEquipmentSuit(ProgramSkillFrame frame);
     bool CanContinueHpConditional(ProgramSkillFrame frame);
     bool CanContinuePhaseAlcohol(ProgramSkillFrame frame);
+    bool CanContinueSelectedCardPayment(ProgramSkillFrame frame);
     bool ValidDamageTargetObtain(ProgramSkillFrame frame);
     bool ValidDamageTargetMount(ProgramSkillFrame frame);
     int LivingInAttackRange(int seat);

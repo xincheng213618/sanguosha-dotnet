@@ -8,6 +8,7 @@
         {
           "id": "equip-target",
           "usesPerTurn": null,
+          "continueAfterSkillLossAfter": "zhijian-placed",
           "minCards": 0,
           "maxCards": 0,
           "sourceZones": [

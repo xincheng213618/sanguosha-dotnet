@@ -28,6 +28,8 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     {
         "owner" => frame.OwnerSeat,
         "selectedTarget" => frame.SelectedTargetSeats is [var seat] ? seat : null,
+        "selectedFirst" => frame.SelectedTargetSeats.Count >= 1 ? frame.SelectedTargetSeats[0] : null,
+        "selectedSecond" => frame.SelectedTargetSeats.Count >= 2 ? frame.SelectedTargetSeats[1] : null,
         "eventSource" => frame.WindowContext?.SourceSeat,
         "eventTarget" => frame.WindowContext?.TargetSeat,
         _ => null
