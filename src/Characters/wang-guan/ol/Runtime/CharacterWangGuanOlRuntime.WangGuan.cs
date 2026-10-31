@@ -46,7 +46,11 @@ internal sealed partial class CharacterWangGuanOlRuntime
                 throw new InvalidOperationException("Miuyan requires the actual positive whole-Use damage ledger, never an attempted Fire Attack damage fact.");
             if (invoice!.PreviousState == SkillPolarity.Yin && !positive)
             {
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MiuyanRoundDisabledEvent(f.Id, native, invoice.ActionId, invoice.Source, invoice.GameplayHash, invoice.RoundNumber));
+                _coreProgramSkillChangesOperations.IssueSkillState(new(f.Id, f.InstructionIndex - 1,
+                    new(invoice.Source.SkillId, invoice.Source.BindingId, invoice.Source.OwnerSeat, invoice.Source.SkillInstanceId),
+                    native, invoice.ActionId), invoice.Source.OwnerSeat,
+                    new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.CurrentRound)
+                        { CharacterOnly = false }, ["ol:miuyan"]);
                 FinishWangGuan(f);
                 return SkillProgramStepOutcome.AwaitChild;
             }

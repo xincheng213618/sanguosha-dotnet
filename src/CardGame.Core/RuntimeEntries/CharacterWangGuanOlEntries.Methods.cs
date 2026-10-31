@@ -7,7 +7,6 @@ internal sealed partial class CharacterWangGuanOlEntries
     internal void AssertShiluIdentity(ShiluHandIdentityGrantedEvent e) => _resolve().AssertShiluIdentity(e);
     internal SkillProgramStepOutcome BeginWangGuan(ProgramSkillFrame input, SkillProgramEffectOp op) => _resolve().BeginWangGuan(input, op);
     internal bool CanRunIssuedMiuyanCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().CanRunIssuedMiuyanCandidate(c, context);
-    internal long CaptureMiuyanQualificationStamp(long underlying) => _resolve().CaptureMiuyanQualificationStamp(underlying);
     internal PromptChoice ChooseWangGuanAi(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseWangGuanAi(p, f);
     internal void CollectIssuedMiuyanCandidates(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result) => _resolve().CollectIssuedMiuyanCandidates(action, window, result);
     internal bool ContinueIssuedWangGuan(ProgramSkillFrame f) => _resolve().ContinueIssuedWangGuan(f);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterWangGuanOlEntries
     internal void FinishWangGuan(ProgramSkillFrame f) => _resolve().FinishWangGuan(f);
     internal bool IsIssuedMiuyanCandidate(ProgramTriggerCandidate c) => _resolve().IsIssuedMiuyanCandidate(c);
     internal bool IsMiuyanCategoryGiftMovementReveal(IGameEvent fact) => _resolve().IsMiuyanCategoryGiftMovementReveal(fact);
-    internal bool IsMiuyanGrantQualified(CharacterState owner, SkillGrant grant) => _resolve().IsMiuyanGrantQualified(owner, grant);
     internal bool IsMiuyanShandaoMovementReveal(IGameEvent fact) => _resolve().IsMiuyanShandaoMovementReveal(fact);
     internal void IssueMiuyanUse(long useId, CardActionContext? action) => _resolve().IssueMiuyanUse(useId, action);
     internal CardUseFrame? MiuyanCandidateUse(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().MiuyanCandidateUse(c, context);

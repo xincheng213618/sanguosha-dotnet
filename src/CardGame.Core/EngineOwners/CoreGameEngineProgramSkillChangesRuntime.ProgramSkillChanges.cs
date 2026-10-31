@@ -30,12 +30,14 @@ internal sealed partial class CoreGameEngineProgramSkillChangesRuntime
     internal void RemoveProgramExplicitSkillSources(ProgramSkillFrame frame, IReadOnlyList<string> grantIds) => ProgramSkillChanges.RemoveExplicitSources(frame, grantIds);
     internal int IssueSkillState(SkillStateOrigin origin, int seat, SkillStateSpec spec, IReadOnlyList<string> skills, int? endSeat = null) => ProgramSkillChanges.IssueSkillState(origin, seat, spec, skills, endSeat);
     internal void ExpireCurrentTurnSkillStates(int turnNumber, int turnSeat) => ProgramSkillChanges.ExpireCurrentTurnStates(turnNumber, turnSeat);
+    internal void ExpireCurrentRoundSkillStates(int roundNumber) => ProgramSkillChanges.ExpireCurrentRoundStates(roundNumber);
     ProgramSkillFrame IProgramSkillChangeFacts.ActiveFrame(long id) => _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
     bool IProgramSkillChangeFacts.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool IProgramSkillChangeFacts.Alive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     string IProgramSkillChangeFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
     string IProgramSkillChangeFacts.SkillName(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId).Name;
     SkillTag IProgramSkillChangeFacts.SkillTags(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId).Tags;
+    int IProgramSkillChangeFacts.RoundNumber => _stateRound._roundNumber;
     int IProgramSkillChangeFacts.MaximumHp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].MaxHp;
     int IProgramSkillChangeFacts.ConversionTier(int seat, string state) => _coreGameEngineConfiguredConversionsConfiguredConversionTiersAccess._configuredConversionTiers.GetValueOrDefault((seat, state));
     void IProgramSkillChangeFacts.RequireSkill(string skillId) => _ = _contentRegistryOperations._contentRegistry.GetSkill(skillId);

@@ -5,21 +5,6 @@ internal sealed partial class CharacterWangGuanOlRuntime
 {
     internal bool HasMiuyanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMiuyanCompletedUse);
 
-    internal long CaptureMiuyanQualificationStamp(long underlying)
-    {
-        if (!HasMiuyanCapability)
-            return underlying;
-        var next = (underlying, _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MiuyanRoundDisabledEvent>().Count);
-        if (_characterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess._miuyanQualificationStamp == 0 || next != _characterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess._miuyanQualificationDependencies)
-        {
-            _characterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess._miuyanQualificationDependencies = next;
-            _characterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess._miuyanQualificationStamp++;
-        }
-
-        return long.MinValue + _characterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess._miuyanQualificationStamp;
-    }
-
-    internal bool IsMiuyanGrantQualified(CharacterState owner, SkillGrant grant) => !HasMiuyanCapability || grant.SkillId != "ol:miuyan" || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MiuyanRoundDisabledEvent>().Any(e => e.Source.OwnerSeat == owner.Seat && e.Source.SkillId == grant.SkillId && e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
     internal void IssueMiuyanUse(long useId, CardActionContext? action)
     {
         if (!HasMiuyanCapability || action is not { Type: CardActionType.Use, EffectiveKind: CardKind.FireAttack } || action.ConversionChain.SingleOrDefault(s => s.SkillId == "ol:miuyan" && s.BindingId == "black-fire-attack")is not { } source)

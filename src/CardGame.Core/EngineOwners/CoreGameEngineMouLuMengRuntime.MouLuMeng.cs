@@ -17,6 +17,7 @@ internal sealed partial class CoreGameEngineMouLuMengRuntime
                 _characterGuanYuRuntimeOperations.ReturnDemonRoundHolds();
             _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber++;
             _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Clear();
+            _roundSkillStates.ExpireCurrentRoundSkillStates(_coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber);
             _skillRuntimeStateOperations._skillRuntimeState.ResetRound();
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoundStartedEvent(_coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber, current.Seat));
             _coreShanheSourceDifficultyOperations.Value.RestoreShanheSourceRoundArmor();

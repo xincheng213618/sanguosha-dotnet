@@ -6,7 +6,6 @@ public sealed record MiuyanUseInvoice(long UseId,long ActionId,CardConversionSou
     int OriginalActor,int ProviderSeat,CardActionCost Material,long BeforePayment);
 public sealed record MiuyanUseIssuedEvent(MiuyanUseInvoice Invoice):IGameEvent;
 public sealed record MiuyanPhaseHandRevealedEvent(ActualDiscardRecoveryPhaseKey Phase,long RevealFrameId,int CardId,int HolderSeat,long Entry,string RevealKind):IGameEvent;
-public sealed record MiuyanRoundDisabledEvent(long ProgramFrameId,long UseId,long ActionId,CardConversionSource Source,string GameplayHash,int RoundNumber):IGameEvent;
 public sealed record MiuyanClaimEntityFrozenEvent(long FrameId,int Index,WangGuanHandEntity Entity):IGameEvent;
 public sealed record MiuyanEntityObtainedEvent(long FrameId,int Index,WangGuanHandEntity Entity,long MovementSequence):IGameEvent;
 internal sealed class ResolveMiuyanCompletedUseDescriptor:WangGuanDescriptor

@@ -4,7 +4,7 @@ namespace CardGame.Core;
 
 public enum SkillStateAction { Suppress, Lose, Transfer }
 public enum SkillStateScope { All, NonLocked, Named, ChosenFromTarget, Expression }
-public enum SkillStateDuration { CurrentTurn, UntilTurnEndOf, Permanent }
+public enum SkillStateDuration { CurrentTurn, UntilTurnEndOf, Permanent, CurrentRound }
 public enum SkillStateEndTiming { AfterTurnEnded, BeforeTurnEnded }
 
 public sealed record SkillStateSpec(SkillStateAction Action, SkillStateScope Scope, SkillStateDuration Duration)
@@ -30,6 +30,8 @@ public sealed record SkillStateLease(SkillStateAction Action, SkillStateScope Sc
     public SkillStateOrigin? Origin { get; init; }
     public int? DeathSeat { get; init; }
     public string? TargetGrantId { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? IssuedRound { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public SkillStateEndTiming EndTiming { get; init; }
 }

@@ -17,6 +17,7 @@ internal static class SkillStateChecks
             ("chosen return", ChosenLossReturnsToOrdinaryDrawCold),
             ("overlapping expiry", OverlappingExpiryPreservesTheExistingInstance),
             ("next owner turn expiry", AfterCurrentTurnWaitsForTheNextOwnerTurnEnd),
+            ("current round expiry", CurrentRoundExpiresWithoutRoundEndingTracking),
             ("existing transfer", TransferReusesAnAlreadyOwnedInstance),
             ("named future source", NamedSuppressionCoversAnIndependentlyAcquiredSource),
             ("filter resources", FiltersShareExpressionResourcesAndReadSkillFacts),
@@ -122,6 +123,30 @@ internal static class SkillStateChecks
                 s.G.Events.Single(e => e.Payload is SkillStateExpiredEvent expiry && expiry.SourceId == source).Sequence == expired,
                 "Cold replay preserves the selected lifecycle boundary and exact expiry/end publication order.");
         }
+    }
+
+    private static void CurrentRoundExpiresWithoutRoundEndingTracking()
+    {
+        var s = Scene.Start();
+        Require(!s.G.RoundEndingEntries.Value.TracksRoundEnding, "The shared fixture has no optional round-ending capability.");
+        var round = s.E<RoundStartedEvent>().Last().RoundNumber;
+        s.Use(0, Driver, "through-current-round", 1); s.Play(0);
+        var source = s.E<SkillStateChangedEvent>().Single(e => e.Seat == 1 && e.SkillId == Counter).SourceId;
+        s.Play(1);
+        Require(s.E<RoundStartedEvent>().Last().RoundNumber == round && s.Owns(1, Counter) && !s.CanUse(1, Counter, "pulse"),
+            "A named current-round restriction preserves ownership and remains effective throughout the original round.");
+        s.Cold();
+        Require(s.Owns(1, Counter) && !s.Effective(1, Counter) && s.StateLeases(1) == 1,
+            "Cold replay retains a current-round restriction without enabling round-ending tracking.");
+        s.Reach(() => s.E<RoundStartedEvent>().Last().RoundNumber > round);
+        var started = s.G.Events.Last(e => e.Payload is RoundStartedEvent next && next.RoundNumber > round).Sequence;
+        var expired = s.G.Events.Single(e => e.Payload is SkillStateExpiredEvent expiry && expiry.SourceId == source).Sequence;
+        Require(s.E<RoundEndedEvent>().Length == 0 && expired < started && s.StateLeases(1) == 0 &&
+            s.Owns(1, Counter) && s.Effective(1, Counter),
+            "The native round clock expires the restriction before the next round starts, even without a RoundEnded fact.");
+        s.Cold(); s.Play(0);
+        Require(s.E<RoundEndedEvent>().Length == 0 && s.Effective(1, Counter) && s.StateLeases(1) == 0,
+            "Cold replay reaches the owner's next play with the current-round restriction already removed.");
     }
 
     private static void TransferReusesAnAlreadyOwnedInstance()
@@ -345,6 +370,8 @@ internal static class SkillStateChecks
                       {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"nonLocked","duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"owner"},"afterCurrentTurn":true}]},
                     {"id":"through-next-owner-before-end","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"nonLocked","duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"owner"},"afterCurrentTurn":true,"endTiming":"beforeTurnEnded"}]},
+                    {"id":"through-current-round","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"named","skillIds":["{{{Counter}}}"],"duration":"currentRound"}]},
                     {"id":"transfer","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"skillState","target":"selectedTarget","action":"transfer","scope":"named","skillIds":["{{{Counter}}}"],"duration":"currentTurn"}]},
                     {"id":"lose-own-counter","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[

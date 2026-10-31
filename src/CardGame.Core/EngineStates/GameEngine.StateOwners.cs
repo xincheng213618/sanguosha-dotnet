@@ -32,7 +32,6 @@ public sealed partial class GameEngine
     private readonly EngineStates.CharacterLiuQiOlState _characterLiuQiOl = new();
     private readonly EngineStates.CharacterLvKaiOlState _characterLvKaiOl = new();
     private readonly EngineStates.CharacterTaiShiCiMobileShiState _characterTaiShiCiMobileShi = new();
-    private readonly EngineStates.CharacterWangGuanOlState _characterWangGuanOl = new();
     private readonly EngineStates.CharacterYangWanOlState _characterYangWanOl = new();
     private readonly EngineStates.CharacterZhangLingOlState _characterZhangLingOl = new();
     private readonly EngineStates.CharacterZhangXunAnniversaryState _characterZhangXunAnniversary = new();
@@ -190,7 +189,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICharacterLiuQiOlHasIssuedLiuQiAccess), _characterLiuQiOl),
         new(typeof(EngineStates.Contracts.ICharacterLvKaiOlBijingMarkedCardIdsAccess), _characterLvKaiOl),
         new(typeof(EngineStates.Contracts.ICharacterTaiShiCiMobileShiShiTzLieScanSequenceAccess), _characterTaiShiCiMobileShi),
-        new(typeof(EngineStates.Contracts.ICharacterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess), _characterWangGuanOl),
         new(typeof(EngineStates.Contracts.ICharacterYangWanOlZhuihuanArmChoicesAccess), _characterYangWanOl),
         new(typeof(EngineStates.Contracts.ICharacterZhangLingOlSynchronizingCategoryTalismansAccess), _characterZhangLingOl),
         new(typeof(EngineStates.Contracts.ICharacterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess), _characterZhangXunAnniversary),

@@ -42,6 +42,7 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
         var source = $"skill-state:{origin.FrameId}:{origin.EffectIndex}:{seat}:{origin.Source.SkillInstanceId}";
         var scope = spec.Action == SkillStateAction.Transfer ? SkillStateScope.Named : spec.Scope;
         var owner = origin.Source.OwnerSeat;
+        var round = spec.Duration == SkillStateDuration.CurrentRound ? facts.RoundNumber : (int?)null;
         if (spec.Action == SkillStateAction.Lose && spec.Duration == SkillStateDuration.Permanent && !spec.ExpireOnDeath)
             foreach (var grant in grants) operations.SetGrantEnabled(seat, grant.GrantId, false);
         else
@@ -58,7 +59,7 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
                 var state = new SkillStateLease(spec.Action == SkillStateAction.Transfer ? SkillStateAction.Suppress : spec.Action,
                     scope, spec.Duration, turn.TurnNumber, endSeat ?? turn.CurrentSeat, name,
                     spec.PrintedOnly, spec.ExcludeLocked, spec.ExpireOnDeath, CharacterOnly: spec.CharacterOnly,
-                    AfterCurrentTurn: spec.AfterCurrentTurn) { Origin = origin, DeathSeat = seat, TargetGrantId = grantId, EndTiming = spec.EndTiming };
+                    AfterCurrentTurn: spec.AfterCurrentTurn) { Origin = origin, DeathSeat = seat, TargetGrantId = grantId, EndTiming = spec.EndTiming, IssuedRound = round };
                 operations.Grant(seat, new SkillGrant(key, name ?? origin.Source.SkillId, key, source, false) { SkillState = state });
             }
         }
@@ -75,7 +76,7 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
                 {
                     SkillState = new(SkillStateAction.Transfer, SkillStateScope.Named, spec.Duration,
                         turn.TurnNumber, endSeat ?? turn.CurrentSeat, id, ExpireOnDeath: spec.ExpireOnDeath, Acquisition: true,
-                        AfterCurrentTurn: spec.AfterCurrentTurn) { Origin = origin, DeathSeat = seat, EndTiming = spec.EndTiming }
+                        AfterCurrentTurn: spec.AfterCurrentTurn) { Origin = origin, DeathSeat = seat, EndTiming = spec.EndTiming, IssuedRound = round }
                 });
             }
             foreach (var id in acquired) operations.RegisterTaggedConversionSkill(owner, id);
@@ -108,8 +109,11 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
     internal void ExpireCurrentTurnStates(int turnNumber, int turnSeat) => RemoveExpiredStates(s =>
         s.Duration == SkillStateDuration.CurrentTurn && EndsAtTurn(s, turnNumber, turnSeat));
 
+    internal void ExpireCurrentRoundStates(int roundNumber) => RemoveExpiredStates(s =>
+        s.Duration == SkillStateDuration.CurrentRound && s.IssuedRound != roundNumber);
+
     private static bool EndsAtTurn(SkillStateLease s, int turnNumber, int turnSeat) =>
-        s.Duration != SkillStateDuration.Permanent && turnSeat == s.EndSeat &&
+        s.Duration is SkillStateDuration.CurrentTurn or SkillStateDuration.UntilTurnEndOf && turnSeat == s.EndSeat &&
         (s.Duration == SkillStateDuration.CurrentTurn ? turnNumber == s.IssuedTurn :
             s.AfterCurrentTurn ? turnNumber > s.IssuedTurn : turnNumber >= s.IssuedTurn);
 
@@ -118,6 +122,8 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
         var ended = participants.Players.SelectMany(player => player.SkillGrants.Grants
             .Where(grant => grant.SkillState is { } state && expired(state))
             .Select(grant => (player.Seat, Grant: grant))).ToArray();
+        if (ended.Length == 0) return;
+        observations.Capture(participants.Players);
         foreach (var (seat, grant) in ended) operations.RemoveGrant(seat, grant.GrantId);
         foreach (var (seat, grant) in ended)
             operations.AdvanceFact(new SkillStateExpiredEvent(seat, grant.SourceId, grant.SkillState!.Origin));
@@ -360,6 +366,7 @@ internal interface IProgramSkillChangeFacts : IProgramSkillGrantQueries
     string Name(int seat);
     string SkillName(string skillId);
     SkillTag SkillTags(string skillId);
+    int RoundNumber { get; }
     int MaximumHp(int seat);
     int ConversionTier(int seat, string state);
     void RequireSkill(string skillId);

@@ -183,8 +183,6 @@ public sealed partial class GameEngine
     // Existing match-local derived index; replay rebuilds it in event order.
     // The independent Runtime owns scanning and qualification, not this state.
     private ref int _shiTzLieScanSequence => ref _characterTaiShiCiMobileShi.ReferenceToShiTzLieScanSequence;
-    private ref (long Base, int Round, int Count) _miuyanQualificationDependencies => ref _characterWangGuanOl.ReferenceToMiuyanQualificationDependencies;
-    private ref long _miuyanQualificationStamp => ref _characterWangGuanOl.ReferenceToMiuyanQualificationStamp;
     // Private 追还 arm choices: arm frame id → secretly chosen seat. The map is
     // runtime trusted state; replay rebuilds it from the accepted choice
     // commands exactly like the 闭境 marked-card map.
