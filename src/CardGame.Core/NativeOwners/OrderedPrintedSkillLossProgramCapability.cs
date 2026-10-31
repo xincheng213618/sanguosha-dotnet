@@ -1,6 +1,0 @@
-#nullable enable
-namespace CardGame.Core.NativeOwners;
-internal sealed class OrderedPrintedSkillLossProgramCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineOrderedPrintedSkillLossRuntime>> getCoreGameEngineOrderedPrintedSkillLossRuntime) : IOrderedPrintedSkillLossProgramHost
-{
-    public SkillProgramStepOutcome ExecuteOrderedPrintedSkillLoss(ProgramSkillFrame frame) => getCoreGameEngineOrderedPrintedSkillLossRuntime().Value.ExecuteOrderedPrintedSkillLoss(frame);
-}

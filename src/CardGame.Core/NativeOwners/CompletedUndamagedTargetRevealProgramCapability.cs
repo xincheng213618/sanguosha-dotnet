@@ -1,7 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.NativeOwners;
-internal sealed class CompletedUndamagedTargetRevealProgramCapability(Func<RuntimeEntries.CoreGameEngineCompletedUndamagedTargetRevealEntries> getCoreGameEngineCompletedUndamagedTargetRevealRuntime) : ICompletedUndamagedTargetRevealProgramHost
-{
-    public SkillProgramStepOutcome CompletedUndamagedTargetReveal(ProgramSkillFrame f) => getCoreGameEngineCompletedUndamagedTargetRevealRuntime().BeginCompletedUndamagedTargetReveal(f);
-}

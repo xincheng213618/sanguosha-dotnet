@@ -1,6 +1,0 @@
-#nullable enable
-namespace CardGame.Core.NativeOwners;
-internal sealed class OverflowTargetCancellationCapability(Func<RuntimeEntries.CoreGameEngineOverflowTargetCancellationEntries> getCoreGameEngineOverflowTargetCancellationRuntime) : IOverflowTargetCancellationHost
-{
-    public SkillProgramStepOutcome BeginOverflowTargetCancellation(ProgramSkillFrame frame) => getCoreGameEngineOverflowTargetCancellationRuntime().BeginOverflowTargetCancellation(frame);
-}

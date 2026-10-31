@@ -1,7 +1,0 @@
-#nullable enable
-namespace CardGame.Core.NativeOwners;
-internal sealed class OwnTrickAndHandCategoryProgramCapability(Func<RuntimeEntries.CoreGameEngineOwnTrickDrawTargetsEntries> getCoreGameEngineOwnTrickDrawTargetsRuntime, Func<RuntimeEntries.CoreGameEngineTurnHandCategoryRestrictionsEntries> getCoreGameEngineTurnHandCategoryRestrictionsRuntime) : IOwnTrickAndHandCategoryProgramHost
-{
-    public SkillProgramStepOutcome DrawThenNullifyOwnMultiTargetTrick(ProgramSkillFrame f) => getCoreGameEngineOwnTrickDrawTargetsRuntime().BeginOwnTrickDraw(f);
-    public void RestrictDamageSourceHandCategory(ProgramSkillFrame f, SkillProgramCardCategory category) => getCoreGameEngineTurnHandCategoryRestrictionsRuntime().GrantDamageSourceHandCategory(f, category);
-}

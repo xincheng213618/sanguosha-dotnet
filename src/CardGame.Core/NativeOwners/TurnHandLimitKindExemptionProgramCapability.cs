@@ -1,6 +1,0 @@
-#nullable enable
-namespace CardGame.Core.NativeOwners;
-internal sealed class TurnHandLimitKindExemptionProgramCapability(Func<RuntimeEntries.CoreGameEngineTurnHandLimitKindExemptionsEntries> getCoreGameEngineTurnHandLimitKindExemptionsRuntime) : ITurnHandLimitKindExemptionProgramHost
-{
-    public void GrantTurnHandLimitCardKindExemption(ProgramSkillFrame frame, IReadOnlyList<CardKind> cardKinds) => getCoreGameEngineTurnHandLimitKindExemptionsRuntime().GrantProgramTurnHandLimitCardKindExemption(frame, cardKinds);
-}

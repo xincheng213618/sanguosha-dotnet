@@ -72,8 +72,7 @@ internal static class ProgramDamageHookChecks
 
         // Exercise actual engine metadata too: fixtures cannot conceal an invalid
         // module signature or a duplicate order elsewhere in the content tree.
-        var field = typeof(GameEngine).GetField("DamageHookMetadata", BindingFlags.NonPublic | BindingFlags.Static)!;
-        var actual = ((Lazy<ProgramDamageHookCatalog>)field.GetValue(null)!).Value;
+        var actual = CardGame.Core.EngineOwners.CoreProgramDamageHooksRuntime.NativeDamageHookCatalog;
         Need(actual.Phases[ProgramDamagePhase.AdditiveAmount].Count > 0 && actual.Phases[ProgramDamagePhase.BeforeChainAdvance].Count > 0,
             "The real engine discovers its module-owned actual-damage contracts.");
 

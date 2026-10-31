@@ -1,6 +1,0 @@
-#nullable enable
-namespace CardGame.Core.NativeOwners;
-internal sealed class RandomAreaAcquisitionCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime>> getCoreGameEngineRandomAreaAcquisitionRuntime) : IRandomAreaAcquisitionHost
-{
-    public SkillProgramStepOutcome ObtainRandomAreaFromEachOtherThenTurnOver(ProgramSkillFrame frame) => getCoreGameEngineRandomAreaAcquisitionRuntime().Value.ObtainRandomAreaFromEachOtherThenTurnOver(frame);
-}

@@ -1,7 +1,0 @@
-#nullable enable
-namespace CardGame.Core.NativeOwners;
-internal sealed class AlternatingSuitAndCompletedTopCapability(Func<RuntimeEntries.CoreGameEngineAlternatingSuitAndCompletedTopEntries> getCoreGameEngineAlternatingSuitAndCompletedTopRuntime) : IAlternatingSuitAndCompletedTopHost
-{
-    public SkillProgramStepOutcome BeginAlternatingSuitDrawDiscard(ProgramSkillFrame f) => getCoreGameEngineAlternatingSuitAndCompletedTopRuntime().BeginAlternatingSuitDrawDiscard(f);
-    public SkillProgramStepOutcome BeginFirstCategoryCompletedTop(ProgramSkillFrame f) => getCoreGameEngineAlternatingSuitAndCompletedTopRuntime().BeginFirstCategoryCompletedTop(f);
-}

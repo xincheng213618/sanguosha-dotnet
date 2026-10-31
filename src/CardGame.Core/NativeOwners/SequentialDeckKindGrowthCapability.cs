@@ -1,6 +1,0 @@
-#nullable enable
-namespace CardGame.Core.NativeOwners;
-internal sealed class SequentialDeckKindGrowthCapability(Func<RuntimeEntries.CoreGameEngineSequentialDeckKindGrowthEntries> getCoreGameEngineSequentialDeckKindGrowthRuntime) : ISequentialDeckKindGrowthHost
-{
-    public SkillProgramStepOutcome AcquireDeckKindSequentiallyAndGrowOnShortfall(ProgramSkillFrame frame, SkillProgramEffect effect) => getCoreGameEngineSequentialDeckKindGrowthRuntime().AcquireDeckKindSequentiallyAndGrowOnShortfall(frame, effect);
-}

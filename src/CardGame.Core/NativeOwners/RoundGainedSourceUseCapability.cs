@@ -1,8 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.NativeOwners;
-internal sealed class RoundGainedSourceUseCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRoundGainedTrickTargetsRuntime>> getCoreGameEngineRoundGainedTrickTargetsRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRoundGainedEquipmentDrawsRuntime>> getCoreGameEngineRoundGainedEquipmentDrawsRuntime) : IRoundGainedSourceUseHost
-{
-    public SkillProgramStepOutcome AdjustOneRoundGainedOrdinaryTrickTarget(ProgramSkillFrame frame) => getCoreGameEngineRoundGainedTrickTargetsRuntime().Value.OfferRoundGainedTrickTarget(frame);
-    public SkillProgramStepOutcome DrawForRoundGainedEquipmentUse(ProgramSkillFrame frame) => getCoreGameEngineRoundGainedEquipmentDrawsRuntime().Value.BeginRoundGainedEquipmentDraw(frame);
-}

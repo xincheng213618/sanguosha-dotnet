@@ -1,7 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.NativeOwners;
-internal sealed class SlashTargetPenaltyProgramCapability(Func<RuntimeEntries.CoreGameEngineSlashTargetPenaltyPaymentsEntries> getCoreGameEngineSlashTargetPenaltyPaymentsRuntime) : ISlashTargetPenaltyProgramHost
-{
-    public SkillProgramStepOutcome RequireTargetDiscardOrEquipmentRecast(ProgramSkillFrame f) => getCoreGameEngineSlashTargetPenaltyPaymentsRuntime().RequireTargetDiscardOrEquipmentRecast(f);
-}

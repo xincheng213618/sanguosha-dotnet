@@ -1,7 +1,0 @@
-#nullable enable
-namespace CardGame.Core.NativeOwners;
-internal sealed class AlcoholSlashSuppressionProgramCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime>> getCoreGameEngineAlcoholSlashSuppressionsRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineOwnedDamagePointJudgmentsRuntime>> getCoreGameEngineOwnedDamagePointJudgmentsRuntime) : IAlcoholSlashSuppressionProgramHost
-{
-    public void SuppressOwnSkillAfterAlcoholSlashDamage(ProgramSkillFrame frame, string skillId) => getCoreGameEngineAlcoholSlashSuppressionsRuntime().Value.SuppressOwnSkillAfterAlcoholSlashDamage(frame, skillId);
-    public SkillProgramStepOutcome StartOwnedDamagePointJudgment(ProgramSkillFrame frame, SkillProgramEffect effect) => getCoreGameEngineOwnedDamagePointJudgmentsRuntime().Value.BeginOwnedDamagePointJudgment(frame, effect);
-}

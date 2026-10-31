@@ -1,8 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.NativeOwners;
-internal sealed class EquipmentDonationProgramCapability(Func<RuntimeEntries.CoreGameEngineEquipmentDonationProgramsEntries> getCoreGameEngineEquipmentDonationProgramsRuntime, Func<RuntimeEntries.CoreGameEngineActualEndedTurnEquipmentEntries> getCoreGameEngineActualEndedTurnEquipmentRuntime) : IEquipmentDonationProgramHost
-{
-    public SkillProgramStepOutcome DonateAllEquipmentAndOfferRecipientBenefits(ProgramSkillFrame f, string usageId) => getCoreGameEngineEquipmentDonationProgramsRuntime().RunAllEquipmentDonation(f, usageId);
-    public SkillProgramStepOutcome ChooseEquipmentOrDrawAfterOtherActualTurn(ProgramSkillFrame f) => getCoreGameEngineActualEndedTurnEquipmentRuntime().RunActualEndedTurnEquipment(f);
-}

@@ -1,8 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.NativeOwners;
-internal sealed class ConfiguredConversionProgramCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineConfiguredConversionsRuntime>> getCoreGameEngineConfiguredConversionsRuntime, Func<RuntimeEntries.CoreGameEngineProgramSkillChangesEntries> getCoreGameEngineProgramSkillChangesRuntime) : IConfiguredConversionProgramHost
-{
-    public SkillProgramStepOutcome DeclareBoundCardName(ProgramSkillFrame frame, string sourceBind, string stateId) => getCoreGameEngineConfiguredConversionsRuntime().Value.BeginConfiguredCardDeclaration(frame, sourceBind, stateId);
-    public void UpgradeConversionTier(ProgramSkillFrame frame, string stateId) => getCoreGameEngineProgramSkillChangesRuntime().UpgradeConfiguredConversionTier(frame, stateId);
-}

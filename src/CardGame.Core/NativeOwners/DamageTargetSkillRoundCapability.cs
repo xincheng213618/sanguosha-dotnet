@@ -1,6 +1,0 @@
-#nullable enable
-namespace CardGame.Core.NativeOwners;
-internal sealed class DamageTargetSkillRoundCapability(Func<RuntimeEntries.CoreGameEngineDamageTargetSkillRoundDrawEntries> getCoreGameEngineDamageTargetSkillRoundDrawRuntime) : IDamageTargetSkillRoundDrawHost
-{
-    public SkillProgramStepOutcome GrantDamageTargetSkillAndDrawByRound(ProgramSkillFrame frame) => getCoreGameEngineDamageTargetSkillRoundDrawRuntime().GrantDamageTargetSkillAndDrawByRound(frame);
-}

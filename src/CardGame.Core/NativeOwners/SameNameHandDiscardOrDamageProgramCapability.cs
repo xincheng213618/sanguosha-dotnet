@@ -1,7 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.NativeOwners;
-internal sealed class SameNameHandDiscardOrDamageProgramCapability(Func<RuntimeEntries.CoreGameEngineSameNameHandDiscardOrDamageEntries> getCoreGameEngineSameNameHandDiscardOrDamageRuntime) : ISameNameHandDiscardOrDamageProgramHost
-{
-    public SkillProgramStepOutcome OfferSameNameHandDiscardOrDamage(ProgramSkillFrame f) => getCoreGameEngineSameNameHandDiscardOrDamageRuntime().BeginSameNameHandDiscardOrDamage(f);
-}

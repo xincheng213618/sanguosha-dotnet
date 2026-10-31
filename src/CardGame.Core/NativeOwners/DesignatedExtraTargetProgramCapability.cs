@@ -1,7 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.NativeOwners;
-internal sealed class DesignatedExtraTargetProgramCapability(Func<RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries> getCoreGameEngineDesignatedExtraTargetsRuntime) : IDesignatedExtraTargetProgramHost
-{
-    public SkillProgramStepOutcome AddOneDistanceFreeCurrentUseTarget(ProgramSkillFrame frame) => getCoreGameEngineDesignatedExtraTargetsRuntime().AddOneDistanceFreeCurrentUseTarget(frame);
-}
