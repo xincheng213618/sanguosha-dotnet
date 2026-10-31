@@ -8,12 +8,12 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CharacterZhaoYunOlGod2016Runtime
 {
-    private readonly ICharacterZhaoYunOlGod2016ContentRegistryOperations _contentRegistryOperations;
-    private readonly ICharacterZhaoYunOlGod2016CorePlayCardHistoryOperations _corePlayCardHistoryOperations;
-    private readonly ICharacterZhaoYunOlGod2016CoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
-    private readonly ICharacterZhaoYunOlGod2016KernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEnginePlayCardHistoryEntries _corePlayCardHistoryOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CharacterZhaoYunOlGod2016Runtime(ICharacterZhaoYunOlGod2016ContentRegistryOperations contentRegistryOperations, ICharacterZhaoYunOlGod2016CorePlayCardHistoryOperations corePlayCardHistoryOperations, ICharacterZhaoYunOlGod2016CoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterZhaoYunOlGod2016KernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CharacterZhaoYunOlGod2016Runtime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEnginePlayCardHistoryEntries corePlayCardHistoryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations, global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._contentRegistryOperations = contentRegistryOperations;
         this._corePlayCardHistoryOperations = corePlayCardHistoryOperations;

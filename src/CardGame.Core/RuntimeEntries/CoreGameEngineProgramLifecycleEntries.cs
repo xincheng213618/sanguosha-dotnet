@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime))]
 internal sealed partial class CoreGameEngineProgramLifecycleEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime> _resolve;

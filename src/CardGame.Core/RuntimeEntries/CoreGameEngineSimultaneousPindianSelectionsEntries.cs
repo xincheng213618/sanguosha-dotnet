@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineSimultaneousPindianSelectionsRuntime))]
 internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineSimultaneousPindianSelectionsRuntime> _resolve;

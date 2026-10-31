@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreModeNativeFrameRuntimeRuntime
 {
-    private readonly ICoreModeNativeFrameRuntimeModeRuntimeOperations _modeRuntimeOperations;
-    internal CoreModeNativeFrameRuntimeRuntime(ICoreModeNativeFrameRuntimeModeRuntimeOperations modeRuntimeOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    internal CoreModeNativeFrameRuntimeRuntime(global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations)
     {
         this._modeRuntimeOperations = modeRuntimeOperations;
     }

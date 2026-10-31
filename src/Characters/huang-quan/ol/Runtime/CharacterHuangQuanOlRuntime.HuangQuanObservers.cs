@@ -56,7 +56,7 @@ internal sealed partial class CharacterHuangQuanOlRuntime
         return p.Stage == "draw-paid" && child is CardsMovedTriggerWindowFrame moved && moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => m.Sequence > p.Before && m.Sequence <= p.After && p.CardIds.Contains(m.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
     }
 
-    internal ProgramSkillFrame? HuangQuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterHuangQuanOlOperations.HuangQuanFirstChild(r, c), (i) => _coreJianjiDeclarationsOperations2.HuangQuanDeclarationObserverSuffix(i));
+    internal ProgramSkillFrame? HuangQuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterHuangQuanOlOperations.HuangQuanFirstChild(r, c), (i) => _coreJianjiDeclarationsOperations.HuangQuanDeclarationObserverSuffix(i));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 190)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 300)]
     internal bool HasHuangQuanDamageObserver(long id) => HuangQuanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);

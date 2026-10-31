@@ -139,7 +139,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         var location = _cardZonesOperations._cardZones.GetLocation(card.Id);
         if (location == CardLocation.WoodenOxGrain(owner.Seat) && _characterHuCheErMouOperations.MouHuCheErEquipmentDisabled(owner.Seat))
             return[];
-        var zone = location == CardLocation.Hand(owner.Seat) || _characterGongsunZanMouMobileOperations.IsMouGszHuCard(owner, card.Id) || _characterLuSuMobileShiOperations.IsShiLsHandAccess(owner.Seat, card.Id) ? CardZoneKind.Hand : location == CardLocation.Equipment(owner.Seat) ? CardZoneKind.Equipment : location == CardLocation.Authority(owner.Seat) ? CardZoneKind.Authority : location == CardLocation.WoodenOxGrain(owner.Seat) ? CardZoneKind.WoodenOxGrain : location == CardLocation.Judgment(owner.Seat) ? CardZoneKind.Judgment : location.Zone == CardZoneKind.PublicPersistentPile && location.OwnerSeat == owner.Seat ? CardZoneKind.PublicPersistentPile : (CardZoneKind? )null;
+        var zone = location == CardLocation.Hand(owner.Seat) || _characterGongsunZanMouMobileOperations.IsMouGszHuCard(owner, card.Id) || _characterLuSuMobileShiOperations.IsShiLsHandAccess2(owner.Seat, card.Id) ? CardZoneKind.Hand : location == CardLocation.Equipment(owner.Seat) ? CardZoneKind.Equipment : location == CardLocation.Authority(owner.Seat) ? CardZoneKind.Authority : location == CardLocation.WoodenOxGrain(owner.Seat) ? CardZoneKind.WoodenOxGrain : location == CardLocation.Judgment(owner.Seat) ? CardZoneKind.Judgment : location.Zone == CardZoneKind.PublicPersistentPile && location.OwnerSeat == owner.Seat ? CardZoneKind.PublicPersistentPile : (CardZoneKind? )null;
         if (zone is null || _coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(owner.Seat, outputKind, [card.Id], forResponse && !dyingUse))
             return[];
         var inputKind = _coreWenhePoisonOperations.EffectiveConversionInputKind(owner, card);
@@ -214,7 +214,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         foreach (var cardId in orderedCardIds)
         {
             var location = _cardZonesOperations._cardZones.GetLocation(cardId);
-            if (location.OwnerSeat != owner.Seat && !_characterLuSuMobileShiOperations.IsShiLsHandAccess(owner.Seat, cardId))
+            if (location.OwnerSeat != owner.Seat && !_characterLuSuMobileShiOperations.IsShiLsHandAccess2(owner.Seat, cardId))
                 return null;
             var card = _cardZonesOperations._cardZones.CardsAt(location).SingleOrDefault(item => item.Id == cardId);
             if (card is null || !(rule.SourceZones.Contains(location.Zone) || _characterGongsunZanMouMobileOperations.MouGszHuHandSource(owner, card, rule.SourceZones) || _characterChengJiChengCuiOlOperations.IsTousuiVariableSource(owner, rule, card, location)) || _coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, card) || HasProgramCardIdentity(owner, card) || rule.InputKinds.Count != 0 && !ProgramCardKindMatch.Contains(rule.InputKinds, _coreWenhePoisonOperations.EffectiveConversionInputKind(owner, card)) || rule.InputSuits.Count != 0 && !rule.InputSuits.Contains(rule.UseEffectiveInputSuit == true ? _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card) : card.Suit))
@@ -495,7 +495,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
 
     internal CardConversionSource? GetSelectedUseConversion(CharacterState actor, CharacterState provider, Card card, CardKind effectiveKind)
     {
-        if (_characterLuSuMobileShiOperations.IsShiLsHandAccess(actor.Seat, card.Id))
+        if (_characterLuSuMobileShiOperations.IsShiLsHandAccess2(actor.Seat, card.Id))
             provider = actor;
         var hasIdentity = HasProgramCardIdentity(provider, card);
         var fanConvertsSlash = effectiveKind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(actor);

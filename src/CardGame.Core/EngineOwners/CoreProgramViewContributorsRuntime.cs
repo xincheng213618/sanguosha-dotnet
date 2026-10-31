@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreProgramViewContributorsRuntime
 {
-    private readonly ICoreProgramViewContributorsViewContributorsOperations _viewContributorsOperations;
-    private readonly ICoreProgramViewContributorsKernelCoreProgramRuntimeModulesOperations _kernelCoreProgramRuntimeModulesOperations;
-    internal CoreProgramViewContributorsRuntime(ICoreProgramViewContributorsViewContributorsOperations viewContributorsOperations, ICoreProgramViewContributorsKernelCoreProgramRuntimeModulesOperations kernelCoreProgramRuntimeModulesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelViewContributorsAccess _viewContributorsOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations;
+    internal CoreProgramViewContributorsRuntime(global::CardGame.Core.EngineOwners.IKernelViewContributorsAccess viewContributorsOperations, global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations kernelCoreProgramRuntimeModulesOperations)
     {
         this._viewContributorsOperations = viewContributorsOperations;
         this._kernelCoreProgramRuntimeModulesOperations = kernelCoreProgramRuntimeModulesOperations;

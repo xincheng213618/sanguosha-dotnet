@@ -62,7 +62,7 @@ internal sealed partial class CharacterWangCanOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 3700)]
     internal ProgramSkillWindowContext? TrySanwenGain(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         var features = ProgramInstructionResolver.Default.Features(trigger);
         if (features.HasOperation(SkillProgramEffectOp.ResolveSanwenActualGainDuplicates))
             return new(trigger.Window, frame.Id, candidate.OwnerSeat, SourceSeat: frame.Batch.OriginOwnerSeat, TargetSeat: candidate.OwnerSeat, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]), MovementBatch: frame.Batch)

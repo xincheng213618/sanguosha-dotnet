@@ -34,7 +34,7 @@ internal sealed partial class CharacterPangJiOlRuntime
                 continue;
             var t = _contentRegistryOperations._contentRegistry.GetSkill(arm.Source.SkillId).Program!.Triggers.Single(t => t.Id == "armed-target-pindian");
             var origin = new BiguoTargetOrigin(arm.FrameId, arm.Source, arm.GameplayHash, use.Id, action.ActionId, arm.ActualTurn, arm.TurnOwner);
-            var c = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, owner, owner, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[owner], action))with
+            var c = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, owner, owner, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[owner], action))with
             {
                 BiguoTarget = origin
             };

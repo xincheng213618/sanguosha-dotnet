@@ -8,7 +8,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoYunMobileShiRuntime
 {
     internal const string MobileShiWuyiSkill = "mobile:shi-wuyi";
-    internal bool MobileShiWuyiAtLeast(CharacterState owner, int level) => _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Any(instance => instance.SkillId == MobileShiWuyiSkill && _coreProgramPersistentStateOperations.GetProgramBooleanState(owner.Seat, instance.SkillId, instance.SkillInstanceId, global::CardGame.Core.EngineOwners.CharacterZhaoYunMobileShiDefinitions.MobileShiWuyiLevels[level - 1]));
+    internal bool MobileShiWuyiAtLeast(CharacterState owner, int level) => _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Any(instance => instance.SkillId == MobileShiWuyiSkill && _coreProgramPersistentStateOperations.GetProgramBooleanState2(owner.Seat, instance.SkillId, instance.SkillInstanceId, global::CardGame.Core.EngineOwners.CharacterZhaoYunMobileShiDefinitions.MobileShiWuyiLevels[level - 1]));
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 67200)]
     internal void RecordMobileShiWuyiHandBasic(CardActionAcceptedEvent accepted)
     {

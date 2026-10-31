@@ -16,7 +16,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
     internal bool DongxinContextLegal(int owner, string direction, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.Amount > 0 && c.TargetSeat is { } victim && _coreTableSeatQueriesOperations.IsValidPlayerSeat(victim) && c.SourceSeat is { } source && _coreTableSeatQueriesOperations.IsValidPlayerSeat(source) && _coreMatchParticipantsPlayersAccess._players[source].IsAlive && (direction == "dealt" ? source == owner : direction == "received" && victim == owner) && DongxinDirectionAvailable(owner, direction) && DongxinCanPay(owner, victim);
     internal bool DongxinCanPay(int owner, int victim)
     {
-        var total = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[victim]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(victim).Count;
+        var total = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[victim]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment2(victim).Count;
         var required = Math.Min(Math.Max(0, _coreMatchParticipantsPlayersAccess._players[victim].MaxHp - _coreMatchParticipantsPlayersAccess._players[victim].Hp) + 1, total);
         return SunYuanEligibleCards(owner, victim, false).Count >= required;
     }

@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreJudgmentCursorRuntimeRuntime
 {
-    private readonly ICoreJudgmentCursorRuntimeResolutionStackOperations _resolutionStackOperations;
-    internal CoreJudgmentCursorRuntimeRuntime(ICoreJudgmentCursorRuntimeResolutionStackOperations resolutionStackOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    internal CoreJudgmentCursorRuntimeRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
     }

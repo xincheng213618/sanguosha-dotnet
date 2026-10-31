@@ -28,7 +28,7 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionObserversRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == armorOwner && recovery.Attempt.TargetSeat == armorOwner && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.MoveReason?.Value == reason;
     }
 
-    internal ProgramSkillFrame? PhaseNamePredictionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePhaseNamePredictionObserversOperations.PhaseNamePredictionFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasHandGainDebtObserverSuffix(index));
+    internal ProgramSkillFrame? PhaseNamePredictionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePhaseNamePredictionObserversOperations.PhaseNamePredictionFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 20, group: 10)]
     internal bool IsPhaseNamePredictionDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PhaseNamePredictionObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1800)]

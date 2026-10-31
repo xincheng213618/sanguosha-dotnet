@@ -33,7 +33,7 @@ internal sealed partial class CharacterZhangFeiOlMagicRuntime
     long global::CardGame.Core.IMoZhangFeiFacts.MovementSequence => _coreCardMovementJournalMovementSequenceAccess._movementSequence;
 
     IReadOnlyList<ProgramTriggerCandidate> global::CardGame.Core.IMoZhangFeiFacts.Candidates(int seat, SkillProgramTriggerWindow window) => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[seat], window);
-    SkillProgramTrigger global::CardGame.Core.IMoZhangFeiFacts.Trigger(ProgramTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger(c);
+    SkillProgramTrigger global::CardGame.Core.IMoZhangFeiFacts.Trigger(ProgramTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger2(c);
     SkillProgram global::CardGame.Core.IMoZhangFeiFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
     IEnumerable<T> global::CardGame.Core.IMoZhangFeiFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
     CardKind? global::CardGame.Core.IMoZhangFeiFacts.DamageKind(long windowId) => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id == windowId ? _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.EffectiveCardKind ?? _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.Card?.Kind : null;

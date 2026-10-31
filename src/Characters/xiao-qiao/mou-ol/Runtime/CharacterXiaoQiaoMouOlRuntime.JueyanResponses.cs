@@ -19,7 +19,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         }
         else if (kind == CardKind.Dodge)
         {
-            if (!_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is not null || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } slash && (_characterLiuQiOlOperations.IsWenjiResponseForbidden(slash.ResolutionId, actor.Seat) || _coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(slash)is not null))
+            if (!_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is not null || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } slash && (_characterLiuQiOlOperations.IsWenjiResponseForbidden2(slash.ResolutionId, actor.Seat) || _coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(slash)is not null))
                 return[];
         }
         else if (kind == CardKind.Nullification)

@@ -44,7 +44,7 @@ internal sealed partial class CharacterRuanJiAnniversaryRuntime
         if (op == SkillProgramEffectOp.ResolveAnniversaryRuanJiZhaowen)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray())));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, RuanJiRevealReturn))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, RuanJiRevealReturn))
                 return SkillProgramStepOutcome.AwaitChild;
             CompleteRuanJiReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
             return SkillProgramStepOutcome.AwaitChild;

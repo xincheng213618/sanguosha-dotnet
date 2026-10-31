@@ -26,7 +26,7 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
             if (window.CompletedResponseReturn is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Step: ResolutionFrameStep.Completed, Action: { } native } use || native.ActionId != a.ActionId || native.ActorSeat != a.ActorSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Any(e => e.ResolutionId == use.Id))
                 return false;
         }
-        else if (window.CompletedResponseReturn is not { IsCommitted: false } response || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(a, response.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window))
+        else if (window.CompletedResponseReturn is not { IsCommitted: false } response || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, response.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window))
             return false;
         action = a;
         origin = window.ParentFrameId;
@@ -47,7 +47,7 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
         {
             if (result.Any(c => c.OwnerSeat == material.Source.OwnerSeat && c.SkillId == ShiCaoZSifeng && c.TriggerId == trigger.Id && c.SkillInstanceId == material.Source.SkillInstanceId))
                 continue;
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, material.Source.OwnerSeat, material.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[material.Source.OwnerSeat], action));
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, material.Source.OwnerSeat, material.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[material.Source.OwnerSeat], action));
             result.Add(new(material.Source.OwnerSeat, material.Source.OwnerSeat, ShiCaoZSifeng, trigger.Id, material.Hash, material.Source.SkillInstanceId, trigger.Priority, context));
         }
     }

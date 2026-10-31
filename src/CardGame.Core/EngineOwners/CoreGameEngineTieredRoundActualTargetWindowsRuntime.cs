@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineTieredRoundActualTargetWindowsRuntime
 {
-    private readonly ICoreTieredRoundActualTargetWindowsResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreTieredRoundActualTargetWindowsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
-    private readonly ICoreTieredRoundActualTargetWindowsCoreRuntimeOperations _coreRuntimeOperations;
-    private readonly ICoreTieredRoundActualTargetWindowsCoreTieredRoundZeroUsesOperations _coreTieredRoundZeroUsesOperations;
-    internal CoreGameEngineTieredRoundActualTargetWindowsRuntime(ICoreTieredRoundActualTargetWindowsResolutionStackOperations resolutionStackOperations, ICoreTieredRoundActualTargetWindowsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreTieredRoundActualTargetWindowsCoreRuntimeOperations coreRuntimeOperations, ICoreTieredRoundActualTargetWindowsCoreTieredRoundZeroUsesOperations coreTieredRoundZeroUsesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseLifecycleEntries _coreCardUseLifecycleOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineTieredRoundZeroUsesEntries _coreTieredRoundZeroUsesOperations;
+    internal CoreGameEngineTieredRoundActualTargetWindowsRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseLifecycleEntries coreCardUseLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineTieredRoundZeroUsesEntries coreTieredRoundZeroUsesOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;

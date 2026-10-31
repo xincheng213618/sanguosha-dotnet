@@ -124,13 +124,13 @@ internal sealed partial class CharacterWuJingOlRuntime
         if (window != SkillProgramTriggerWindow.CardUseCompleted || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == action.ActionId)is not { WuJingHeji: { Rewarded: false, Origin: { RewardEligible: true } origin }, Action.ConversionChain.Count: 0 } use || !IsWuJingHejiUse(use) || !_coreMatchParticipantsPlayersAccess._players[origin.Source.OwnerSeat].IsAlive)
             return;
         var t = _contentRegistryOperations._contentRegistry.GetSkill(origin.Source.SkillId).Program!.Triggers.Single(t => t.Effects is [{ Op: SkillProgramEffectOp.RewardHejiUnconvertedUse }]);
-        var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, origin.Source.OwnerSeat, action.TargetSeats is [var target] ? target : -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[origin.Source.OwnerSeat], action));
+        var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, origin.Source.OwnerSeat, action.TargetSeats is [var target] ? target : -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[origin.Source.OwnerSeat], action));
         result.Add(new(origin.Source.OwnerSeat, context.TargetSeat ?? -1, origin.Source.SkillId, t.Id, origin.GameplayHash, origin.Source.SkillInstanceId, t.Priority, context));
     }
 
     internal bool IsIssuedWuJingHejiReward(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (_coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is not [{ Op: SkillProgramEffectOp.RewardHejiUnconvertedUse }] || WuJingCompletedUse(context)is not { WuJingHeji: { Rewarded: false, Origin: { RewardEligible: true } r }, Action.ConversionChain.Count: 0 } use || !IsWuJingHejiUse(use) || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || r.Source.OwnerSeat != c.OwnerSeat || r.Source.SkillId != c.SkillId || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash)
+        if (_coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.RewardHejiUnconvertedUse }] || WuJingCompletedUse(context)is not { WuJingHeji: { Rewarded: false, Origin: { RewardEligible: true } r }, Action.ConversionChain.Count: 0 } use || !IsWuJingHejiUse(use) || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || r.Source.OwnerSeat != c.OwnerSeat || r.Source.SkillId != c.SkillId || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash)
             return false;
         return context.ParentFrameId == 0 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is ProgramCardTriggerWindowFrame w && w.ParentFrameId == r.UseId && w.Action.ActionId == r.ActionId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) == c;
     }

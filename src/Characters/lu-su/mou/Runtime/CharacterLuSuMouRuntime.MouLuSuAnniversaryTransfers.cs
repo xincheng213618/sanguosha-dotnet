@@ -42,7 +42,7 @@ internal sealed partial class CharacterLuSuMouRuntime
     {
         if (!HasMouLuSuAnniversary)
             return[];
-        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).SelectMany(owner => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained).Where(c => IsMouLuSuGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c))).SelectMany(c => MouLuSuGainPeers(batch, owner.Seat).Select(p => c with { OccurrenceIndex = p.Index }))).ToArray();
+        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).SelectMany(owner => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained).Where(c => IsMouLuSuGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c))).SelectMany(c => MouLuSuGainPeers(batch, owner.Seat).Select(p => c with { OccurrenceIndex = p.Index }))).ToArray();
     }
 
     internal int? MouLuSuGainPeer(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
@@ -66,7 +66,7 @@ internal sealed partial class CharacterLuSuMouRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 2600)]
     internal ProgramSkillWindowContext? TryCreateMouLuSuGainContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsMouLuSuGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsMouLuSuGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateMouLuSuGainContext(frame, candidate);
         return null;
     }

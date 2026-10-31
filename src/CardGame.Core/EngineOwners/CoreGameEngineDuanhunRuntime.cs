@@ -8,14 +8,14 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineDuanhunRuntime
 {
-    private readonly ICoreDuanhunCharacterHuCheErMouOperations _characterHuCheErMouOperations;
-    private readonly ICoreDuanhunCardZonesOperations _cardZonesOperations;
-    private readonly ICoreDuanhunCoreEquipmentSkillsOperations _coreEquipmentSkillsOperations;
-    private readonly ICoreDuanhunCoreNationalSkillsOperations _coreNationalSkillsOperations;
-    private readonly ICoreDuanhunCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
-    private readonly ICoreDuanhunCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterHuCheErMouEntries _characterHuCheErMouOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess _cardZonesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineEquipmentSkillsEntries _coreEquipmentSkillsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineDuanhunRuntime(ICoreDuanhunCharacterHuCheErMouOperations characterHuCheErMouOperations, ICoreDuanhunCardZonesOperations cardZonesOperations, ICoreDuanhunCoreEquipmentSkillsOperations coreEquipmentSkillsOperations, ICoreDuanhunCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreDuanhunCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreDuanhunCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineDuanhunRuntime(global::CardGame.Core.RuntimeEntries.CharacterHuCheErMouEntries characterHuCheErMouOperations, global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess cardZonesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineEquipmentSkillsEntries coreEquipmentSkillsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries coreNationalSkillsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations, global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._characterHuCheErMouOperations = characterHuCheErMouOperations;
         this._cardZonesOperations = cardZonesOperations;

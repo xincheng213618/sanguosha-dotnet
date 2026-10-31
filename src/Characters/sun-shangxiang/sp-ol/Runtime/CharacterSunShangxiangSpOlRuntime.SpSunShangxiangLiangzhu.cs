@@ -19,7 +19,7 @@ internal sealed partial class CharacterSunShangxiangSpOlRuntime
         if (!HasSpSunShangxiangLiangzhu || change.Kind != HpChangeKind.Recovery || change.Amount <= 0 || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != change.TargetSeat || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase))
             return;
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive))
-            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.AfterHpRecovered).Where(c => IsSpSunShangxiangLiangzhuTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c))))
+            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.AfterHpRecovered).Where(c => IsSpSunShangxiangLiangzhuTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c))))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SpSunShangxiangRecoveryQualifiedEvent(new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash, change.Id, change.ParentFrameId, change.TargetSeat, change.HpBefore, change.HpAfter, phase));
     }
 

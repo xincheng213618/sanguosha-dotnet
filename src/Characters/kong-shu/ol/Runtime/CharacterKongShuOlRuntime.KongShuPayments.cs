@@ -122,7 +122,7 @@ internal sealed partial class CharacterKongShuOlRuntime
             return;
         var program = _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program!;
         var trigger = program.Triggers.Single(t => t.Effects is [{ Op: SkillProgramEffectOp.ResolveLeiluanLastHandUseBenefit }]);
-        var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[p.OwnerSeat], action);
+        var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[p.OwnerSeat], action);
         var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, p.OwnerSeat, -1, facts);
         result.Add(new(p.OwnerSeat, -1, p.Source.SkillId, trigger.Id, p.GameplayHash, p.Source.SkillInstanceId, trigger.Priority, context));
     }

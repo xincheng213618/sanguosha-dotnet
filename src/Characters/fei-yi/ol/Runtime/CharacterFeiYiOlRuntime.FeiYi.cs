@@ -105,7 +105,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, [_coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.RevealedCard!.Value))]));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FeiYiHezhongPaidEvent(f.Id, r.Source, r.GameplayHash, r.Turn, r.TurnOwner, r.BatchId!.Value, r.RevealedCard.Value, r.RevealedRank!.Value, greater));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { FeiYi = r with { Greater = greater, Paid = true } });
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "hezhong-direction-hand"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "hezhong-direction-hand"))
                 return;
             BeginFeiYiDraw(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), true);
             return;

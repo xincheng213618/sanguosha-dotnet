@@ -19,7 +19,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
             throw new InvalidOperationException("Sun Yuan lost the accepted play-start or damage-direction qualification.");
         var holder = saying ? f.OwnerSeat : c.TargetSeat!.Value;
         var lost = saying ? 0 : Math.Max(0, _coreMatchParticipantsPlayersAccess._players[holder].MaxHp - _coreMatchParticipantsPlayersAccess._players[holder].Hp);
-        var required = saying ? 1 : Math.Min(lost + 1, _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(holder).Count);
+        var required = saying ? 1 : Math.Min(lost + 1, _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment2(holder).Count);
         var r = new SunYuanReceipt(SunYuanSource(f), f.GameplayHash, op, c.ParentFrameId, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, saying ? SunYuanStage.Target : SunYuanStage.DiscardCards)
         {
             Holder = holder,

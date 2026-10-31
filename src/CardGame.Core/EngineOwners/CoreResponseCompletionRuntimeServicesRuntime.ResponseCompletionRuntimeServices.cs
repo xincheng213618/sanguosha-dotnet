@@ -31,7 +31,7 @@ internal sealed partial class CoreResponseCompletionRuntimeServicesRuntime
     int global::CardGame.Core.IResponseCompletionFacts.PlayerSeat(int playerIndex) => _coreMatchParticipantsPlayersAccess._players[playerIndex].Seat;
     SkillProgramTriggerFacts global::CardGame.Core.IResponseCompletionFacts.CaptureProgramTriggerFacts(int playerIndex) => _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[playerIndex]);
     IReadOnlyList<ProgramTriggerCandidate> global::CardGame.Core.IResponseCompletionFacts.CollectProgramTriggerCandidates(int playerIndex, SkillProgramTriggerWindow window) => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[playerIndex], window);
-    SkillProgramTrigger global::CardGame.Core.IResponseCompletionFacts.GetProgramTrigger(ProgramTriggerCandidate candidate) => _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+    SkillProgramTrigger global::CardGame.Core.IResponseCompletionFacts.GetProgramTrigger(ProgramTriggerCandidate candidate) => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
     SkillProgram? global::CardGame.Core.IResponseCompletionFacts.Program(string skillId) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(skillId)?.Program;
     SkillProgramViewAs? global::CardGame.Core.IResponseCompletionFacts.ViewAsRule(CardConversionSource source) => _corePlayCardHistoryOperations.ViewAsRule(source);
     IEnumerable<IGameEvent> global::CardGame.Core.IResponseCompletionFacts.CompleteProgramEventHistory() => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory();

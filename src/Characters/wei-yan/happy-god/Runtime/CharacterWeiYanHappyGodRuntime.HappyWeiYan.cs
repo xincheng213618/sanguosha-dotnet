@@ -238,7 +238,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         {
             var slot = Enum.Parse<EquipmentSlot>(chosen.Parameters["option"][5..]);
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { HappyWeiYan = receipt with { Slot = slot } });
-            var occupied = _corePhysicalOwnedCardQueriesOperations.GetEquipment(receipt.Target).Where(c => (HappyBoneSlot(c) ?? _coreEquipmentContentOperations.EquipmentRules.Get(c.Kind).Slot) == slot).ToArray();
+            var occupied = _corePhysicalOwnedCardQueriesOperations.GetEquipment2(receipt.Target).Where(c => (HappyBoneSlot(c) ?? _coreEquipmentContentOperations.EquipmentRules.Get(c.Kind).Slot) == slot).ToArray();
             if (occupied.Length >= _coreMatchParticipantsPlayersAccess._players[receipt.Target].EquipmentSlotCapacity(slot))
             {
                 PayHappyWeiYanMove(frame, HappyWeiYanStage.Replacing, occupied[0], CardLocation.Equipment(receipt.Target), CardLocation.DiscardPile, HappyBoneReplace);

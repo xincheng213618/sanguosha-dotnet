@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreSnapshotValueProjectionRuntime))]
 internal sealed partial class CoreSnapshotValueProjectionEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreSnapshotValueProjectionRuntime> _resolve;

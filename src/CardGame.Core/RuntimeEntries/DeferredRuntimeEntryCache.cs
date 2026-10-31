@@ -4,6 +4,14 @@ namespace CardGame.Core;
 internal sealed class DeferredRuntimeEntryCache
 {
     private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _entries = new();
+    internal object GetOrAdd(ProgramRuntimeEntryRegistration registration, global::System.Func<global::System.Type, object> resolve)
+    {
+        if (_entries.TryGetValue(registration.Type, out var existing)) return existing;
+        var entry = registration.Create(resolve);
+        _entries.Add(registration.Type, entry);
+        return entry;
+    }
+
     internal bool TryGet<TEntry>(out TEntry entry)
         where TEntry : class
     {

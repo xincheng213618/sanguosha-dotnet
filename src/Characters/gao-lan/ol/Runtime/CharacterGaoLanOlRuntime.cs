@@ -8,14 +8,14 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
 internal sealed partial class CharacterGaoLanOlRuntime : global::CardGame.Core.IGaoLanProgramHost
 {
-    private readonly ICharacterGaoLanOlCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
-    private readonly ICharacterGaoLanOlCoreRuntimeOperations _coreRuntimeOperations;
-    private readonly ICharacterGaoLanOlCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
-    private readonly ICharacterGaoLanOlCoreNativeRecoveryFramesOperations _coreNativeRecoveryFramesOperations;
-    private readonly ICharacterGaoLanOlCoreRecoveryReplacementOperations _coreRecoveryReplacementOperations;
-    private readonly ICharacterGaoLanOlKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineTreatedWoundedEntries _coreTreatedWoundedOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeRecoveryFramesEntries _coreNativeRecoveryFramesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreRecoveryReplacementEntries _coreRecoveryReplacementOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CharacterGaoLanOlRuntime(ICharacterGaoLanOlCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICharacterGaoLanOlCoreRuntimeOperations coreRuntimeOperations, ICharacterGaoLanOlCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICharacterGaoLanOlCoreNativeRecoveryFramesOperations coreNativeRecoveryFramesOperations, ICharacterGaoLanOlCoreRecoveryReplacementOperations coreRecoveryReplacementOperations, ICharacterGaoLanOlKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CharacterGaoLanOlRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineTreatedWoundedEntries coreTreatedWoundedOperations, global::CardGame.Core.RuntimeEntries.CoreNativeRecoveryFramesEntries coreNativeRecoveryFramesOperations, global::CardGame.Core.RuntimeEntries.CoreRecoveryReplacementEntries coreRecoveryReplacementOperations, global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;
         this._coreRuntimeOperations = coreRuntimeOperations;

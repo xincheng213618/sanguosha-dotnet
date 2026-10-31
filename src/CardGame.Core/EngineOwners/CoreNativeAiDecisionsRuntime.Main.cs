@@ -370,7 +370,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
         var selected = cardId is { } selectedCardId ? _coreNativeNullificationOperations.GetNullificationCards(responder).Single(card => card.Id == selectedCardId) : null;
         if (selected is not null && decision.Choices.FirstOrDefault(candidate => candidate.Cards.Contains(selected.Id) && candidate.Parameters.GetValueOrDefault("response") == "extended-view-as")is { } extendedChoice && !decision.Choices.Any(candidate => candidate.Cards is [var singleId] && singleId == selected.Id))
         {
-            _coreExtendedViewAsOperations.ResolveExtendedViewAsResponse(extendedChoice);
+            _coreExtendedViewAsOperations.ResolveExtendedViewAsResponse2(extendedChoice);
             return;
         }
 

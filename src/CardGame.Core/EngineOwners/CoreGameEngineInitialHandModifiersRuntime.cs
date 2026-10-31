@@ -8,12 +8,12 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineInitialHandModifiersRuntime
 {
-    private readonly ICoreInitialHandModifiersCharacterZhouYuLeOperations _characterZhouYuLeOperations;
-    private readonly ICoreInitialHandModifiersModeRulesOperations _modeRulesOperations;
-    private readonly ICoreInitialHandModifiersModeRuntimeOperations _modeRuntimeOperations;
-    private readonly ICoreInitialHandModifiersCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterZhouYuLeEntries _characterZhouYuLeOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess _modeRulesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries _coreRuleQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionInitialHandSizeModeDefinitionAccess _coreMatchDefinitionInitialHandSizeModeDefinitionAccess;
-    internal CoreGameEngineInitialHandModifiersRuntime(ICoreInitialHandModifiersCharacterZhouYuLeOperations characterZhouYuLeOperations, ICoreInitialHandModifiersModeRulesOperations modeRulesOperations, ICoreInitialHandModifiersModeRuntimeOperations modeRuntimeOperations, ICoreInitialHandModifiersCoreRuleQueriesOperations coreRuleQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionInitialHandSizeModeDefinitionAccess coreMatchDefinitionInitialHandSizeModeDefinitionAccess)
+    internal CoreGameEngineInitialHandModifiersRuntime(global::CardGame.Core.RuntimeEntries.CharacterZhouYuLeEntries characterZhouYuLeOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess modeRulesOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries coreRuleQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionInitialHandSizeModeDefinitionAccess coreMatchDefinitionInitialHandSizeModeDefinitionAccess)
     {
         this._characterZhouYuLeOperations = characterZhouYuLeOperations;
         this._modeRulesOperations = modeRulesOperations;

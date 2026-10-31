@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreActualTurnsRuntime))]
 internal sealed partial class CoreActualTurnsEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreActualTurnsRuntime> _resolve;

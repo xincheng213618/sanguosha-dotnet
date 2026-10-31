@@ -69,7 +69,7 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
                 break;
             case "mobile:shi-tuntian":
                 var instance = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[target]).ProgramInstances.First(binding => binding.SkillId == skill && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[target], skill, binding.SkillInstanceId));
-                _characterDengAiMobileShiOperations.ChangeShiDaCharge(frame.Id, new(skill, "external-charge", target, instance.SkillInstanceId), _contentRegistryOperations._contentRegistry.GetSkill(skill).Program!.GameplayHash, 1, 0, 0);
+                _characterDengAiMobileShiOperations.ChangeShiDaCharge2(frame.Id, new(skill, "external-charge", target, instance.SkillInstanceId), _contentRegistryOperations._contentRegistry.GetSkill(skill).Program!.GameplayHash, 1, 0, 0);
                 break;
             default:
                 throw new InvalidOperationException("Unsupported actual charge source.");

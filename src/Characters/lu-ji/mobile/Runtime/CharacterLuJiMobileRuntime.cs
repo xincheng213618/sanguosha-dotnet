@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CharacterLuJiMobileRuntime
 {
-    private readonly ICharacterLuJiMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
-    internal CharacterLuJiMobileRuntime(ICharacterLuJiMobileCoreNationalSkillsOperations coreNationalSkillsOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations;
+    internal CharacterLuJiMobileRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries coreNationalSkillsOperations)
     {
         this._coreNationalSkillsOperations = coreNationalSkillsOperations;
     }

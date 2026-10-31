@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineKenshangPaymentsRuntime
 {
-    private readonly ICoreKenshangPaymentsCharacterMaXiuMaTieOlOperations _characterMaXiuMaTieOlOperations;
-    private readonly ICoreKenshangPaymentsCardZonesOperations _cardZonesOperations;
-    private readonly ICoreKenshangPaymentsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
-    private readonly ICoreKenshangPaymentsCoreCardUsePaymentsOperations _coreCardUsePaymentsOperations;
-    internal CoreGameEngineKenshangPaymentsRuntime(ICoreKenshangPaymentsCharacterMaXiuMaTieOlOperations characterMaXiuMaTieOlOperations, ICoreKenshangPaymentsCardZonesOperations cardZonesOperations, ICoreKenshangPaymentsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICoreKenshangPaymentsCoreCardUsePaymentsOperations coreCardUsePaymentsOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterMaXiuMaTieOlEntries _characterMaXiuMaTieOlOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess _cardZonesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseLifecycleEntries _coreCardUseLifecycleOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUsePaymentsEntries _coreCardUsePaymentsOperations;
+    internal CoreGameEngineKenshangPaymentsRuntime(global::CardGame.Core.RuntimeEntries.CharacterMaXiuMaTieOlEntries characterMaXiuMaTieOlOperations, global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess cardZonesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseLifecycleEntries coreCardUseLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUsePaymentsEntries coreCardUsePaymentsOperations)
     {
         this._characterMaXiuMaTieOlOperations = characterMaXiuMaTieOlOperations;
         this._cardZonesOperations = cardZonesOperations;

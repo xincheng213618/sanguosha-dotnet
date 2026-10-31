@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEnginePlannedPhaseQuantitiesRuntime
 {
-    private readonly ICorePlannedPhaseQuantitiesContentRegistryOperations _contentRegistryOperations;
-    private readonly ICorePlannedPhaseQuantitiesResolutionStackOperations _resolutionStackOperations;
-    private readonly ICorePlannedPhaseQuantitiesCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
-    private readonly ICorePlannedPhaseQuantitiesCoreRuleQueriesOperations _coreRuleQueriesOperations;
-    internal CoreGameEnginePlannedPhaseQuantitiesRuntime(ICorePlannedPhaseQuantitiesContentRegistryOperations contentRegistryOperations, ICorePlannedPhaseQuantitiesResolutionStackOperations resolutionStackOperations, ICorePlannedPhaseQuantitiesCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICorePlannedPhaseQuantitiesCoreRuleQueriesOperations coreRuleQueriesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries _coreRuleQueriesOperations;
+    internal CoreGameEnginePlannedPhaseQuantitiesRuntime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries coreRuleQueriesOperations)
     {
         this._contentRegistryOperations = contentRegistryOperations;
         this._resolutionStackOperations = resolutionStackOperations;

@@ -9,8 +9,3 @@ internal interface ICharacterTangZiOlCoreProgramSelectionModulesOperations : glo
 {
     global::CardGame.Core.IProgramSelectionQueries ProgramSelectionQueries { get; }
 }
-
-internal interface ICharacterTangZiOlCoreTreatedWoundedOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    bool IsRuleWounded(global::CardGame.Core.CharacterState player);
-}

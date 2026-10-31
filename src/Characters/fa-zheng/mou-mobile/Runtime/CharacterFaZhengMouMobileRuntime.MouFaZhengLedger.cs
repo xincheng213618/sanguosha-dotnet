@@ -55,7 +55,7 @@ internal sealed partial class CharacterFaZhengMouMobileRuntime
             var gain = batch.Movements.Select((m, i) => (m, i)).FirstOrDefault(x => x.m.Sequence > mark.GiftSequence && x.m.To == CardLocation.Hand(mark.TargetSeat) && _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(x.m, batch) != x.m.To);
             if (gain.m is null)
                 continue;
-            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[mark.Source.OwnerSeat], SkillProgramTriggerWindow.CardsGained).Where(c => IsMouFaZhengGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c))).OrderBy(c => c.SkillInstanceId == mark.Source.SkillInstanceId ? 0 : 1).ThenBy(c => c.SkillInstanceId, StringComparer.Ordinal).Take(1))
+            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[mark.Source.OwnerSeat], SkillProgramTriggerWindow.CardsGained).Where(c => IsMouFaZhengGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c))).OrderBy(c => c.SkillInstanceId == mark.Source.SkillInstanceId ? 0 : 1).ThenBy(c => c.SkillInstanceId, StringComparer.Ordinal).Take(1))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouFaZhengGainQualifiedEvent(batch.Id, new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash, mark.MarkId, gain.i, gain.m.Sequence, mark.TargetSeat));
         }
     }
@@ -82,7 +82,7 @@ internal sealed partial class CharacterFaZhengMouMobileRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 2700)]
     internal ProgramSkillWindowContext? TryCreateMouFaZhengGainContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsMouFaZhengGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsMouFaZhengGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateMouFaZhengGainContext(frame, candidate);
         return null;
     }

@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreProgramDistanceRulesRuntime
 {
-    private readonly ICoreProgramDistanceRulesDistanceRulesOperations _distanceRulesOperations;
-    private readonly ICoreProgramDistanceRulesKernelCoreProgramRuntimeModulesOperations _kernelCoreProgramRuntimeModulesOperations;
-    internal CoreProgramDistanceRulesRuntime(ICoreProgramDistanceRulesDistanceRulesOperations distanceRulesOperations, ICoreProgramDistanceRulesKernelCoreProgramRuntimeModulesOperations kernelCoreProgramRuntimeModulesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelDistanceRulesAccess _distanceRulesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations;
+    internal CoreProgramDistanceRulesRuntime(global::CardGame.Core.EngineOwners.IKernelDistanceRulesAccess distanceRulesOperations, global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations kernelCoreProgramRuntimeModulesOperations)
     {
         this._distanceRulesOperations = distanceRulesOperations;
         this._kernelCoreProgramRuntimeModulesOperations = kernelCoreProgramRuntimeModulesOperations;

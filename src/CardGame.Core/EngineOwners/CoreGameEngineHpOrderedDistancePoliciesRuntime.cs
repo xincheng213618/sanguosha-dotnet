@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineHpOrderedDistancePoliciesRuntime
 {
-    private readonly ICoreHpOrderedDistancePoliciesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
-    internal CoreGameEngineHpOrderedDistancePoliciesRuntime(ICoreHpOrderedDistancePoliciesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
+    internal CoreGameEngineHpOrderedDistancePoliciesRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations)
     {
         this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
     }

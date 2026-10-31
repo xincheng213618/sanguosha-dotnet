@@ -89,7 +89,7 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
     {
         if (!features.HasOperation(SkillProgramEffectOp.ResolveSourceDingxiUsedCard))
             return null;
-        if (candidate.SkillId != SourceBeigongIds.Dingxi || _coreProgramLifecycleOperations.GetProgramTrigger(candidate)is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementOccurrence: SkillProgramMovementOccurrence.PerBatch, Effects: [{ Op: SkillProgramEffectOp.ResolveSourceDingxiUsedCard }] })
+        if (candidate.SkillId != SourceBeigongIds.Dingxi || _coreProgramLifecycleOperations.GetProgramTrigger2(candidate)is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementOccurrence: SkillProgramMovementOccurrence.PerBatch, Effects: [{ Op: SkillProgramEffectOp.ResolveSourceDingxiUsedCard }] })
             return[];
         var eligible = SourceDingxiCandidates(candidate.OwnerSeat, new(SkillProgramTriggerWindow.DiscardPileReceived, batch.ParentFrameId ?? 0, candidate.OwnerSeat, MovementBatch: batch)).ToHashSet();
         return batch.Movements.Select((m, i) => (m, i)).Where(p => eligible.Contains(p.m.CardId)).Select(p => p.i).ToArray();

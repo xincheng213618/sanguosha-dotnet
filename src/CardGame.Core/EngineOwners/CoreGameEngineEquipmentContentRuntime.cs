@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineEquipmentContentRuntime
 {
-    private readonly ICoreEquipmentContentContentRegistryOperations _contentRegistryOperations;
-    private readonly ICoreEquipmentContentEquipmentRulesOperations _equipmentRulesOperations;
-    private readonly ICoreEquipmentContentModeRuntimeOperations _modeRuntimeOperations;
-    internal CoreGameEngineEquipmentContentRuntime(ICoreEquipmentContentContentRegistryOperations contentRegistryOperations, ICoreEquipmentContentEquipmentRulesOperations equipmentRulesOperations, ICoreEquipmentContentModeRuntimeOperations modeRuntimeOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelEquipmentRulesAccess _equipmentRulesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    internal CoreGameEngineEquipmentContentRuntime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.EngineOwners.IKernelEquipmentRulesAccess equipmentRulesOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations)
     {
         this._contentRegistryOperations = contentRegistryOperations;
         this._equipmentRulesOperations = equipmentRulesOperations;

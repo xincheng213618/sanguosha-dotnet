@@ -53,7 +53,7 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
                 if (result.Any(c => c.OwnerSeat == source.OwnerSeat && c.SkillId == source.SkillId && c.SkillInstanceId == source.SkillInstanceId && c.TriggerId == trigger.Id))
                     continue;
                 var eventTarget = action.TargetSeats.Count == 1 ? action.TargetSeats.Single() : -1;
-                var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, eventTarget, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action)with { CardUseCausedDamage = use.CausedDamage });
+                var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, eventTarget, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action)with { CardUseCausedDamage = use.CausedDamage });
                 result.Add(new(source.OwnerSeat, eventTarget, source.SkillId, trigger.Id, program.GameplayHash, source.SkillInstanceId, trigger.Priority, context));
             }
         }
@@ -68,7 +68,7 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
         var program = _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program;
         var trigger = program?.Triggers.SingleOrDefault(t => t.Id == candidate.BindingId);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
-        if (benefit is null || current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.TriggerId != candidate.BindingId || current.SkillInstanceId != candidate.SkillInstanceId || current.GameplayHash != candidate.GameplayHash || _coreCardActionsOperations.CreateCardActionProgramContext(window, current) != context || program?.GameplayHash != candidate.GameplayHash || trigger?.Effects is not [{ Op: SkillProgramEffectOp.DrawAfterJoinedTrickDamage }] || index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != use.Id || !HasJoinedTrickOwnerDamage(use, candidate.OwnerSeat) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardKind == use.CardKind && e.CardId == use.CardId) != 1)
+        if (benefit is null || current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.TriggerId != candidate.BindingId || current.SkillInstanceId != candidate.SkillInstanceId || current.GameplayHash != candidate.GameplayHash || _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) != context || program?.GameplayHash != candidate.GameplayHash || trigger?.Effects is not [{ Op: SkillProgramEffectOp.DrawAfterJoinedTrickDamage }] || index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != use.Id || !HasJoinedTrickOwnerDamage(use, candidate.OwnerSeat) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardKind == use.CardKind && e.CardId == use.CardId) != 1)
             return null;
         AssertJoinedTrickDamageBenefits(use);
         return benefit;

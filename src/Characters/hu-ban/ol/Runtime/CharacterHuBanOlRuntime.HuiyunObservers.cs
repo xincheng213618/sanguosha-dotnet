@@ -95,7 +95,7 @@ internal sealed partial class CharacterHuBanOlRuntime
         return r.Stage is HuiyunStage.RecastDrawChildren or HuiyunStage.DrawChildren && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle || m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(HuiyunCurrent(r).TargetSeat) && m.Reason == (r.Stage == HuiyunStage.RecastDrawChildren ? CardMoveReasons.RecastDraw : new CardMoveReason("skill-program.hu-ban.huiyun.draw"))));
     }
 
-    internal ProgramSkillFrame? HuBanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHuBanOlOperations.HuBanFirstChild(f, c), (i) => _coreObserverSubtreesOperations2.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations2.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations2.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations2.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
+    internal ProgramSkillFrame? HuBanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHuBanOlOperations.HuBanFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
     internal int? HuBanAnyObserverRootIndex()
     {
         if (HuBanObserverRoot()is { } program)
@@ -106,7 +106,7 @@ internal sealed partial class CharacterHuBanOlRuntime
                 continue;
             var first = _resolutionStackOperations._resolutionStack[i + 1];
             var native = first is CardsMovedTriggerWindowFrame moved && _coreCardUsePaymentsOperations.IsPaidCardUseMovementReturn(use, moved) || first is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == use.Id && hp.ResumeFrameId == use.Id && hp.Continuation == PostEventContinuation.RecoveryPaidCardUse || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(first, use);
-            if (native && _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations2.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations2.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations2.IsSuspendedOrPaidRescueObserverSuffix(n, d)))
+            if (native && _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)))
                 return i;
         }
 

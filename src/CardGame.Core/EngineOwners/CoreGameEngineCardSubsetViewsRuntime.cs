@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineCardSubsetViewsRuntime
 {
-    private readonly ICoreCardSubsetViewsCardZonesOperations _cardZonesOperations;
-    private readonly ICoreCardSubsetViewsResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreCardSubsetViewsCorePendingDecisionPolicyPipelineOperations _corePendingDecisionPolicyPipelineOperations;
-    private readonly ICoreCardSubsetViewsCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
-    internal CoreGameEngineCardSubsetViewsRuntime(ICoreCardSubsetViewsCardZonesOperations cardZonesOperations, ICoreCardSubsetViewsResolutionStackOperations resolutionStackOperations, ICoreCardSubsetViewsCorePendingDecisionPolicyPipelineOperations corePendingDecisionPolicyPipelineOperations, ICoreCardSubsetViewsCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess _cardZonesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries _corePendingDecisionPolicyPipelineOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreSnapshotValueProjectionEntries _coreSnapshotValueProjectionOperations;
+    internal CoreGameEngineCardSubsetViewsRuntime(global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess cardZonesOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries corePendingDecisionPolicyPipelineOperations, global::CardGame.Core.RuntimeEntries.CoreSnapshotValueProjectionEntries coreSnapshotValueProjectionOperations)
     {
         this._cardZonesOperations = cardZonesOperations;
         this._resolutionStackOperations = resolutionStackOperations;

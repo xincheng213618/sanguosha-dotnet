@@ -114,7 +114,7 @@ internal sealed partial class CharacterRuanYuOlRuntime
             if (!HasRuanYuRedPayment(action, paid.Source, paid.GameplayHash, parent.Value) || _contentRegistryOperations._contentRegistry.GetSkill(paid.Source.SkillId).Program is not { } program || program.GameplayHash != paid.GameplayHash || result.Any(c => c.OwnerSeat == paid.Source.OwnerSeat && c.SkillId == paid.Source.SkillId && c.TriggerId == "unique-red-use" && c.SkillInstanceId == paid.Source.SkillInstanceId && c.GameplayHash == paid.GameplayHash))
                 continue;
             var trigger = program.Triggers.Single(t => t.Id == "unique-red-use");
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, paid.Source.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[paid.Source.OwnerSeat], action));
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, paid.Source.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[paid.Source.OwnerSeat], action));
             result.Add(new(paid.Source.OwnerSeat, -1, paid.Source.SkillId, trigger.Id, paid.GameplayHash, paid.Source.SkillInstanceId, trigger.Priority, context));
         }
 

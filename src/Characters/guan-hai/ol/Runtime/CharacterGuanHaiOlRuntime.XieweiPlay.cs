@@ -127,7 +127,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         if (window != SkillProgramTriggerWindow.CardUseCommitted || IssuedXieweiPayment(action)is not { } p || _coreProgramEventHistoryOperations.ProgramEventHistory<XieweiCommittedEvent>().Any(e => e.PaymentId == p.Id))
             return;
         var t = _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program!.Triggers.Single(t => t.Effects is [{ Op: SkillProgramEffectOp.ResolveXieweiTwoHandBaitBasicUse }]);
-        var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, p.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[p.OwnerSeat], action));
+        var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, p.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[p.OwnerSeat], action));
         candidates.Add(new(p.OwnerSeat, -1, p.Source.SkillId, t.Id, p.GameplayHash, p.Source.SkillInstanceId, t.Priority, context));
     }
 
@@ -135,7 +135,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 230)]
     internal bool IsIssuedXieweiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (c.SkillId != "ol:xiewei" || context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.OwnerSeat != c.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) != c || IssuedXieweiPayment(w.Action)is not { } p || p.Source.SkillInstanceId != c.SkillInstanceId || p.OwnerSeat != c.OwnerSeat || p.GameplayHash != c.GameplayHash || context.CardUse?.CardActionId != p.ActionId || _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveXieweiTwoHandBaitBasicUse }])
+        if (c.SkillId != "ol:xiewei" || context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.OwnerSeat != c.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) != c || IssuedXieweiPayment(w.Action)is not { } p || p.Source.SkillInstanceId != c.SkillInstanceId || p.OwnerSeat != c.OwnerSeat || p.GameplayHash != c.GameplayHash || context.CardUse?.CardActionId != p.ActionId || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveXieweiTwoHandBaitBasicUse }])
             return false;
         return !_coreProgramEventHistoryOperations.ProgramEventHistory<XieweiCommittedEvent>().Any(e => e.PaymentId == p.Id);
     }

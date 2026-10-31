@@ -208,7 +208,7 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), p.Seat, "he-yan-shown", Array.AsReadOnly(shown)));
         }
 
-        if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, HeYanRevealReturn))
+        if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, HeYanRevealReturn))
             ReturnHeYanReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }
 

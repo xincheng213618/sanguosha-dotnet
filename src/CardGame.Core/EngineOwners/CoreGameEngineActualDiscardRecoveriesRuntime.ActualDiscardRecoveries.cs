@@ -11,7 +11,7 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 890)]
     internal bool CanOfferActualDiscardRecovery(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        var op = _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects.SingleOrDefault(e => e.Op == SkillProgramEffectOp.RestoreActualDiscardBatch);
+        var op = _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects.SingleOrDefault(e => e.Op == SkillProgramEffectOp.RestoreActualDiscardBatch);
         if (op is null)
             return true;
         return context is { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index, SourceSeat: { } source } && source != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[source].IsAlive && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && _coreActualDiscardRecoveryPhasesOperations.MatchingActualDiscardRecoveryIndexes(batch, c).Contains(index);

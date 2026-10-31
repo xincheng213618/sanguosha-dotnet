@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineWushuangTacticRulesRuntime
 {
-    private readonly ICoreWushuangTacticRulesCoreWushuangOperations _coreWushuangOperations;
-    internal CoreGameEngineWushuangTacticRulesRuntime(ICoreWushuangTacticRulesCoreWushuangOperations coreWushuangOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangEntries _coreWushuangOperations;
+    internal CoreGameEngineWushuangTacticRulesRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangEntries coreWushuangOperations)
     {
         this._coreWushuangOperations = coreWushuangOperations;
     }

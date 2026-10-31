@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineModeCardRecastsRuntime))]
 internal sealed partial class CoreGameEngineModeCardRecastsEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineModeCardRecastsRuntime> _resolve;

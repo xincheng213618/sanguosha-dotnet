@@ -18,6 +18,6 @@ internal sealed partial class CoreGameEngineFeibaiEffectiveUseKindsRuntime
         // must never consume that incoming Slash's committed kind conversion.
         if (fact.RoundActionType != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(original))
             return original;
-        return _coreSlashUseOrdinalsOperations.SlashUseKindAtPrefix(fact, history, end, current, original);
+        return _coreSlashUseOrdinalsOperations.SlashUseKindAtPrefix2(fact, history, end, current, original);
     }
 }

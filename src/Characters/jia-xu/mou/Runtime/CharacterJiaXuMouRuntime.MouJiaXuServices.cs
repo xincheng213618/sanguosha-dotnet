@@ -29,7 +29,7 @@ internal sealed partial class CharacterJiaXuMouRuntime
     IReadOnlyList<int> global::CardGame.Core.IMouJiaXuFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
     IReadOnlyList<MouJiaXuCard> global::CardGame.Core.IMouJiaXuFacts.Hand(int seat, bool discard) => !((global::CardGame.Core.IMouJiaXuFacts)this).Alive(seat) ? [] : Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Where(c => !discard || !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, CardLocation.Hand(seat), OwnedCardMoveIntent.Discard)).Select(c => new MouJiaXuCard(c.Id, seat, c.DisplayName, _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[seat], c))).ToArray());
     string global::CardGame.Core.IMouJiaXuFacts.FumouInstance(int owner) => _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[owner], MouJiaXuRuntime.Fumou);
-    bool global::CardGame.Core.IMouJiaXuFacts.Yin(int owner, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState(owner, MouJiaXuRuntime.Fumou, instance, "yin");
+    bool global::CardGame.Core.IMouJiaXuFacts.Yin(int owner, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(owner, MouJiaXuRuntime.Fumou, instance, "yin");
     bool global::CardGame.Core.IMouJiaXuFacts.Parent(ProgramSkillFrame f)
     {
         if (f.TriggerId is null)

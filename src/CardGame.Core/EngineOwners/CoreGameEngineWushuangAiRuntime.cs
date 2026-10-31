@@ -8,16 +8,16 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineWushuangAiRuntime
 {
-    private readonly ICoreWushuangAiContentRegistryOperations _contentRegistryOperations;
-    private readonly ICoreWushuangAiResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreWushuangAiCoreRuntimeOperations _coreRuntimeOperations;
-    private readonly ICoreWushuangAiCoreWushuangOperations _coreWushuangOperations;
-    private readonly ICoreWushuangAiCoreWushuangAcquisitionOperations _coreWushuangAcquisitionOperations;
-    private readonly ICoreWushuangAiCoreWushuangTacticRulesOperations _coreWushuangTacticRulesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangEntries _coreWushuangOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangAcquisitionEntries _coreWushuangAcquisitionOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangTacticRulesEntries _coreWushuangTacticRulesOperations;
     private readonly ICoreWushuangAiCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
     private readonly ICoreWushuangAiCoreWushuangModeProjectionOperations _coreWushuangModeProjectionOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
-    internal CoreGameEngineWushuangAiRuntime(ICoreWushuangAiContentRegistryOperations contentRegistryOperations, ICoreWushuangAiResolutionStackOperations resolutionStackOperations, ICoreWushuangAiCoreRuntimeOperations coreRuntimeOperations, ICoreWushuangAiCoreWushuangOperations coreWushuangOperations, ICoreWushuangAiCoreWushuangAcquisitionOperations coreWushuangAcquisitionOperations, ICoreWushuangAiCoreWushuangTacticRulesOperations coreWushuangTacticRulesOperations, ICoreWushuangAiCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreWushuangAiCoreWushuangModeProjectionOperations coreWushuangModeProjectionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess)
+    internal CoreGameEngineWushuangAiRuntime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangEntries coreWushuangOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangAcquisitionEntries coreWushuangAcquisitionOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangTacticRulesEntries coreWushuangTacticRulesOperations, ICoreWushuangAiCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, ICoreWushuangAiCoreWushuangModeProjectionOperations coreWushuangModeProjectionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess)
     {
         this._contentRegistryOperations = contentRegistryOperations;
         this._resolutionStackOperations = resolutionStackOperations;

@@ -8,13 +8,13 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineModeRulesRuntime
 {
-    private readonly ICoreModeRulesCharacterDongZhaoOlOperations _characterDongZhaoOlOperations;
-    private readonly ICoreModeRulesModeRulesOperations _modeRulesOperations;
-    private readonly ICoreModeRulesModeRuntimeOperations _modeRuntimeOperations;
-    private readonly ICoreModeRulesCoreMatchOutcomesOperations _coreMatchOutcomesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterDongZhaoOlEntries _characterDongZhaoOlOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess _modeRulesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreMatchOutcomesEntries _coreMatchOutcomesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess _coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineModeRulesRuntime(ICoreModeRulesCharacterDongZhaoOlOperations characterDongZhaoOlOperations, ICoreModeRulesModeRulesOperations modeRulesOperations, ICoreModeRulesModeRuntimeOperations modeRuntimeOperations, ICoreModeRulesCoreMatchOutcomesOperations coreMatchOutcomesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineModeRulesRuntime(global::CardGame.Core.RuntimeEntries.CharacterDongZhaoOlEntries characterDongZhaoOlOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess modeRulesOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreMatchOutcomesEntries coreMatchOutcomesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._characterDongZhaoOlOperations = characterDongZhaoOlOperations;
         this._modeRulesOperations = modeRulesOperations;

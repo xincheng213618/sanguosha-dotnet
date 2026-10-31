@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreNativeCardAppearanceRuntime
 {
-    private readonly ICoreNativeCardAppearanceCharacterZhangFeiAnniversaryGodOperations _characterZhangFeiAnniversaryGodOperations;
-    private readonly ICoreNativeCardAppearanceCoreCardDeclarationsOperations _coreCardDeclarationsOperations;
-    private readonly ICoreNativeCardAppearanceCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
-    internal CoreNativeCardAppearanceRuntime(ICoreNativeCardAppearanceCharacterZhangFeiAnniversaryGodOperations characterZhangFeiAnniversaryGodOperations, ICoreNativeCardAppearanceCoreCardDeclarationsOperations coreCardDeclarationsOperations, ICoreNativeCardAppearanceCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterZhangFeiAnniversaryGodEntries _characterZhangFeiAnniversaryGodOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardDeclarationsEntries _coreCardDeclarationsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
+    internal CoreNativeCardAppearanceRuntime(global::CardGame.Core.RuntimeEntries.CharacterZhangFeiAnniversaryGodEntries characterZhangFeiAnniversaryGodOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardDeclarationsEntries coreCardDeclarationsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations)
     {
         this._characterZhangFeiAnniversaryGodOperations = characterZhangFeiAnniversaryGodOperations;
         this._coreCardDeclarationsOperations = coreCardDeclarationsOperations;

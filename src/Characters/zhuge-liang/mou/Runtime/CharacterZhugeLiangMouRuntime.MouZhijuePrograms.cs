@@ -8,7 +8,7 @@ using System.Globalization;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeLiangMouRuntime
 {
-    internal bool MouZhijueYang(int seat) => _coreProgramPersistentStateOperations.GetProgramBooleanState(seat, "mou:zhijue", _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[seat], "mou:zhijue"), "yang");
+    internal bool MouZhijueYang(int seat) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(seat, "mou:zhijue", _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[seat], "mou:zhijue"), "yang");
     internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> MouYangOptions(CharacterState owner)
     {
         var top = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault();

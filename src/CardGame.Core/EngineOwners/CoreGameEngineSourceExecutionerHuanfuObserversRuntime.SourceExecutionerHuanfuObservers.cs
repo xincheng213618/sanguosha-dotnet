@@ -38,7 +38,7 @@ internal sealed partial class CoreGameEngineSourceExecutionerHuanfuObserversRunt
             return null;
         var wi = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
         var current = window.Candidates[window.CandidateIndex];
-        if (wi < 1 || _resolutionStackOperations._resolutionStack[wi - 1].Id != use.Id || current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.SkillInstanceId != candidate.SkillInstanceId || current.TriggerId != candidate.BindingId || current.GameplayHash != candidate.GameplayHash || _coreCardActionsOperations.CreateCardActionProgramContext(window, current) != context || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive)
+        if (wi < 1 || _resolutionStackOperations._resolutionStack[wi - 1].Id != use.Id || current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.SkillInstanceId != candidate.SkillInstanceId || current.TriggerId != candidate.BindingId || current.GameplayHash != candidate.GameplayHash || _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) != context || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive)
             return null;
         AssertSourceHuanfuBets(use);
         return SourceHuanfuSettlement(candidate.OwnerSeat, candidate.SkillInstanceId, candidate.GameplayHash, use);
@@ -57,7 +57,7 @@ internal sealed partial class CoreGameEngineSourceExecutionerHuanfuObserversRunt
             var trigger = program.Triggers.Single(t => t.Id == "settle-wager");
             result.RemoveAll(c => c.OwnerSeat == source.OwnerSeat && c.SkillId == source.SkillId && c.TriggerId == trigger.Id);
             var target = action.TargetSeats.Count == 1 ? action.TargetSeats.Single() : -1;
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action)with { CardUseCausedDamage = use.CausedDamage });
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action)with { CardUseCausedDamage = use.CausedDamage });
             result.Add(new(source.OwnerSeat, target, source.SkillId, trigger.Id, bet.GameplayHash, source.SkillInstanceId, trigger.Priority, context));
         }
     }

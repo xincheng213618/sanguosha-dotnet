@@ -261,7 +261,7 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CompletedUndamagedTargetRevealSelectionIssuedEvent(f.Id, target, selected.Length, revealed.Length, same));
         if (cards.Length > 0)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, CompletedUndamagedRevealBind, Array.AsReadOnly(cards.Select(c => _coreSnapshotValueProjectionOperations.ToSnapshot(c)with { Suit = revealed.Single(m => m.CardId == c.Id).EffectiveSuit }).ToArray())));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "completed-target-hand-reveal"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "completed-target-hand-reveal"))
             return;
         ContinueCompletedTargetPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }

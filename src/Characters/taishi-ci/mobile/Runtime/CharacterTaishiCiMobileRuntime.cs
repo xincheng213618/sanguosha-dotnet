@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CharacterTaishiCiMobileRuntime
 {
-    private readonly ICharacterTaishiCiMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
-    private readonly ICharacterTaishiCiMobileCoreProgramPersistentStateOperations _coreProgramPersistentStateOperations;
-    private readonly ICharacterTaishiCiMobileCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramPersistentStateEntries _coreProgramPersistentStateOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CharacterTaishiCiMobileRuntime(ICharacterTaishiCiMobileCoreNationalSkillsOperations coreNationalSkillsOperations, ICharacterTaishiCiMobileCoreProgramPersistentStateOperations coreProgramPersistentStateOperations, ICharacterTaishiCiMobileCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CharacterTaishiCiMobileRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries coreNationalSkillsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramPersistentStateEntries coreProgramPersistentStateOperations, global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreNationalSkillsOperations = coreNationalSkillsOperations;
         this._coreProgramPersistentStateOperations = coreProgramPersistentStateOperations;

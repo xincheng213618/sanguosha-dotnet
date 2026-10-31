@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineCapturedEquipmentDrawsRuntime))]
 internal sealed partial class CoreGameEngineCapturedEquipmentDrawsEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineCapturedEquipmentDrawsRuntime> _resolve;

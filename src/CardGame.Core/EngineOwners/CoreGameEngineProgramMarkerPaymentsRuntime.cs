@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineProgramMarkerPaymentsRuntime
 {
-    private readonly ICoreProgramMarkerPaymentsCoreResolutionIdentityBoundaryOperations _coreResolutionIdentityBoundaryOperations;
-    private readonly ICoreProgramMarkerPaymentsKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
-    internal CoreGameEngineProgramMarkerPaymentsRuntime(ICoreProgramMarkerPaymentsCoreResolutionIdentityBoundaryOperations coreResolutionIdentityBoundaryOperations, ICoreProgramMarkerPaymentsKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreResolutionIdentityBoundaryEntries _coreResolutionIdentityBoundaryOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
+    internal CoreGameEngineProgramMarkerPaymentsRuntime(global::CardGame.Core.RuntimeEntries.CoreResolutionIdentityBoundaryEntries coreResolutionIdentityBoundaryOperations, global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations)
     {
         this._coreResolutionIdentityBoundaryOperations = coreResolutionIdentityBoundaryOperations;
         this._kernelCoreGameEngineRuleProgressionOperations = kernelCoreGameEngineRuleProgressionOperations;

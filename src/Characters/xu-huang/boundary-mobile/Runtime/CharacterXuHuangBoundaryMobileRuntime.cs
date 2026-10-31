@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CharacterXuHuangBoundaryMobileRuntime
 {
-    private readonly ICharacterXuHuangBoundaryMobileCardZonesOperations _cardZonesOperations;
-    private readonly ICharacterXuHuangBoundaryMobileCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
-    private readonly ICharacterXuHuangBoundaryMobileCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess _cardZonesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeSkillContextQueriesEntries _coreNativeSkillContextQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
-    internal CharacterXuHuangBoundaryMobileRuntime(ICharacterXuHuangBoundaryMobileCardZonesOperations cardZonesOperations, ICharacterXuHuangBoundaryMobileCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICharacterXuHuangBoundaryMobileCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    internal CharacterXuHuangBoundaryMobileRuntime(global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess cardZonesOperations, global::CardGame.Core.RuntimeEntries.CoreNativeSkillContextQueriesEntries coreNativeSkillContextQueriesOperations, global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
     {
         this._cardZonesOperations = cardZonesOperations;
         this._coreNativeSkillContextQueriesOperations = coreNativeSkillContextQueriesOperations;

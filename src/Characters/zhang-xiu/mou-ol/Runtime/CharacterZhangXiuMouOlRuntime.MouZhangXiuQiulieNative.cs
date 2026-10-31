@@ -166,7 +166,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
         {
             var trigger = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.Triggers.Single(t => t.Id == binding);
             if (!result.Any(c => c.OwnerSeat == source.OwnerSeat && c.SkillId == source.SkillId && c.SkillInstanceId == source.SkillInstanceId && c.TriggerId == binding))
-                result.Add(new(source.OwnerSeat, target, source.SkillId, binding, hash, source.SkillInstanceId, trigger.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action))));
+                result.Add(new(source.OwnerSeat, target, source.SkillId, binding, hash, source.SkillInstanceId, trigger.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action))));
         }
 
         if (window == SkillProgramTriggerWindow.CardUseBeforeTargetEffects && use.MouZhangXiuOlQiulie is { } o && IsMouZhangXiuOlSlash(use) && _coreMatchParticipantsPlayersAccess._players[o.TargetSeat].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash && e.UseId == use.Id))

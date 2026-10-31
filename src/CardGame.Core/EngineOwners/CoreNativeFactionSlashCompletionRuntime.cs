@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreNativeFactionSlashCompletionRuntime
 {
-    private readonly ICoreNativeFactionSlashCompletionResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreNativeFactionSlashCompletionCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
-    internal CoreNativeFactionSlashCompletionRuntime(ICoreNativeFactionSlashCompletionResolutionStackOperations resolutionStackOperations, ICoreNativeFactionSlashCompletionCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeCardContinuationCursorsEntries _coreNativeCardContinuationCursorsOperations;
+    internal CoreNativeFactionSlashCompletionRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreNativeCardContinuationCursorsEntries coreNativeCardContinuationCursorsOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreNativeCardContinuationCursorsOperations = coreNativeCardContinuationCursorsOperations;

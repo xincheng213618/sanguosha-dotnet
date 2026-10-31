@@ -274,7 +274,7 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, frame) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.SourceSeat == seat && recovery.Attempt.TargetSeat == seat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == reason;
     }
 
-    internal ProgramSkillFrame? DrawAdviceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreDrawAdviceProgramsOperations.DrawAdviceFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasPaidDamageObserverSuffix(index));
+    internal ProgramSkillFrame? DrawAdviceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreDrawAdviceProgramsOperations.DrawAdviceFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 280)]
     internal bool IsDrawAdviceProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DrawAdviceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1950)]

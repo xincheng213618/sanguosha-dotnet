@@ -118,7 +118,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
         var trigger = _contentRegistryOperations._contentRegistry.GetSkill(s.Source.SkillId).Program!.Triggers.Single(t => t.Id == s.Source.BindingId);
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         _coreRuntimeOperations.ReplaceRuntimeFrame(u.Id, u = u with { MouSimaYiSecret = s with { Started = true, WindowId = id, Call = call } });
-        var context = _coreCardActionsOperations.CreateCardActionProgramContext(a, SkillProgramTriggerWindow.CardUseCommitted, id, u.SourceSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[u.SourceSeat], a));
+        var context = _coreCardActionsOperations.CreateCardActionProgramContext(a, SkillProgramTriggerWindow.CardUseCommitted, id, u.SourceSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[u.SourceSeat], a));
         context = context with
         {
             CardUse = context.CardUse!with

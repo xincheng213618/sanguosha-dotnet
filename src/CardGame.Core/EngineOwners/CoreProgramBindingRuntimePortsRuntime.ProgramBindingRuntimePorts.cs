@@ -8,7 +8,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramBindingRuntimePortsRuntime
 {
     ContentSkillDefinition global::CardGame.Core.IProgramBindingFacts.Skill(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId);
-    SkillProgramTrigger global::CardGame.Core.IProgramBindingFacts.Trigger(ProgramTriggerCandidate candidate) => _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+    SkillProgramTrigger global::CardGame.Core.IProgramBindingFacts.Trigger(ProgramTriggerCandidate candidate) => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
     bool global::CardGame.Core.IProgramBindingFacts.CanRun(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _coreProgramLifecycleOperations.CanRunProgramTrigger(candidate, context);
     bool global::CardGame.Core.IProgramBindingFacts.IsHuman(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
     string global::CardGame.Core.IProgramBindingFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;

@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEngineProgramRandomTransfersRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { PendingMovementContinuation = new ProgramMovementContinuation(targetSeat, 0, null) });
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { PendingMovementContinuation = null, PublicHandRevealSelection = new("random-hand-transfer", frame.InstructionIndex, 0, card.Id, card.Kind, CardLocation.Hand(frame.OwnerSeat), CardLocation.Hand(targetSeat), frame.OwnerSeat, frame.OwnerSeat, resultBind, card.Suit) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, resultBind, Array.AsReadOnly(new[] { snapshot })));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(frame.Id, "random-hand-transfer"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frame.Id, "random-hand-transfer"))
             return SkillProgramStepOutcome.AwaitChild;
         ContinueRandomTransferAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));
         return SkillProgramStepOutcome.AwaitChild;

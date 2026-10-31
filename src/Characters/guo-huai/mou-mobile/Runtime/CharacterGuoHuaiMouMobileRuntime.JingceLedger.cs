@@ -27,7 +27,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
         if (!HasMouGuoHuaiMobile || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiStartedEvent>().Any(e => e.Op == SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart && e.Source.OwnerSeat == owner.Seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber))
             return false;
         var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(owner);
-        var candidates = _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(owner, SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, facts).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart }]).ToArray();
+        var candidates = _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(owner, SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, facts).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart }]).ToArray();
         if (candidates.Length == 0)
             return false;
         if (_resolutionStackOperations._resolutionStack.Count != 0 || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || owner.Seat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
@@ -62,7 +62,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGuoHuaiPredictionVerifiedEvent(p.PredictionId, batch.Id, gain.i, gain.m.Sequence, recipient, success));
             if (!success || !LiveMouGhSource(p.Source, p.GameplayHash))
                 continue;
-            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat], SkillProgramTriggerWindow.CardsGained).Where(c => IsMouGuoHuaiGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c)) && c.SkillInstanceId == p.Source.SkillInstanceId))
+            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat], SkillProgramTriggerWindow.CardsGained).Where(c => IsMouGuoHuaiGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) && c.SkillInstanceId == p.Source.SkillInstanceId))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGuoHuaiGainQualifiedEvent(p.PredictionId, batch.Id, new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash, gain.i, gain.m.Sequence, recipient));
         }
     }
@@ -89,7 +89,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 2500)]
     internal ProgramSkillWindowContext? TryCreateMouGuoHuaiGainContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsMouGuoHuaiGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsMouGuoHuaiGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateMouGuoHuaiGainContext(frame, candidate);
         return null;
     }

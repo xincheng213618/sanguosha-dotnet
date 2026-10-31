@@ -40,7 +40,7 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
             if (result.Any(c => c.OwnerSeat == action.ActorSeat && c.SkillId == state.Source.SkillId && c.TriggerId == t.Id && c.SkillInstanceId == state.Source.SkillInstanceId))
                 continue;
             var target = action.TargetSeats.Count == 1 ? action.TargetSeats[0] : -1;
-            result.Add(new(action.ActorSeat, target, state.Source.SkillId, t.Id, state.GameplayHash, state.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, action.ActorSeat, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action))));
+            result.Add(new(action.ActorSeat, target, state.Source.SkillId, t.Id, state.GameplayHash, state.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, action.ActorSeat, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action))));
         }
     }
 

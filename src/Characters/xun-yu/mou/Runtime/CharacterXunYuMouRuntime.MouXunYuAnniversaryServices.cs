@@ -25,7 +25,7 @@ internal sealed partial class CharacterXunYuMouRuntime
     int global::CardGame.Core.IMouXunYuAnniversaryFacts.Hp(int s) => _coreMatchParticipantsPlayersAccess._players[s].Hp;
     string global::CardGame.Core.IMouXunYuAnniversaryFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
     string global::CardGame.Core.IMouXunYuAnniversaryFacts.Instance(int s, string skill) => _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[s], skill);
-    bool global::CardGame.Core.IMouXunYuAnniversaryFacts.Yin(int owner, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState(owner, MouXunYuAnniversaryRuntime.Shimou, instance, "yin");
+    bool global::CardGame.Core.IMouXunYuAnniversaryFacts.Yin(int owner, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(owner, MouXunYuAnniversaryRuntime.Shimou, instance, "yin");
     SkillProgram? global::CardGame.Core.IMouXunYuAnniversaryFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
     SkillPromptPresentation global::CardGame.Core.IMouXunYuAnniversaryFacts.Presentation(string id)
     {

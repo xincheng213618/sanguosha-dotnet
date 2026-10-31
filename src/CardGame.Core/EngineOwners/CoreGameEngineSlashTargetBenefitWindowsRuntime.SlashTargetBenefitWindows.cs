@@ -69,8 +69,8 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || FreezeSlashTargetBenefitUse(attack)is not { } identity || !_coreMatchParticipantsPlayersAccess._players[identity.ActorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[identity.TargetSeat].IsAlive)
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(identity.CardUseFrameId)!;
-        var facts = use.Action is { } a ? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[identity.ActorSeat], a) : _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[identity.ActorSeat]);
-        var eligible = _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[identity.ActorSeat], SkillProgramTriggerWindow.ActualSlashTargetBenefit, facts).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.OfferSlashTargetBenefit }]).ToArray();
+        var facts = use.Action is { } a ? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[identity.ActorSeat], a) : _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[identity.ActorSeat]);
+        var eligible = _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[identity.ActorSeat], SkillProgramTriggerWindow.ActualSlashTargetBenefit, facts).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.OfferSlashTargetBenefit }]).ToArray();
         var entries = new List<(ProgramTriggerCandidate Candidate, ActualUseTargetIdentity Identity)>();
         // The finalized list is captured before the FIRST target effect. Each target's
         // optional benefit completes here, rather than waiting for prior damage/death.
@@ -92,7 +92,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
         for (var i = 0; i < entries.Count; i++)
         {
             var(c, targetIdentity) = entries[i];
-            var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(c);
+            var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(c);
             var receipt = new SlashTargetBenefitReceipt(id, i, targetIdentity, new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash, trigger.Effects[0].StateId!, SlashTargetBenefitStage.Offered);
             receipts.Add(receipt);
             contexts.Add(new(SkillProgramTriggerWindow.ActualSlashTargetBenefit, id, c.OwnerSeat, SourceSeat: targetIdentity.ActorSeat, TargetSeat: targetIdentity.TargetSeat, OccurrenceIndex: c.OccurrenceIndex) { SlashTargetBenefit = receipt });

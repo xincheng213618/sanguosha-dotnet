@@ -39,7 +39,7 @@ internal sealed partial class CharacterWangCanOlRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangCan = r with { Entities = ids } });
             _coreProgramLifecycleOperations.SetProgramCardSet(f.Id, "sanwen-witness", witnesses, SkillProgramCardSetVisibility.Public);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "sanwen-witness", Array.AsReadOnly(witnesses.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray())));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "sanwen-witness-hand"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "sanwen-witness-hand"))
                 return SkillProgramStepOutcome.AwaitChild;
             ContinueSanwenAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
             return SkillProgramStepOutcome.AwaitChild;

@@ -53,7 +53,7 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
             {
                 if (result.Any(c => c.OwnerSeat == action.ActorSeat && c.SkillId == grant.Source.SkillId && c.SkillInstanceId == grant.Source.SkillInstanceId && c.TriggerId == trigger.Id))
                     continue;
-                var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, action.ActorSeat, action.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action));
+                var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, action.ActorSeat, action.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action));
                 result.Add(new(action.ActorSeat, action.ActorSeat, grant.Source.SkillId, trigger.Id, program.GameplayHash, grant.Source.SkillInstanceId, trigger.Priority, context));
             }
         }
@@ -65,7 +65,7 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
         if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } card } || card.ActorSeat != candidate.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != card.ParentCardUseFrameId || window.Action.ActionId != card.CardActionId || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == card.ParentCardUseFrameId)is not { OriginalTargetAddition: { } receipt } use || use.Action is not { Type: CardActionType.Use } currentAction || currentAction.ActionId != card.CardActionId || currentAction.ActorSeat != candidate.OwnerSeat || use.SourceSeat != currentAction.ActorSeat || window.Action.ActorSeat != candidate.OwnerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return false;
         var current = window.Candidates[window.CandidateIndex];
-        if (current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.TriggerId != candidate.BindingId || current.SkillInstanceId != candidate.SkillInstanceId || current.GameplayHash != candidate.GameplayHash || _coreCardActionsOperations.CreateCardActionProgramContext(window, current) != context)
+        if (current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.TriggerId != candidate.BindingId || current.SkillInstanceId != candidate.SkillInstanceId || current.GameplayHash != candidate.GameplayHash || _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) != context)
             return false;
         var program = _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program;
         return program?.GameplayHash == candidate.GameplayHash && program.Triggers.Any(t => t.Id == candidate.BindingId && t.Window == context.Window && t.Effects.Any(e => e.Op == SkillProgramEffectOp.OfferOriginalTargetAddition)) && receipt.Grants.Any(g => g.Source.OwnerSeat == candidate.OwnerSeat && g.Source.SkillId == candidate.SkillId && g.Source.SkillInstanceId == candidate.SkillInstanceId && g.GameplayHash == candidate.GameplayHash);

@@ -47,7 +47,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
         return false;
     }
 
-    internal ProgramSkillFrame? FeiYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterFeiYiOlOperations.FeiYiFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations2.IsMovementObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations2.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
+    internal ProgramSkillFrame? FeiYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterFeiYiOlOperations.FeiYiFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 470)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 580)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 610)]

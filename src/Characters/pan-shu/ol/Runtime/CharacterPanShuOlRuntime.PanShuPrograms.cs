@@ -14,7 +14,7 @@ internal sealed partial class CharacterPanShuOlRuntime
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive))
             foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsMoved))
             {
-                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
                 if (!IsOtherLastHandLossTrigger(trigger))
                     continue;
                 var indexes = batch.Movements.Select((movement, index) => (movement, index)).Where(item => item.movement.From.Zone == CardZoneKind.Hand && item.movement.From.OwnerSeat is { } source && source != candidate.OwnerSeat && source != item.movement.To.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(source) && _coreMatchParticipantsPlayersAccess._players[source].IsAlive && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat == source && LostLastHandCard(batch, source)).Select(item => item.index).ToArray();
@@ -50,9 +50,9 @@ internal sealed partial class CharacterPanShuOlRuntime
     internal void SetForeignProgramBooleanState(ProgramSkillFrame frame, string targetSkillId, string stateId, bool value)
     {
         var instance = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).ProgramInstances.SingleOrDefault(item => item.SkillId == targetSkillId) ?? throw new InvalidOperationException($"The paired program instance '{(targetSkillId)}' is not installed.");
-        var definition = _coreProgramPersistentStateOperations.GetProgramBooleanStateDefinition(targetSkillId, stateId);
+        var definition = _coreProgramPersistentStateOperations.GetProgramBooleanStateDefinition2(targetSkillId, stateId);
         var key = new global::CardGame.Core.GameEngine.ProgramBooleanStateKey(frame.OwnerSeat, targetSkillId, instance.SkillInstanceId, stateId);
-        if (_coreProgramPersistentStateOperations.GetProgramBooleanState(frame.OwnerSeat, targetSkillId, instance.SkillInstanceId, stateId) == value)
+        if (_coreProgramPersistentStateOperations.GetProgramBooleanState2(frame.OwnerSeat, targetSkillId, instance.SkillInstanceId, stateId) == value)
             return;
         _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates[key] = value;
         if (definition.Visibility == SkillProgramStateVisibility.Public)

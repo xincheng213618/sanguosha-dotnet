@@ -37,7 +37,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         if (_resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame parent || _coreCardUseLifecycleOperations.LifecycleCardUse(parent.ParentFrameId)is not { } native || !IsIssuedMouLixianUse(native) || parent.Action.ActionId != native.Action!.ActionId || _resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame child || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count)
             return false;
         var candidate = parent.Candidates[parent.CandidateIndex];
-        return global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(child, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)) && child.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext(parent, candidate);
+        return global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(child, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)) && child.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext2(parent, candidate);
     }
 
     internal IReadOnlyList<Card> SeparateMouLixianDamageChildProcessing(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)

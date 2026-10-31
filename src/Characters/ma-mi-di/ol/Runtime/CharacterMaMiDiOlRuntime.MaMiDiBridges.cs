@@ -40,7 +40,7 @@ internal sealed partial class CharacterMaMiDiOlRuntime
             var trigger = p.Triggers.Single(t => t.Effects is [{ Op: SkillProgramEffectOp.ResolveBingjieIssuedTargetDiscards }]);
             if (result.Any(c => c.OwnerSeat == issued.ActorSeat && c.SkillId == grant.Source.SkillId && c.SkillInstanceId == grant.Source.SkillInstanceId && c.TriggerId == trigger.Id))
                 continue;
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, issued.ActorSeat, issued.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[issued.ActorSeat], action));
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, issued.ActorSeat, issued.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[issued.ActorSeat], action));
             result.Add(new(issued.ActorSeat, issued.ActorSeat, grant.Source.SkillId, trigger.Id, grant.GameplayHash, grant.Source.SkillInstanceId, trigger.Priority, context));
         }
     }
@@ -51,7 +51,7 @@ internal sealed partial class CharacterMaMiDiOlRuntime
         if (candidate.SkillId != "ol:bingjie" || candidate.BindingId != "issued-turn-target-discards" || c is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } card } || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { MaMiDiBingjie: { } r, Action: { } action } use || r.UseId != use.Id || r.ActionId != action.ActionId || r.ActorSeat != candidate.OwnerSeat || r.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || r.Kind != action.EffectiveKind || action.ActorSeat != candidate.OwnerSeat || window.Action.ActorSeat != candidate.OwnerSeat || !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(r.Kind)) || card.CardActionId != r.ActionId || card.ParentCardUseFrameId != use.Id || window.Action.ActionId != r.ActionId || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive)
             return false;
         var current = window.Candidates[window.CandidateIndex];
-        if (!MaMiDiCandidateMatches(candidate, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(current)) || _coreCardActionsOperations.CreateCardActionProgramContext(window, current) != c || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program is not { } p || p.GameplayHash != candidate.GameplayHash || p.Triggers.Single(t => t.Id == candidate.BindingId).Effects is not [{ Op: SkillProgramEffectOp.ResolveBingjieIssuedTargetDiscards }])
+        if (!MaMiDiCandidateMatches(candidate, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(current)) || _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) != c || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program is not { } p || p.GameplayHash != candidate.GameplayHash || p.Triggers.Single(t => t.Id == candidate.BindingId).Effects is not [{ Op: SkillProgramEffectOp.ResolveBingjieIssuedTargetDiscards }])
             return false;
         return r.Grants.Any(g => g.Source.SkillId == candidate.SkillId && g.Source.SkillInstanceId == candidate.SkillInstanceId && g.Source.OwnerSeat == candidate.OwnerSeat && g.GameplayHash == candidate.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<BingjieGrantedEvent>().Contains(g) && !_coreProgramEventHistoryOperations.ProgramEventHistory<BingjieUseBoundEvent>().Any(e => e.UseId == use.Id && e.GrantFrameId == g.FrameId));
     }
@@ -60,7 +60,7 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     {
         if (candidate.SkillId != "ol:bingjie" || candidate.TriggerId != "issued-turn-target-discards" || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)?.MaMiDiBingjie is not { } r || r.ActorSeat != candidate.OwnerSeat || r.ActionId != w.Action.ActionId || w.Action.ActorSeat != r.ActorSeat)
             return c;
-        var current = _coreCardActionsOperations.CreateCardActionProgramContext(w.Action, SkillProgramTriggerWindow.CardUseTargetsFinalized, w.Id, candidate.OwnerSeat, candidate.OpponentSeat, c.Facts ?? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], w.Action));
+        var current = _coreCardActionsOperations.CreateCardActionProgramContext(w.Action, SkillProgramTriggerWindow.CardUseTargetsFinalized, w.Id, candidate.OwnerSeat, candidate.OpponentSeat, c.Facts ?? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], w.Action));
         return current with
         {
             CardUse = current.CardUse!with
@@ -93,7 +93,7 @@ internal sealed partial class CharacterMaMiDiOlRuntime
             if (previous is not null)
             {
                 var prior = history.Take(at).OfType<CardActionAcceptedEvent>().Where(e => e.Action.ActionId == previous.ActionId).ToArray();
-                if (prior is not [var accepted] || accepted.Action.ParentActionId != incoming.ActionId || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(accepted.Action, ProgramCompletedResponseKind.Nullification) || previous.ActorSeat != accepted.Action.ProviderSeat)
+                if (prior is not [var accepted] || accepted.Action.ParentActionId != incoming.ActionId || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(accepted.Action, ProgramCompletedResponseKind.Nullification) || previous.ActorSeat != accepted.Action.ProviderSeat)
                     return null;
                 incomingActor = previous.ActorSeat;
                 incomingId = previous.ActionId;

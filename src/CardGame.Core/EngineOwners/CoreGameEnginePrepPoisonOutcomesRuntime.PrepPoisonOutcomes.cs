@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime
             return false;
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.Context.ParentFrameId);
         var candidates = parent?.Candidates ?? _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(c.Owner, c.Trigger.Window);
-        var first = candidates.FirstOrDefault(candidate => candidate.SkillId == c.SkillId && ResolvePrepPoisonOutcomeByRoundDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)));
+        var first = candidates.FirstOrDefault(candidate => candidate.SkillId == c.SkillId && ResolvePrepPoisonOutcomeByRoundDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)));
         return first is not null && first.SkillInstanceId == c.Candidate.SkillInstanceId && first.BindingId == c.Candidate.BindingId;
     }
 

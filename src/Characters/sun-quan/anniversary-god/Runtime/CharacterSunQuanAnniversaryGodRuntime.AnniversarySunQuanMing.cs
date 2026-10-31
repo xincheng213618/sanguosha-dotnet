@@ -147,7 +147,7 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 1100)]
     internal ProgramSkillWindowContext? TryCreateAnniversaryMingColorContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsAnniversaryMingColorTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsAnniversaryMingColorTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateAnniversaryMingColorContext(frame, candidate);
         return null;
     }

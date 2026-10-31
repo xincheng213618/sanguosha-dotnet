@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
 internal sealed partial class CharacterTangZiOlRuntime : global::CardGame.Core.ISelectionWoundedQueries
 {
-    private readonly ICharacterTangZiOlCoreTreatedWoundedOperations _coreTreatedWoundedOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineTreatedWoundedEntries _coreTreatedWoundedOperations;
     private readonly ICharacterTangZiOlCoreProgramSelectionModulesOperations _coreProgramSelectionModulesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CharacterTangZiOlRuntime(ICharacterTangZiOlCoreTreatedWoundedOperations coreTreatedWoundedOperations, ICharacterTangZiOlCoreProgramSelectionModulesOperations coreProgramSelectionModulesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CharacterTangZiOlRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineTreatedWoundedEntries coreTreatedWoundedOperations, ICharacterTangZiOlCoreProgramSelectionModulesOperations coreProgramSelectionModulesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
         this._coreProgramSelectionModulesOperations = coreProgramSelectionModulesOperations;

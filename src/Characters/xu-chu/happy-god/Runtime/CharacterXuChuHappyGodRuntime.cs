@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CharacterXuChuHappyGodRuntime
 {
-    private readonly ICharacterXuChuHappyGodCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
-    internal CharacterXuChuHappyGodRuntime(ICharacterXuChuHappyGodCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries _coreAlternatingBenefitsOperations;
+    internal CharacterXuChuHappyGodRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations)
     {
         this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
     }

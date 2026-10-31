@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
 internal sealed partial class CharacterGuoHuaiMobileRuntime : global::CardGame.Core.IMobileGuoHuaiHost
 {
-    private readonly ICharacterGuoHuaiMobileCoreActualPlayPhaseCardUsesOperations _coreActualPlayPhaseCardUsesOperations;
-    private readonly ICharacterGuoHuaiMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineActualPlayPhaseCardUsesEntries _coreActualPlayPhaseCardUsesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess _coreActualTurnProgressCurrentSeatPhaseAccess;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CharacterGuoHuaiMobileRuntime(ICharacterGuoHuaiMobileCoreActualPlayPhaseCardUsesOperations coreActualPlayPhaseCardUsesOperations, ICharacterGuoHuaiMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CharacterGuoHuaiMobileRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineActualPlayPhaseCardUsesEntries coreActualPlayPhaseCardUsesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseAccess coreActualTurnProgressCurrentSeatPhaseAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreActualPlayPhaseCardUsesOperations = coreActualPlayPhaseCardUsesOperations;
         this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;

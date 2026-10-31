@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreNativeDamageFramesRuntime))]
 internal sealed partial class CoreNativeDamageFramesEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeDamageFramesRuntime> _resolve;

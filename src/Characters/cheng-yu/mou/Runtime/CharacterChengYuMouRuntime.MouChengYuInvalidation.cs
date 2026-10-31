@@ -13,7 +13,7 @@ internal sealed partial class CharacterChengYuMouRuntime
             return null;
         var a = w.Action;
         if (a.Type == CardActionType.Response)
-            return w.CompletedResponseReturn is { IsCommitted: true } typed && _coreResponseUseCompletionOperations.IsCompletedResponseUse(a, typed.Kind) ? new(w.Id, w.ParentFrameId, a, true) : null;
+            return w.CompletedResponseReturn is { IsCommitted: true } typed && _coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, typed.Kind) ? new(w.Id, w.ParentFrameId, a, true) : null;
         return a.Type == CardActionType.Use && _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is { Action: { } actual } u && MouCySameAction(a, actual) && u.CardKind == a.EffectiveKind ? new(w.Id, w.ParentFrameId, a, false) : null;
     }
 

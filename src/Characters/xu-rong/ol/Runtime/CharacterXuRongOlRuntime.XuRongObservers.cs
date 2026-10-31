@@ -64,7 +64,7 @@ internal sealed partial class CharacterXuRongOlRuntime
     }
 
     : context;
-    internal bool HasXuRongDyingQualification(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _coreProgramLifecycleOperations.GetProgramTrigger(candidate).Effects is [{ Op: SkillProgramEffectOp.ReplenishShaJueAndClaimDyingCause }] && context.Window == SkillProgramTriggerWindow.DyingEntering && context.XuRongDying is { } proof && proof.VictimSeat != candidate.OwnerSeat && context.TargetSeat == proof.VictimSeat && proof.HpAtEntry <= 0 && proof.RescueCardsRequired == 1 - proof.HpAtEntry && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(d => d.Id == proof.DyingFrameId && d.XuRongProof == proof);
+    internal bool HasXuRongDyingQualification(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.ReplenishShaJueAndClaimDyingCause }] && context.Window == SkillProgramTriggerWindow.DyingEntering && context.XuRongDying is { } proof && proof.VictimSeat != candidate.OwnerSeat && context.TargetSeat == proof.VictimSeat && proof.HpAtEntry <= 0 && proof.RescueCardsRequired == 1 - proof.HpAtEntry && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(d => d.Id == proof.DyingFrameId && d.XuRongProof == proof);
     internal bool ExactXuRongParent(ProgramSkillFrame f, XuRongPending r)
     {
         if (f.Id <= 0 || f.GameplayHash != r.GameplayHash || f.InstructionIndex != r.InstructionIndex || f.InstructionIndex != 1 || f.WindowContext?.ParentFrameId != r.ParentFrameId || XuRongSource(f) != r.Source || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash)

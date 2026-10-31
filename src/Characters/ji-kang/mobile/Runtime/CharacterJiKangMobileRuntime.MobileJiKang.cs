@@ -215,7 +215,7 @@ internal sealed partial class CharacterJiKangMobileRuntime
                 if (r.Paid && _coreMatchParticipantsPlayersAccess._players[r.Subject].IsAlive)
                 {
                     StepMobileJiKang(f, r with { Stage = MobileJiKangStage.FinalGrantChildren });
-                    _coreProgramSkillChangesOperations.GrantProgramSkills(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), r.Subject, ["mobile:juexiang"]);
+                    _coreProgramSkillChangesOperations.GrantProgramSkills2(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), r.Subject, ["mobile:juexiang"]);
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileJiKangProgressEvent(id, "inherit-juexiang", r.Cursor, r.Subject, 1, 0));
                     ContinueMobileJiKang(id);
                     return;

@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CharacterMaChaoBoundaryMobileRuntime
 {
-    private readonly ICharacterMaChaoBoundaryMobileCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
-    private readonly ICharacterMaChaoBoundaryMobileCoreCardAttackStateOperations _coreCardAttackStateOperations;
-    private readonly ICharacterMaChaoBoundaryMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
-    internal CharacterMaChaoBoundaryMobileRuntime(ICharacterMaChaoBoundaryMobileCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICharacterMaChaoBoundaryMobileCoreCardAttackStateOperations coreCardAttackStateOperations, ICharacterMaChaoBoundaryMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreActiveNativeAttackQueriesEntries _coreActiveNativeAttackQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries _coreCardAttackStateOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations;
+    internal CharacterMaChaoBoundaryMobileRuntime(global::CardGame.Core.RuntimeEntries.CoreActiveNativeAttackQueriesEntries coreActiveNativeAttackQueriesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries coreCardAttackStateOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations)
     {
         this._coreActiveNativeAttackQueriesOperations = coreActiveNativeAttackQueriesOperations;
         this._coreCardAttackStateOperations = coreCardAttackStateOperations;

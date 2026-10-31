@@ -10,7 +10,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
     internal const string HappyEzhiDraw = "skill-program.happy:ezhi.draw", HappyEzhiDiscard = "skill-program.happy:ezhi.discard", HappyGujingDiscard = "skill-program.happy:gujing.discard";
     internal bool HasHappyWeiYanEzhiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveHappyWeiYanEzhi);
 
-    internal IReadOnlyList<HappyWeiYanBone> HappyBones(int holder) => _corePhysicalOwnedCardQueriesOperations.GetEquipment(holder).Select(card => HappyBoneAt(card.Id, CardLocation.Equipment(holder), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)is { } bone ? bone with { Holder = holder } : null).OfType<HappyWeiYanBone>().ToArray();
+    internal IReadOnlyList<HappyWeiYanBone> HappyBones(int holder) => _corePhysicalOwnedCardQueriesOperations.GetEquipment2(holder).Select(card => HappyBoneAt(card.Id, CardLocation.Equipment(holder), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)is { } bone ? bone with { Holder = holder } : null).OfType<HappyWeiYanBone>().ToArray();
     internal bool TryHappyEzhiAction(ProgramSkillWindowContext context, out CardActionContext action, out long parent)
     {
         action = null !;
@@ -22,7 +22,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
             action = normal;
             parent = use.Id;
         }
-        else if (_resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { CompletedResponseReturn: { IsCommitted: true } response } window && window.Action.ActionId == info.CardActionId && _coreResponseUseCompletionOperations.IsCompletedResponseUse(window.Action, response.Kind))
+        else if (_resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { CompletedResponseReturn: { IsCommitted: true } response } window && window.Action.ActionId == info.CardActionId && _coreResponseUseCompletionOperations.IsCompletedResponseUse2(window.Action, response.Kind))
         {
             action = window.Action;
             parent = window.ParentFrameId;

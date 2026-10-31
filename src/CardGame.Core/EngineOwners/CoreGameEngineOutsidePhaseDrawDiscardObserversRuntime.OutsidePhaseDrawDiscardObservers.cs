@@ -107,7 +107,7 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardObserversRunt
         return parent is CardsMovedTriggerWindowFrame window && child is ProgramSkillFrame { OutsidePhaseDrawDiscard: { } r } observer && r.WindowFrameId == window.Id && observer.WindowContext?.ParentFrameId == window.Id && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(observer, window.Candidates[window.CandidateIndex]) && ValidOutsidePhaseDrawDiscardReceipt(observer);
     }
 
-    internal ProgramSkillFrame? OutsidePhaseDrawDiscardObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreOutsidePhaseDrawDiscardObserversOperations.OutsidePhaseDrawDiscardFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? OutsidePhaseDrawDiscardObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreOutsidePhaseDrawDiscardObserversOperations.OutsidePhaseDrawDiscardFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 50)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 80)]
     internal bool IsOutsidePhaseDrawDiscardDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OutsidePhaseDrawDiscardObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);

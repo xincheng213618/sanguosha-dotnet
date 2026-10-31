@@ -10,7 +10,7 @@ internal sealed partial class CharacterTianChouOlRuntime
 {
     internal const string TianChouTopReason = "skill-program.tian-chou.shandao.top";
     internal static CardConversionSource TianChouSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_tian_chou_ol_TianChou.TianChouSource(f);
-    internal bool TianChouHasCards(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(seat)).Any();
+    internal bool TianChouHasCards(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat)).Any();
     SkillProgramStepOutcome global::CardGame.Core.ITianChouHost.Resolve(ProgramSkillFrame f) => BeginTianChou(f);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 27090, SkillProgramEffectOp.ResolveShandaoTopAndGlobalTricks)]
     internal bool CanActivateTianChou(CharacterState owner) => _coreMatchParticipantsPlayersAccess._players.Any(p => TianChouHasCards(p.Seat));
@@ -116,7 +116,7 @@ internal sealed partial class CharacterTianChouOlRuntime
         // A selected foreign hand remains hidden until this real card is revealed and moved.
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PublicHandRevealSelection = new("shandao-hand-top", f.InstructionIndex, 0, card.Id, card.Kind, from, CardLocation.DrawPile, f.OwnerSeat, f.OwnerSeat) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "shandao-hand-top"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "shandao-hand-top"))
             return;
         ContinueShandaoAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }

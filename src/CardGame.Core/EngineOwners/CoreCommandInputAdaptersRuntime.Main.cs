@@ -169,9 +169,9 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
         if (_characterGuoTuOlOperations.IsWeijieAnswer(choice))
             return _characterGuoTuOlOperations.SubmitWeijieAnswer(actorSeat, prompt, choice);
         if (_coreChainedStateBasicConversionsOperations.IsChainedStateBasicAnswer(choice))
-            return _coreChainedStateBasicConversionsOperations.SubmitChainedStateBasicAnswer(actorSeat, prompt, choice);
+            return _coreChainedStateBasicConversionsOperations.SubmitChainedStateBasicAnswer2(actorSeat, prompt, choice);
         if (_coreDrawFundedDistinctBasicPaymentOperations.IsDrawFundedDistinctBasicAnswer(choice))
-            return _coreDrawFundedDistinctBasicPaymentOperations.SubmitDrawFundedDistinctBasicAnswer(actorSeat, prompt, choice);
+            return _coreDrawFundedDistinctBasicPaymentOperations.SubmitDrawFundedDistinctBasicAnswer2(actorSeat, prompt, choice);
         if (_coreRequestedDeckBasicsOperations.IsRequestedDeckBasicAnswer(choice))
             return _coreRequestedDeckBasicsOperations.SubmitRequestedDeckBasicAnswer(actorSeat, prompt, choice);
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.Kind == DecisionKind.ProgramJudgmentTrigger)
@@ -251,7 +251,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
         if (selected.Parameters.GetValueOrDefault("response") == "tiered-round-zero-use")
             return _kernelCoreMainOperations.Accept(() => _coreTieredRoundZeroResponsesOperations.ResolveTieredRoundZeroResponse(selected, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands));
         if (selected.Parameters.GetValueOrDefault("response") == "extended-view-as")
-            return _kernelCoreMainOperations.Accept(() => _coreExtendedViewAsOperations.ResolveExtendedViewAsResponse(selected));
+            return _kernelCoreMainOperations.Accept(() => _coreExtendedViewAsOperations.ResolveExtendedViewAsResponse2(selected));
         if (selected.Parameters.GetValueOrDefault("response") == "program-dodge")
             return _kernelCoreMainOperations.Accept(() => _coreProgramDodgeResponsesOperations.BeginProgramDodgeResponse(selected, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands));
         if (selected.Parameters.GetValueOrDefault("response") == "friend-duel-discard")
@@ -383,7 +383,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
 
     internal CommandResult SubmitFactionDefensePromptAnswer(PromptChoice selected, string response) => response switch
     {
-        "extended-view-as" when selected.Cards.Count == 2 && selected.Parameters.GetValueOrDefault("output-kind") == "Dodge" && global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var source) && _characterGuanHaiOlOperations.IsXieweiSource(source) => _kernelCoreMainOperations.Accept(() => _coreExtendedViewAsOperations.ResolveExtendedViewAsResponse(selected)),
+        "extended-view-as" when selected.Cards.Count == 2 && selected.Parameters.GetValueOrDefault("output-kind") == "Dodge" && global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var source) && _characterGuanHaiOlOperations.IsXieweiSource(source) => _kernelCoreMainOperations.Accept(() => _coreExtendedViewAsOperations.ResolveExtendedViewAsResponse2(selected)),
         "faction-defense-dodge" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanFactionDefenseResponseCore(useDodge: true, useBagua: false, requestedCardId: selected.Cards[0], _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
         "faction-defense-bagua" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanFactionDefenseResponseCore(useDodge: false, useBagua: true, requestedCardId: null, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
         "faction-defense-decline" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanFactionDefenseResponseCore(useDodge: false, useBagua: false, requestedCardId: null, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),

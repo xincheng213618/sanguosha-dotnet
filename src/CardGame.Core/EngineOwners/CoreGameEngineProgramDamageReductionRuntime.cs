@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineProgramDamageReductionRuntime
 {
-    private readonly ICoreProgramDamageReductionResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreProgramDamageReductionCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
-    private readonly ICoreProgramDamageReductionCoreRuntimeOperations _coreRuntimeOperations;
-    private readonly ICoreProgramDamageReductionKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
-    internal CoreGameEngineProgramDamageReductionRuntime(ICoreProgramDamageReductionResolutionStackOperations resolutionStackOperations, ICoreProgramDamageReductionCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreProgramDamageReductionCoreRuntimeOperations coreRuntimeOperations, ICoreProgramDamageReductionKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries _coreProgramAttackAttemptOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
+    internal CoreGameEngineProgramDamageReductionRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries coreProgramAttackAttemptOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;

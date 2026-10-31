@@ -89,7 +89,7 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouZhenJiLuoshen = r with { RevealedCardId = card.Id, RevealedSuit = suit, Stage = MouZhenJiLuoshenStage.MovementChildren, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, f.TriggerId!, f.OwnerSeat, "luoshen-reveal", [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhenJiLuoshenRevealedEvent(f.Id, r.Cursor, chooser, card.Id, suit));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "luoshen-selected-hand"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "luoshen-selected-hand"))
             return;
         ContinueLuoshenAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }

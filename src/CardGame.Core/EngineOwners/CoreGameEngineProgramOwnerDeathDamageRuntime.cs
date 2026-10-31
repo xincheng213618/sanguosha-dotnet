@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineProgramOwnerDeathDamageRuntime
 {
-    private readonly ICoreProgramOwnerDeathDamageResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreProgramOwnerDeathDamageCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
-    private readonly ICoreProgramOwnerDeathDamageCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries _coreDyingCursorRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineProgramOwnerDeathDamageRuntime(ICoreProgramOwnerDeathDamageResolutionStackOperations resolutionStackOperations, ICoreProgramOwnerDeathDamageCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreProgramOwnerDeathDamageCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineProgramOwnerDeathDamageRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries coreDyingCursorRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;

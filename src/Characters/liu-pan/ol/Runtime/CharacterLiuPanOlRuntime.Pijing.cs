@@ -32,7 +32,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal IReadOnlyList<Card> PijingGiftCards(int donor, int recipient) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[donor]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(donor)).Where(c => !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(recipient, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Transfer)).OrderBy(c => _cardZonesOperations._cardZones.GetLocation(c.Id).Zone).ThenBy(c => c.Id).ToArray());
+    internal IReadOnlyList<Card> PijingGiftCards(int donor, int recipient) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[donor]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(donor)).Where(c => !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(recipient, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Transfer)).OrderBy(c => _cardZonesOperations._cardZones.GetLocation(c.Id).Zone).ThenBy(c => c.Id).ToArray());
     internal void IssuePijingGift(ProgramSkillFrame f)
     {
         var r = f.Pijing!;

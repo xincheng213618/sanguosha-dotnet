@@ -108,7 +108,7 @@ internal sealed partial class CharacterWuYiBoundaryMobileRuntime
             if (result.Any(c => c.SkillId == grant.Source.SkillId && c.TriggerId == binding && c.OwnerSeat == grant.Source.OwnerSeat && c.SkillInstanceId == grant.Source.SkillInstanceId))
                 continue;
             var trigger = _contentRegistryOperations._contentRegistry.GetSkill(grant.Source.SkillId).Program!.Triggers.Single(t => t.Id == binding);
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, grant.Source.OwnerSeat, grant.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[grant.Source.OwnerSeat], action));
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, grant.Source.OwnerSeat, grant.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[grant.Source.OwnerSeat], action));
             result.Add(new(grant.Source.OwnerSeat, grant.Source.OwnerSeat, grant.Source.SkillId, binding, grant.Hash, grant.Source.SkillInstanceId, trigger.Priority, context));
         }
     }

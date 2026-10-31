@@ -11,7 +11,7 @@ internal sealed partial class CoreGameEngineShanheSourceLihuo3160Runtime
     SkillProgramStepOutcome global::CardGame.Core.IShanheSourceJiangdongTrioHost.LihuoFirstDamage(ProgramSkillFrame f) => BeginShanheSourceLihuoCost(f);
     SkillProgramStepOutcome global::CardGame.Core.IShanheSourceJiangdongTrioHost.ChunlaoStorage(ProgramSkillFrame f) => _coreShanheSourceChunlao3161Operations.BeginShanheSourceChunlaoStorage(f);
     internal static bool IsShanheSourceLihuoConversion(CardConversionSource source) => source.SkillId == ShanheSourceJiangdongTrioIds.Lihuo && source.BindingId is "ordinary-slash-to-fire" or "committed-fire-target";
-    internal int ShanheSourceLihuoProspectiveTargetBonus(CardUseFrame use) => use.CardKind == CardKind.Slash && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame f && f.SkillId == ShanheSourceJiangdongTrioIds.Lihuo && f.WindowContext?.CardUse?.ParentCardUseFrameId == use.Id && !_coreProgramPersistentStateOperations.GetProgramBooleanState(f.OwnerSeat, f.SkillId, f.SkillInstanceId, ShanheSourceJiangdongTrioIds.FireTargetState) ? 1 : 0;
+    internal int ShanheSourceLihuoProspectiveTargetBonus(CardUseFrame use) => use.CardKind == CardKind.Slash && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame f && f.SkillId == ShanheSourceJiangdongTrioIds.Lihuo && f.WindowContext?.CardUse?.ParentCardUseFrameId == use.Id && !_coreProgramPersistentStateOperations.GetProgramBooleanState2(f.OwnerSeat, f.SkillId, f.SkillInstanceId, ShanheSourceJiangdongTrioIds.FireTargetState) ? 1 : 0;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 24920)]
     internal void UnlockShanheSourceLihuoTarget(IGameEvent fact)
     {

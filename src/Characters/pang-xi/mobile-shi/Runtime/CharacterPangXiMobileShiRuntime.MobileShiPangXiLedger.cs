@@ -15,7 +15,7 @@ internal sealed partial class CharacterPangXiMobileShiRuntime
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive))
             foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsMoved))
             {
-                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
                 if (!IsShiPxRiderTrigger(trigger))
                     continue;
                 var swap = ShiPxActiveSwap(candidate.OwnerSeat);

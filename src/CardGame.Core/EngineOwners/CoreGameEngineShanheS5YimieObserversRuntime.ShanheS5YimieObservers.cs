@@ -17,7 +17,7 @@ internal sealed partial class CoreGameEngineShanheS5YimieObserversRuntime
         return child is HpChangedTriggerWindowFrame hp && hp.ResumeFrameId == root.Id && hp.Change.ParentFrameId == root.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Loss && hp.Change.SourceSeat is null && hp.Change.TargetSeat == root.OwnerSeat && hp.Change.HpBefore == r.CostHpBefore && hp.Change.HpAfter == r.CostHpBefore - 1 && hp.Change.Amount == 1;
     }
 
-    internal ProgramSkillFrame? ShanheS5YimieCostObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreShanheS5YimieObserversOperations.ShanheS5YimieCostFirstChild(root, child), (i) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(i));
+    internal ProgramSkillFrame? ShanheS5YimieCostObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreShanheS5YimieObserversOperations.ShanheS5YimieCostFirstChild(root, child), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
     internal bool ShanheS5YimieRecoveryFirstChild(ShanheS5YimieRecoveryFrame root, ResolutionFrame child)
     {
         if (!root.Requested)

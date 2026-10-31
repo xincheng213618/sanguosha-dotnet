@@ -84,7 +84,7 @@ internal sealed partial class CharacterYuanJiOlRuntime
             var move = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence > before && m.Sequence <= after && m.CardId == card.Id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(seat) && m.Reason.Value == YuanJiPairReason);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YuanJiShownEvent(f.Id, r.Cursor, seat, card.Id, card.Suit, card.Rank, move.Sequence));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "yuan-ji-drawn-hand"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "yuan-ji-drawn-hand"))
                 return;
         }
         else if (!pair)

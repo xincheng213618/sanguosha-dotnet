@@ -194,7 +194,7 @@ internal sealed partial class CoreGameEngineOriginalHandEntityObserversRuntime
         return decision.ValidTargetSeats.SequenceEqual(expected.SelectMany(c => c.Targets).Distinct()) && decision.Choices.Count == expected.Count && decision.Choices.Zip(expected).All(pair => pair.First.Id == pair.Second.Id && pair.First.Cards.Count == 0 && pair.First.Targets.SequenceEqual(pair.Second.Targets) && pair.First.Parameters.OrderBy(p => p.Key).SequenceEqual(pair.Second.Parameters.OrderBy(p => p.Key)));
     }
 
-    internal ProgramSkillFrame? OriginalHandEntityObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreOriginalHandEntityObserversOperations.OriginalHandEntityFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasObserverSuffix(index, (child) => _coreOriginalHandEntityObserversOperations.OriginalHandEntityObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations2.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
+    internal ProgramSkillFrame? OriginalHandEntityObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreOriginalHandEntityObserversOperations.OriginalHandEntityFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreOriginalHandEntityObserversOperations.OriginalHandEntityObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
     internal bool OriginalHandEntityObserverEdge(int child)
     {
         var parent = _resolutionStackOperations._resolutionStack[child - 1];

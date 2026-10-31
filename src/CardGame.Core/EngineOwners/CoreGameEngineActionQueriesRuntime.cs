@@ -8,13 +8,13 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineActionQueriesRuntime
 {
-    private readonly ICoreActionQueriesCoreCardConversionsOperations _coreCardConversionsOperations;
-    private readonly ICoreActionQueriesCoreRuleQueriesOperations _coreRuleQueriesOperations;
-    private readonly ICoreActionQueriesCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
-    private readonly ICoreActionQueriesKernelCoreGameEngineActionQueriesOperations _kernelCoreGameEngineActionQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardConversionsEntries _coreCardConversionsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries _coreRuleQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeLegalActionsEntries _coreNativeLegalActionsOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelCreateActionQueryScopeOperations _kernelCoreGameEngineActionQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineActionQueriesActionQueryAccess _coreGameEngineActionQueriesActionQueryAccess;
-    internal CoreGameEngineActionQueriesRuntime(ICoreActionQueriesCoreCardConversionsOperations coreCardConversionsOperations, ICoreActionQueriesCoreRuleQueriesOperations coreRuleQueriesOperations, ICoreActionQueriesCoreNativeLegalActionsOperations coreNativeLegalActionsOperations, ICoreActionQueriesKernelCoreGameEngineActionQueriesOperations kernelCoreGameEngineActionQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineActionQueriesActionQueryAccess coreGameEngineActionQueriesActionQueryAccess)
+    internal CoreGameEngineActionQueriesRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineCardConversionsEntries coreCardConversionsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries coreRuleQueriesOperations, global::CardGame.Core.RuntimeEntries.CoreNativeLegalActionsEntries coreNativeLegalActionsOperations, global::CardGame.Core.EngineOwners.IKernelCreateActionQueryScopeOperations kernelCoreGameEngineActionQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineActionQueriesActionQueryAccess coreGameEngineActionQueriesActionQueryAccess)
     {
         this._coreCardConversionsOperations = coreCardConversionsOperations;
         this._coreRuleQueriesOperations = coreRuleQueriesOperations;

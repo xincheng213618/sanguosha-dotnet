@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CharacterDiaoChanMouMobileRuntime))]
 internal sealed partial class CharacterDiaoChanMouMobileEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterDiaoChanMouMobileRuntime> _resolve;

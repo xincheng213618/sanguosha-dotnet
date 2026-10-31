@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineRecoveryDamageEdgesRuntime
 {
-    private readonly ICoreRecoveryDamageEdgesCoreNativeRecoveryDamageOperations _coreNativeRecoveryDamageOperations;
-    internal CoreGameEngineRecoveryDamageEdgesRuntime(ICoreRecoveryDamageEdgesCoreNativeRecoveryDamageOperations coreNativeRecoveryDamageOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNativeRecoveryDamageEntries _coreNativeRecoveryDamageOperations;
+    internal CoreGameEngineRecoveryDamageEdgesRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineNativeRecoveryDamageEntries coreNativeRecoveryDamageOperations)
     {
         this._coreNativeRecoveryDamageOperations = coreNativeRecoveryDamageOperations;
     }

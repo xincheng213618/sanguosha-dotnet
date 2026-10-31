@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
             if (previous is not null)
             {
                 var prior = history.Take(acceptedIndex).OfType<CardActionAcceptedEvent>().Where(e => e.Action.ActionId == previous.ActionId).ToArray();
-                if (prior is not [var accepted] || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(accepted.Action, ProgramCompletedResponseKind.Nullification) || accepted.Action.ParentActionId != original.ActionId || previous.ActorSeat != accepted.Action.ProviderSeat || previous.NativeActorSeat != accepted.Action.ActorSeat)
+                if (prior is not [var accepted] || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(accepted.Action, ProgramCompletedResponseKind.Nullification) || accepted.Action.ParentActionId != original.ActionId || previous.ActorSeat != accepted.Action.ProviderSeat || previous.NativeActorSeat != accepted.Action.ActorSeat)
                     return null;
                 paired = accepted.Action;
                 pairedSeat = previous.ActorSeat;

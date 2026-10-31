@@ -24,7 +24,7 @@ internal sealed partial class CharacterCaoSongOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? CaoSongLiluObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterCaoSongOlOperations.CaoSongLiluFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? CaoSongLiluObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterCaoSongOlOperations.CaoSongLiluFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 310)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 420)]
     internal bool HasCaoSongLiluDamageObserver(long id) => CaoSongLiluObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(frame => frame.Id == id && frame is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);

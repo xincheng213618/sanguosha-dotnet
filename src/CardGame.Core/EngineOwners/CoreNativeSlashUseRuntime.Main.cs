@@ -126,7 +126,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
 
     internal void ResolveZhangbaSlash(CharacterState source, CharacterState target, IReadOnlyList<Card> physicalCards)
     {
-        if (!_coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(source) || physicalCards.Count != 2 || physicalCards.Select(card => card.Id).Distinct().Count() != 2 || physicalCards.Any(card => !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(source, _cardZonesOperations._cardZones.GetLocation(card.Id)) && !_characterGongsunZanMouMobileOperations.IsMouGszHuCard(source, card.Id) && !_characterLuSuMobileShiOperations.IsShiLsHandAccess(source.Seat, card.Id)) || !_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(source, target, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(source, physicalCards), effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(source, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(source, physicalCards), physicalCardIds: physicalCards.Select(c => c.Id).ToArray()))
+        if (!_coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(source) || physicalCards.Count != 2 || physicalCards.Select(card => card.Id).Distinct().Count() != 2 || physicalCards.Any(card => !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(source, _cardZonesOperations._cardZones.GetLocation(card.Id)) && !_characterGongsunZanMouMobileOperations.IsMouGszHuCard(source, card.Id) && !_characterLuSuMobileShiOperations.IsShiLsHandAccess2(source.Seat, card.Id)) || !_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(source, target, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(source, physicalCards), effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(source, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(source, physicalCards), physicalCardIds: physicalCards.Select(c => c.Id).ToArray()))
         {
             throw new InvalidOperationException("Zhangba Serpent Spear became illegal before resolution.");
         }
@@ -385,7 +385,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
             return;
         }
 
-        if (_characterLuMengMouOperations.IsYingboUnrespondable(resolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(resolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden(resolutionId, target.Seat))
+        if (_characterLuMengMouOperations.IsYingboUnrespondable(resolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(resolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(resolutionId, target.Seat))
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(resolutionId, ResolutionFrameStep.ResolvingEffect);
             if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))

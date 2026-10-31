@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreNianModeProjectionRuntime
 {
-    private readonly ICoreNianModeProjectionCoreNianChallengeHostOperations _coreNianChallengeHostOperations;
-    internal CoreNianModeProjectionRuntime(ICoreNianModeProjectionCoreNianChallengeHostOperations coreNianChallengeHostOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNianChallengeHostEntries _coreNianChallengeHostOperations;
+    internal CoreNianModeProjectionRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineNianChallengeHostEntries coreNianChallengeHostOperations)
     {
         this._coreNianChallengeHostOperations = coreNianChallengeHostOperations;
     }

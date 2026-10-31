@@ -58,7 +58,7 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 39950, SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill, SkillProgramEffectOp.RestoreMobileZhitiEquipmentSlot)]
     internal bool MobileShenZhangLiaoEligible(ProgramTriggerLegalityContext g)
     {
-        var op = _coreProgramLifecycleOperations.GetProgramTrigger(g.Candidate).Effects[0].Op;
+        var op = _coreProgramLifecycleOperations.GetProgramTrigger2(g.Candidate).Effects[0].Op;
         if (op == SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill)
             return g.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } source, TargetSeat: { } target, Amount: > 0 } && source == g.OwnerSeat && source != target && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play, ActorSeat: var actor } && actor == source && !MobileDuoruiLeases.Any(e => e.Source.OwnerSeat == source) && MobileDuoruiSlots(source).Length > 0 && MobileDuoruiSkills(target).Length > 0;
         if (g.WindowContext is not { } context || MobileZhitiSlots(g.OwnerSeat).Length == 0)

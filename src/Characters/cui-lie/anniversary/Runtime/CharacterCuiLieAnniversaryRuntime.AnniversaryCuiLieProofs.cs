@@ -101,7 +101,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         return parent is ProgramSkillFrame f && CuiLieFirstChild(f, child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i);
     }
 
-    internal bool CuiLieObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterCuiLieAnniversaryOperations.CuiLieObserverEdge(n), (n, d) => _coreObserverSubtreesOperations2.IsSuspendedOrPaidRescueObserverSuffix(n, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, d) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, d));
+    internal bool CuiLieObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterCuiLieAnniversaryOperations.CuiLieObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, d) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, d));
     internal ProgramSkillFrame? CuiLieObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterCuiLieAnniversaryOperations.CuiLieFirstChild(f, c), (i) => _characterCuiLieAnniversaryOperations.CuiLieObserverSuffix(i));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 46900)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 46900)]

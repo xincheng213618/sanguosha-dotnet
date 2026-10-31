@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreProgramLoseDeathSourceSkillsOperationRuntime
 {
-    private readonly ICoreProgramLoseDeathSourceSkillsOperationCoreMatchLogOperations _coreMatchLogOperations;
-    private readonly ICoreProgramLoseDeathSourceSkillsOperationCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
-    private readonly ICoreProgramLoseDeathSourceSkillsOperationKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreMatchLogEntries _coreMatchLogOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreProgramLoseDeathSourceSkillsOperationRuntime(ICoreProgramLoseDeathSourceSkillsOperationCoreMatchLogOperations coreMatchLogOperations, ICoreProgramLoseDeathSourceSkillsOperationCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, ICoreProgramLoseDeathSourceSkillsOperationKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreProgramLoseDeathSourceSkillsOperationRuntime(global::CardGame.Core.RuntimeEntries.CoreMatchLogEntries coreMatchLogOperations, global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries coreTableSeatQueriesOperations, global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreMatchLogOperations = coreMatchLogOperations;
         this._coreTableSeatQueriesOperations = coreTableSeatQueriesOperations;

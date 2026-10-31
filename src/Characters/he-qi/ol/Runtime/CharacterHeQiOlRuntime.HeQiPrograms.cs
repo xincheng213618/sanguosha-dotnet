@@ -145,7 +145,7 @@ internal sealed partial class CharacterHeQiOlRuntime
         if (shown.Any(m => _cardZonesOperations._cardZones.GetLocation(m.CardId) != m.From))
             throw new InvalidOperationException("A revealed physical card left its actual hand before the reveal.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, shown.Select(m => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId))).ToArray()));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "joint-hands-dodges"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "joint-hands-dodges"))
         {
             return;
         }

@@ -50,12 +50,12 @@ internal sealed partial class CoreGameEngineActualHandGainProgramsRuntime
                 continue;
             if (owner.Seat == timing.ActualTurnOwnerSeat)
             {
-                foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects.Any(e => e.Op == SkillProgramEffectOp.DrawAfterActualOwnHandGain)))
+                foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects.Any(e => e.Op == SkillProgramEffectOp.DrawAfterActualOwnHandGain)))
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ActualOwnTurnHandGainsRecordedEvent(new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash, batch.TurnNumber, timing.ActualTurnOwnerSeat, batch.Id, gains));
                 continue;
             }
 
-            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.AfterTurnEnded).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects.Any(e => e.Op == SkillProgramEffectOp.DiscardForeignTurnHandGains)))
+            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.AfterTurnEnded).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects.Any(e => e.Op == SkillProgramEffectOp.DiscardForeignTurnHandGains)))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ForeignTurnHandGainsRecordedEvent(new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash, batch.TurnNumber, timing.ActualTurnOwnerSeat, batch.Id, gains));
         }
     }

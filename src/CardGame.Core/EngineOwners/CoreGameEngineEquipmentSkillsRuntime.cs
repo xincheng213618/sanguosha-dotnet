@@ -8,12 +8,12 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineEquipmentSkillsRuntime
 {
-    private readonly ICoreEquipmentSkillsCharacterWeiYanHappyGodOperations _characterWeiYanHappyGodOperations;
-    private readonly ICoreEquipmentSkillsContentRegistryOperations _contentRegistryOperations;
-    private readonly ICoreEquipmentSkillsCoreAdvancedWeaponsOperations _coreAdvancedWeaponsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterWeiYanHappyGodEntries _characterWeiYanHappyGodOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineAdvancedWeaponsEntries _coreAdvancedWeaponsOperations;
     private readonly ICoreEquipmentSkillsCoreEquipmentContentOperations _coreEquipmentContentOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineEquipmentSkillsRuntime(ICoreEquipmentSkillsCharacterWeiYanHappyGodOperations characterWeiYanHappyGodOperations, ICoreEquipmentSkillsContentRegistryOperations contentRegistryOperations, ICoreEquipmentSkillsCoreAdvancedWeaponsOperations coreAdvancedWeaponsOperations, ICoreEquipmentSkillsCoreEquipmentContentOperations coreEquipmentContentOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineEquipmentSkillsRuntime(global::CardGame.Core.RuntimeEntries.CharacterWeiYanHappyGodEntries characterWeiYanHappyGodOperations, global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineAdvancedWeaponsEntries coreAdvancedWeaponsOperations, ICoreEquipmentSkillsCoreEquipmentContentOperations coreEquipmentContentOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._characterWeiYanHappyGodOperations = characterWeiYanHappyGodOperations;
         this._contentRegistryOperations = contentRegistryOperations;

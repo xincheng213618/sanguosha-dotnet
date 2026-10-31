@@ -101,7 +101,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
                 continue;
             var candidate = w.Candidates[w.CandidateIndex];
             if (ui + 2 == _resolutionStackOperations._resolutionStack.Count)
-                return legacy && _coreProgramLifecycleOperations.GetProgramTrigger(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveShutongFinalizedUse);
+                return legacy && _coreProgramLifecycleOperations.GetProgramTrigger2(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveShutongFinalizedUse);
             if (_resolutionStackOperations._resolutionStack[ui + 2] is not ProgramSkillFrame binding || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(binding, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)) || binding.WindowContext?.ParentFrameId != w.Id)
                 continue;
             if (binding.CuiYan is not null)

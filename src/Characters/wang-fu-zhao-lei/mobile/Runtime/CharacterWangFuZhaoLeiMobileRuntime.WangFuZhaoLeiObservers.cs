@@ -80,7 +80,7 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 80)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 70)]
     internal bool IsXunyiRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame child) => XunyiFirstChild(frame, child);
-    internal ProgramSkillFrame? XunyiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterWangFuZhaoLeiMobileOperations.XunyiFirstChild(frame, child), (index) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? XunyiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterWangFuZhaoLeiMobileOperations.XunyiFirstChild(frame, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 390)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 500)]
     internal bool HasXunyiDamageObserver(long id) => XunyiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

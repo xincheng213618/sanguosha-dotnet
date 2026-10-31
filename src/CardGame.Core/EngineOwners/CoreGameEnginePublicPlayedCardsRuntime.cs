@@ -8,12 +8,12 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEnginePublicPlayedCardsRuntime
 {
-    private readonly ICorePublicPlayedCardsCardZonesOperations _cardZonesOperations;
-    private readonly ICorePublicPlayedCardsResolutionStackOperations _resolutionStackOperations;
-    private readonly ICorePublicPlayedCardsCoreCardUseLifecycleOperations _coreCardUseLifecycleOperations;
-    private readonly ICorePublicPlayedCardsCoreWushuangJinzhiOperations _coreWushuangJinzhiOperations;
-    private readonly ICorePublicPlayedCardsCoreSnapshotValueProjectionOperations _coreSnapshotValueProjectionOperations;
-    internal CoreGameEnginePublicPlayedCardsRuntime(ICorePublicPlayedCardsCardZonesOperations cardZonesOperations, ICorePublicPlayedCardsResolutionStackOperations resolutionStackOperations, ICorePublicPlayedCardsCoreCardUseLifecycleOperations coreCardUseLifecycleOperations, ICorePublicPlayedCardsCoreWushuangJinzhiOperations coreWushuangJinzhiOperations, ICorePublicPlayedCardsCoreSnapshotValueProjectionOperations coreSnapshotValueProjectionOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess _cardZonesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseLifecycleEntries _coreCardUseLifecycleOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangJinzhiEntries _coreWushuangJinzhiOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreSnapshotValueProjectionEntries _coreSnapshotValueProjectionOperations;
+    internal CoreGameEnginePublicPlayedCardsRuntime(global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess cardZonesOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseLifecycleEntries coreCardUseLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangJinzhiEntries coreWushuangJinzhiOperations, global::CardGame.Core.RuntimeEntries.CoreSnapshotValueProjectionEntries coreSnapshotValueProjectionOperations)
     {
         this._cardZonesOperations = cardZonesOperations;
         this._resolutionStackOperations = resolutionStackOperations;

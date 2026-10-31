@@ -122,7 +122,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         foreach (var q in claims.Where(q => q.ActionId == action.ActionId && q.ProviderSeat == action.ProviderSeat && q.ActorSeat == action.ActorSeat))
         {
             result.RemoveAll(c => c.OwnerSeat == q.Source.OwnerSeat && c.SkillId == q.Source.SkillId && c.TriggerId == q.Source.BindingId && c.SkillInstanceId == q.Source.SkillInstanceId);
-            result.Add(new(q.Source.OwnerSeat, -1, q.Source.SkillId, q.Source.BindingId, q.GameplayHash, q.Source.SkillInstanceId, 0, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, q.Ordinal, q.Source.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[q.Source.OwnerSeat], action))));
+            result.Add(new(q.Source.OwnerSeat, -1, q.Source.SkillId, q.Source.BindingId, q.GameplayHash, q.Source.SkillInstanceId, 0, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, q.Ordinal, q.Source.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[q.Source.OwnerSeat], action))));
         }
     }
 

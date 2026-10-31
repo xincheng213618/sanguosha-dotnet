@@ -59,7 +59,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LeChengyan = r = r with { RevealedCardId = card.Id, RevealedKind = kind } });
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, f.TriggerId!, f.OwnerSeat, "chengyan-shown", [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LeChengyanRevealedEvent(f.Id, r.UseId, r.ActionId, card.Id, kind));
-                if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "chengyan-drawn-hand"))
+                if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "chengyan-drawn-hand"))
                     return;
                 ContinueChengyanAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
                 return;

@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineConvertedSlashResponseRuntime
 {
-    private readonly ICoreConvertedSlashResponseCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
-    private readonly ICoreConvertedSlashResponseCoreNativeCardAppearanceOperations _coreNativeCardAppearanceOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeCardAppearanceEntries _coreNativeCardAppearanceOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineConvertedSlashResponseRuntime(ICoreConvertedSlashResponseCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreConvertedSlashResponseCoreNativeCardAppearanceOperations coreNativeCardAppearanceOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineConvertedSlashResponseRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations, global::CardGame.Core.RuntimeEntries.CoreNativeCardAppearanceEntries coreNativeCardAppearanceOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;
         this._coreNativeCardAppearanceOperations = coreNativeCardAppearanceOperations;

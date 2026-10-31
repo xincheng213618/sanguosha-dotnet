@@ -48,7 +48,7 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
                 continue;
             if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], source.SkillId, source.SkillInstanceId) && !MouPtPaidBySource(use, source, notice.GameplayHash))
                 continue;
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, SkillProgramTriggerWindow.CardUseTargetsFinalized, frame.Id, source.OwnerSeat, notice.TargetSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action))with
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, SkillProgramTriggerWindow.CardUseTargetsFinalized, frame.Id, source.OwnerSeat, notice.TargetSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action))with
             {
                 MouPangTongLateTargetSeat = notice.TargetSeat
             };

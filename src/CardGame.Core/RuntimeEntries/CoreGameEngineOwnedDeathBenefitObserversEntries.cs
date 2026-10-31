@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineOwnedDeathBenefitObserversRuntime))]
 internal sealed partial class CoreGameEngineOwnedDeathBenefitObserversEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineOwnedDeathBenefitObserversRuntime> _resolve;

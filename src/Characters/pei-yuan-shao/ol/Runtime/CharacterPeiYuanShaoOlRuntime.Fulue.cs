@@ -17,7 +17,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
         if (context.CardUse is not { } card || context.OwnerSeat != c.OwnerSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } use || action.ActionId != card.CardActionId || !FulueCardKind(use.CardKind) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action) || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != use.Id || window.Action.ActionId != action.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return null;
         var current = window.Candidates[window.CandidateIndex];
-        return current.OwnerSeat == c.OwnerSeat && current.SkillId == c.SkillId && current.TriggerId == c.BindingId && current.SkillInstanceId == c.SkillInstanceId && current.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext(window, current) == context ? use : null;
+        return current.OwnerSeat == c.OwnerSeat && current.SkillId == c.SkillId && current.TriggerId == c.BindingId && current.SkillInstanceId == c.SkillInstanceId && current.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) == context ? use : null;
     }
 
     internal bool FulueOriginalCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
@@ -43,7 +43,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
     {
         if (!IsIssuedFulueCandidate(c) || FulueContextUse(c, context)is not { } use)
             return false;
-        var op = _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects[0].Op;
+        var op = _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects[0].Op;
         if (op == SkillProgramEffectOp.ResolveFulueCounterOption)
             return context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && use.FulueCounter is { Applied: false } r && ValidFulueCounterInvoice(use, r) && r.Source.OwnerSeat == c.OwnerSeat && r.Source.SkillId == c.SkillId && r.Source.SkillInstanceId == c.SkillInstanceId && r.GameplayHash == c.GameplayHash && FulueOptionAvailable(r.Source, r.ActualTurn, r.OtherOption);
         return context.Window == SkillProgramTriggerWindow.CardUseCompleted && use.Step == ResolutionFrameStep.Completed && FulueUseProof(use) && FulueZeroDamage(use) && FulueOriginalEntry(use, c.OwnerSeat, c.SkillId, c.SkillInstanceId)is { } entry && _coreMatchParticipantsPlayersAccess._players[entry.UserSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[entry.TargetSeat].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<FulueCounterRequestedEvent>().Any(e => e.Invoice.OriginalUseId == use.Id && e.Invoice.Source == entry.Source) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) == 1;
@@ -65,7 +65,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
             var trigger = p.Triggers.Single(t => t.Effects[0].Op == op);
             if (result.Any(c => c.OwnerSeat == source.OwnerSeat && c.SkillId == source.SkillId && c.SkillInstanceId == source.SkillInstanceId && c.TriggerId == trigger.Id))
                 continue;
-            result.Add(new(source.OwnerSeat, source.OwnerSeat, source.SkillId, trigger.Id, hash, source.SkillInstanceId, trigger.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action))));
+            result.Add(new(source.OwnerSeat, source.OwnerSeat, source.SkillId, trigger.Id, hash, source.SkillInstanceId, trigger.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action))));
         }
     }
 
@@ -108,7 +108,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
     }
 
     internal IReadOnlyList<PromptChoice> FulueObtainChoices(long frame, int user, int target) => _coreMatchParticipantsPlayersAccess._players[user].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive ? _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(frame, user, target, [CardZoneKind.Hand, CardZoneKind.Equipment, CardZoneKind.Judgment], OwnedCardMoveIntent.Obtain) : [];
-    internal bool HasFulueObtainableCard(int user, int target) => _coreMatchParticipantsPlayersAccess._players[user].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(target)).Concat(_corePhysicalOwnedCardQueriesOperations.GetJudgment(target)).Any(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(user, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Obtain));
+    internal bool HasFulueObtainableCard(int user, int target) => _coreMatchParticipantsPlayersAccess._players[user].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(target)).Concat(_corePhysicalOwnedCardQueriesOperations.GetJudgment2(target)).Any(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(user, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Obtain));
     internal IReadOnlyList<PromptChoice> FulueChoices(ProgramSkillFrame f)
     {
         var r = f.Fulue!;

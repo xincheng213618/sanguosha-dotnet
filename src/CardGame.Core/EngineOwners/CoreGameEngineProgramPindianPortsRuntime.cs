@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
 internal sealed partial class CoreGameEngineProgramPindianPortsRuntime : global::CardGame.Core.IProgramPindianPolicyQueries, global::CardGame.Core.IProgramPindianProducer
 {
-    private readonly ICoreProgramPindianPortsCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
-    private readonly ICoreProgramPindianPortsCorePindianOperations _corePindianOperations;
-    private readonly ICoreProgramPindianPortsCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterLuKangWumiaoEntries _characterLuKangWumiaoOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEnginePindianEntries _corePindianOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineProgramPindianPortsRuntime(ICoreProgramPindianPortsCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICoreProgramPindianPortsCorePindianOperations corePindianOperations, ICoreProgramPindianPortsCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineProgramPindianPortsRuntime(global::CardGame.Core.RuntimeEntries.CharacterLuKangWumiaoEntries characterLuKangWumiaoOperations, global::CardGame.Core.RuntimeEntries.CoreGameEnginePindianEntries corePindianOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;
         this._corePindianOperations = corePindianOperations;

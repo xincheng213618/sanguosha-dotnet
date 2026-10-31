@@ -18,7 +18,7 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
     internal string? ShiHqYingjiLabel(int id) => HasShiHqYingji(id) ? "应机" : null;
     internal bool ShiHqTargetUsed(int owner, int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHqShanxiUsedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && e.Target == target);
     [ProgramCardLegality(ProgramCardLegalityStage.ConversionSourceBan, 49000)]
-    internal bool BanShiHqUnmarkedConversion(ProgramViewAsSourceQuery q) => q.Source.SkillId == ShiHqShanxi && (q.Source.BindingId != ShiHqView || q.ForResponse || q.DyingUse || q.Source.OwnerSeat != q.Owner.Seat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != q.Owner.Seat || _cardZonesOperations._cardZones.GetLocation(q.Card.Id) != CardLocation.Hand(q.Owner.Seat) && !_characterLuSuMobileShiOperations.IsShiLsHandAccess(q.Owner.Seat, q.Card.Id) || !HasShiHqYingji(q.Card.Id));
+    internal bool BanShiHqUnmarkedConversion(ProgramViewAsSourceQuery q) => q.Source.SkillId == ShiHqShanxi && (q.Source.BindingId != ShiHqView || q.ForResponse || q.DyingUse || q.Source.OwnerSeat != q.Owner.Seat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != q.Owner.Seat || _cardZonesOperations._cardZones.GetLocation(q.Card.Id) != CardLocation.Hand(q.Owner.Seat) && !_characterLuSuMobileShiOperations.IsShiLsHandAccess2(q.Owner.Seat, q.Card.Id) || !HasShiHqYingji(q.Card.Id));
     [ProgramCardLegality(ProgramCardLegalityStage.AfterLegalActionKind, 49000)]
     internal bool BanShiHqRepeatedTarget(ProgramLegalActionQuery q) => q.Action.ConversionSource is { SkillId: ShiHqShanxi } && (q.Action.TargetSeats.Count == 0 || q.Action.TargetSeats.Any(s => s == q.Actor.Seat || ShiHqTargetUsed(q.Actor.Seat, s)));
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 49000)]
@@ -110,7 +110,7 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 600)]
     internal ProgramSkillWindowContext? TryCreateShiHqMovementContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsShiHqMarkTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsShiHqMarkTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateShiHqMovementContext(frame, candidate);
         return null;
     }

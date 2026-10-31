@@ -45,7 +45,7 @@ internal sealed partial class CharacterZhuRongMouMobileRuntime
         {
             if (!_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != won.Source.OwnerSeat && p.Seat != won.OpponentSeat))
                 continue;
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, won.Source.OwnerSeat, won.OpponentSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[won.Source.OwnerSeat], action));
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, won.Source.OwnerSeat, won.OpponentSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[won.Source.OwnerSeat], action));
             result.Add(new(won.Source.OwnerSeat, won.OpponentSeat, MouZhuRongComposition.Lieren, trigger.Id, won.GameplayHash, won.Source.SkillInstanceId, trigger.Priority, context));
         }
     }

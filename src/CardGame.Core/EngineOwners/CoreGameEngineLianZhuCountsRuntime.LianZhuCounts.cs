@@ -14,7 +14,7 @@ internal sealed partial class CoreGameEngineLianZhuCountsRuntime
             return false;
         // Inspect only the giver's own published source regions; a forged ID
         // must not turn this legality query into a foreign-zone probe.
-        var card = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(ownerSeat)).SingleOrDefault(c => c.Id == cardId);
+        var card = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(ownerSeat)).SingleOrDefault(c => c.Id == cardId);
         if (card is null)
             return false;
         var from = _cardZonesOperations._cardZones.GetLocation(cardId);

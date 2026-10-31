@@ -117,7 +117,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     {
         if (context.CardUse is not null || context.Window != SkillProgramTriggerWindow.CardUseCompleted || _resolutionStackOperations._resolutionStack.LastOrDefault()is not WenlanDirectDuelWindowFrame window || window.Id != context.ParentFrameId || WenlanDirectQualificationFor(candidate, context)is not { } qualification || qualification.SecondOrdinal < 2 || qualification.SecondOrdinal % 2 != 0 || qualification.SecondOrdinal != WenlanEntry(qualification.SecondEntryId).Ordinal || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || CurrentWenlanSource(candidate.OwnerSeat, SkillProgramTriggerWindow.CardUseCompleted) != qualification.Source || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program is not { } program || !LeCaoZhiComposition.IsWenlanProgram(program) || program.GameplayHash != candidate.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanStartedEvent>().Any(e => e.Qualification.SecondEntryId == qualification.SecondEntryId))
             return false;
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         return trigger.Id == WenlanUseBinding && trigger.Window == context.Window && trigger.Priority == candidate.Priority && !trigger.Optional && trigger.Effects is [{ Op: SkillProgramEffectOp.ResolveLeCaoZhiWenlan }];
     }
 

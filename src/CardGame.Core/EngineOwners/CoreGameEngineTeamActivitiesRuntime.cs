@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineTeamActivitiesRuntime
 {
-    private readonly ICoreTeamActivitiesModeRuntimeOperations _modeRuntimeOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
     private readonly ICoreTeamActivitiesCoreModeAllegianceOperations _coreModeAllegianceOperations;
-    private readonly ICoreTeamActivitiesCoreNationalSkillsOperations _coreNationalSkillsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineTeamActivitiesRuntime(ICoreTeamActivitiesModeRuntimeOperations modeRuntimeOperations, ICoreTeamActivitiesCoreModeAllegianceOperations coreModeAllegianceOperations, ICoreTeamActivitiesCoreNationalSkillsOperations coreNationalSkillsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineTeamActivitiesRuntime(global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations, ICoreTeamActivitiesCoreModeAllegianceOperations coreModeAllegianceOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries coreNationalSkillsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._modeRuntimeOperations = modeRuntimeOperations;
         this._coreModeAllegianceOperations = coreModeAllegianceOperations;

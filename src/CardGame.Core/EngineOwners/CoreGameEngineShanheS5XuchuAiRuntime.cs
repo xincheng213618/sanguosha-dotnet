@@ -8,12 +8,12 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineShanheS5XuchuAiRuntime
 {
-    private readonly ICoreShanheS5XuchuAiCoreActualTurnsOperations _coreActualTurnsOperations;
-    private readonly ICoreShanheS5XuchuAiCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
-    private readonly ICoreShanheS5XuchuAiCoreShanheS5XuchuOperations _coreShanheS5XuchuOperations;
-    private readonly ICoreShanheS5XuchuAiCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreActualTurnsEntries _coreActualTurnsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineShanheS5XuchuEntries _coreShanheS5XuchuOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineShanheS5XuchuAiRuntime(ICoreShanheS5XuchuAiCoreActualTurnsOperations coreActualTurnsOperations, ICoreShanheS5XuchuAiCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICoreShanheS5XuchuAiCoreShanheS5XuchuOperations coreShanheS5XuchuOperations, ICoreShanheS5XuchuAiCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineShanheS5XuchuAiRuntime(global::CardGame.Core.RuntimeEntries.CoreActualTurnsEntries coreActualTurnsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineShanheS5XuchuEntries coreShanheS5XuchuOperations, global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreActualTurnsOperations = coreActualTurnsOperations;
         this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;

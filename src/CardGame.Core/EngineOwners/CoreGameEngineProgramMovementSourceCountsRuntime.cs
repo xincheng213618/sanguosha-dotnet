@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineProgramMovementSourceCountsRuntime
 {
-    private readonly ICoreProgramMovementSourceCountsCoreProgramDiscardOriginsOperations _coreProgramDiscardOriginsOperations;
-    internal CoreGameEngineProgramMovementSourceCountsRuntime(ICoreProgramMovementSourceCountsCoreProgramDiscardOriginsOperations coreProgramDiscardOriginsOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramDiscardOriginsEntries _coreProgramDiscardOriginsOperations;
+    internal CoreGameEngineProgramMovementSourceCountsRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramDiscardOriginsEntries coreProgramDiscardOriginsOperations)
     {
         this._coreProgramDiscardOriginsOperations = coreProgramDiscardOriginsOperations;
     }

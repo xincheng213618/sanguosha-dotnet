@@ -20,6 +20,7 @@ internal sealed class ProgramRuntimeModuleCatalog
     internal static ProgramRuntimeModuleCatalog Default => BuiltIn.Value;
     internal sealed record Registration(Type Type, ConstructorInfo? Constructor, IReadOnlyList<Type> Dependencies);
     private readonly IReadOnlyDictionary<Type, Registration> _registrations;
+    private readonly IReadOnlyDictionary<Type, ProgramRuntimeEntryRegistration> _entries;
     internal IReadOnlyList<Registration> Registrations { get; }
     internal IReadOnlyList<MethodInfo> Methods { get; }
 
@@ -29,6 +30,7 @@ internal sealed class ProgramRuntimeModuleCatalog
         var registrations = new List<Registration>();
         var methods = new List<MethodInfo>(legacyMethods ?? []);
         var engineContracts = new Dictionary<Type, bool>();
+        var entries = new Dictionary<Type, ProgramRuntimeEntryRegistration>();
         foreach (var type in types.Select(type => type ??
                      throw new InvalidOperationException("A runtime module type cannot be null."))
                      .OrderBy(type => type.FullName, StringComparer.Ordinal))
@@ -58,14 +60,9 @@ internal sealed class ProgramRuntimeModuleCatalog
                 constructor = only;
                 dependencies = only.GetParameters().Select(parameter => parameter.ParameterType).ToArray();
                 if (dependencies.Distinct().Count() != dependencies.Length || dependencies.Any(dependency =>
-                        !dependency.IsInterface || dependency.ContainsGenericParameters ||
-                        typeof(ISkillProgramExecutionHost).IsAssignableFrom(dependency) ||
-                        typeof(ISkillProgramEffectHost).IsAssignableFrom(dependency) ||
-                        dependency == typeof(IProgramSelectionQuery) || dependency == typeof(IProgramRuntimeOperations) ||
-                        !typeof(IProgramSelectionQuery).IsAssignableFrom(dependency) &&
-                        !typeof(IProgramRuntimeOperations).IsAssignableFrom(dependency)) ||
+                        !IsDedicatedDependency(dependency)) ||
                     only.GetParameters().Any(parameter => parameter.IsOptional || parameter.IsOut))
-                    throw Invalid(type, "constructor dependencies must be dedicated query or runtime-operation interfaces");
+                    throw Invalid(type, "constructor dependencies must be dedicated contracts or declared shared entries");
                 if (dependencies.Any(ContractExposesEngine))
                     throw Invalid(type, "dedicated dependency contracts must not expose GameEngine or engine callbacks");
             }
@@ -74,14 +71,32 @@ internal sealed class ProgramRuntimeModuleCatalog
         }
         Registrations = Array.AsReadOnly(registrations.ToArray());
         _registrations = new ReadOnlyDictionary<Type, Registration>(registrations.ToDictionary(item => item.Type));
+        _entries = new ReadOnlyDictionary<Type, ProgramRuntimeEntryRegistration>(entries);
         Methods = Array.AsReadOnly(methods.ToArray());
+
+        bool IsDedicatedDependency(Type dependency)
+        {
+            if (dependency.IsDefined(typeof(ProgramRuntimeEntryAttribute), false))
+            {
+                if (!entries.ContainsKey(dependency)) entries.Add(dependency, ProgramRuntimeEntryRegistration.For(dependency));
+                return true;
+            }
+            return dependency.IsInterface && !dependency.ContainsGenericParameters &&
+                !typeof(ISkillProgramExecutionHost).IsAssignableFrom(dependency) &&
+                !typeof(ISkillProgramEffectHost).IsAssignableFrom(dependency) &&
+                dependency != typeof(IProgramSelectionQuery) && dependency != typeof(IProgramRuntimeOperations) &&
+                (typeof(IProgramSelectionQuery).IsAssignableFrom(dependency) ||
+                    typeof(IProgramRuntimeOperations).IsAssignableFrom(dependency));
+        }
 
         bool ContractExposesEngine(Type contract)
         {
             if (engineContracts.TryGetValue(contract, out var result)) return result;
             result = ContainsEngine(contract) || contract.GetInterfaces().Append(contract).Any(current => current.GetMethods(
                 BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
-                BindingFlags.DeclaredOnly).Any(ExposesEngine));
+                BindingFlags.DeclaredOnly).Any(ExposesEngine)) ||
+                contract.IsClass && contract.GetFields(BindingFlags.Instance | BindingFlags.Public |
+                    BindingFlags.NonPublic | BindingFlags.DeclaredOnly).Any(field => ContainsEngine(field.FieldType));
             engineContracts.Add(contract, result);
             return result;
         }
@@ -105,6 +120,8 @@ internal sealed class ProgramRuntimeModuleCatalog
 
     internal static bool IsDeclared(Type? type) => type?.IsDefined(typeof(ProgramRuntimeModuleAttribute), false) == true;
     internal static bool IsDeclaredStaticHandler(MethodInfo method) => method.IsStatic && IsDeclared(method.DeclaringType);
+    internal bool TryGetEntry(Type type, out ProgramRuntimeEntryRegistration registration) =>
+        _entries.TryGetValue(type, out registration!);
     internal Registration Get(Type type) => _registrations.TryGetValue(type, out var registration) ? registration :
         throw Invalid(type, "is not registered as an independent runtime module");
     private static InvalidOperationException Invalid(Type type, string reason) =>

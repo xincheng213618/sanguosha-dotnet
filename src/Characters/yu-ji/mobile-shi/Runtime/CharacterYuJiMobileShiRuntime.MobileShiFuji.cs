@@ -52,7 +52,7 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal bool IsMobileShiFujiEmpoweredActive(ProgramSkillFrame f) => _coreProgramPersistentStateOperations.GetProgramBooleanState(f.OwnerSeat, f.SkillId, f.SkillInstanceId, MobileShiFujiEmpoweredState);
+    internal bool IsMobileShiFujiEmpoweredActive(ProgramSkillFrame f) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(f.OwnerSeat, f.SkillId, f.SkillInstanceId, MobileShiFujiEmpoweredState);
     internal int LastMobileShiFujiEmpowerIndex(IGameEvent[] history, int ownerSeat)
     {
         for (var i = history.Length - 1; i >= 0; i--)

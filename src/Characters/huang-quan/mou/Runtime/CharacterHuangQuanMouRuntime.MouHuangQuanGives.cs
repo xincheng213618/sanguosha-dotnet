@@ -90,7 +90,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 3400)]
     internal ProgramSkillWindowContext? TryCreateMouHqGiveContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         if (IsMouHqGiveTrigger(trigger))
             return CreateMouHqGiveContext(frame, candidate);
         return null;

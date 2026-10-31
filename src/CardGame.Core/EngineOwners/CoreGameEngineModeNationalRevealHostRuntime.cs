@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineModeNationalRevealHostRuntime
 {
-    private readonly ICoreModeNationalRevealHostKernelCoreGameEngineModeNationalRevealHostOperations _kernelCoreGameEngineModeNationalRevealHostOperations;
-    internal CoreGameEngineModeNationalRevealHostRuntime(ICoreModeNationalRevealHostKernelCoreGameEngineModeNationalRevealHostOperations kernelCoreGameEngineModeNationalRevealHostOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelCreateModeNationalRevealHostOperations _kernelCoreGameEngineModeNationalRevealHostOperations;
+    internal CoreGameEngineModeNationalRevealHostRuntime(global::CardGame.Core.EngineOwners.IKernelCreateModeNationalRevealHostOperations kernelCoreGameEngineModeNationalRevealHostOperations)
     {
         this._kernelCoreGameEngineModeNationalRevealHostOperations = kernelCoreGameEngineModeNationalRevealHostOperations;
     }

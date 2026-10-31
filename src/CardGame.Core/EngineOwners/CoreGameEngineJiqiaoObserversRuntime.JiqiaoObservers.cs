@@ -60,7 +60,7 @@ internal sealed partial class CoreGameEngineJiqiaoObserversRuntime
     }
 
     internal bool HasPaidJiqiaoSilverLion(ProgramSkillFrame f) => f.JiqiaoPaid is { } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.Invoice.CostBefore && m.Sequence <= r.Invoice.CostAfter && m.From == CardLocation.Equipment(f.OwnerSeat) && IsJiqiaoPaidCostDestination(f, m) && m.Reason.Value == "program.jiqiao.cost" && _coreJiqiaoProgramsOperations.JiqiaoCard(m.CardId).Kind == CardKind.SilverLion);
-    internal ProgramSkillFrame? JiqiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _coreJiqiaoObserversOperations.JiqiaoFirstChild(r, c), (i) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(i));
+    internal ProgramSkillFrame? JiqiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _coreJiqiaoObserversOperations.JiqiaoFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 70)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 180)]
     internal bool HasJiqiaoDamageObserver(long id) => JiqiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

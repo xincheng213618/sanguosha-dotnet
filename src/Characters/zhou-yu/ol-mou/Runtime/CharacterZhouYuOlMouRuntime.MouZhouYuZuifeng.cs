@@ -29,9 +29,9 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         return Array.AsReadOnly(hand.Where(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], c)is Suit.Spade or Suit.Heart or Suit.Club or Suit.Diamond && counts[_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], c)] == 1 && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, CardLocation.Hand(owner), OwnedCardMoveIntent.Discard)).ToArray());
     }
 
-    internal int[] MouZuifengTargets(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0 && !_characterSunHongOlOperations.HasPrintedGeneralSkillTargetBan(f.OwnerSeat, f.SkillId, p.Seat, f.SkillInstanceId)).Select(p => p.Seat).ToArray();
+    internal int[] MouZuifengTargets(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0 && !_characterSunHongOlOperations.HasPrintedGeneralSkillTargetBan2(f.OwnerSeat, f.SkillId, p.Seat, f.SkillInstanceId)).Select(p => p.Seat).ToArray();
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 29020, SkillProgramEffectOp.ResolveMouZhouYuZuifeng)]
-    internal bool CanActivateMouZuifeng(ProgramActivationLegalityContext gate) => MouZuifengPlay(gate.OwnerSeat)is { } phase && MouZuifengUses(gate.OwnerSeat, phase) < gate.Owner.MaxHp && MouZuifengCosts(gate.OwnerSeat).Count > 0 && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0 && !_characterSunHongOlOperations.HasPrintedGeneralSkillTargetBan(gate.OwnerSeat, gate.SkillId, p.Seat));
+    internal bool CanActivateMouZuifeng(ProgramActivationLegalityContext gate) => MouZuifengPlay(gate.OwnerSeat)is { } phase && MouZuifengUses(gate.OwnerSeat, phase) < gate.Owner.MaxHp && MouZuifengCosts(gate.OwnerSeat).Count > 0 && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0 && !_characterSunHongOlOperations.HasPrintedGeneralSkillTargetBan2(gate.OwnerSeat, gate.SkillId, p.Seat));
     internal SkillProgramStepOutcome BeginMouZuifeng(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -140,7 +140,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouZuifeng = r with { Stage = MouZuifengStage.DamageChildren, ShownId = card.Id, ShownKind = card.Kind, ShownSuit = suit, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZuifengShownEvent(f.Id, f.OwnerSeat, r.TargetSeat, card.Id, card.Kind, suit, same));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "zuifeng-selected-hand"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "zuifeng-selected-hand"))
                 return;
             ContinueZuifengAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
             return;

@@ -17,8 +17,8 @@ internal sealed partial class CharacterXueZongMobileRuntime
         if (action.Type == CardActionType.Use)
             return true;
         if (action.EffectiveKind == CardKind.Nullification)
-            return _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCompletedResponseKind.Nullification);
-        if (!_coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCompletedResponseKind.Dodge))
+            return _coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Nullification);
+        if (!_coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Dodge))
             return false;
         return _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } kind } attack } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat == action.ActorSeat;
     }
@@ -102,7 +102,7 @@ internal sealed partial class CharacterXueZongMobileRuntime
                 ActiveActionId = item.Action.ActionId
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(parent = parent with { MobileFunanCompletions = receipt });
-            if (item.Source.SkillId != MobileXueZongComposition.Funan || item.Source.BindingId != MobileXueZongComposition.Reward || item.Action.ActorSeat != item.Source.OwnerSeat || item.Action.EffectiveKind != CardKind.Nullification || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(item.Action, ProgramCompletedResponseKind.Nullification) || item.Action.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(parent) || item.Action.OpponentSeat != parent.SourceSeat || _contentRegistryOperations._contentRegistry.GetSkill(item.Source.SkillId).Program is not { } program || program.GameplayHash != item.GameplayHash)
+            if (item.Source.SkillId != MobileXueZongComposition.Funan || item.Source.BindingId != MobileXueZongComposition.Reward || item.Action.ActorSeat != item.Source.OwnerSeat || item.Action.EffectiveKind != CardKind.Nullification || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(item.Action, ProgramCompletedResponseKind.Nullification) || item.Action.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(parent) || item.Action.OpponentSeat != parent.SourceSeat || _contentRegistryOperations._contentRegistry.GetSkill(item.Source.SkillId).Program is not { } program || program.GameplayHash != item.GameplayHash)
                 throw new InvalidOperationException("Funan's deferred completion changed its exact accepted response, source or content.");
             if (!_coreMatchParticipantsPlayersAccess._players[item.Source.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[item.Source.OwnerSeat], item.Source.SkillId, item.Source.SkillInstanceId) || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileFunanDirectResponseObservedEvent>().Any(e => e.RespondedActionId == item.Action.ActionId && e.ResponderSeat != item.Source.OwnerSeat))
                 continue;
@@ -110,7 +110,7 @@ internal sealed partial class CharacterXueZongMobileRuntime
                 throw new InvalidOperationException("Funan's deferred completion lost its commitment-time acquired entity proof.");
             var trigger = program.Triggers.Single(t => t.Id == item.Source.BindingId);
             var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(item.Action, SkillProgramTriggerWindow.CardUseCompleted, id, item.Source.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[item.Source.OwnerSeat], item.Action));
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(item.Action, SkillProgramTriggerWindow.CardUseCompleted, id, item.Source.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[item.Source.OwnerSeat], item.Action));
             context = context with
             {
                 CardUse = context.CardUse!with
@@ -142,7 +142,7 @@ internal sealed partial class CharacterXueZongMobileRuntime
             if (receipt.Cursor < 0 || receipt.Cursor > receipt.Items.Count || receipt.Items.Count == 0 || receipt.Items.Select(item => (item.Action.ActionId, item.Source)).Distinct().Count() != receipt.Items.Count || receipt.ActiveActionId is { } active && (receipt.Cursor == 0 || receipt.Items[receipt.Cursor - 1].Action.ActionId != active))
                 throw new InvalidOperationException("Deferred Funan counterspell rewards lost their unique original response cursor.");
             foreach (var item in receipt.Items)
-                if (item.Source.SkillId != MobileXueZongComposition.Funan || item.Source.BindingId != MobileXueZongComposition.Reward || item.Source.OwnerSeat != item.Action.ActorSeat || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(item.Action, ProgramCompletedResponseKind.Nullification) || item.Action.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(parent) || item.Action.OpponentSeat != parent.SourceSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileFunanUseEntityCapturedEvent>().Any(e => e.ActionId == item.Action.ActionId && e.ActorSeat == item.Source.OwnerSeat && e.SkillInstanceId == item.Source.SkillInstanceId && e.GameplayHash == item.GameplayHash && item.Action.PhysicalCards.Any(c => c.CardId == e.CardId)) || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == item.Action.ActionId && e.Action.ActorSeat == item.Action.ActorSeat && e.Action.EffectiveKind == CardKind.Nullification && e.Action.ParentActionId == item.Action.ParentActionId))
+                if (item.Source.SkillId != MobileXueZongComposition.Funan || item.Source.BindingId != MobileXueZongComposition.Reward || item.Source.OwnerSeat != item.Action.ActorSeat || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(item.Action, ProgramCompletedResponseKind.Nullification) || item.Action.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(parent) || item.Action.OpponentSeat != parent.SourceSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileFunanUseEntityCapturedEvent>().Any(e => e.ActionId == item.Action.ActionId && e.ActorSeat == item.Source.OwnerSeat && e.SkillInstanceId == item.Source.SkillInstanceId && e.GameplayHash == item.GameplayHash && item.Action.PhysicalCards.Any(c => c.CardId == e.CardId)) || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == item.Action.ActionId && e.Action.ActorSeat == item.Action.ActorSeat && e.Action.EffectiveKind == CardKind.Nullification && e.Action.ParentActionId == item.Action.ParentActionId))
                     throw new InvalidOperationException("Deferred Funan counterspell rewards lost their actual accepted use or commitment-time entity source.");
         }
     }

@@ -54,7 +54,7 @@ internal sealed partial class CharacterLuoXianOlRuntime
         var reveals = pending.Stage == DailiStage.DrawChildren && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive ? DailiDrawnMovements(frame).Where(m => CurrentHandEntry(frame.OwnerSeat, m.CardId) == m.Sequence).Select(m => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId))).ToArray() : [];
         if (reveals.Length > 0)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(frame.Id, Array.AsReadOnly(reveals)));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(frame.Id, "daili-drawn-hand"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frame.Id, "daili-drawn-hand"))
             return true;
         CompleteDailiAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));
         return true;

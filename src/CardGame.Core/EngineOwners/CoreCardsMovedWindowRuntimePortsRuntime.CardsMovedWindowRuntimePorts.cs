@@ -23,7 +23,7 @@ internal sealed partial class CoreCardsMovedWindowRuntimePortsRuntime
     bool global::CardGame.Core.ICardsMovedWindowFacts.IsAlive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     bool global::CardGame.Core.ICardsMovedWindowFacts.HasActiveJudgment => _coreJudgmentCursorRuntimeOperations.ActiveJudgment is not null;
 
-    SkillProgramTrigger global::CardGame.Core.ICardsMovedWindowFacts.GetProgramTrigger(ProgramTriggerCandidate candidate) => _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+    SkillProgramTrigger global::CardGame.Core.ICardsMovedWindowFacts.GetProgramTrigger(ProgramTriggerCandidate candidate) => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
     IEnumerable<(CardMovementSourceCount Count, bool DiscardOriginOnly)> global::CardGame.Core.ICardsMovedWindowFacts.ProgramMovementSourceCounts(CardMovementBatchContext batch, SkillProgramTriggerWindow window) => _coreProgramMovementSourceCountsOperations.ProgramMovementSourceCounts(batch, window);
     bool global::CardGame.Core.ICardsMovedWindowFacts.ContainsMovement(CardMovementRecord movement) => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(movement);
     CardLocation? global::CardGame.Core.ICardsMovedWindowFacts.GetProgramDiscardSource(CardMovementRecord movement) => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement);

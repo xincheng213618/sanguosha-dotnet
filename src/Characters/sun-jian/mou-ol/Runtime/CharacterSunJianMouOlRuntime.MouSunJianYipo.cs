@@ -11,12 +11,12 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     internal const string MouSunJianOlYipoDrawReason = "skill-program.mou-ol:yipo.draw", MouSunJianOlYipoDiscardReason = "skill-program.mou-ol:yipo.discard";
     internal static CardConversionSource MouSunJianOlSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     SkillProgramStepOutcome global::CardGame.Core.IMouSunJianOlHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouSunJianYipo ? BeginMouSunJianOlYipo(f) : BeginMouSunJianOlHulie(f, op);
-    internal bool HasMouSunJianOlHpSubject(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[seat], SkillProgramTriggerWindow.AfterHealthChanged).Any(c => c.SkillId == MouSunJianOlComposition.Yipo && _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ResolveMouSunJianYipo }]);
+    internal bool HasMouSunJianOlHpSubject(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[seat], SkillProgramTriggerWindow.AfterHealthChanged).Any(c => c.SkillId == MouSunJianOlComposition.Yipo && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ResolveMouSunJianYipo }]);
     internal void CaptureMouSunJianOlHp(HpChangeContext change)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouSunJianYipo) || change.Amount <= 0 || change.HpAfter <= 0 || change.HpAfter == change.HpBefore || !_coreMatchParticipantsPlayersAccess._players[change.TargetSeat].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<MouSunJianOlHpFirstReachedEvent>().Any(e => e.OwnerSeat == change.TargetSeat && e.Hp == change.HpAfter))
             return;
-        var qualified = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[change.TargetSeat], SkillProgramTriggerWindow.AfterHealthChanged).Where(c => c.SkillId == MouSunJianOlComposition.Yipo && _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ResolveMouSunJianYipo }]).ToArray();
+        var qualified = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[change.TargetSeat], SkillProgramTriggerWindow.AfterHealthChanged).Where(c => c.SkillId == MouSunJianOlComposition.Yipo && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ResolveMouSunJianYipo }]).ToArray();
         if (qualified.Length == 0)
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouSunJianOlHpFirstReachedEvent(change.TargetSeat, change.HpAfter, change.Id));
@@ -39,7 +39,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal Card[] MouSunJianOlYipoDiscardable(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(seat)).Where(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard)).ToArray();
+    internal Card[] MouSunJianOlYipoDiscardable(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat)).Where(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard)).ToArray();
     internal IReadOnlyList<PromptChoice> MouSunJianOlYipoChoices(ProgramSkillFrame f)
     {
         var r = f.MouSunJianOlYipo!;

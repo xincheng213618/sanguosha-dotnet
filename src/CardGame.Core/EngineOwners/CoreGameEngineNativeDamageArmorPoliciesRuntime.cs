@@ -8,12 +8,12 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineNativeDamageArmorPoliciesRuntime
 {
-    private readonly ICoreNativeDamageArmorPoliciesCoreDuanhunOperations _coreDuanhunOperations;
-    private readonly ICoreNativeDamageArmorPoliciesCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
-    private readonly ICoreNativeDamageArmorPoliciesCoreWushuangCombatTacticsOperations _coreWushuangCombatTacticsOperations;
-    private readonly ICoreNativeDamageArmorPoliciesCoreTableSeatQueriesOperations _coreTableSeatQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineDuanhunEntries _coreDuanhunOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangCombatTacticsEntries _coreWushuangCombatTacticsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineNativeDamageArmorPoliciesRuntime(ICoreNativeDamageArmorPoliciesCoreDuanhunOperations coreDuanhunOperations, ICoreNativeDamageArmorPoliciesCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICoreNativeDamageArmorPoliciesCoreWushuangCombatTacticsOperations coreWushuangCombatTacticsOperations, ICoreNativeDamageArmorPoliciesCoreTableSeatQueriesOperations coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineNativeDamageArmorPoliciesRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineDuanhunEntries coreDuanhunOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangCombatTacticsEntries coreWushuangCombatTacticsOperations, global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries coreTableSeatQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreDuanhunOperations = coreDuanhunOperations;
         this._coreProgramCardPoliciesOperations = coreProgramCardPoliciesOperations;

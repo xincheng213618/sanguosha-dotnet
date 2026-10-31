@@ -8,15 +8,15 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
 internal sealed partial class CoreGameEnginePhysicalCardDrawRuntime : global::CardGame.Core.IPhysicalCardDrawLogs, global::CardGame.Core.IPhysicalCardDrawPolicies
 {
-    private readonly ICorePhysicalCardDrawCharacterGuoZhaoAnniversaryOperations _characterGuoZhaoAnniversaryOperations;
-    private readonly ICorePhysicalCardDrawCharacterLuKangWumiaoOperations _characterLuKangWumiaoOperations;
-    private readonly ICorePhysicalCardDrawModeRulesOperations _modeRulesOperations;
-    private readonly ICorePhysicalCardDrawModeRuntimeOperations _modeRuntimeOperations;
-    private readonly ICorePhysicalCardDrawCoreProgramCardPoliciesOperations _coreProgramCardPoliciesOperations;
-    private readonly ICorePhysicalCardDrawCoreShanheCampaignsOperations _coreShanheCampaignsOperations;
-    private readonly ICorePhysicalCardDrawCoreMatchLogOperations _coreMatchLogOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterGuoZhaoAnniversaryEntries _characterGuoZhaoAnniversaryOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterLuKangWumiaoEntries _characterLuKangWumiaoOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess _modeRulesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineShanheCampaignsEntries _coreShanheCampaignsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreMatchLogEntries _coreMatchLogOperations;
     private readonly ICorePhysicalCardDrawPhysicalCardDrawOperations _physicalCardDrawOperations;
-    internal CoreGameEnginePhysicalCardDrawRuntime(ICorePhysicalCardDrawCharacterGuoZhaoAnniversaryOperations characterGuoZhaoAnniversaryOperations, ICorePhysicalCardDrawCharacterLuKangWumiaoOperations characterLuKangWumiaoOperations, ICorePhysicalCardDrawModeRulesOperations modeRulesOperations, ICorePhysicalCardDrawModeRuntimeOperations modeRuntimeOperations, ICorePhysicalCardDrawCoreProgramCardPoliciesOperations coreProgramCardPoliciesOperations, ICorePhysicalCardDrawCoreShanheCampaignsOperations coreShanheCampaignsOperations, ICorePhysicalCardDrawCoreMatchLogOperations coreMatchLogOperations, ICorePhysicalCardDrawPhysicalCardDrawOperations physicalCardDrawOperations)
+    internal CoreGameEnginePhysicalCardDrawRuntime(global::CardGame.Core.RuntimeEntries.CharacterGuoZhaoAnniversaryEntries characterGuoZhaoAnniversaryOperations, global::CardGame.Core.RuntimeEntries.CharacterLuKangWumiaoEntries characterLuKangWumiaoOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess modeRulesOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineShanheCampaignsEntries coreShanheCampaignsOperations, global::CardGame.Core.RuntimeEntries.CoreMatchLogEntries coreMatchLogOperations, ICorePhysicalCardDrawPhysicalCardDrawOperations physicalCardDrawOperations)
     {
         this._characterGuoZhaoAnniversaryOperations = characterGuoZhaoAnniversaryOperations;
         this._characterLuKangWumiaoOperations = characterLuKangWumiaoOperations;

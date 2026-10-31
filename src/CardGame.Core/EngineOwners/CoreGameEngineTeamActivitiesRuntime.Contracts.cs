@@ -9,13 +9,3 @@ internal interface ICoreTeamActivitiesCoreModeAllegianceOperations : global::Car
 {
     global::CardGame.Core.IMatchModeAllegiancePolicy ModeAllegiancePolicy { get; }
 }
-
-internal interface ICoreTeamActivitiesCoreNationalSkillsOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    global::CardGame.Core.SkillBindingShard GetSkillBindingShard(global::CardGame.Core.CharacterState player);
-}
-
-internal interface ICoreTeamActivitiesModeRuntimeOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    ref readonly global::CardGame.Core.MatchModeRuntime _modeRuntime { get; }
-}

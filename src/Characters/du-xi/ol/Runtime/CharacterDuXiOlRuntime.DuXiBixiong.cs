@@ -25,7 +25,7 @@ internal sealed partial class CharacterDuXiOlRuntime
         var moves = DuXiBixiongMovements(batch, owner).ToArray();
         if (moves.Length == 0)
             return;
-        foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[owner], SkillProgramTriggerWindow.CardsMoved).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects.Any(e => e.Op == SkillProgramEffectOp.RecordBixiongActualDiscard)))
+        foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[owner], SkillProgramTriggerWindow.CardsMoved).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects.Any(e => e.Op == SkillProgramEffectOp.RecordBixiongActualDiscard)))
         {
             var source = new CardConversionSource(candidate.SkillId, candidate.BindingId, owner, candidate.SkillInstanceId);
             foreach (var move in moves)

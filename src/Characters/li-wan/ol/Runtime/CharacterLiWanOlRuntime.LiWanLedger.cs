@@ -51,7 +51,7 @@ internal sealed partial class CharacterLiWanOlRuntime
     {
         if (!HasLiWanCapability || context.OwnerSeat != c.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(c.SkillId)?.Program is not { } program || program.GameplayHash != c.GameplayHash)
             return false;
-        var op = _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects[0].Op;
+        var op = _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects[0].Op;
         if (op == SkillProgramEffectOp.ResolveLianjuOppositeColorReturn)
         {
             if (context.Window != SkillProgramTriggerWindow.TurnEnding || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate != c)

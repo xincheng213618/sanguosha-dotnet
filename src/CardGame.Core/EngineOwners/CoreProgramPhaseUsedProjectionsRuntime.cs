@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreProgramPhaseUsedProjectionsRuntime
 {
-    private readonly ICoreProgramPhaseUsedProjectionsPhaseUsedProjectionsOperations _phaseUsedProjectionsOperations;
-    private readonly ICoreProgramPhaseUsedProjectionsKernelCoreProgramRuntimeModulesOperations _kernelCoreProgramRuntimeModulesOperations;
-    internal CoreProgramPhaseUsedProjectionsRuntime(ICoreProgramPhaseUsedProjectionsPhaseUsedProjectionsOperations phaseUsedProjectionsOperations, ICoreProgramPhaseUsedProjectionsKernelCoreProgramRuntimeModulesOperations kernelCoreProgramRuntimeModulesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelPhaseUsedProjectionsAccess _phaseUsedProjectionsOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations;
+    internal CoreProgramPhaseUsedProjectionsRuntime(global::CardGame.Core.EngineOwners.IKernelPhaseUsedProjectionsAccess phaseUsedProjectionsOperations, global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations kernelCoreProgramRuntimeModulesOperations)
     {
         this._phaseUsedProjectionsOperations = phaseUsedProjectionsOperations;
         this._kernelCoreProgramRuntimeModulesOperations = kernelCoreProgramRuntimeModulesOperations;

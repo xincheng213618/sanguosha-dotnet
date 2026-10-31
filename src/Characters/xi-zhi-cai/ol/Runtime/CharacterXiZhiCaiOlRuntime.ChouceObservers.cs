@@ -54,6 +54,6 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
         var candidate = frame.Candidates[frame.CandidateIndex];
         if (candidate.OwnerSeat != child.OwnerSeat || candidate.SkillId != child.SkillId || candidate.TriggerId != child.TriggerId || candidate.SkillInstanceId != child.SkillInstanceId || candidate.GameplayHash != child.GameplayHash)
             return false;
-        return ValidChouce(root) && _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXiZhiCaiOlOperations.XiZhiCaiFirstChild(r, c), (i) => _coreObserverSubtreesOperations2.HasObserverSuffix(i, (n) => _characterXiZhiCaiOlOperations.XiZhiCaiObserverEdge(n), (n, d) => _coreObserverSubtreesOperations2.IsSuspendedOrPaidRescueObserverSuffix(n, d)), root.Id)is not null;
+        return ValidChouce(root) && _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXiZhiCaiOlOperations.XiZhiCaiFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterXiZhiCaiOlOperations.XiZhiCaiObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)), root.Id)is not null;
     }
 }

@@ -85,7 +85,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
             if (responseKind is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(nativeParentId)is not { Action: { } actual } use || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action))
                 return null;
         }
-        else if (responseKind is not { } kind || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(action, kind) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, action)))
+        else if (responseKind is not { } kind || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, kind) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, action)))
             return null;
         var hand = action.PhysicalCards.Where(c => c.From.OwnerSeat == action.ActorSeat && c.From.Zone is CardZoneKind.Hand or CardZoneKind.WoodenOxGrain).ToArray();
         if (hand.Length == 0 || hand.Select(c => c.CardId).Distinct().Count() != hand.Length)
@@ -114,7 +114,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
             return false;
         if (p.Action.Type == CardActionType.Use && (_coreCardUseLifecycleOperations.LifecycleCardUse(p.NativeParentId)is not { Action: { } a } || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(a, p.Action)))
             return false;
-        if (p.Action.Type == CardActionType.Response && (p.ResponseKind is not { } kind || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(p.Action, kind)))
+        if (p.Action.Type == CardActionType.Response && (p.ResponseKind is not { } kind || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(p.Action, kind)))
             return false;
         return p.Payments.Count == p.HandMaterials.Count && p.Payments.Select(m => m.CardId).Distinct().Count() == p.Payments.Count && p.HandMaterials.All(c => p.Action.PhysicalCards.Contains(c) && ShanjiaHeld(c.From, d.Source.OwnerSeat) && c.From.Zone != CardZoneKind.Equipment && p.Payments.Count(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > p.Before && m.Sequence <= p.After && m.CardId == c.CardId && m.CardKind == c.CardKind && m.From == c.From) == 1);
     }

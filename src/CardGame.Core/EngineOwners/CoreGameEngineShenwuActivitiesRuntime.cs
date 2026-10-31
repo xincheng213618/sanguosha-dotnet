@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineShenwuActivitiesRuntime
 {
-    private readonly ICoreShenwuActivitiesModeRuntimeOperations _modeRuntimeOperations;
-    internal CoreGameEngineShenwuActivitiesRuntime(ICoreShenwuActivitiesModeRuntimeOperations modeRuntimeOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    internal CoreGameEngineShenwuActivitiesRuntime(global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations)
     {
         this._modeRuntimeOperations = modeRuntimeOperations;
     }

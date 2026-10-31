@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CorePublicJournalProjectionRuntime
 {
-    private readonly ICorePublicJournalProjectionCharacterSimaYiMouOperations _characterSimaYiMouOperations;
-    internal CorePublicJournalProjectionRuntime(ICorePublicJournalProjectionCharacterSimaYiMouOperations characterSimaYiMouOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterSimaYiMouEntries _characterSimaYiMouOperations;
+    internal CorePublicJournalProjectionRuntime(global::CardGame.Core.RuntimeEntries.CharacterSimaYiMouEntries characterSimaYiMouOperations)
     {
         this._characterSimaYiMouOperations = characterSimaYiMouOperations;
     }

@@ -99,7 +99,7 @@ internal sealed partial class CharacterYaDanOlRuntime
     [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 180)]
     internal bool IsIssuedQingyaCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (_coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveQingyaNextActualPhaseUse }] || context.ActualPhaseEnd is not { } due || !_coreActualPhaseEndsOperations.IsExactActualPhaseEndCandidate(c, context) || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive)
+        if (_coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveQingyaNextActualPhaseUse }] || context.ActualPhaseEnd is not { } due || !_coreActualPhaseEndsOperations.IsExactActualPhaseEndCandidate(c, context) || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive)
             return false;
         var grant = _coreProgramEventHistoryOperations.ProgramEventHistory<QingyaGrantIssuedEvent>().SingleOrDefault(g => g.GrantId == due.EntitlementId);
         return grant is not null && grant.Source.OwnerSeat == c.OwnerSeat && grant.Source.SkillId == c.SkillId && grant.Source.SkillInstanceId == c.SkillInstanceId && grant.GameplayHash == c.GameplayHash && QingyaGrantDue(grant, due.Phase);

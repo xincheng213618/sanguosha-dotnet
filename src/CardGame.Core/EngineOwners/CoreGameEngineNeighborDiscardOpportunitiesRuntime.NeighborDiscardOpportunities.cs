@@ -60,7 +60,7 @@ internal sealed partial class CoreGameEngineNeighborDiscardOpportunitiesRuntime
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive))
             foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsMoved))
             {
-                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
                 if (!IsNeighborDiscardTopTrigger(trigger) || NeighborDiscardIndexes(batch, owner.Seat).Length == 0 || !seen.Add((candidate.OwnerSeat, candidate.SkillId, candidate.BindingId, candidate.SkillInstanceId)))
                     continue;
                 yield return candidate;
@@ -102,7 +102,7 @@ internal sealed partial class CoreGameEngineNeighborDiscardOpportunitiesRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 4500)]
     internal ProgramSkillWindowContext? TryCreateNeighborDiscardContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         if (IsNeighborDiscardTopTrigger(trigger))
             return CreateNeighborDiscardContext(frame, candidate);
         return null;

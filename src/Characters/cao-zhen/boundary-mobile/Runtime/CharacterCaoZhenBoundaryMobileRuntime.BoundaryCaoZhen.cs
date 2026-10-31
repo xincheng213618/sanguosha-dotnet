@@ -40,7 +40,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(current.ParentFrameId)is not { Action: { } actual } use || actual.ActionId != current.Action.ActionId || context.Window == SkillProgramTriggerWindow.CardUseCompleted && use.Step != ResolutionFrameStep.Completed)
                 return false;
         }
-        else if (current.CompletedResponseReturn is not { } typed || typed.IsCommitted != (context.Window == SkillProgramTriggerWindow.CardUseCommitted) || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(current.Action, typed.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(current))
+        else if (current.CompletedResponseReturn is not { } typed || typed.IsCommitted != (context.Window == SkillProgramTriggerWindow.CardUseCommitted) || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(current.Action, typed.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(current))
             return false;
         window = current;
         return true;
@@ -58,7 +58,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
             {
                 if (window == SkillProgramTriggerWindow.CardUseCompleted ? action.ActorSeat != owner.Seat || BoundarySidiEligibleHolders(owner.Seat, candidate.SkillInstanceId).Length == 0 : !BoundarySidiRecords(owner.Seat, candidate.SkillInstanceId).Any(record => record.HolderSeat == action.ActorSeat))
                     continue;
-                var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, owner.Seat, owner.Seat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(owner, action));
+                var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, owner.Seat, owner.Seat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(owner, action));
                 result.Add(new(owner.Seat, owner.Seat, candidate.SkillId, candidate.BindingId, candidate.GameplayHash, candidate.SkillInstanceId, candidate.Priority, context));
             }
     }

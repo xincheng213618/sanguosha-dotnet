@@ -21,13 +21,13 @@ internal sealed partial class CharacterSimaYiMobileGodRuntime
 
     MobileSimaSword? global::CardGame.Core.IMobileSimaRenjieFacts.ActiveSword => _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { } sword ? ProjectMobileSimaSword(sword) : null;
 
-    IReadOnlyList<Card> global::CardGame.Core.IMobileSimaRenjieFacts.Equipment(int seat) => _corePhysicalOwnedCardQueriesOperations.GetEquipment(seat);
+    IReadOnlyList<Card> global::CardGame.Core.IMobileSimaRenjieFacts.Equipment(int seat) => _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat);
     bool global::CardGame.Core.IMobileSimaRenjieFacts.WenjiNullificationForbidden(NullificationWindowFrame frame, int actor) => _characterLiuQiOlOperations.IsWenjiNullificationResponseForbidden(frame, actor);
     bool global::CardGame.Core.IMobileSimaRenjieFacts.FuqiNullificationBanned(int actor) => _coreWushuangSkillsBAuditOperations.WushuangFuqiNullificationBanned(actor);
     bool global::CardGame.Core.IMobileSimaRenjieFacts.NearbyResponseProhibited(int source, int actor, CardKind kind, IReadOnlyList<int> targets) => _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(source, actor, kind, targets);
     bool global::CardGame.Core.IMobileSimaRenjieFacts.UseUnrespondable(long useId) => _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(useId);
     bool global::CardGame.Core.IMobileSimaRenjieFacts.YingboUnrespondable(long useId) => _characterLuMengMouOperations.IsYingboUnrespondable(useId);
-    bool global::CardGame.Core.IMobileSimaRenjieFacts.WenjiResponseForbidden(long useId, int actor) => _characterLiuQiOlOperations.IsWenjiResponseForbidden(useId, actor);
+    bool global::CardGame.Core.IMobileSimaRenjieFacts.WenjiResponseForbidden(long useId, int actor) => _characterLiuQiOlOperations.IsWenjiResponseForbidden2(useId, actor);
     bool global::CardGame.Core.IMobileSimaRenjieFacts.LegalBorrowedSwordTarget(int owner, int target) => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target]);
     int global::CardGame.Core.IMobileSimaRenjieFacts.ExtraEffectOrdinal(long useId) => _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(useId);
     bool global::CardGame.Core.IMobileSimaRenjieFacts.NullificationEffectOwner(NullificationWindowFrame frame) => _coreDelayedNullificationOperations.HasNullificationEffectOwner(frame);

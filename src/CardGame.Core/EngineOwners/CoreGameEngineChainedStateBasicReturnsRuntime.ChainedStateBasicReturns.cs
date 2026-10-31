@@ -345,11 +345,11 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsRuntime
             return false;
         var candidate = window.Candidates[window.CandidateIndex];
         var context = candidate.FrozenContext;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } cardUse } || context.ParentFrameId != window.Id || cardUse.ParentCardUseFrameId != original.Id || cardUse.CardActionId != action.ActionId || _coreCardActionsOperations.CreateCardActionProgramContext(window, candidate) != context || saved.Kind != DecisionKind.ProgramTrigger || !saved.IsPrivate || saved.SkillPrompt?.SkillId != candidate.SkillId || saved.Choices.Count == 0)
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } cardUse } || context.ParentFrameId != window.Id || cardUse.ParentCardUseFrameId != original.Id || cardUse.CardActionId != action.ActionId || _coreCardActionsOperations.CreateCardActionProgramContext2(window, candidate) != context || saved.Kind != DecisionKind.ProgramTrigger || !saved.IsPrivate || saved.SkillPrompt?.SkillId != candidate.SkillId || saved.Choices.Count == 0)
             return false;
         if (bound is null)
         {
-            if (!_coreProgramLifecycleOperations.GetProgramTrigger(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)).Optional || saved.PlayerSeat != (context.OptionalChooserSeat ?? candidate.OwnerSeat) || saved.SourceSeat != (context.OptionalChooserSeat is not null ? candidate.OwnerSeat : context.SourceSeat) || saved.TargetSeat != (context.OptionalChooserSeat ?? context.TargetSeat ?? candidate.OwnerSeat) || saved.Choices.Count != 2 || !saved.Choices.Select(c => c.Parameters.GetValueOrDefault("program-action")).Order().SequenceEqual(["activate", "skip"]) || saved.Choices.Any(c => c.Cards.Count != 0 || c.Targets.Count != 0 || c.Parameters.GetValueOrDefault("skill-id") != candidate.SkillId || c.Parameters.GetValueOrDefault("binding-id") != candidate.TriggerId || c.Parameters.GetValueOrDefault("skill-instance-id") != candidate.SkillInstanceId))
+            if (!_coreProgramLifecycleOperations.GetProgramTrigger2(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)).Optional || saved.PlayerSeat != (context.OptionalChooserSeat ?? candidate.OwnerSeat) || saved.SourceSeat != (context.OptionalChooserSeat is not null ? candidate.OwnerSeat : context.SourceSeat) || saved.TargetSeat != (context.OptionalChooserSeat ?? context.TargetSeat ?? candidate.OwnerSeat) || saved.Choices.Count != 2 || !saved.Choices.Select(c => c.Parameters.GetValueOrDefault("program-action")).Order().SequenceEqual(["activate", "skip"]) || saved.Choices.Any(c => c.Cards.Count != 0 || c.Targets.Count != 0 || c.Parameters.GetValueOrDefault("skill-id") != candidate.SkillId || c.Parameters.GetValueOrDefault("binding-id") != candidate.TriggerId || c.Parameters.GetValueOrDefault("skill-instance-id") != candidate.SkillInstanceId))
                 return false;
         }
         else
@@ -389,7 +389,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsRuntime
         {
             var candidate = hp.Candidates[index];
             var hpContext = hp.Contexts[index];
-            if (candidate.OwnerSeat != dying.VictimSeat || hpContext.OwnerSeat != candidate.OwnerSeat || hpContext.ParentFrameId != hp.Id || hpContext.HpChange != hp.Change || hpContext.SourceSeat != hp.Change.SourceSeat || hpContext.TargetSeat != hp.Change.TargetSeat || hpContext.Amount != hp.Change.Amount || hpContext.OccurrenceIndex != candidate.OccurrenceIndex || hpContext.Window is not (SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged) || _coreProgramLifecycleOperations.GetProgramTrigger(candidate).Window != hpContext.Window)
+            if (candidate.OwnerSeat != dying.VictimSeat || hpContext.OwnerSeat != candidate.OwnerSeat || hpContext.ParentFrameId != hp.Id || hpContext.HpChange != hp.Change || hpContext.SourceSeat != hp.Change.SourceSeat || hpContext.TargetSeat != hp.Change.TargetSeat || hpContext.Amount != hp.Change.Amount || hpContext.OccurrenceIndex != candidate.OccurrenceIndex || hpContext.Window is not (SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged) || _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Window != hpContext.Window)
                 return false;
         }
 

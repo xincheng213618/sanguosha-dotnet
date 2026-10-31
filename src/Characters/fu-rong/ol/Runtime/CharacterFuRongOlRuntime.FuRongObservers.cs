@@ -31,7 +31,7 @@ internal sealed partial class CharacterFuRongOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? FuRongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterFuRongOlOperations.FuRongFirstChild(root, child), (root) => _coreObserverSubtreesOperations2.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations2.IsMovementObserverEdge(i) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations2.IsSuspendedOrPaidRescueObserverSuffix(i, dying)));
+    internal ProgramSkillFrame? FuRongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterFuRongOlOperations.FuRongFirstChild(root, child), (root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying)));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 410)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 520)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 550)]

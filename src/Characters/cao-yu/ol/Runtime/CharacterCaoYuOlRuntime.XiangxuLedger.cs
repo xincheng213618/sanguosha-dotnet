@@ -22,7 +22,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
         var after = remaining.Min(p => counts[p.Seat]);
         if (before == after)
             return null;
-        var sources = remaining.Where(p => counts[p.Seat] == after && counts[p.Seat] != before).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.CardsMoved)).Where(c => IsXiangxuMinimumTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c))).ToArray();
+        var sources = remaining.Where(p => counts[p.Seat] == after && counts[p.Seat] != before).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.CardsMoved)).Where(c => IsXiangxuMinimumTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c))).ToArray();
         return sources.Length == 0 ? null : new(death.Id, death.ParentFrameId, victimSeat, death.KillerSeat, kind, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, sources, counts, alive);
     }
 
@@ -36,7 +36,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
         var after = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Min(p => r.HandCounts[p.Seat]);
         foreach (var c in r.Sources)
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || r.HandCounts[c.OwnerSeat] != after || r.HandCounts[c.OwnerSeat] == before || !IsXiangxuMinimumTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c)))
+            if (!_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || r.HandCounts[c.OwnerSeat] != after || r.HandCounts[c.OwnerSeat] == before || !IsXiangxuMinimumTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)))
                 throw new InvalidOperationException("Xiangxu death minimum changed its captured original source or causal population edge.");
             var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
             var source = new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId);
@@ -53,7 +53,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
     {
         if (!HasCaoYuCapability || !_coreMatchSetupSetupCompleteAccess._setupComplete || !CaoYuActualTurnOpen(batch.TurnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) || !batch.Movements.Any(m => m.From.Zone == CardZoneKind.Hand || m.To.Zone == CardZoneKind.Hand))
             return;
-        var bindings = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.CardsMoved)).Where(c => IsXiangxuMinimumTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c))).ToArray();
+        var bindings = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.CardsMoved)).Where(c => IsXiangxuMinimumTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c))).ToArray();
         if (bindings.Length == 0)
             return;
         var before = _coreMatchParticipantsPlayersAccess._players.Select(p => _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count).ToArray();
@@ -183,7 +183,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 2100)]
     internal ProgramSkillWindowContext? TryCreateXiangxuMinimumContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsXiangxuMinimumTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsXiangxuMinimumTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateXiangxuMinimumContext(frame, candidate);
         return null;
     }

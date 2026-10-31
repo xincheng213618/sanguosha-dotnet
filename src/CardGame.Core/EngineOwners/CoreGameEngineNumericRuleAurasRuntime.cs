@@ -8,12 +8,12 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineNumericRuleAurasRuntime
 {
-    private readonly ICoreNumericRuleAurasCoreNationalSkillsOperations _coreNationalSkillsOperations;
-    private readonly ICoreNumericRuleAurasCoreRuleQueriesOperations _coreRuleQueriesOperations;
-    private readonly ICoreNumericRuleAurasCoreNativeSkillContextQueriesOperations _coreNativeSkillContextQueriesOperations;
-    private readonly ICoreNumericRuleAurasCoreTeamActivityProgramsOperations _coreTeamActivityProgramsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries _coreRuleQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeSkillContextQueriesEntries _coreNativeSkillContextQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreTeamActivityProgramsEntries _coreTeamActivityProgramsOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineNumericRuleAurasRuntime(ICoreNumericRuleAurasCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreNumericRuleAurasCoreRuleQueriesOperations coreRuleQueriesOperations, ICoreNumericRuleAurasCoreNativeSkillContextQueriesOperations coreNativeSkillContextQueriesOperations, ICoreNumericRuleAurasCoreTeamActivityProgramsOperations coreTeamActivityProgramsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineNumericRuleAurasRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries coreNationalSkillsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries coreRuleQueriesOperations, global::CardGame.Core.RuntimeEntries.CoreNativeSkillContextQueriesEntries coreNativeSkillContextQueriesOperations, global::CardGame.Core.RuntimeEntries.CoreTeamActivityProgramsEntries coreTeamActivityProgramsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreNationalSkillsOperations = coreNationalSkillsOperations;
         this._coreRuleQueriesOperations = coreRuleQueriesOperations;

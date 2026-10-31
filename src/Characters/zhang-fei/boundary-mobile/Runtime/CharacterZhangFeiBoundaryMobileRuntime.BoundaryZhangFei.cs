@@ -101,7 +101,7 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
         foreach (var target in targets)
         {
             var owner = reserve.Source.OwnerSeat;
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, owner, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[owner], action));
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, owner, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[owner], action));
             result.Add(new(owner, target, BoundaryZhangFeiLiyong, trigger.Id, reserve.GameplayHash, reserve.Source.SkillInstanceId, trigger.Priority, context));
         }
     }

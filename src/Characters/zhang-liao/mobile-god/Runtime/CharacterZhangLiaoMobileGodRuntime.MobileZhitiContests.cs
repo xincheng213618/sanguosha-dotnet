@@ -78,7 +78,7 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
             var context = MobileZhitiContestContext(parent, candidate);
             if (_coreProgramLifecycleOperations.CanRunProgramTrigger(candidate, context))
             {
-                if (_coreProgramLifecycleOperations.GetProgramTrigger(candidate).Optional)
+                if (_coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Optional)
                     _coreProgramLifecycleOperations.ExposeProgramTriggerDecision(candidate, context);
                 else
                     _coreProgramLifecycleOperations.BeginProgramBinding(candidate, context);
@@ -144,7 +144,7 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
     internal bool IsMobileZhitiContestSubtree(ResolutionFrame parent)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == parent.Id);
-        if (parent.MobileZhitiContest is not { Finished: false } || index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame source || !MobileZhitiProgramRidesOn(source, parent) || !_coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreNativeEquipmentInvocationsOperations.NativeEquipmentObserverEdge(n), (n, d) => _coreObserverSubtreesOperations2.IsSuspendedOrPaidRescueObserverSuffix(n, d)))
+        if (parent.MobileZhitiContest is not { Finished: false } || index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame source || !MobileZhitiProgramRidesOn(source, parent) || !_coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreNativeEquipmentInvocationsOperations.NativeEquipmentObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)))
             return false;
         AssertMobileZhitiContest(parent);
         return true;

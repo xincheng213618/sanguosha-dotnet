@@ -42,7 +42,7 @@ internal sealed partial class CoreGameEngineSequentialTrickTargetsRuntime
             return;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(frameId)is { } use && _characterXunXuAnniversaryOperations.TryFinishAnniversaryXunXuUseMaterials(use))
             return;
-        if (_coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(frameId, card.Id))
+        if (_coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial3(frameId, card.Id))
             return;
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.UseFinished);
     }

@@ -8,13 +8,13 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
 internal sealed partial class CoreGameEngineCardSnapshotFactsRuntime : global::CardGame.Core.ICardSkillMarkSources, global::CardGame.Core.ICardSnapshotFacts
 {
-    private readonly ICoreCardSnapshotFactsCharacterDaQiaoLeOperations _characterDaQiaoLeOperations;
-    private readonly ICoreCardSnapshotFactsCharacterDiaoChanLeOperations _characterDiaoChanLeOperations;
-    private readonly ICoreCardSnapshotFactsCharacterWeiYanHappyGodOperations _characterWeiYanHappyGodOperations;
-    private readonly ICoreCardSnapshotFactsProgramPipelineHooksOperations _programPipelineHooksOperations;
-    private readonly ICoreCardSnapshotFactsCoreActualTurnsOperations _coreActualTurnsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterDaQiaoLeEntries _characterDaQiaoLeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterDiaoChanLeEntries _characterDiaoChanLeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterWeiYanHappyGodEntries _characterWeiYanHappyGodOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelProgramPipelineHooksAccess _programPipelineHooksOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreActualTurnsEntries _coreActualTurnsOperations;
     private readonly ICoreCardSnapshotFactsCardSkillMarkProjectorOperations _cardSkillMarkProjectorOperations;
-    internal CoreGameEngineCardSnapshotFactsRuntime(ICoreCardSnapshotFactsCharacterDaQiaoLeOperations characterDaQiaoLeOperations, ICoreCardSnapshotFactsCharacterDiaoChanLeOperations characterDiaoChanLeOperations, ICoreCardSnapshotFactsCharacterWeiYanHappyGodOperations characterWeiYanHappyGodOperations, ICoreCardSnapshotFactsProgramPipelineHooksOperations programPipelineHooksOperations, ICoreCardSnapshotFactsCoreActualTurnsOperations coreActualTurnsOperations, ICoreCardSnapshotFactsCardSkillMarkProjectorOperations cardSkillMarkProjectorOperations)
+    internal CoreGameEngineCardSnapshotFactsRuntime(global::CardGame.Core.RuntimeEntries.CharacterDaQiaoLeEntries characterDaQiaoLeOperations, global::CardGame.Core.RuntimeEntries.CharacterDiaoChanLeEntries characterDiaoChanLeOperations, global::CardGame.Core.RuntimeEntries.CharacterWeiYanHappyGodEntries characterWeiYanHappyGodOperations, global::CardGame.Core.EngineOwners.IKernelProgramPipelineHooksAccess programPipelineHooksOperations, global::CardGame.Core.RuntimeEntries.CoreActualTurnsEntries coreActualTurnsOperations, ICoreCardSnapshotFactsCardSkillMarkProjectorOperations cardSkillMarkProjectorOperations)
     {
         this._characterDaQiaoLeOperations = characterDaQiaoLeOperations;
         this._characterDiaoChanLeOperations = characterDiaoChanLeOperations;

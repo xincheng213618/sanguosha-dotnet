@@ -39,7 +39,7 @@ internal sealed partial class CoreGameEngineProgramChoicesRuntime
         {
             SelectedTarget = frame.SelectedTargetSeats.Count == 1 ? _coreNativeSkillContextQueriesOperations.CreateSkillContext(_coreMatchParticipantsPlayersAccess._players[frame.SelectedTargetSeats[0]]) : null,
             Actor = frame.WindowContext?.CardUse is { } card ? _coreNativeSkillContextQueriesOperations.CreateSkillContext(_coreMatchParticipantsPlayersAccess._players[card.ActorSeat]) : null,
-            BooleanState = stateId => _coreProgramPersistentStateOperations.GetProgramBooleanState(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, stateId),
+            BooleanState = stateId => _coreProgramPersistentStateOperations.GetProgramBooleanState2(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, stateId),
             PindianWon = bind => frame.PindianResultBindings.SingleOrDefault(item => item.Name == bind)?.SourceWon ?? false,
             PindianOutcome = bind => frame.PindianResultBindings.SingleOrDefault(item => item.Name == bind)?.SourceWon,
             HasClaimableDamageCards = effect.Options.Any(option => option.Condition.ContainsHasClaimableDamageCards()) && _coreProgramLifecycleOperations.GetClaimableProgramDamageCards(frame).Length > 0,

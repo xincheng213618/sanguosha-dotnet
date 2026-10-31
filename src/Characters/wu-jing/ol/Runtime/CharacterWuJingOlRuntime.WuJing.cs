@@ -213,7 +213,7 @@ internal sealed partial class CharacterWuJingOlRuntime
         var zhangba = choice.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString();
         var cards = choice.Cards.Count == 1 ? new[]
         {
-            _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(f.OwnerSeat)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileOriginalUseCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Single(c => c.Id == choice.Cards[0])
+            _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(f.OwnerSeat)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileOriginalUseCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Single(c => c.Id == choice.Cards[0])
         }
 
         : zhangba ? _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Single(p => p.Select(c => c.Id).SequenceEqual(choice.Cards)).ToArray() : _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], choice.Cards, kind, false, source!)?.Cards.ToArray() ?? throw new InvalidOperationException("Heji lost its real multi-material conversion.");

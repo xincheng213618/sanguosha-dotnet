@@ -172,7 +172,7 @@ internal sealed partial class CoreGameEngineCardSupplyCompletionRuntime
             {
                 SkillProgramTriggerWindow.AfterHpRecovered,
                 SkillProgramTriggerWindow.AfterHealthChanged
-            }.SelectMany(w => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, w)).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Condition.Evaluate(facts, c.SkillId, c.SkillInstanceId)).SelectMany(c => Enumerable.Range(0, _coreProgramLifecycleOperations.GetProgramTrigger(c).HpChangeOccurrence == SkillProgramHpChangeOccurrence.PerPoint ? change.Amount : 1).Select(i => c with { OccurrenceIndex = i })).ToArray() : [];
+            }.SelectMany(w => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, w)).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Condition.Evaluate(facts, c.SkillId, c.SkillInstanceId)).SelectMany(c => Enumerable.Range(0, _coreProgramLifecycleOperations.GetProgramTrigger2(c).HpChangeOccurrence == SkillProgramHpChangeOccurrence.PerPoint ? change.Amount : 1).Select(i => c with { OccurrenceIndex = i })).ToArray() : [];
             if (candidates.Length == 0)
             {
                 r = r with
@@ -183,7 +183,7 @@ internal sealed partial class CoreGameEngineCardSupplyCompletionRuntime
                 continue;
             }
 
-            var contexts = candidates.Select(c => new ProgramSkillWindowContext(_coreProgramLifecycleOperations.GetProgramTrigger(c).Window, change.Id, owner.Seat, SourceSeat: change.SourceSeat, TargetSeat: owner.Seat, Amount: change.Amount, OccurrenceIndex: c.OccurrenceIndex, Facts: facts, HpChange: change)).ToArray();
+            var contexts = candidates.Select(c => new ProgramSkillWindowContext(_coreProgramLifecycleOperations.GetProgramTrigger2(c).Window, change.Id, owner.Seat, SourceSeat: change.SourceSeat, TargetSeat: owner.Seat, Amount: change.Amount, OccurrenceIndex: c.OccurrenceIndex, Facts: facts, HpChange: change)).ToArray();
             _coreRuntimeOperations.ReplaceRuntimeTop(window with { CardSupplyCompletion = r with { ActiveHealthChildFrameId = change.Id } });
             _coreRuntimeOperations.PushRuntimeFrame(new HpChangedTriggerWindowFrame(change.Id, change, Array.AsReadOnly(candidates), Array.AsReadOnly(contexts), PostEventContinuation.CardSupplyCompletion, window.Id));
             _coreRuntimeOperations.AdvanceRuntimeTop<HpChangedTriggerWindowFrame>();

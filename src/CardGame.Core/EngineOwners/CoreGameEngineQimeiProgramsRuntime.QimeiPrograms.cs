@@ -93,7 +93,7 @@ internal sealed partial class CoreGameEngineQimeiProgramsRuntime
         }
     }
 
-    internal IReadOnlyList<ProgramTriggerCandidate> CollectQimeiCandidates(long nativeId, SkillProgramTriggerWindow window) => !HasQimeiCapability ? [] : _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QimeiEqualityQualifiedEvent>().Where(e => e.Receipt.NativeChangeId == nativeId).SelectMany(e => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[e.Receipt.Grant.Source.OwnerSeat], window).Where(c => c.SkillId == e.Receipt.Grant.Source.SkillId && c.SkillInstanceId == e.Receipt.Grant.Source.SkillInstanceId && _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.SettleQimeiPairEquality }])).Distinct().ToArray();
+    internal IReadOnlyList<ProgramTriggerCandidate> CollectQimeiCandidates(long nativeId, SkillProgramTriggerWindow window) => !HasQimeiCapability ? [] : _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QimeiEqualityQualifiedEvent>().Where(e => e.Receipt.NativeChangeId == nativeId).SelectMany(e => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[e.Receipt.Grant.Source.OwnerSeat], window).Where(c => c.SkillId == e.Receipt.Grant.Source.SkillId && c.SkillInstanceId == e.Receipt.Grant.Source.SkillInstanceId && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.SettleQimeiPairEquality }])).Distinct().ToArray();
     internal IReadOnlyList<ProgramTriggerCandidate> CollectQimeiMovementCandidates(CardMovementBatchContext b) => CollectQimeiCandidates(b.Id, SkillProgramTriggerWindow.CardsMoved);
     internal IReadOnlyList<ProgramTriggerCandidate> CollectQimeiHpCandidates(HpChangeContext c) => CollectQimeiCandidates(c.Id, SkillProgramTriggerWindow.AfterHealthChanged);
     internal QimeiEqualityReceipt? QimeiQualification(ProgramTriggerCandidate c, long id) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QimeiEqualityQualifiedEvent>().Select(e => e.Receipt).SingleOrDefault(r => r.NativeChangeId == id && r.Grant.Source.OwnerSeat == c.OwnerSeat && r.Grant.Source.SkillId == c.SkillId && r.Grant.Source.SkillInstanceId == c.SkillInstanceId);
@@ -176,7 +176,7 @@ internal sealed partial class CoreGameEngineQimeiProgramsRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 3900)]
     internal ProgramSkillWindowContext? TryCreateQimeiMovementContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         if (IsQimeiEqualityTrigger(trigger))
             return CreateQimeiMovementContext(frame, candidate);
         return null;

@@ -59,7 +59,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
         if (!HasQingyuanCapability || batch.TurnNumber < 1)
             return;
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive))
-            foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained).Where(c => IsQingyuanGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c))))
+            foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained).Where(c => IsQingyuanGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c))))
             {
                 var partners = QingyuanPartners(owner.Seat, candidate.SkillId, candidate.SkillInstanceId).Where(IsLiveQingyuanPartner).ToArray();
                 var gain = batch.Movements.Select((m, i) => (m, i)).FirstOrDefault(pair => pair.m.To is { Zone: CardZoneKind.Hand, OwnerSeat: { } seat } && partners.Any(p => p.PartnerSeat == seat && p.MovementSequence < pair.m.Sequence) && _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(pair.m, batch) != CardLocation.Hand(seat));
@@ -97,7 +97,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 2400)]
     internal ProgramSkillWindowContext? TryCreateQingyuanGainContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsQingyuanGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsQingyuanGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateQingyuanGainContext(frame, candidate);
         return null;
     }

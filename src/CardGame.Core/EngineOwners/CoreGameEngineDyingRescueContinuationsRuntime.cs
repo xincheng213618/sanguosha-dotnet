@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineDyingRescueContinuationsRuntime
 {
-    private readonly ICoreDyingRescueContinuationsCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
-    internal CoreGameEngineDyingRescueContinuationsRuntime(ICoreDyingRescueContinuationsCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries _coreAlternatingBenefitsOperations;
+    internal CoreGameEngineDyingRescueContinuationsRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations)
     {
         this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
     }

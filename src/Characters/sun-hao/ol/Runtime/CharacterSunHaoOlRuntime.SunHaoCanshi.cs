@@ -34,7 +34,7 @@ internal sealed partial class CharacterSunHaoOlRuntime
             var t = p.Triggers.Single(t => t.Id == "issued-turn-use-discard");
             if (result.Any(c => c.OwnerSeat == action.ActorSeat && c.SkillId == g.Source.SkillId && c.SkillInstanceId == g.Source.SkillInstanceId && c.TriggerId == t.Id))
                 continue;
-            var c = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, action.ActorSeat, action.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action));
+            var c = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, action.ActorSeat, action.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action));
             result.Add(new(action.ActorSeat, action.ActorSeat, g.Source.SkillId, t.Id, g.GameplayHash, g.Source.SkillInstanceId, t.Priority, c));
         }
     }
@@ -42,14 +42,14 @@ internal sealed partial class CharacterSunHaoOlRuntime
     [ProgramIssuedTrigger(540)]
     internal bool IsIssuedSunHaoCanshiCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
     {
-        if (candidate.SkillId is not ("ol:sun-hao-canshi" or SunHaoComposition.MobileCanshi) || candidate.BindingId != "issued-turn-use-discard" || c is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } card } || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CharacterMaMiDiOlRuntime.MaMiDiCandidateMatches(candidate, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex])) || _coreCardActionsOperations.CreateCardActionProgramContext(w, w.Candidates[w.CandidateIndex]) != c || w.Action.ActionId != card.CardActionId || w.Action.ActorSeat != candidate.OwnerSeat || !SunHaoCanshiUseKind(w.Action, candidate.SkillId) || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+        if (candidate.SkillId is not ("ol:sun-hao-canshi" or SunHaoComposition.MobileCanshi) || candidate.BindingId != "issued-turn-use-discard" || c is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } card } || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CharacterMaMiDiOlRuntime.MaMiDiCandidateMatches(candidate, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex])) || _coreCardActionsOperations.CreateCardActionProgramContext2(w, w.Candidates[w.CandidateIndex]) != c || w.Action.ActionId != card.CardActionId || w.Action.ActorSeat != candidate.OwnerSeat || !SunHaoCanshiUseKind(w.Action, candidate.SkillId) || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return false;
         if (w.Action.Type == CardActionType.Use)
         {
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { } use || use.Action?.ActionId != w.Action.ActionId || use.SourceSeat != candidate.OwnerSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id))
                 return false;
         }
-        else if (w.CompletedResponseReturn is not { IsCommitted: true } typed || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(w.Action, typed.Kind))
+        else if (w.CompletedResponseReturn is not { IsCommitted: true } typed || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(w.Action, typed.Kind))
             return false;
         return CurrentSunHaoGrants(candidate.OwnerSeat).Any(g => g.Source.SkillId == candidate.SkillId && g.Source.SkillInstanceId == candidate.SkillInstanceId && g.GameplayHash == candidate.GameplayHash) && !_coreProgramEventHistoryOperations.ProgramEventHistory<SunHaoCanshiStartedEvent>().Any(e => e.WindowId == w.Id && e.Source.SkillInstanceId == candidate.SkillInstanceId);
     }

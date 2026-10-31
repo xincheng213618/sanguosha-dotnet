@@ -26,7 +26,7 @@ internal sealed partial class CoreGameEnginePindianRevealWindowsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != parent || cards.Count < 2 || cards.Select(c => c.Seat).Distinct().Count() != cards.Count || cards.Select(c => c.CardId).Distinct().Count() != cards.Count || cards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.CardId) != CardLocation.Processing))
             throw new InvalidOperationException("A Pindian reveal requires its actual complete paid group.");
-        var candidates = cards.SelectMany(c => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[c.Seat], SkillProgramTriggerWindow.PindianCardsRevealed)).Concat(_characterCuiLieAnniversaryOperations.AnniversaryCuiLieIssuedPindianCandidates(cards)).DistinctBy(c => (c.OwnerSeat, c.SkillId, c.BindingId, c.SkillInstanceId)).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.AddRaoshePindianRankAndRestoreGushe or SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw }]).OrderByDescending(c => c.Priority).ThenBy(c => _coreTableOrderOperations.RelativeTableOrder(0, c.OwnerSeat)).ThenBy(c => c.SkillId, StringComparer.Ordinal).ThenBy(c => c.SkillInstanceId, StringComparer.Ordinal).ToArray();
+        var candidates = cards.SelectMany(c => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[c.Seat], SkillProgramTriggerWindow.PindianCardsRevealed)).Concat(_characterCuiLieAnniversaryOperations.AnniversaryCuiLieIssuedPindianCandidates(cards)).DistinctBy(c => (c.OwnerSeat, c.SkillId, c.BindingId, c.SkillInstanceId)).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.AddRaoshePindianRankAndRestoreGushe or SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw }]).OrderByDescending(c => c.Priority).ThenBy(c => _coreTableOrderOperations.RelativeTableOrder(0, c.OwnerSeat)).ThenBy(c => c.SkillId, StringComparer.Ordinal).ThenBy(c => c.SkillInstanceId, StringComparer.Ordinal).ToArray();
         _coreRuntimeOperations.PushRuntimeFrame(new PindianRevealWindowFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, parent, simultaneous, cards, candidates));
         ContinuePindianRevealWindow();
     }
@@ -49,7 +49,7 @@ internal sealed partial class CoreGameEnginePindianRevealWindowsRuntime
         if (context.Window != SkillProgramTriggerWindow.PindianCardsRevealed)
             return true;
         var w = _resolutionStackOperations._resolutionStack.OfType<PindianRevealWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId);
-        return w is not null && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && w.Candidates[w.CandidateIndex] == c && context.SourceSeat == c.OwnerSeat && context.TargetSeat == c.OwnerSeat && w.Cards.Any(card => card.Seat == c.OwnerSeat && card.Rank == context.Amount && (_coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw }] || card.Rank <= _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.RaoShe))) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.AddRaoshePindianRankAndRestoreGushe or SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw }];
+        return w is not null && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && w.Candidates[w.CandidateIndex] == c && context.SourceSeat == c.OwnerSeat && context.TargetSeat == c.OwnerSeat && w.Cards.Any(card => card.Seat == c.OwnerSeat && card.Rank == context.Amount && (_coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw }] || card.Rank <= _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.RaoShe))) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.AddRaoshePindianRankAndRestoreGushe or SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw }];
     }
 
     [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.AfterOpening, 50, NativeFrameAutomaticPending.RequireNoneBeforeFrame, NativeFrameAutomaticPublish.AfterAdvance)]
@@ -73,7 +73,7 @@ internal sealed partial class CoreGameEnginePindianRevealWindowsRuntime
                 continue;
             }
 
-            if (!_coreProgramLifecycleOperations.GetProgramTrigger(c).Optional)
+            if (!_coreProgramLifecycleOperations.GetProgramTrigger2(c).Optional)
             {
                 _coreProgramLifecycleOperations.BeginProgramBinding(c, context);
                 return;

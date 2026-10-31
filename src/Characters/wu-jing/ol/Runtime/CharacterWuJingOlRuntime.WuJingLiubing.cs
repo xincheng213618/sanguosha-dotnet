@@ -116,7 +116,7 @@ internal sealed partial class CharacterWuJingOlRuntime
         {
             var anchor = group.First(e => batch.Movements.Any(m => m.CardId == e.CardId && m.Sequence == e.MovementSequence));
             var occurrence = batch.Movements.ToList().FindIndex(m => m.CardId == anchor.CardId && m.Sequence == anchor.MovementSequence);
-            return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != anchor.FinalActor).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.DiscardPileReceived)).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ClaimLiubingUndamagingSlash }]).Select(c => c with { OccurrenceIndex = occurrence });
+            return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != anchor.FinalActor).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.DiscardPileReceived)).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ClaimLiubingUndamagingSlash }]).Select(c => c with { OccurrenceIndex = occurrence });
         }).Distinct().ToArray();
     }
 

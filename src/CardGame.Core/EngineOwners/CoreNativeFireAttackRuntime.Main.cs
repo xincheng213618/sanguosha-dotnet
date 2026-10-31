@@ -113,7 +113,7 @@ internal sealed partial class CoreNativeFireAttackRuntime
         {
             pending = SetFireAttackSelection(pending.Id, pending.FireAttackSelection!with { RevealedPaymentCardId = matchingDiscard.Id });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(pending.Id, [_coreSnapshotValueProjectionOperations.ToSnapshot(matchingDiscard)]));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(pending.Id, "native-fire-attack-payment"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(pending.Id, "native-fire-attack-payment"))
                 return;
             _coreRevealedFireAttackPaymentOperations.ContinueRevealedFireAttackPayment(pending);
             return;

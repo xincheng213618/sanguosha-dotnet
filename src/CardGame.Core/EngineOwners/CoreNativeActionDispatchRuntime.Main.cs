@@ -101,7 +101,7 @@ internal sealed partial class CoreNativeActionDispatchRuntime
 
                 break;
             case LegalActionKind.Peach:
-                _coreNativeRecoveryCardsOperations.ResolvePeach(actor, actor, card, allowDying: false, conversionSource: action.ConversionSource);
+                _coreNativeRecoveryCardsOperations.ResolvePeach2(actor, actor, card, allowDying: false, conversionSource: action.ConversionSource);
                 break;
             case LegalActionKind.Duel:
                 if (action.TargetSeats.Count > 1)

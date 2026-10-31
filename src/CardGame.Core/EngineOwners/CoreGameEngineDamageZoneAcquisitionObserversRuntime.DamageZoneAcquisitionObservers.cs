@@ -25,7 +25,7 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionObserversRuntim
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.SourceSeat == r.VictimSeat && recovery.Attempt.TargetSeat == r.VictimSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == "skill-program.damage-zone-acquisition.obtain";
     }
 
-    internal ProgramSkillFrame? DamageAcquisitionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreDamageZoneAcquisitionObserversOperations.DamageAcquisitionFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? DamageAcquisitionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreDamageZoneAcquisitionObserversOperations.DamageAcquisitionFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 480)]
     internal bool TryAdvanceDamageAcquisitionSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DamageAcquisitionObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1580)]

@@ -68,7 +68,7 @@ internal sealed partial class CharacterSunRuOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && CanContinuePaidSunRuOl(root);
     }
 
-    internal ProgramSkillFrame? SunRuOlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterSunRuOlOperations.SunRuOlFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? SunRuOlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterSunRuOlOperations.SunRuOlFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 340)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 450)]
     internal bool HasSunRuOlDamageObserver(long id) => SunRuOlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreProgramPipelineHooksRuntime
 {
-    private readonly ICoreProgramPipelineHooksProgramPipelineHooksOperations _programPipelineHooksOperations;
-    internal CoreProgramPipelineHooksRuntime(ICoreProgramPipelineHooksProgramPipelineHooksOperations programPipelineHooksOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelProgramPipelineHooksAccess _programPipelineHooksOperations;
+    internal CoreProgramPipelineHooksRuntime(global::CardGame.Core.EngineOwners.IKernelProgramPipelineHooksAccess programPipelineHooksOperations)
     {
         this._programPipelineHooksOperations = programPipelineHooksOperations;
     }

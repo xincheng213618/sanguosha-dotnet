@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreProgramCardUsePaymentsRuntime
 {
-    private readonly ICoreProgramCardUsePaymentsCardUsePaymentsOperations _cardUsePaymentsOperations;
-    private readonly ICoreProgramCardUsePaymentsKernelCoreProgramRuntimeModulesOperations _kernelCoreProgramRuntimeModulesOperations;
-    internal CoreProgramCardUsePaymentsRuntime(ICoreProgramCardUsePaymentsCardUsePaymentsOperations cardUsePaymentsOperations, ICoreProgramCardUsePaymentsKernelCoreProgramRuntimeModulesOperations kernelCoreProgramRuntimeModulesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelCardUsePaymentsAccess _cardUsePaymentsOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations;
+    internal CoreProgramCardUsePaymentsRuntime(global::CardGame.Core.EngineOwners.IKernelCardUsePaymentsAccess cardUsePaymentsOperations, global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations kernelCoreProgramRuntimeModulesOperations)
     {
         this._cardUsePaymentsOperations = cardUsePaymentsOperations;
         this._kernelCoreProgramRuntimeModulesOperations = kernelCoreProgramRuntimeModulesOperations;

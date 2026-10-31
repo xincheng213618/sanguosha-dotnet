@@ -138,7 +138,7 @@ internal sealed partial class CharacterChengYuMouOlRuntime
             if (!_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat].IsAlive || result.Any(c => c.OwnerSeat == source.OwnerSeat && c.SkillId == source.SkillId && c.TriggerId == source.BindingId && c.SkillInstanceId == source.SkillInstanceId))
                 continue;
             var t = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.Triggers.Single(t => t.Id == source.BindingId);
-            result.Add(new(source.OwnerSeat, action.ActorSeat, source.SkillId, t.Id, hash, source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, action.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action))));
+            result.Add(new(source.OwnerSeat, action.ActorSeat, source.SkillId, t.Id, hash, source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, action.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action))));
         }
     }
 

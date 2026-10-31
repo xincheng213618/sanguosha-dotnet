@@ -35,7 +35,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
         {
             if (_coreProgramEventHistoryOperations.ProgramEventHistory<YuandiPaidEvent>().Any(e => e.OwnerSeat == owner.Seat && e.ActualTurn == batch.TurnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat))
                 continue;
-            var binding = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsMoved).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ResolveYuandiDiscardNames }]).OrderBy(c => c.SkillInstanceId, StringComparer.Ordinal).FirstOrDefault();
+            var binding = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsMoved).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ResolveYuandiDiscardNames }]).OrderBy(c => c.SkillInstanceId, StringComparer.Ordinal).FirstOrDefault();
             if (binding is null)
                 continue;
             var mask = YuandiRemainingMask(owner.Seat);
@@ -66,7 +66,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
 
     internal ProgramSkillWindowContext CreateYuandiMovementContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (_coreProgramLifecycleOperations.GetProgramTrigger(candidate).Effects is not [{ Op: SkillProgramEffectOp.ResolveYuandiDiscardNames }] || candidate.OccurrenceIndex < 0 || candidate.OccurrenceIndex >= frame.Batch.Movements.Count || !_coreProgramEventHistoryOperations.ProgramEventHistory<YuandiOpportunityEvent>().Any(e => e.BatchId == frame.Id && e.OwnerSeat == candidate.OwnerSeat && e.SkillInstanceId == candidate.SkillInstanceId && e.GameplayHash == candidate.GameplayHash && e.OccurrenceIndex == candidate.OccurrenceIndex && e.CompletionSequence == frame.Batch.Movements[candidate.OccurrenceIndex].Sequence))
+        if (_coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is not [{ Op: SkillProgramEffectOp.ResolveYuandiDiscardNames }] || candidate.OccurrenceIndex < 0 || candidate.OccurrenceIndex >= frame.Batch.Movements.Count || !_coreProgramEventHistoryOperations.ProgramEventHistory<YuandiOpportunityEvent>().Any(e => e.BatchId == frame.Id && e.OwnerSeat == candidate.OwnerSeat && e.SkillInstanceId == candidate.SkillInstanceId && e.GameplayHash == candidate.GameplayHash && e.OccurrenceIndex == candidate.OccurrenceIndex && e.CompletionSequence == frame.Batch.Movements[candidate.OccurrenceIndex].Sequence))
             throw new InvalidOperationException("Yuandi requires its original whole discard batch and issued name-group occurrence.");
         return new(SkillProgramTriggerWindow.CardsMoved, frame.Id, candidate.OwnerSeat, OccurrenceIndex: candidate.OccurrenceIndex, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]), MovementBatch: frame.Batch, MovementIndex: candidate.OccurrenceIndex);
     }
@@ -80,7 +80,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 3000)]
     internal ProgramSkillWindowContext? TryCreateYuandiMovementContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (_coreProgramLifecycleOperations.GetProgramTrigger(candidate).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveYuandiDiscardNames))
+        if (_coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveYuandiDiscardNames))
             return CreateYuandiMovementContext(frame, candidate);
         return null;
     }

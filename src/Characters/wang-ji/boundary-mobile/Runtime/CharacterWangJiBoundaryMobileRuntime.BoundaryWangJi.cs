@@ -45,7 +45,7 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(current.ParentFrameId)is not { Action: { } actual, Step: ResolutionFrameStep.Completed } || actual.ActionId != current.Action.ActionId)
                 return false;
         }
-        else if (current.CompletedResponseReturn is not { IsCommitted: false } typed || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(current.Action, typed.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(current))
+        else if (current.CompletedResponseReturn is not { IsCommitted: false } typed || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(current.Action, typed.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(current))
             return false;
         window = current;
         return true;

@@ -20,7 +20,7 @@ internal sealed partial class CharacterZhongYaoMobileRuntime
     IReadOnlyList<int> global::CardGame.Core.IMobileZhongYaoSelectionQueries.EligibleTargets(int ownerSeat) => MobileZhongYaoZuodingTargets(ownerSeat, _resolutionStackOperations._resolutionStack.LastOrDefault() switch
     {
         ProgramSkillFrame frame => frame.WindowContext,
-        ProgramCardTriggerWindowFrame window when window.CandidateIndex < window.Candidates.Count => _coreCardActionsOperations.CreateCardActionProgramContext(window, window.Candidates[window.CandidateIndex]),
+        ProgramCardTriggerWindowFrame window when window.CandidateIndex < window.Candidates.Count => _coreCardActionsOperations.CreateCardActionProgramContext2(window, window.Candidates[window.CandidateIndex]),
         _ => null
     });
 }

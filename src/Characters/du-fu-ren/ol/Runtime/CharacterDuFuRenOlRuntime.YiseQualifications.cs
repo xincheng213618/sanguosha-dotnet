@@ -61,7 +61,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     {
         if (batch.DuFuRenGains is not { Count: > 0 } gains)
             return[];
-        return gains.GroupBy(g => (g.OwnerSeat, g.RecipientSeat)).Where(g => _coreMatchParticipantsPlayersAccess._players[g.Key.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[g.Key.RecipientSeat].IsAlive).SelectMany(g => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[g.Key.OwnerSeat], SkillProgramTriggerWindow.CardsMoved).Where(c => IsDuFuRenYiseTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c))).Select(c => c with { OccurrenceIndex = batch.Movements.ToList().FindIndex(m => m.Sequence == g.Min(g => g.GainSequence)) })).ToArray();
+        return gains.GroupBy(g => (g.OwnerSeat, g.RecipientSeat)).Where(g => _coreMatchParticipantsPlayersAccess._players[g.Key.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[g.Key.RecipientSeat].IsAlive).SelectMany(g => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[g.Key.OwnerSeat], SkillProgramTriggerWindow.CardsMoved).Where(c => IsDuFuRenYiseTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c))).Select(c => c with { OccurrenceIndex = batch.Movements.ToList().FindIndex(m => m.Sequence == g.Min(g => g.GainSequence)) })).ToArray();
     }
 
     internal ProgramSkillWindowContext CreateDuFuRenYiseContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate c)
@@ -73,7 +73,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
 
     internal IReadOnlyList<DuFuRenGain>? CurrentDuFuRenGains(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (!IsDuFuRenYiseTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c)) || context.Window != SkillProgramTriggerWindow.CardsMoved || context.OwnerSeat != c.OwnerSeat || context.SourceSeat != c.OwnerSeat || context.OccurrenceIndex != c.OccurrenceIndex || context.MovementIndex != c.OccurrenceIndex || context.TargetSeat is not { } target || target == c.OwnerSeat || context.MovementBatch is not { DuFuRenGains: { } gains } batch || batch.Id != context.ParentFrameId || c.OccurrenceIndex < 0 || c.OccurrenceIndex >= batch.Movements.Count || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == batch.Id)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != c || !parent.Batch.Movements.SequenceEqual(batch.Movements) || parent.Batch.DuFuRenGains is not { } parentGains || !parentGains.SequenceEqual(gains))
+        if (!IsDuFuRenYiseTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) || context.Window != SkillProgramTriggerWindow.CardsMoved || context.OwnerSeat != c.OwnerSeat || context.SourceSeat != c.OwnerSeat || context.OccurrenceIndex != c.OccurrenceIndex || context.MovementIndex != c.OccurrenceIndex || context.TargetSeat is not { } target || target == c.OwnerSeat || context.MovementBatch is not { DuFuRenGains: { } gains } batch || batch.Id != context.ParentFrameId || c.OccurrenceIndex < 0 || c.OccurrenceIndex >= batch.Movements.Count || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == batch.Id)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != c || !parent.Batch.Movements.SequenceEqual(batch.Movements) || parent.Batch.DuFuRenGains is not { } parentGains || !parentGains.SequenceEqual(gains))
             return null;
         var selected = gains.Where(g => g.OwnerSeat == c.OwnerSeat && g.RecipientSeat == target).ToArray();
         if (selected.Length == 0 || batch.Movements[c.OccurrenceIndex].Sequence != selected.Min(g => g.GainSequence) || selected.Any(g => g.BatchId != batch.Id || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == g.EntrySequence && m.CardId == g.CardId && m.From == g.From) || !batch.Movements.Any(m => m.Sequence == g.GainSequence && m.CardId == g.CardId && m.To == CardLocation.Hand(target))))
@@ -88,7 +88,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 2900)]
     internal ProgramSkillWindowContext? TryCreateDuFuRenYiseContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsDuFuRenYiseTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsDuFuRenYiseTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateDuFuRenYiseContext(frame, candidate);
         return null;
     }

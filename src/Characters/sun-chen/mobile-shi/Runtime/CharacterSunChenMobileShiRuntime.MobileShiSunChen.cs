@@ -29,7 +29,7 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(nativeId)is not { Step: ResolutionFrameStep.Completed, Action: { } original } use || original.ActionId != a.ActionId || use.SourceSeat != owner)
                 return null;
         }
-        else if (p.CompletedResponseReturn is not { IsCommitted: false } response || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(a, response.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(p))
+        else if (p.CompletedResponseReturn is not { IsCommitted: false } response || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, response.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(p))
             return null;
         if (a.PhysicalCards.Count == 0 || a.PhysicalCards.Any(c => c.From.Zone != CardZoneKind.Hand || c.From.OwnerSeat != owner && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsMaterialAuthorizedEvent>().Any(e => e.Actor == owner && e.UseId == (a.Type == CardActionType.Use ? nativeId : 0) && e.ActionId == a.ActionId && e.CardId == c.CardId && e.From == c.From)))
             return null;

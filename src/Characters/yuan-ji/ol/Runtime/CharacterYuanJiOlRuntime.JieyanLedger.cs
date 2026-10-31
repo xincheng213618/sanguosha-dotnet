@@ -45,7 +45,7 @@ internal sealed partial class CharacterYuanJiOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 3200)]
     internal ProgramSkillWindowContext? TryCreateJieyanContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (_coreProgramLifecycleOperations.GetProgramTrigger(candidate).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair))
+        if (_coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair))
             return CreateJieyanContext(frame, candidate);
         return null;
     }

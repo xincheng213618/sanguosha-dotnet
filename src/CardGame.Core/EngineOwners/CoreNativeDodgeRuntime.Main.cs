@@ -111,7 +111,7 @@ internal sealed partial class CoreNativeDodgeRuntime
 
     internal void ResolveDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CharacterState defender, Card responseCard)
     {
-        if (_characterLiuQiOlOperations.IsWenjiResponseForbidden(attack.ResolutionId, defender.Seat))
+        if (_characterLiuQiOlOperations.IsWenjiResponseForbidden2(attack.ResolutionId, defender.Seat))
             throw new InvalidOperationException("Wenji forbids this exact Slash Dodge response.");
         if (_coreCardDeclarationsOperations.TryBeginCardDeclaration(defender, responseCard, CardKind.Dodge, _coreCardDeclarationsOperations.PeekDeclarationConversion(defender, responseCard, CardKind.Dodge, false), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Dodge, defender.Seat), [attack.SourceSeat]))
             return;

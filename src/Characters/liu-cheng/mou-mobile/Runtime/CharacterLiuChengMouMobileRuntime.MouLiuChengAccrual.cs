@@ -57,7 +57,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         if (window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return false;
         var current = window.Candidates[window.CandidateIndex];
-        var expected = _coreCardActionsOperations.CreateCardActionProgramContext(window, current);
+        var expected = _coreCardActionsOperations.CreateCardActionProgramContext2(window, current);
         return current.OwnerSeat == candidate.OwnerSeat && current.SkillId == candidate.SkillId && current.TriggerId == candidate.BindingId && current.SkillInstanceId == candidate.SkillInstanceId && current.GameplayHash == candidate.GameplayHash && (expected with
         {
             MouLiuChengAccrual = null

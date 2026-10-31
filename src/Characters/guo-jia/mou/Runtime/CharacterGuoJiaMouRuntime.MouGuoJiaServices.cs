@@ -21,7 +21,7 @@ internal sealed partial class CharacterGuoJiaMouRuntime
     SkillProgram? global::CardGame.Core.IMouGuoJiaFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
     IEnumerable<T> global::CardGame.Core.IMouGuoJiaFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
     bool global::CardGame.Core.IMouGuoJiaFacts.Parent(ProgramSkillFrame f) => MouGjParent(f);
-    bool global::CardGame.Core.IMouGuoJiaFacts.Yin(int s, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState(s, MouGuoJiaRuntime.Xianmou, instance, "yin");
+    bool global::CardGame.Core.IMouGuoJiaFacts.Yin(int s, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(s, MouGuoJiaRuntime.Xianmou, instance, "yin");
     IReadOnlyList<int> global::CardGame.Core.IMouGuoJiaFacts.Living => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
 
     IReadOnlyList<MouGjEntity> global::CardGame.Core.IMouGuoJiaFacts.Hand(int s) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Select(c => new MouGjEntity(c.Id, c.Kind, CardLocation.Hand(s), c.DisplayName)).ToArray());

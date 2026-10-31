@@ -14,7 +14,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
             return;
         if (!result.Any(c => c.OwnerSeat == parent.OwnerSeat && c.SkillId == AnniversaryMaTieComposition.Quxian && c.TriggerId == "issued-slash-reward" && c.SkillInstanceId == n.Source.SkillInstanceId))
         {
-            var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat], action)with
+            var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat], action)with
             {
                 CardUseCausedDamage = use.CausedDamage
             };
@@ -41,7 +41,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
 
     internal bool MaTieCardParent(ProgramSkillFrame f, SkillProgramTriggerWindow window)
     {
-        if (f.ActivationId != f.TriggerId || f.WindowContext is not { } c || MaTieCardWindow(c, window)is null || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) || f.WindowContext != _coreCardActionsOperations.CreateCardActionProgramContext(parent, parent.Candidates[parent.CandidateIndex]))
+        if (f.ActivationId != f.TriggerId || f.WindowContext is not { } c || MaTieCardWindow(c, window)is null || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) || f.WindowContext != _coreCardActionsOperations.CreateCardActionProgramContext2(parent, parent.Candidates[parent.CandidateIndex]))
             return false;
         return true;
     }

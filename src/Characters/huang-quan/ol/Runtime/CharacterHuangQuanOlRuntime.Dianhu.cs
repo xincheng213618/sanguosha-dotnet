@@ -73,7 +73,7 @@ internal sealed partial class CharacterHuangQuanOlRuntime
     {
         if (change.Kind != HpChangeKind.Recovery || !HasDianhuRelation)
             return[];
-        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.DianhuRelations.Count > 0).SelectMany(p => p.DianhuRelations).Where(g => g.TargetSeat == change.TargetSeat && DianhuSourceEnabled(g)).SelectMany(g => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat], SkillProgramTriggerWindow.AfterHpRecovered).Where(c => c.SkillId == g.Source.SkillId && c.SkillInstanceId == g.Source.SkillInstanceId && IsDianhuDrawTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c)) && DianhuQualification(c, change.Id)is { } r && !DianhuConsumed(r))).Distinct().ToArray();
+        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.DianhuRelations.Count > 0).SelectMany(p => p.DianhuRelations).Where(g => g.TargetSeat == change.TargetSeat && DianhuSourceEnabled(g)).SelectMany(g => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat], SkillProgramTriggerWindow.AfterHpRecovered).Where(c => c.SkillId == g.Source.SkillId && c.SkillInstanceId == g.Source.SkillInstanceId && IsDianhuDrawTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) && DianhuQualification(c, change.Id)is { } r && !DianhuConsumed(r))).Distinct().ToArray();
     }
 
     internal ProgramSkillWindowContext CreateDianhuHpContext(HpChangeContext change, ProgramTriggerCandidate c)

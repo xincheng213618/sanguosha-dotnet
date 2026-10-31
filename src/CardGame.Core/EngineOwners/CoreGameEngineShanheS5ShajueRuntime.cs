@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineShanheS5ShajueRuntime
 {
-    private readonly ICoreShanheS5ShajueResolutionStackOperations _resolutionStackOperations;
-    internal CoreGameEngineShanheS5ShajueRuntime(ICoreShanheS5ShajueResolutionStackOperations resolutionStackOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    internal CoreGameEngineShanheS5ShajueRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
     }

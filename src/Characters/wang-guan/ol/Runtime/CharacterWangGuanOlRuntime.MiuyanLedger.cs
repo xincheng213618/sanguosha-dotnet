@@ -51,7 +51,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
         if (!IsIssuedMiuyanCandidate(c) || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.OwnerSeat != c.OwnerSeat || context.CardUse is not { } card || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is not { Step: ResolutionFrameStep.Completed, MiuyanUse: { } r, Action: { } action } use || !MiuyanUseProof(use) || card.CardActionId != r.ActionId || r.Source.OwnerSeat != c.OwnerSeat || r.Source.SkillId != c.SkillId || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != use.Id || window.Action.ActionId != action.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return null;
         var current = window.Candidates[window.CandidateIndex];
-        return current.OwnerSeat == c.OwnerSeat && current.SkillId == c.SkillId && current.TriggerId == c.BindingId && current.SkillInstanceId == c.SkillInstanceId && current.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext(window, current) == context && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) == 1 ? use : null;
+        return current.OwnerSeat == c.OwnerSeat && current.SkillId == c.SkillId && current.TriggerId == c.BindingId && current.SkillInstanceId == c.SkillInstanceId && current.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) == context && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) == 1 ? use : null;
     }
 
     internal bool IsIssuedMiuyanCandidate(ProgramTriggerCandidate c) => HasMiuyanCapability && c.SkillId == "ol:miuyan" && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.Triggers.Any(t => t.Id == c.BindingId && t.Effects is [{ Op: SkillProgramEffectOp.ResolveMiuyanCompletedUse }]) == true;
@@ -64,7 +64,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
         var t = _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program!.Triggers.Single();
         if (result.Any(c => c.OwnerSeat == r.Source.OwnerSeat && c.SkillId == r.Source.SkillId && c.SkillInstanceId == r.Source.SkillInstanceId && c.TriggerId == t.Id))
             return;
-        result.Add(new(r.Source.OwnerSeat, r.Source.OwnerSeat, r.Source.SkillId, t.Id, r.GameplayHash, r.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, r.Source.OwnerSeat, r.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], action))));
+        result.Add(new(r.Source.OwnerSeat, r.Source.OwnerSeat, r.Source.SkillId, t.Id, r.GameplayHash, r.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, r.Source.OwnerSeat, r.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], action))));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27210)]

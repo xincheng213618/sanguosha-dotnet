@@ -72,7 +72,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
             if (result.Any(c => c.SkillId == g.Source.SkillId && c.TriggerId == "next-sole-use" && c.OwnerSeat == g.Source.OwnerSeat))
                 continue;
             var trigger = _contentRegistryOperations._contentRegistry.GetSkill(g.Source.SkillId).Program!.Triggers.Single(t => t.Id == "next-sole-use");
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, g.Source.OwnerSeat, g.HolderSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat], action))with
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, g.Source.OwnerSeat, g.HolderSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat], action))with
             {
                 PijingIssuedGroupId = g.GroupId,
                 OptionalChooserSeat = g.HolderSeat

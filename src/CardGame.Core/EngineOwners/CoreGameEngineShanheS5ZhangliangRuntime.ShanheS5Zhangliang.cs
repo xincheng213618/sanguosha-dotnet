@@ -44,7 +44,7 @@ internal sealed partial class CoreGameEngineShanheS5ZhangliangRuntime
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive))
             foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained))
             {
-                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
                 if (!IsOwnTurnEnemyHandGainTrigger(trigger) || OwnTurnEnemyHandGainTarget(batch, owner.Seat, trigger.Effects[0].Amount)is not { } target)
                     continue;
                 var indexes = OwnTurnEnemyHandGainIndexes(batch, target);
@@ -57,7 +57,7 @@ internal sealed partial class CoreGameEngineShanheS5ZhangliangRuntime
 
     internal ProgramSkillWindowContext CreateOwnTurnEnemyHandGainContext(CardsMovedTriggerWindowFrame parent, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         var target = OwnTurnEnemyHandGainTarget(parent.Batch, candidate.OwnerSeat, trigger.Effects[0].Amount) ?? throw new InvalidOperationException("An own-turn enemy hand-gain candidate lost its original real gain batch.");
         var indexes = OwnTurnEnemyHandGainIndexes(parent.Batch, target);
         var count = parent.Batch.DestinationCounts!.Single(item => item.Location == CardLocation.Hand(target));
@@ -66,7 +66,7 @@ internal sealed partial class CoreGameEngineShanheS5ZhangliangRuntime
 
     internal bool CanRunOwnTurnEnemyHandGain(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         if (!IsOwnTurnEnemyHandGainTrigger(trigger) || context.Window != SkillProgramTriggerWindow.CardsGained || context.OwnerSeat != candidate.OwnerSeat || context.MovementBatch is not { } batch || context.ParentFrameId != batch.Id || context.SourceSeat != batch.OriginOwnerSeat || context.OccurrenceIndex != candidate.OccurrenceIndex || context.MovementIndex != candidate.OccurrenceIndex || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == batch.Id)is not CardsMovedTriggerWindowFrame parent || parent.Batch != batch || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != candidate || OwnTurnEnemyHandGainTarget(batch, candidate.OwnerSeat, trigger.Effects[0].Amount)is not { } target || context.TargetSeat != target)
             return false;
         return OwnTurnEnemyHandGainIndexes(batch, target)[0] == candidate.OccurrenceIndex;
@@ -100,7 +100,7 @@ internal sealed partial class CoreGameEngineShanheS5ZhangliangRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 800)]
     internal ProgramSkillWindowContext? TryCreateOwnTurnEnemyHandGainContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsOwnTurnEnemyHandGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsOwnTurnEnemyHandGainTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateOwnTurnEnemyHandGainContext(frame, candidate);
         return null;
     }

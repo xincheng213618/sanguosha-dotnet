@@ -50,7 +50,7 @@ internal sealed partial class CoreGameEngineGameDomainsRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 4400)]
     internal ProgramSkillWindowContext? TryCreateFirstDomainContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         if (trigger.Window == SkillProgramTriggerWindow.FirstGameDomainCrossing)
             return CreateFirstDomainContext(frame, candidate);
         return null;

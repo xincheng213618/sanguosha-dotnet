@@ -8,14 +8,14 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreNativeDamageHandlesRuntime
 {
-    private readonly ICoreNativeDamageHandlesCharacterZhouQunOlOperations _characterZhouQunOlOperations;
-    private readonly ICoreNativeDamageHandlesCardZonesOperations _cardZonesOperations;
-    private readonly ICoreNativeDamageHandlesModeRulesOperations _modeRulesOperations;
-    private readonly ICoreNativeDamageHandlesResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreNativeDamageHandlesCoreActiveNativeAttackQueriesOperations _coreActiveNativeAttackQueriesOperations;
-    private readonly ICoreNativeDamageHandlesCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
-    private readonly ICoreNativeDamageHandlesCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
-    internal CoreNativeDamageHandlesRuntime(ICoreNativeDamageHandlesCharacterZhouQunOlOperations characterZhouQunOlOperations, ICoreNativeDamageHandlesCardZonesOperations cardZonesOperations, ICoreNativeDamageHandlesModeRulesOperations modeRulesOperations, ICoreNativeDamageHandlesResolutionStackOperations resolutionStackOperations, ICoreNativeDamageHandlesCoreActiveNativeAttackQueriesOperations coreActiveNativeAttackQueriesOperations, ICoreNativeDamageHandlesCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreNativeDamageHandlesCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterZhouQunOlEntries _characterZhouQunOlOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess _cardZonesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess _modeRulesOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreActiveNativeAttackQueriesEntries _coreActiveNativeAttackQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreDamageCursorRuntimeEntries _coreDamageCursorRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries _coreProgramAttackAttemptOperations;
+    internal CoreNativeDamageHandlesRuntime(global::CardGame.Core.RuntimeEntries.CharacterZhouQunOlEntries characterZhouQunOlOperations, global::CardGame.Core.EngineOwners.IKernelCardZoneStoreAccess cardZonesOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess modeRulesOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreActiveNativeAttackQueriesEntries coreActiveNativeAttackQueriesOperations, global::CardGame.Core.RuntimeEntries.CoreDamageCursorRuntimeEntries coreDamageCursorRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries coreProgramAttackAttemptOperations)
     {
         this._characterZhouQunOlOperations = characterZhouQunOlOperations;
         this._cardZonesOperations = cardZonesOperations;

@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineNianChallengeHostRuntime
 {
-    private readonly ICoreNianChallengeHostModeRuntimeOperations _modeRuntimeOperations;
-    private readonly ICoreNianChallengeHostKernelCoreGameEngineNianChallengeHostOperations _kernelCoreGameEngineNianChallengeHostOperations;
-    internal CoreGameEngineNianChallengeHostRuntime(ICoreNianChallengeHostModeRuntimeOperations modeRuntimeOperations, ICoreNianChallengeHostKernelCoreGameEngineNianChallengeHostOperations kernelCoreGameEngineNianChallengeHostOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelCreateNianChallengeHostOperations _kernelCoreGameEngineNianChallengeHostOperations;
+    internal CoreGameEngineNianChallengeHostRuntime(global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations, global::CardGame.Core.EngineOwners.IKernelCreateNianChallengeHostOperations kernelCoreGameEngineNianChallengeHostOperations)
     {
         this._modeRuntimeOperations = modeRuntimeOperations;
         this._kernelCoreGameEngineNianChallengeHostOperations = kernelCoreGameEngineNianChallengeHostOperations;

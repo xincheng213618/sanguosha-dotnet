@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineEarnedActualEndingBenefitsRuntime
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (frame.PaidOwnTarget is not { Applied: true } paid || frame.WindowContext?.ActualUseTarget != paid.Use || frame.ChoiceBindings.SingleOrDefault(b => b.Name == "benefit")?.OptionId != "ending")
             throw new InvalidOperationException("An earned Ending benefit requires its exact paid and applied original target.");
-        var candidate = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], SkillProgramTriggerWindow.TurnEnding).FirstOrDefault(c => c.SkillId == skillId && c.BindingId == bindingId && _coreProgramLifecycleOperations.GetProgramTrigger(c)is { TurnOwnerScope: SkillProgramTurnOwnerScope.EarnedActualEnding, Optional: false } t && t.Effects is [{ Op: SkillProgramEffectOp.DrawLostHpThenOfferOwnedCardsUpTo }]);
+        var candidate = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], SkillProgramTriggerWindow.TurnEnding).FirstOrDefault(c => c.SkillId == skillId && c.BindingId == bindingId && _coreProgramLifecycleOperations.GetProgramTrigger2(c)is { TurnOwnerScope: SkillProgramTurnOwnerScope.EarnedActualEnding, Optional: false } t && t.Effects is [{ Op: SkillProgramEffectOp.DrawLostHpThenOfferOwnedCardsUpTo }]);
         if (candidate is null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EarnedActualEndingBenefitIssuedEvent>().Any(e => e.Benefit.Id == frame.Id))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new EarnedActualEndingBenefitIssuedEvent(new(frame.Id, frame.Id, paid.Use.CardUseFrameId, paid.Source, paid.GameplayHash, paid.Use.ActualTurnNumber, paid.Use.ActualTurnOwnerSeat, new(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId), candidate.GameplayHash)));
@@ -42,7 +42,7 @@ internal sealed partial class CoreGameEngineEarnedActualEndingBenefitsRuntime
                 continue;
             }
 
-            var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+            var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
             if (trigger.TurnOwnerScope != SkillProgramTurnOwnerScope.EarnedActualEnding || trigger.Optional || trigger.Effects is not [{ Op: SkillProgramEffectOp.DrawLostHpThenOfferOwnedCardsUpTo }])
             {
                 ConsumeEarnedActualEnding(benefit, false);
@@ -90,7 +90,7 @@ internal sealed partial class CoreGameEngineEarnedActualEndingBenefitsRuntime
     {
         if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().LastOrDefault()is not { } ending || ending.Id != context.ParentFrameId || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || ending.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || ending.ItemIndex < 0 || ending.ItemIndex >= ending.Items.Count || ending.Items[ending.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate))
             return false;
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         return trigger.Effects is [{ Op: SkillProgramEffectOp.DrawLostHpThenOfferOwnedCardsUpTo }] && (trigger.TurnOwnerScope == SkillProgramTurnOwnerScope.Own && context.EarnedBenefit is null && frame.OwnerSeat == ending.OwnerSeat || trigger.TurnOwnerScope == SkillProgramTurnOwnerScope.EarnedActualEnding && MatchesEarnedActualEnding(candidate, context, true));
     }
 }

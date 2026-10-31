@@ -104,7 +104,7 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
         var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Select(c => c.Id).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HandComparisonDraft = new(target, source, cards, Math.Min(_coreMatchParticipantsPlayersAccess._players[target].Hp, cards.Length), [], "reveal") });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramHandComparisonSourceRevealedEvent(f.Id, f.OwnerSeat, source));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "hand-comparison-source"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "hand-comparison-source"))
             return SkillProgramStepOutcome.AwaitChild;
         PublishHandComparison(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
         return SkillProgramStepOutcome.AwaitChoice;
@@ -173,7 +173,7 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HandComparisonDraft = d });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramHandComparisonCardRevealedEvent(f.Id, d.TargetSeat, id));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "hand-comparison-target"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "hand-comparison-target"))
             {
                 return;
             }

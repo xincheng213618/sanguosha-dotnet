@@ -45,7 +45,7 @@ internal sealed partial class CoreGameEngineUnexpectedAssaultRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(use.Id, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(targetCard) })));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new UnexpectedAssaultRevealedEvent(receipt));
         _coreMatchLogOperations.AddLog("CardRevealed", $"{(_coreMatchParticipantsPlayersAccess._players[sourceSeat].Name)} 展示了 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 的【{(targetCard.DisplayName)}】（{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(receipt.EffectiveRevealedSuit))}）。", sourceSeat, targetSeat);
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(use.Id, "unexpected-assault-hand"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(use.Id, "unexpected-assault-hand"))
             return true;
         ContinueUnexpectedAssaultPublicReveal(_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)!);
         return true;

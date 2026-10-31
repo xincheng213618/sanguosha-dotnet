@@ -198,7 +198,7 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureRuntime
         return true;
     }
 
-    internal Card[] PhaseHandDebtCards(ProgramSkillFrame frame) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(frame.OwnerSeat)).Where(card => !(card.IsGeneralWeapon && _cardZonesOperations._cardZones.GetLocation(card.Id).Zone == CardZoneKind.Equipment) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(frame.OwnerSeat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Transfer)).ToArray();
+    internal Card[] PhaseHandDebtCards(ProgramSkillFrame frame) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(frame.OwnerSeat)).Where(card => !(card.IsGeneralWeapon && _cardZonesOperations._cardZones.GetLocation(card.Id).Zone == CardZoneKind.Equipment) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(frame.OwnerSeat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Transfer)).ToArray();
     internal SkillProgramStepOutcome BeginPhaseHandDebtReturn(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

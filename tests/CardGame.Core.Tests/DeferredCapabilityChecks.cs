@@ -26,6 +26,34 @@ internal static class DeferredCapabilityChecks
             "A ref return reaches the actual state owner while factories and module instances remain isolated per match.");
         Reject(() => new ProgramCapabilityCatalog([typeof(WrongFactoryPort)]));
         Reject(() => new ProgramCapabilityCatalog([typeof(UndeclaredTargetPort)]));
+        CheckSharedEntries();
+    }
+
+    private static void CheckSharedEntries()
+    {
+        var modules = new ProgramRuntimeModuleCatalog([typeof(SharedFirst), typeof(SharedSecond)]);
+        var capabilities = new ProgramCapabilityCatalog([]);
+        var value = new ValueStore(5);
+        var match = new MatchRuntime(modules, capabilities, new NoEngineAdapters(), [new(typeof(IValueStore), value)]);
+        var other = new MatchRuntime(modules, capabilities, new NoEngineAdapters(), [new(typeof(IValueStore), new ValueStore(20))]);
+        var first = match.GetDeferredEntry<FirstEntry, SharedFirst>(FirstEntry.Create);
+        Require(ModuleCount(match) == 0 && ReferenceEquals(first, match.GetDeferredEntry<FirstEntry, SharedFirst>(FirstEntry.Create)),
+            "A shared entry is cached without constructing either mutually dependent module.");
+        var argumentSawModules = -1;
+        int Argument() { argumentSawModules = ModuleCount(match); return 1; }
+        Require(first.Read(Argument()) == 7 && argumentSawModules == 0 && ModuleCount(match) == 2,
+            "Call arguments are evaluated before shared entries construct their target and its deferred dependencies.");
+        var second = (SharedSecond)match.GetModule(typeof(SharedSecond));
+        Require(ReferenceEquals(second.First, first) && second.ReadFirst() == 6,
+            "Injection and the kernel entry getter share one entry object, including a deferred call back to the original module.");
+        var input = 3;
+        Require(first.Combine(ref input, out var total) && input == 8 && total == 13,
+            "Shared entries forward the original ref/out storage without per-consumer adapters.");
+        first.Number = 7;
+        Require(value.Number == 7 && first.Read() == 8 &&
+                other.GetDeferredEntry<FirstEntry, SharedFirst>(FirstEntry.Create).Read() == 21 &&
+                !ReferenceEquals(first, other.GetDeferredEntry<FirstEntry, SharedFirst>(FirstEntry.Create)),
+            "Shared entry references reach actual state and remain isolated between matches.");
     }
 
     private interface IFirst : IProgramRuntimeOperations
@@ -46,6 +74,38 @@ internal static class DeferredCapabilityChecks
     {
         private int _number = initial;
         public ref int Number => ref _number;
+    }
+    [ProgramRuntimeModule]
+    private sealed class SharedFirst(SecondEntry second)
+    {
+        internal int Read(int offset) => second.Read() + 1 + offset;
+        internal bool Combine(ref int input, out int total) => second.Combine(ref input, out total);
+        internal ref int Number => ref second.Number;
+    }
+    [ProgramRuntimeModule]
+    private sealed class SharedSecond(FirstEntry first, IValueStore value)
+    {
+        internal FirstEntry First => first;
+        internal int Read() => value.Number;
+        internal int ReadFirst() => first.Read();
+        internal bool Combine(ref int input, out int total)
+        { input += value.Number; total = input + value.Number; return true; }
+        internal ref int Number => ref value.Number;
+    }
+    [ProgramRuntimeEntry(typeof(SharedFirst))]
+    private sealed class FirstEntry(Func<SharedFirst> resolve)
+    {
+        internal static FirstEntry Create(Func<SharedFirst> resolve) => new(resolve);
+        internal int Read(int offset = 0) => resolve().Read(offset);
+        internal bool Combine(ref int input, out int total) => resolve().Combine(ref input, out total);
+        internal ref int Number => ref resolve().Number;
+    }
+    [ProgramRuntimeEntry(typeof(SharedSecond))]
+    private sealed class SecondEntry(Func<SharedSecond> resolve)
+    {
+        internal int Read() => resolve().Read();
+        internal bool Combine(ref int input, out int total) => resolve().Combine(ref input, out total);
+        internal ref int Number => ref resolve().Number;
     }
     [ProgramRuntimeModule]
     private sealed class First(ISecond second)

@@ -26,7 +26,7 @@ internal sealed partial class CoreNativeNullificationRuntime
         var pending = new global::CardGame.Core.NativeOwners.JizhiResolution(sourceSeat, resolutionId, effectCard, effectiveCardKind, targetSeats, actionKind, targetCardId, requiredCardKind);
         if (_coreCardActionsOperations.TryBeginFinalizedTrickPrograms(pending))
             return;
-        if (_coreCardActionsOperations.TryBeginProgramCardUseBeforeTargetEffects(pending))
+        if (_coreCardActionsOperations.TryBeginProgramCardUseBeforeTargetEffects2(pending))
         {
             return;
         }
@@ -234,7 +234,7 @@ internal sealed partial class CoreNativeNullificationRuntime
         var completedResponseUseSuit = _coreResponseUseCompletionOperations.FreezeCompletedResponseUseSuit(responder, [card], CardKind.Nullification);
         var responsePaymentBefore = _coreCardMovementJournalMovementSequenceAccess._movementSequence;
         _corePhysicalMovementFacadesOperations.MoveCard(card, responseFrom, CardLocation.Processing, CardMoveReasons.Nullification, disclosure: CardMovementDisclosure.FaceUp);
-        if (!_characterMiHengLeOperations.IsSiruiOutsideResponseMaterial(pending.Id, card.Id) && !_coreWushuangShopCardsOperations.IsWushuangShopDestroyedNullificationPayment(pending.Id, responder.Seat, new(card.Id, card.Kind, responseFrom, responseCostIsRed), responsePaymentBefore))
+        if (!_characterMiHengLeOperations.IsSiruiOutsideResponseMaterial(pending.Id, card.Id) && !_coreWushuangShopCardsOperations.IsWushuangShopDestroyedNullificationPayment2(pending.Id, responder.Seat, new(card.Id, card.Kind, responseFrom, responseCostIsRed), responsePaymentBefore))
             _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.NullificationFinished);
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(frame => frame.Id == pending.Id);
         pending = (responseFrom == CardLocation.Hand(responder.Seat) && _coreNamedAmbushInvalidationOperations.HasEnabledMatchingNamedAmbush(responder.Seat, CardKind.Nullification)) || _characterChengYuMouOperations.HasMouCyMatchingName(responder.Seat, CardKind.Nullification) || _characterHuangZhongAnniversaryGodOperations.HasAnniversaryHzPendingInvalidation(responder.Seat) || _coreFieldEquipmentOperations.HasHappyWeiYanPotentialCancellation(responder.Seat) ? _coreNamedAmbushInvalidationOperations.PrepareNamedAmbushCounterspell(pending, responder.Seat, card.Id) : _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { EffectNullified = !pending.EffectNullified, ChainDepth = pending.ChainDepth + 1, CandidateSeats = BuildNullificationCandidateSeats(responder.Seat), CandidateIndex = 0, Step = ResolutionFrameStep.AwaitingResponse });

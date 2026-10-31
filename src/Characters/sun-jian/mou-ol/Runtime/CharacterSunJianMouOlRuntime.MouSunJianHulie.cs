@@ -39,7 +39,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
         {
             var t = _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program!.Triggers.Single(t => t.Id == "undamaged-counter");
             if (!result.Any(c => c.OwnerSeat == e.Source.OwnerSeat && c.SkillId == e.Source.SkillId && c.SkillInstanceId == e.Source.SkillInstanceId && c.TriggerId == t.Id))
-                result.Add(new(e.Source.OwnerSeat, e.Source.OwnerSeat, e.Source.SkillId, t.Id, e.GameplayHash, e.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(a, window, 0, e.Source.OwnerSeat, e.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat], a))));
+                result.Add(new(e.Source.OwnerSeat, e.Source.OwnerSeat, e.Source.SkillId, t.Id, e.GameplayHash, e.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(a, window, 0, e.Source.OwnerSeat, e.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat], a))));
         }
     }
 

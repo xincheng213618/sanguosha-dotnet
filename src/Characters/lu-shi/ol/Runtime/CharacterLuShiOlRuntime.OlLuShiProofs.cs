@@ -72,7 +72,7 @@ internal sealed partial class CharacterLuShiOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? OlLuShiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLuShiOlOperations.OlLuShiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations2.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? OlLuShiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLuShiOlOperations.OlLuShiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 42700)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 42700)]
     internal bool OlLuShiDamageObserver(long id) => OlLuShiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

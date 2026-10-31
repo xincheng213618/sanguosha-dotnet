@@ -18,10 +18,3 @@ internal sealed class CorePhysicalMovementFacadesMovementEquipmentEffectsAdapter
     private readonly global::System.Func<global::CardGame.Core.MovementEquipmentEffectsRuntime> _targetFactory = targetFactory;
     public global::CardGame.Core.MovementEquipmentEffectsRuntime Get() => this._targetFactory();
 }
-
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineAtomicCardMovementRuntime))]
-internal sealed class CorePhysicalMovementFacadesCoreAtomicCardMovementAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineAtomicCardMovementRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICorePhysicalMovementFacadesCoreAtomicCardMovementOperations
-{
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineAtomicCardMovementRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.AtomicCardMovementRuntime AtomicCardMovements { get => this._targetFactory().AtomicCardMovements; }
-}

@@ -124,7 +124,7 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
                 continue;
             }
 
-            var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+            var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
             if (trigger.Optional)
             {
                 _coreProgramLifecycleOperations.ExposeProgramTriggerDecision(candidate, context);
@@ -182,7 +182,7 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
                 DeathExtinguishedFaction = _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[death.VictimSeat])is { } faction && !_coreMatchParticipantsPlayersAccess._players.Any(other => other.IsAlive && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(other) == faction)
             };
             foreach (var candidate in _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(player, SkillProgramTriggerWindow.CharacterDied, facts))
-                if (!_coreProgramLifecycleOperations.GetProgramTrigger(candidate).Effects.Any(effect => effect.Op == SkillProgramEffectOp.ResolveAnniversaryYuanYinYunjiu))
+                if (!_coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects.Any(effect => effect.Op == SkillProgramEffectOp.ResolveAnniversaryYuanYinYunjiu))
                     collected.Add((candidate, facts));
         }
 
@@ -226,7 +226,7 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
                 continue;
             }
 
-            var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+            var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
             if (trigger.Optional)
             {
                 _coreProgramLifecycleOperations.ExposeProgramTriggerDecision(candidate, context);

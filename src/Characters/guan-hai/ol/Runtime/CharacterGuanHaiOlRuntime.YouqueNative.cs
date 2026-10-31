@@ -160,7 +160,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 240)]
     internal bool IsIssuedGuanHaiYouqueCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (YouqueRewardUse(context)is not { YouqueSlash: { } o } || c.OwnerSeat != o.Source.OwnerSeat || c.SkillId != o.Source.SkillId || c.SkillInstanceId != o.Source.SkillInstanceId || c.GameplayHash != o.GameplayHash || _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveYouqueIssuedSlashDamageBenefit }] || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not DamageTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex].ToProgramCandidate() != c)
+        if (YouqueRewardUse(context)is not { YouqueSlash: { } o } || c.OwnerSeat != o.Source.OwnerSeat || c.SkillId != o.Source.SkillId || c.SkillInstanceId != o.Source.SkillInstanceId || c.GameplayHash != o.GameplayHash || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveYouqueIssuedSlashDamageBenefit }] || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not DamageTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex].ToProgramCandidate() != c)
             return false;
         return !_coreProgramEventHistoryOperations.ProgramEventHistory<YouqueBenefitIssuedEvent>().Any(e => e.DamageFrameId == context.DamageFrameId && e.UseId == o.UseId);
     }

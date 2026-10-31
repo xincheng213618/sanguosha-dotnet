@@ -147,7 +147,7 @@ internal sealed partial class CoreGameEngineAdvancedWeaponsRuntime
             return SkillProgramStepOutcome.Continue;
         foreach (var seat in affected)
         {
-            var candidates = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(seat)).Concat(_corePhysicalOwnedCardQueriesOperations.GetJudgment(_coreMatchParticipantsPlayersAccess._players[seat])).ToArray();
+            var candidates = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat)).Concat(_corePhysicalOwnedCardQueriesOperations.GetJudgment(_coreMatchParticipantsPlayersAccess._players[seat])).ToArray();
             if (candidates.Length == 0)
                 continue;
             var card = candidates[_randomOperations._random.Next(candidates.Length)];

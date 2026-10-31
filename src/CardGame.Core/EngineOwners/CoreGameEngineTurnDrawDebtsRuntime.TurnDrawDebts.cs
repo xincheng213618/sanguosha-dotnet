@@ -80,7 +80,7 @@ internal sealed partial class CoreGameEngineTurnDrawDebtsRuntime
 
         // X is evaluated once here, before selecting and before any payment child.
         var x = _corePublicFactionCountsOperations.GetPublicLivingFactionCount();
-        var count = Math.Min(x, _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(frame.OwnerSeat).Count);
+        var count = Math.Min(x, _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment2(frame.OwnerSeat).Count);
         var before = _coreCardMovementJournalCardMovementsAccess._cardMovements.Count == 0 ? 0 : _coreCardMovementJournalCardMovementsAccess._cardMovements[^1].Sequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { TurnDrawDebtPayment = new(frame.InstructionIndex - 1, effect.StateId!, effect.ResultBind!, issued.FrameId, x, count, before) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnDrawDebtPaymentStartedEvent(frame.Id, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, frame.OwnerSeat, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), effect.StateId!, issued.FrameId, x, count));

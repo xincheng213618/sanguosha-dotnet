@@ -9,16 +9,3 @@ internal interface ICoreFieldEquipmentCoreEquipmentContentOperations : global::C
 {
     global::CardGame.Core.EquipmentContentRegistry EquipmentRules { get; }
 }
-
-internal interface ICoreFieldEquipmentCharacterWeiYanHappyGodOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    global::CardGame.Core.EquipmentSlot? HappyBoneSlot(global::CardGame.Core.Card card);
-    bool HasHappyWeiYanEzhiCapability { get; }
-
-    bool IsHappyWeiYanBone(int id);
-}
-
-internal interface ICoreFieldEquipmentCorePhysicalOwnedCardQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> GetEquipment(int seat);
-}

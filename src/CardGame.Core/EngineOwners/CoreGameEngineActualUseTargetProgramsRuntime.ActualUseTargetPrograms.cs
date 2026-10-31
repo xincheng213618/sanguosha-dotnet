@@ -52,10 +52,10 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
             var identity = FreezeActualUseTarget(use, target);
             if (identity is null || _coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(use.Id, target))
                 continue;
-            var facts = use.Action is { } action ? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[target], action) : _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[target]);
+            var facts = use.Action is { } action ? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[target], action) : _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[target]);
             foreach (var candidate in _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[target], SkillProgramTriggerWindow.OtherActualUseTargeted, facts))
             {
-                if (!_coreProgramLifecycleOperations.GetProgramTrigger(candidate).Effects.Any(e => e.Op is SkillProgramEffectOp.PayHpThenNullifyOwnActualUseTarget or SkillProgramEffectOp.OfferHalfHandRecipientSupport or SkillProgramEffectOp.DrawThenNullifyOwnMultiTargetTrick || e.Op == SkillProgramEffectOp.OfferSameTypeDifferentNameOrExtraTarget && identity.ActionId is null))
+                if (!_coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects.Any(e => e.Op is SkillProgramEffectOp.PayHpThenNullifyOwnActualUseTarget or SkillProgramEffectOp.OfferHalfHandRecipientSupport or SkillProgramEffectOp.DrawThenNullifyOwnMultiTargetTrick || e.Op == SkillProgramEffectOp.OfferSameTypeDifferentNameOrExtraTarget && identity.ActionId is null))
                     continue;
                 entries.Add((candidate, new(SkillProgramTriggerWindow.OtherActualUseTargeted, id, target, SourceSeat: identity.ActorSeat, TargetSeat: target, OccurrenceIndex: candidate.OccurrenceIndex, Facts: facts) { ActualUseTarget = identity }));
             }
@@ -107,7 +107,7 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
             }
 
             _coreRuntimeOperations.ReplaceRuntimeTop(parent with { Step = ResolutionFrameStep.AwaitingResponse });
-            if (_coreProgramLifecycleOperations.GetProgramTrigger(candidate).Optional)
+            if (_coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Optional)
                 _coreProgramLifecycleOperations.ExposeProgramTriggerDecision(candidate, context);
             else
                 _coreProgramLifecycleOperations.BeginProgramBinding(candidate, context);

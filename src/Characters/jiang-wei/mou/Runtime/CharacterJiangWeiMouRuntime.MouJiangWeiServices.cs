@@ -12,7 +12,7 @@ internal sealed partial class CharacterJiangWeiMouRuntime
     [ProgramTriggerProof(ProgramTriggerProofPhase.NativeWindow, 70, SkillProgramTriggerWindow.DyingExited)]
     internal bool IsMouJiangWeiFuzhanExitContext(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
     {
-        if (c.SkillId != MouJiangWeiAnniversaryRuntime.Fuzhan || _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveMouJiangWeiFuzhan }] || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame p || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || p.Candidates[p.CandidateIndex] != c || !_characterYanPuOlOperations.IsYanPuDyingExitEdge(_resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == p.Id)))
+        if (c.SkillId != MouJiangWeiAnniversaryRuntime.Fuzhan || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveMouJiangWeiFuzhan }] || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame p || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || p.Candidates[p.CandidateIndex] != c || !_characterYanPuOlOperations.IsYanPuDyingExitEdge(_resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == p.Id)))
             return false;
         return _characterJiangWeiMouOperations.CreateMouJiangWeiAnniversaryFacts().CanTrigger(c, w, SkillProgramEffectOp.ResolveMouJiangWeiFuzhan);
     }
@@ -31,7 +31,7 @@ internal sealed partial class CharacterJiangWeiMouRuntime
     bool global::CardGame.Core.IMouJiangWeiAnniversaryFacts.Friendly(int owner, int other) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), other, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
     IReadOnlyList<int> global::CardGame.Core.IMouJiangWeiAnniversaryFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
     string global::CardGame.Core.IMouJiangWeiAnniversaryFacts.Instance(int owner) => _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[owner], MouJiangWeiAnniversaryRuntime.Juemou);
-    bool global::CardGame.Core.IMouJiangWeiAnniversaryFacts.State(int owner, string instance, string state) => _coreProgramPersistentStateOperations.GetProgramBooleanState(owner, MouJiangWeiAnniversaryRuntime.Juemou, instance, state);
+    bool global::CardGame.Core.IMouJiangWeiAnniversaryFacts.State(int owner, string instance, string state) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(owner, MouJiangWeiAnniversaryRuntime.Juemou, instance, state);
     SkillProgram global::CardGame.Core.IMouJiangWeiAnniversaryFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
     IEnumerable<T> global::CardGame.Core.IMouJiangWeiAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
     bool global::CardGame.Core.IMouJiangWeiAnniversaryFacts.Parent(ProgramSkillFrame f)
@@ -97,7 +97,7 @@ internal sealed partial class CharacterJiangWeiMouRuntime
     {
         if (!MouJiangWeiAnniversary.Valid(f) || f.MouJiangWeiAnniversary is not { } r || state is not ("yin" or "modified"))
             throw new InvalidOperationException("Juemou state requires its original accepted branch or Fuzhan.");
-        _coreProgramSkillChangesOperations.SetProgramBooleanState(f, MouJiangWeiAnniversaryRuntime.Juemou, r.JuemouInstance, state, value);
+        _coreProgramSkillChangesOperations.SetProgramBooleanState2(f, MouJiangWeiAnniversaryRuntime.Juemou, r.JuemouInstance, state, value);
     }
 
     MouJiangWeiAnniversaryCard global::CardGame.Core.IMouJiangWeiAnniversaryNative.RandomHand(ProgramSkillFrame f, IReadOnlyList<MouJiangWeiAnniversaryCard> cards)

@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CharacterGongsunZanBoundaryMobileRuntime
 {
-    private readonly ICharacterGongsunZanBoundaryMobileCoreAdvancedLifecycleOperations _coreAdvancedLifecycleOperations;
-    private readonly ICharacterGongsunZanBoundaryMobileCoreNationalSkillsOperations _coreNationalSkillsOperations;
-    internal CharacterGongsunZanBoundaryMobileRuntime(ICharacterGongsunZanBoundaryMobileCoreAdvancedLifecycleOperations coreAdvancedLifecycleOperations, ICharacterGongsunZanBoundaryMobileCoreNationalSkillsOperations coreNationalSkillsOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries _coreAdvancedLifecycleOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations;
+    internal CharacterGongsunZanBoundaryMobileRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries coreAdvancedLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries coreNationalSkillsOperations)
     {
         this._coreAdvancedLifecycleOperations = coreAdvancedLifecycleOperations;
         this._coreNationalSkillsOperations = coreNationalSkillsOperations;

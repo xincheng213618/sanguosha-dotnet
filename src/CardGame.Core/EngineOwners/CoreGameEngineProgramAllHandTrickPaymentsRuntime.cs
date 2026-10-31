@@ -8,12 +8,12 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineProgramAllHandTrickPaymentsRuntime
 {
-    private readonly ICoreProgramAllHandTrickPaymentsContentRegistryOperations _contentRegistryOperations;
-    private readonly ICoreProgramAllHandTrickPaymentsResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreProgramAllHandTrickPaymentsCoreCardUsePaymentsOperations _coreCardUsePaymentsOperations;
-    private readonly ICoreProgramAllHandTrickPaymentsCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUsePaymentsEntries _coreCardUsePaymentsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
-    internal CoreGameEngineProgramAllHandTrickPaymentsRuntime(ICoreProgramAllHandTrickPaymentsContentRegistryOperations contentRegistryOperations, ICoreProgramAllHandTrickPaymentsResolutionStackOperations resolutionStackOperations, ICoreProgramAllHandTrickPaymentsCoreCardUsePaymentsOperations coreCardUsePaymentsOperations, ICoreProgramAllHandTrickPaymentsCoreRuntimeOperations coreRuntimeOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    internal CoreGameEngineProgramAllHandTrickPaymentsRuntime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUsePaymentsEntries coreCardUsePaymentsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
     {
         this._contentRegistryOperations = contentRegistryOperations;
         this._resolutionStackOperations = resolutionStackOperations;

@@ -71,7 +71,7 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? AnniversaryBlyObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterBaiLingYunAnniversaryOperations.AnniversaryBlyFirstChild(f, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations2.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? AnniversaryBlyObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterBaiLingYunAnniversaryOperations.AnniversaryBlyFirstChild(f, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 43600)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 43600)]
     internal bool AnniversaryBlyDamageObserver(long id) => AnniversaryBlyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

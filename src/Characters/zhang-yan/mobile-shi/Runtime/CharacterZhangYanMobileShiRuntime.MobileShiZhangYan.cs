@@ -218,7 +218,7 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
         var cards = r.Plans.Where(p => p.Selected > 0 && _cardZonesOperations._cardZones.GetLocation(p.Selected) == CardLocation.Hand(p.Seat)).Select(p => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(p.Selected))with { Suit = p.Suit }).ToArray();
         if (cards.Length > 0)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, f.TriggerId!, f.OwnerSeat, "feijing-path", Array.AsReadOnly(cards)));
-        if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "mobile-shi-zhang-yan-path"))
+        if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "mobile-shi-zhang-yan-path"))
             AfterShiZyReveal(f);
     }
 

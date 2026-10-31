@@ -9,7 +9,7 @@ internal sealed partial class CharacterBuLianShiBoundaryMobileRuntime
 {
     void global::CardGame.Core.IBoundaryBuLianShiHost.Prepare(ProgramSkillFrame f) => PrepareBoundaryBuLianShiAnxu(f);
     void global::CardGame.Core.IBoundaryBuLianShiHost.SelectLeast(ProgramSkillFrame f) => SelectBoundaryBuLianShiAnxuLeast(f);
-    bool global::CardGame.Core.IBoundaryBuLianShiQueries.HasHe(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(seat).Count > 0;
+    bool global::CardGame.Core.IBoundaryBuLianShiQueries.HasHe(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat).Count > 0;
     IReadOnlyList<int> global::CardGame.Core.IBoundaryBuLianShiQueries.Least(int owner) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { OwnerSeat: var seat, BoundaryBuLianShiAnxu: { LeastSelected: true, LeastSeat: { } least } } f && seat == owner && ValidBoundaryBuLianShiAnxu(f) && _coreMatchParticipantsPlayersAccess._players[least].IsAlive ? [least] : [];
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 55900)]
     internal void CaptureBoundaryBuLianShiAnxuObtain(CardMovedEvent fact)

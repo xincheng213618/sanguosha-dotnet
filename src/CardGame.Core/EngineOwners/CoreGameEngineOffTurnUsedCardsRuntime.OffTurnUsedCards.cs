@@ -107,7 +107,7 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
 
         if (entities.Count == 0 || !entities.Any(e => e.NativeBatchId == anchorBatchId))
             return;
-        foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], SkillProgramTriggerWindow.DiscardPileReceived).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects.Any(e => e.Op == SkillProgramEffectOp.GiveOffTurnUsedCards)))
+        foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], SkillProgramTriggerWindow.DiscardPileReceived).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects.Any(e => e.Op == SkillProgramEffectOp.GiveOffTurnUsedCards)))
         {
             var source = new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId);
             if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OffTurnUsedMaterialDiscardedEvent>().Any(e => e.ActionId == action.ActionId && e.Source == source))
@@ -131,7 +131,7 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 970)]
     internal bool CanOfferOffTurnUsedCards(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (!_coreProgramLifecycleOperations.GetProgramTrigger(c).Effects.Any(e => e.Op == SkillProgramEffectOp.GiveOffTurnUsedCards))
+        if (!_coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects.Any(e => e.Op == SkillProgramEffectOp.GiveOffTurnUsedCards))
             return true;
         return context is { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } b } && b.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && OffTurnGiftActualTurnOwner()is { } turnOwner && turnOwner != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && OffTurnUsedFacts(b.Id, new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash).All(e => e.ActualTurnOwnerSeat == turnOwner) && MatchingOffTurnUsedCardIndexes(b, c).Length > 0 && OffTurnGiftRecipients(c.OwnerSeat).Length > 0;
     }

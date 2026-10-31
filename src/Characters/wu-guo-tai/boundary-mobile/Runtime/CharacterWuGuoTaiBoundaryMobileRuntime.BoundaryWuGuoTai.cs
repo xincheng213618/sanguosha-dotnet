@@ -12,7 +12,7 @@ internal sealed partial class CharacterWuGuoTaiBoundaryMobileRuntime
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(firstSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(secondSeat) || firstSeat == secondSeat || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[firstSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[secondSeat].IsAlive)
             return false;
-        return firstSeat == ownerSeat || secondSeat == ownerSeat || Math.Abs(_corePhysicalOwnedCardQueriesOperations.GetEquipment(firstSeat).Count - _corePhysicalOwnedCardQueriesOperations.GetEquipment(secondSeat).Count) <= Math.Max(0, _coreMatchParticipantsPlayersAccess._players[ownerSeat].MaxHp - _coreMatchParticipantsPlayersAccess._players[ownerSeat].Hp);
+        return firstSeat == ownerSeat || secondSeat == ownerSeat || Math.Abs(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(firstSeat).Count - _corePhysicalOwnedCardQueriesOperations.GetEquipment2(secondSeat).Count) <= Math.Max(0, _coreMatchParticipantsPlayersAccess._players[ownerSeat].MaxHp - _coreMatchParticipantsPlayersAccess._players[ownerSeat].Hp);
     }
 
     internal int? BoundaryWuGuoTaiBuyiDiscardActor(ProgramSkillFrame frame, string bind, IReadOnlyList<int> ids, IReadOnlyList<CardLocation> locations)

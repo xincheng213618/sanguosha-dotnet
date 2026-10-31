@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreProgramRuntimeHooksRuntime
 {
-    private readonly ICoreProgramRuntimeHooksModeRuntimeOperations _modeRuntimeOperations;
-    private readonly ICoreProgramRuntimeHooksRuntimeHooksOperations _runtimeHooksOperations;
-    private readonly ICoreProgramRuntimeHooksKernelCoreProgramRuntimeModulesOperations _kernelCoreProgramRuntimeModulesOperations;
-    internal CoreProgramRuntimeHooksRuntime(ICoreProgramRuntimeHooksModeRuntimeOperations modeRuntimeOperations, ICoreProgramRuntimeHooksRuntimeHooksOperations runtimeHooksOperations, ICoreProgramRuntimeHooksKernelCoreProgramRuntimeModulesOperations kernelCoreProgramRuntimeModulesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelRuntimeHooksAccess _runtimeHooksOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations;
+    internal CoreProgramRuntimeHooksRuntime(global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations, global::CardGame.Core.EngineOwners.IKernelRuntimeHooksAccess runtimeHooksOperations, global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations kernelCoreProgramRuntimeModulesOperations)
     {
         this._modeRuntimeOperations = modeRuntimeOperations;
         this._runtimeHooksOperations = runtimeHooksOperations;

@@ -22,7 +22,7 @@ internal sealed partial class CoreGameEngineNamedUseConversionsRuntime
     {
         foreach (var key in _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates.Keys.ToArray())
         {
-            var definition = _coreProgramPersistentStateOperations.GetProgramBooleanStateDefinition(key.SkillId, key.StateId);
+            var definition = _coreProgramPersistentStateOperations.GetProgramBooleanStateDefinition2(key.SkillId, key.StateId);
             if (definition.ResetScope != SkillProgramStateResetScope.Turn || _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates[key] == definition.InitialValue)
                 continue;
             _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates[key] = definition.InitialValue;

@@ -85,7 +85,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? ZhouQunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhouQunOlOperations.ZhouQunFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations2.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? ZhouQunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhouQunOlOperations.ZhouQunFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1030)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1140)]
     internal bool HasZhouQunDamageObserver(long id) => ZhouQunObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

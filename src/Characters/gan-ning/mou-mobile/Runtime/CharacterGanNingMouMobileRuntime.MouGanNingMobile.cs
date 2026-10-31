@@ -159,7 +159,7 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGanNingGuessedEvent(f.Id, r.TargetSeat, suit, correct, r.Wrong, r.Phase!));
             if (correct)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, f.ActivationId, f.OwnerSeat, "qixi-hand", Array.AsReadOnly(hand.Select(c => _closedHandCardViewQueriesSource.Get().Project(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c)).ToArray())));
-            if (correct && _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "qixi-guessed-hand"))
+            if (correct && _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "qixi-guessed-hand"))
                 return;
             PublishMouGn(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
             return;

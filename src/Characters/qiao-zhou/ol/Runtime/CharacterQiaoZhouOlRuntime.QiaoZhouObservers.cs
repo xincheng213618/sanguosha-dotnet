@@ -26,7 +26,7 @@ internal sealed partial class CharacterQiaoZhouOlRuntime
 
     internal ResolutionFrame? QiaoZhouObserverRoot()
     {
-        var root = _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterQiaoZhouOlOperations.QiaoZhouFirstChild(f, c), (i) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(i));
+        var root = _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterQiaoZhouOlOperations.QiaoZhouFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
         if (root is not null)
             return root;
         if (_resolutionStackOperations._resolutionStack.FirstOrDefault()is not QiaoZhouPreparationFrame prep || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[1] is not CardsMovedTriggerWindowFrame moved || prep.ActiveChildFrameId != moved.Id || !IsQiaoZhouPreparationMovement(prep, moved))

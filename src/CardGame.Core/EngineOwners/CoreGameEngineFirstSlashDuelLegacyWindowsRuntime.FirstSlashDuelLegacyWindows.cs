@@ -11,7 +11,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelLegacyWindowsRuntime
     {
         if (global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(frame) != SkillProgramTriggerWindow.CardUseTargetsFinalized || frame.CandidateIndex >= frame.Candidates.Count)
             return frame;
-        bool IsBenefit(ProgramCardTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(c)).Effects.Any(e => e.Op == SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit);
+        bool IsBenefit(ProgramCardTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger2(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(c)).Effects.Any(e => e.Op == SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit);
         if (!IsBenefit(frame.Candidates[frame.CandidateIndex]) || !frame.Candidates.Skip(frame.CandidateIndex + 1).Any(c => !IsBenefit(c)))
             return frame;
         // Only this newly opted-in candidate moves. Preserve every historical
@@ -44,7 +44,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelLegacyWindowsRuntime
         if (!_coreFirstSlashDuelBenefitsOperations.HasFirstSlashDuelBenefitCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || use.Action is not null || FirstSlashDuelLegacyProducer(use)is not { } producer || !use.TargetSeats.Contains(attack.TargetSeat) || !IsFirstLegacySlashUse(use, producer) || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive)
             return false;
         var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat]);
-        var candidates = _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat], SkillProgramTriggerWindow.CardUseTargetsFinalized, facts).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit }]).ToArray();
+        var candidates = _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat], SkillProgramTriggerWindow.CardUseTargetsFinalized, facts).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit }]).ToArray();
         if (candidates.Length == 0)
             return false;
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
@@ -58,7 +58,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelLegacyWindowsRuntime
     {
         var window = _resolutionStackOperations._resolutionStack.OfType<FirstSlashDuelLegacyWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId);
         var use = window is null ? null : _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId);
-        return window is not null && use is not null && window.CandidateIndex < window.Candidates.Count && window.Candidates[window.CandidateIndex] == c && window.Contexts[window.CandidateIndex] == context && context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && context.CardUse is null && c.OwnerSeat == use.SourceSeat && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && use.TargetSeats is [var target] && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && context.SourceSeat == use.SourceSeat && context.TargetSeat == target && IsFirstLegacySlashUse(use, window.ProducerFrameId) && _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit }] && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FirstSlashDuelBenefitIssuedEvent>().Any(e => e.Receipt.CardUseFrameId == use.Id && e.Receipt.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId));
+        return window is not null && use is not null && window.CandidateIndex < window.Candidates.Count && window.Candidates[window.CandidateIndex] == c && window.Contexts[window.CandidateIndex] == context && context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && context.CardUse is null && c.OwnerSeat == use.SourceSeat && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && use.TargetSeats is [var target] && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && context.SourceSeat == use.SourceSeat && context.TargetSeat == target && IsFirstLegacySlashUse(use, window.ProducerFrameId) && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit }] && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FirstSlashDuelBenefitIssuedEvent>().Any(e => e.Receipt.CardUseFrameId == use.Id && e.Receipt.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId));
     }
 
     [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.AfterOpening, 60, NativeFrameAutomaticPending.RequireNoneBeforeFrame, NativeFrameAutomaticPublish.AfterAdvance)]
@@ -105,7 +105,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelLegacyWindowsRuntime
         foreach (var w in _resolutionStackOperations._resolutionStack.OfType<FirstSlashDuelLegacyWindowFrame>())
         {
             var use = _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId);
-            if (use is null || !IsFirstLegacySlashUse(use, w.ProducerFrameId, requireSingle: false) || w.Candidates.Count == 0 || w.Contexts.Count != w.Candidates.Count || w.CandidateIndex < 0 || w.CandidateIndex > w.Candidates.Count || w.Candidates.Where((c, i) => c.OwnerSeat != use.SourceSeat || w.Contexts[i].ParentFrameId != w.Id || w.Contexts[i].Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || w.Contexts[i].CardUse is not null || _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is not [{ Op: SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit }]).Any())
+            if (use is null || !IsFirstLegacySlashUse(use, w.ProducerFrameId, requireSingle: false) || w.Candidates.Count == 0 || w.Contexts.Count != w.Candidates.Count || w.CandidateIndex < 0 || w.CandidateIndex > w.Candidates.Count || w.Candidates.Where((c, i) => c.OwnerSeat != use.SourceSeat || w.Contexts[i].ParentFrameId != w.Id || w.Contexts[i].Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || w.Contexts[i].CardUse is not null || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit }]).Any())
                 throw new InvalidOperationException("The first-benefit legacy window lost its original Action-null Slash and exact producer.");
         }
     }

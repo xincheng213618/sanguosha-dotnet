@@ -92,7 +92,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Diou = r with { Paid = true, ShownCardId = card.Id, ShownPrintedKind = card.Kind, OutputKind = kind, FirstShow = first, SameName = same, ActualTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, TurnOwner = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, ShowSequence = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Stage = DiouStage.UseChoice } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouShownEvent(f.Id, f.OwnerSeat, card.Id, card.Kind, kind, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, first, same));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "diou-retained-hand", [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "diou-retained-hand"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "diou-retained-hand"))
                 return;
             PublishDiou(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
             return;

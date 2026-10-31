@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreNativeDamageCompletionRuntime
 {
-    private readonly ICoreNativeDamageCompletionCoreProgramAttackAttemptOperations _coreProgramAttackAttemptOperations;
-    private readonly ICoreNativeDamageCompletionCoreNativeAttackCompletionOperations _coreNativeAttackCompletionOperations;
-    internal CoreNativeDamageCompletionRuntime(ICoreNativeDamageCompletionCoreProgramAttackAttemptOperations coreProgramAttackAttemptOperations, ICoreNativeDamageCompletionCoreNativeAttackCompletionOperations coreNativeAttackCompletionOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries _coreProgramAttackAttemptOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeAttackCompletionEntries _coreNativeAttackCompletionOperations;
+    internal CoreNativeDamageCompletionRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries coreProgramAttackAttemptOperations, global::CardGame.Core.RuntimeEntries.CoreNativeAttackCompletionEntries coreNativeAttackCompletionOperations)
     {
         this._coreProgramAttackAttemptOperations = coreProgramAttackAttemptOperations;
         this._coreNativeAttackCompletionOperations = coreNativeAttackCompletionOperations;

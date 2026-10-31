@@ -8,7 +8,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProvenanceVirtualAlcoholRuntime
 {
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 30, SkillProgramEffectOp.UseVirtualAlcohol)]
-    internal bool CanStartProvenanceAlcohol(CharacterState owner) => !owner.IsFaceDown && _coreVirtualBasicOffersOperations.VirtualBasicOptions(owner.Seat).Contains((CardKind.Alcohol, owner.Seat));
+    internal bool CanStartProvenanceAlcohol(CharacterState owner) => !owner.IsFaceDown && _coreVirtualBasicOffersOperations.VirtualBasicOptions2(owner.Seat).Contains((CardKind.Alcohol, owner.Seat));
     internal SkillProgramStepOutcome BeginProvenanceVirtualAlcohol(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEngineProvenanceVirtualAlcoholRuntime
         }
 
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (!_coreVirtualBasicOffersOperations.VirtualBasicOptions(actor.Seat).Contains((CardKind.Alcohol, actor.Seat)))
+        if (!_coreVirtualBasicOffersOperations.VirtualBasicOptions2(actor.Seat).Contains((CardKind.Alcohol, actor.Seat)))
         {
             var cancelled = f with
             {

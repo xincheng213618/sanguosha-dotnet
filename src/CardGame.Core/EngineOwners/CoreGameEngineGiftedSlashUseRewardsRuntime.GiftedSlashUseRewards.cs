@@ -151,7 +151,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
             if (result.Any(c => c.OwnerSeat == source.OwnerSeat && c.SkillId == source.SkillId && c.SkillInstanceId == source.SkillInstanceId && c.TriggerId == trigger.Id))
                 continue;
             var eventTarget = action.TargetSeats.Count == 1 ? action.TargetSeats.Single() : -1;
-            var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action)with
+            var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action)with
             {
                 CardUseCausedDamage = use.CausedDamage
             };
@@ -169,7 +169,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
         var current = window.Candidates[window.CandidateIndex];
         var program = _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program;
         var trigger = program?.Triggers.SingleOrDefault(t => t.Id == candidate.BindingId);
-        if (current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.TriggerId != candidate.BindingId || current.SkillInstanceId != candidate.SkillInstanceId || current.GameplayHash != candidate.GameplayHash || _coreCardActionsOperations.CreateCardActionProgramContext(window, current) != context || program?.GameplayHash != candidate.GameplayHash || trigger?.Effects is not [{ Op: SkillProgramEffectOp.RewardGiftedSlashUse }])
+        if (current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.TriggerId != candidate.BindingId || current.SkillInstanceId != candidate.SkillInstanceId || current.GameplayHash != candidate.GameplayHash || _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) != context || program?.GameplayHash != candidate.GameplayHash || trigger?.Effects is not [{ Op: SkillProgramEffectOp.RewardGiftedSlashUse }])
             return false;
         var wi = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
         if (wi <= 0 || _resolutionStackOperations._resolutionStack[wi - 1].Id != use.Id || context.Facts?.CardUseCausedDamage != use.CausedDamage)
@@ -311,7 +311,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
         return child is CardsMovedTriggerWindowFrame moved && moved.ResumeProgramFrameId is null && moved.Batch.ParentFrameId == frame.Id && moved.Batch.AwaitingProgramFrameId == frame.Id && moved.Batch.OriginOwnerSeat == frame.OwnerSeat && moved.Batch.OriginSkillId == frame.SkillId && moved.Batch.OriginSkillInstanceId == frame.SkillInstanceId && (gift is null || moved.Batch.Id == gift.Policy.GiftBatchId) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(move => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move) && move.Sequence > before && move.Sequence <= after && move.Reason.Value == reason);
     }
 
-    internal ProgramSkillFrame? GiftedSlashObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreGiftedSlashUseRewardsOperations.GiftedSlashFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasPaidDamageObserverSuffix(index));
+    internal ProgramSkillFrame? GiftedSlashObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreGiftedSlashUseRewardsOperations.GiftedSlashFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 270)]
     internal bool IsGiftedSlashProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && GiftedSlashObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1930)]

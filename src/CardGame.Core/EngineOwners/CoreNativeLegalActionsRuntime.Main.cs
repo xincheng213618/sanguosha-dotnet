@@ -77,7 +77,7 @@ internal sealed partial class CoreNativeLegalActionsRuntime
 
             foreach (var slash in playableCards.Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)))
             {
-                foreach (var variant in _coreProgramCardUseRulesOperations.GetSlashUseVariants(actor, slash.Kind))
+                foreach (var variant in _coreProgramCardUseRulesOperations.GetSlashUseVariants2(actor, slash.Kind))
                 {
                     var effectiveKind = variant.EffectiveKind;
                     var targets = _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, slash, effectiveKind: effectiveKind);

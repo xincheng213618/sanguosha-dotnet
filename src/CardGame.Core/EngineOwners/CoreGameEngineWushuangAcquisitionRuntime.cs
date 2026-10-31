@@ -8,16 +8,16 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineWushuangAcquisitionRuntime
 {
-    private readonly ICoreWushuangAcquisitionContentRegistryOperations _contentRegistryOperations;
-    private readonly ICoreWushuangAcquisitionResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreWushuangAcquisitionCoreNationalSkillsOperations _coreNationalSkillsOperations;
-    private readonly ICoreWushuangAcquisitionCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
-    private readonly ICoreWushuangAcquisitionCoreRuntimeOperations _coreRuntimeOperations;
-    private readonly ICoreWushuangAcquisitionCoreWushuangOperations _coreWushuangOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries _coreNationalSkillsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangEntries _coreWushuangOperations;
     private readonly ICoreWushuangAcquisitionCoreWushuangModeProjectionOperations _coreWushuangModeProjectionOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineWushuangAcquisitionRuntime(ICoreWushuangAcquisitionContentRegistryOperations contentRegistryOperations, ICoreWushuangAcquisitionResolutionStackOperations resolutionStackOperations, ICoreWushuangAcquisitionCoreNationalSkillsOperations coreNationalSkillsOperations, ICoreWushuangAcquisitionCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreWushuangAcquisitionCoreRuntimeOperations coreRuntimeOperations, ICoreWushuangAcquisitionCoreWushuangOperations coreWushuangOperations, ICoreWushuangAcquisitionCoreWushuangModeProjectionOperations coreWushuangModeProjectionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineWushuangAcquisitionRuntime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries coreNationalSkillsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangEntries coreWushuangOperations, ICoreWushuangAcquisitionCoreWushuangModeProjectionOperations coreWushuangModeProjectionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._contentRegistryOperations = contentRegistryOperations;
         this._resolutionStackOperations = resolutionStackOperations;

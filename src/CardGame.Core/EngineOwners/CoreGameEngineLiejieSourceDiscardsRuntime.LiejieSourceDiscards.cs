@@ -281,7 +281,7 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, frame) && recovery.Return.Continuation == PostEventContinuation.Program && recovery.Attempt.SourceSeat == frame.OwnerSeat && recovery.Attempt.TargetSeat == frame.OwnerSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == costReason;
     }
 
-    internal ProgramSkillFrame? LiejieSourceDiscardObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreLiejieSourceDiscardsOperations.LiejieSourceDiscardFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasPaidDamageObserverSuffix(index));
+    internal ProgramSkillFrame? LiejieSourceDiscardObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreLiejieSourceDiscardsOperations.LiejieSourceDiscardFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 290)]
     internal bool IsLiejieSourceDiscardProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LiejieSourceDiscardObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1960)]

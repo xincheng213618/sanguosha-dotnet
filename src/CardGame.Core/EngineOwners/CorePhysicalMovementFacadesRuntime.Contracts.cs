@@ -14,8 +14,3 @@ internal interface ICorePhysicalMovementFacadesMovementEquipmentEffectsOperation
 {
     global::CardGame.Core.MovementEquipmentEffectsRuntime Get();
 }
-
-internal interface ICorePhysicalMovementFacadesCoreAtomicCardMovementOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    global::CardGame.Core.AtomicCardMovementRuntime AtomicCardMovements { get; }
-}

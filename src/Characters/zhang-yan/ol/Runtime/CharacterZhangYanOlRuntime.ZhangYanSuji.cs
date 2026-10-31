@@ -46,7 +46,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
         return at > 0 && _resolutionStackOperations._resolutionStack[at - 1] is ProgramSkillFrame { ZhangYan: { Stage: ZhangYanStage.NativeUse, NativeCompleted: false } p } parent && parent.Id == r.ProgramFrameId && p.NativeReturn == r && p.Source == r.Source && p.GameplayHash == r.GameplayHash;
     }
 
-    internal bool IsZhangYanSujiRemovedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { ZhangYanSuji: { } r } u && r.CardId == cardId && _cardZonesOperations._cardZones.Contains(CardLocation.OutsideGame, cardId) && IsZhangYanSujiUse(u) && (r.PrintedKind == CardKind.GeneralWeapon && r.From.Zone == CardZoneKind.Equipment || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(useId, cardId));
+    internal bool IsZhangYanSujiRemovedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { ZhangYanSuji: { } r } u && r.CardId == cardId && _cardZonesOperations._cardZones.Contains(CardLocation.OutsideGame, cardId) && IsZhangYanSujiUse(u) && (r.PrintedKind == CardKind.GeneralWeapon && r.From.Zone == CardZoneKind.Equipment || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial3(useId, cardId));
     [NativeUseValidation(27000)]
     internal void ValidateZhangYanSujiUse(CardUseFrame use)
     {
@@ -97,7 +97,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
     [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 130)]
     internal bool HasIssuedZhangYanSujiRewardCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (ZhangYanRewardUse(context)is not { ZhangYanSuji: { } r } || r.Source.OwnerSeat != c.OwnerSeat || r.Source.SkillId != c.SkillId || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash || _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is not [{ Op: SkillProgramEffectOp.ObtainSujiDamagedPhaseOwnerCard }] || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not DamageTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex].ToProgramCandidate() != c)
+        if (ZhangYanRewardUse(context)is not { ZhangYanSuji: { } r } || r.Source.OwnerSeat != c.OwnerSeat || r.Source.SkillId != c.SkillId || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ObtainSujiDamagedPhaseOwnerCard }] || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not DamageTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex].ToProgramCandidate() != c)
             return false;
         return !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.ObtainSujiDamagedPhaseOwnerCard && e.Source.OwnerSeat == c.OwnerSeat && e.DamageId == w.ParentFrameId);
     }

@@ -5,12 +5,6 @@ using global::System.Linq;
 using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime))]
-internal sealed class CoreProgramOtherOwnedCardDiscardsCoreNativeAiDecisionsAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreProgramOtherOwnedCardDiscardsCoreNativeAiDecisionsOperations
-{
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime> _targetFactory = targetFactory;
-    public void AddThought(global::CardGame.Core.AiThoughtRecord thought) => this._targetFactory().AddThought(thought);
-}
 
 [global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ProgramPaidCardRuntime))]
 internal sealed class CoreProgramOtherOwnedCardDiscardsProgramPaidCardAdapter(global::System.Func<global::CardGame.Core.ProgramPaidCardRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreProgramOtherOwnedCardDiscardsProgramPaidCardOperations

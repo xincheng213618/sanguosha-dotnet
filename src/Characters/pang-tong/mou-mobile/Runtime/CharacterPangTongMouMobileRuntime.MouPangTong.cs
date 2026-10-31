@@ -140,7 +140,7 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
         {
             if (result.Any(c => c.OwnerSeat == paid.Source.OwnerSeat && c.SkillId == paid.Source.SkillId && c.SkillInstanceId == paid.Source.SkillInstanceId && c.TriggerId == "discard-unchained-targets"))
                 continue;
-            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, action.ActorSeat, action.TargetSeats.Count == 1 ? action.TargetSeats[0] : -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action));
+            var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, action.ActorSeat, action.TargetSeats.Count == 1 ? action.TargetSeats[0] : -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action));
             result.Add(new(action.ActorSeat, action.TargetSeats.Count == 1 ? action.TargetSeats[0] : -1, paid.Source.SkillId, "discard-unchained-targets", paid.GameplayHash, paid.Source.SkillInstanceId, 0, context));
         }
     }

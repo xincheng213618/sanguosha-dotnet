@@ -69,7 +69,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         }
         else if (r.Stage == QizhengStage.Response)
         {
-            if (!_characterLiuQiOlOperations.IsWenjiResponseForbidden(use.Id, responder.Seat) && !_coreShanheTrickResponseOperations.IsShanheTrickResponseProhibited(use.SourceSeat, responder.Seat, CardKind.QizhengXiangsheng, use.TargetSeats))
+            if (!_characterLiuQiOlOperations.IsWenjiResponseForbidden2(use.Id, responder.Seat) && !_coreShanheTrickResponseOperations.IsShanheTrickResponseProhibited(use.SourceSeat, responder.Seat, CardKind.QizhengXiangsheng, use.TargetSeats))
                 foreach (var required in new[]
                 {
                     CardKind.Slash,

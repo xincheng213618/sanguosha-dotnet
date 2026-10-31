@@ -19,7 +19,7 @@ internal sealed partial class CharacterYuanJiOlRuntime
         var losses = batch.Movements.Where(m => m.From is { Zone: CardZoneKind.Hand, OwnerSeat: not null } && m.From != m.To).GroupBy(m => m.From.OwnerSeat!.Value).Where(g => _coreMatchParticipantsPlayersAccess._players[g.Key].IsAlive && g.Select(m => m.CardId).Distinct().Count() == 2).ToArray();
         if (losses.Length == 0)
             return;
-        var candidates = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !JieyanDisabled(p.Seat)).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.CardsMoved)).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair }]).ToArray();
+        var candidates = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !JieyanDisabled(p.Seat)).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.CardsMoved)).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair }]).ToArray();
         foreach (var c in candidates)
             foreach (var loss in losses)
             {

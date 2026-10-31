@@ -63,7 +63,7 @@ internal sealed partial class CharacterSunJunMobileShiRuntime
         var a = fact.Action;
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMobileShiXiongtu) || a.Type != CardActionType.Response || a.EffectiveSuit is not { } suit)
             return;
-        if (_coreResponseUseCompletionOperations.IsCompletedResponseUse(a, ProgramCompletedResponseKind.Nullification) && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } counterspell)
+        if (_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, ProgramCompletedResponseKind.Nullification) && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } counterspell)
         {
             RecordShiSjHandAction(counterspell.Id, a, suit);
             return;
@@ -71,7 +71,7 @@ internal sealed partial class CharacterSunJunMobileShiRuntime
 
         // A Dodge against an actual Slash is a Use; an Arrow Barrage Dodge and
         // a Duel/Barbarian Slash retain their ordinary played-response meaning.
-        if (_coreResponseUseCompletionOperations.IsCompletedResponseUse(a, ProgramCompletedResponseKind.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.Action?.ActionId == a.ParentActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(f.CardKind) && f.CardAttack?.TargetSeat == a.ActorSeat)is { } parent)
+        if (_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, ProgramCompletedResponseKind.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.Action?.ActionId == a.ParentActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(f.CardKind) && f.CardAttack?.TargetSeat == a.ActorSeat)is { } parent)
             RecordShiSjHandAction(parent.Id, a, suit);
     }
 

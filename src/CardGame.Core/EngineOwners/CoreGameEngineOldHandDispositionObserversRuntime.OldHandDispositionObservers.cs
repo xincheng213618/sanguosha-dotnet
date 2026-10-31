@@ -15,7 +15,7 @@ internal sealed partial class CoreGameEngineOldHandDispositionObserversRuntime
         return true;
     }
 
-    internal ProgramSkillFrame? OldHandDispositionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreOldHandDispositionObserversOperations.OldHandDispositionFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasHandGainDebtObserverSuffix(index));
+    internal ProgramSkillFrame? OldHandDispositionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreOldHandDispositionObserversOperations.OldHandDispositionFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 70, group: 10)]
     internal bool IsOldHandDispositionProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OldHandDispositionObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1730)]

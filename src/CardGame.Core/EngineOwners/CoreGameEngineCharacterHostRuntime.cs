@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineCharacterHostRuntime
 {
-    private readonly ICoreCharacterHostContentRegistryOperations _contentRegistryOperations;
-    private readonly ICoreCharacterHostCoreProgramSkillChangesOperations _coreProgramSkillChangesOperations;
-    private readonly ICoreCharacterHostCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
-    internal CoreGameEngineCharacterHostRuntime(ICoreCharacterHostContentRegistryOperations contentRegistryOperations, ICoreCharacterHostCoreProgramSkillChangesOperations coreProgramSkillChangesOperations, ICoreCharacterHostCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramSkillChangesEntries _coreProgramSkillChangesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeDamageHandlesEntries _coreNativeDamageHandlesOperations;
+    internal CoreGameEngineCharacterHostRuntime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramSkillChangesEntries coreProgramSkillChangesOperations, global::CardGame.Core.RuntimeEntries.CoreNativeDamageHandlesEntries coreNativeDamageHandlesOperations)
     {
         this._contentRegistryOperations = contentRegistryOperations;
         this._coreProgramSkillChangesOperations = coreProgramSkillChangesOperations;

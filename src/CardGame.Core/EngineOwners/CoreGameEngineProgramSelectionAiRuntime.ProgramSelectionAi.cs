@@ -19,6 +19,6 @@ internal sealed partial class CoreGameEngineProgramSelectionAiRuntime
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[ownerSeat];
         var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(owner);
-        return _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(owner, SkillProgramTriggerWindow.ProgramTargetCommitted, facts).Where(candidate => _coreSkillProgramsOperations.EnabledSkillPrograms(owner).Any(program => program.Id == candidate.SkillId)).SelectMany(candidate => _coreProgramLifecycleOperations.GetProgramTrigger(candidate).Effects);
+        return _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(owner, SkillProgramTriggerWindow.ProgramTargetCommitted, facts).Where(candidate => _coreSkillProgramsOperations.EnabledSkillPrograms(owner).Any(program => program.Id == candidate.SkillId)).SelectMany(candidate => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects);
     }
 }

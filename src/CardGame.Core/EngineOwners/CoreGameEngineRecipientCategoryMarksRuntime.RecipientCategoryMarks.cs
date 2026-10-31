@@ -21,7 +21,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
     {
         if (!TracksRecipientCategoryMarks)
             return existing;
-        var added = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != drawOwner.Seat && _coreNationalSkillsOperations.GetSkillBindingShard(p).GetInstanceTriggers(SkillProgramTriggerWindow.DrawPhaseEnded).Any(binding => ProgramInstructionResolver.Default.Features(binding.Trigger).HasOperation(SkillProgramEffectOp.GiveHandAndGrantCategoryMark))).SelectMany(p => _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(p, SkillProgramTriggerWindow.DrawPhaseEnded, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(p))).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects.Any(e => e.Op == SkillProgramEffectOp.GiveHandAndGrantCategoryMark));
+        var added = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != drawOwner.Seat && _coreNationalSkillsOperations.GetSkillBindingShard(p).GetInstanceTriggers(SkillProgramTriggerWindow.DrawPhaseEnded).Any(binding => ProgramInstructionResolver.Default.Features(binding.Trigger).HasOperation(SkillProgramEffectOp.GiveHandAndGrantCategoryMark))).SelectMany(p => _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(p, SkillProgramTriggerWindow.DrawPhaseEnded, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(p))).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects.Any(e => e.Op == SkillProgramEffectOp.GiveHandAndGrantCategoryMark));
         return Array.AsReadOnly(existing.Concat(added).Distinct().OrderBy(c => _coreTableOrderOperations.RelativeTableOrder(drawOwner.Seat, c.OwnerSeat)).ThenByDescending(c => c.Priority).ThenBy(c => c.SkillId, StringComparer.Ordinal).ThenBy(c => c.BindingId, StringComparer.Ordinal).ToArray());
     }
 
@@ -282,7 +282,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
         var before = RecipientMarkSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PublicHandRevealSelection = new("recipient-category-hand-gift", f.InstructionIndex, 0, id, card.Kind, CardLocation.Hand(r.HolderSeat), CardLocation.Hand(f.OwnerSeat), f.OwnerSeat, r.HolderSeat, EffectiveKind: card.Kind) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), r.HolderSeat, "category-mark-gift", Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "recipient-category-hand-gift"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "recipient-category-hand-gift"))
             return;
         ContinueRecipientCategoryPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }

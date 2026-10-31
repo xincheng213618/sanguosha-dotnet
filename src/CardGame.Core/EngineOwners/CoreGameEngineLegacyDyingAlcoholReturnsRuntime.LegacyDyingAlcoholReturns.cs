@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineLegacyDyingAlcoholReturnsRuntime
         {
             var candidate = hp.Candidates[index];
             var hpContext = hp.Contexts[index];
-            if (candidate.OwnerSeat != dying.VictimSeat || hpContext.OwnerSeat != candidate.OwnerSeat || hpContext.ParentFrameId != hp.Id || hpContext.HpChange != hp.Change || hpContext.SourceSeat != hp.Change.SourceSeat || hpContext.TargetSeat != hp.Change.TargetSeat || hpContext.Amount != hp.Change.Amount || hpContext.OccurrenceIndex != candidate.OccurrenceIndex || hpContext.Window is not (SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged) || _coreProgramLifecycleOperations.GetProgramTrigger(candidate).Window != hpContext.Window)
+            if (candidate.OwnerSeat != dying.VictimSeat || hpContext.OwnerSeat != candidate.OwnerSeat || hpContext.ParentFrameId != hp.Id || hpContext.HpChange != hp.Change || hpContext.SourceSeat != hp.Change.SourceSeat || hpContext.TargetSeat != hp.Change.TargetSeat || hpContext.Amount != hp.Change.Amount || hpContext.OccurrenceIndex != candidate.OccurrenceIndex || hpContext.Window is not (SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged) || _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Window != hpContext.Window)
                 return false;
         }
 

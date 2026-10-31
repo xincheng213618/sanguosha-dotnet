@@ -26,7 +26,7 @@ internal sealed partial class CoreGameEngineAttributedMarkerEventsRuntime
 
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeAttributedDrawObservers(CharacterState subject, IReadOnlyList<ProgramTriggerCandidate> existing)
     {
-        var extra = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != subject.Seat).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.DrawPhaseStarting)).Where(c => ProgramInstructionResolver.Default.Features(_coreProgramLifecycleOperations.GetProgramTrigger(c)).HasOperation(SkillProgramEffectOp.AddMarkerSubjectNormalDraw));
+        var extra = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != subject.Seat).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.DrawPhaseStarting)).Where(c => ProgramInstructionResolver.Default.Features(_coreProgramLifecycleOperations.GetProgramTrigger2(c)).HasOperation(SkillProgramEffectOp.AddMarkerSubjectNormalDraw));
         var observers = extra.ToArray();
         if (observers.Length == 0)
             return existing;

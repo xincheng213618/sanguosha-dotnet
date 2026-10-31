@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineProgramIronChainTargetsRuntime
 {
-    private readonly ICoreProgramIronChainTargetsCharacterPangTongMouMobileOperations _characterPangTongMouMobileOperations;
-    private readonly ICoreProgramIronChainTargetsCoreRuleQueriesOperations _coreRuleQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterPangTongMouMobileEntries _characterPangTongMouMobileOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries _coreRuleQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineProgramIronChainTargetsRuntime(ICoreProgramIronChainTargetsCharacterPangTongMouMobileOperations characterPangTongMouMobileOperations, ICoreProgramIronChainTargetsCoreRuleQueriesOperations coreRuleQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineProgramIronChainTargetsRuntime(global::CardGame.Core.RuntimeEntries.CharacterPangTongMouMobileEntries characterPangTongMouMobileOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries coreRuleQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._characterPangTongMouMobileOperations = characterPangTongMouMobileOperations;
         this._coreRuleQueriesOperations = coreRuleQueriesOperations;

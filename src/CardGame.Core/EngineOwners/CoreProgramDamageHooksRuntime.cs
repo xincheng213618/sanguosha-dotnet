@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreProgramDamageHooksRuntime
 {
-    private readonly ICoreProgramDamageHooksDamageHooksOperations _damageHooksOperations;
-    private readonly ICoreProgramDamageHooksModeRuntimeOperations _modeRuntimeOperations;
-    private readonly ICoreProgramDamageHooksCoreNativeCardClassificationsOperations _coreNativeCardClassificationsOperations;
-    private readonly ICoreProgramDamageHooksKernelCoreProgramRuntimeModulesOperations _kernelCoreProgramRuntimeModulesOperations;
-    internal CoreProgramDamageHooksRuntime(ICoreProgramDamageHooksDamageHooksOperations damageHooksOperations, ICoreProgramDamageHooksModeRuntimeOperations modeRuntimeOperations, ICoreProgramDamageHooksCoreNativeCardClassificationsOperations coreNativeCardClassificationsOperations, ICoreProgramDamageHooksKernelCoreProgramRuntimeModulesOperations kernelCoreProgramRuntimeModulesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelDamageHooksAccess _damageHooksOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeCardClassificationsEntries _coreNativeCardClassificationsOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations;
+    internal CoreProgramDamageHooksRuntime(global::CardGame.Core.EngineOwners.IKernelDamageHooksAccess damageHooksOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreNativeCardClassificationsEntries coreNativeCardClassificationsOperations, global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations kernelCoreProgramRuntimeModulesOperations)
     {
         this._damageHooksOperations = damageHooksOperations;
         this._modeRuntimeOperations = modeRuntimeOperations;

@@ -140,7 +140,7 @@ internal sealed partial class CharacterMaChengOlRuntime
         if (result.Any(c => c.SkillId == r.Source.SkillId && c.TriggerId == "red-holder-outcomes" && c.OwnerSeat == r.Source.OwnerSeat))
             return;
         var t = _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program!.Triggers.Single(t => t.Id == "red-holder-outcomes");
-        var context = _coreCardActionsOperations.CreateCardActionProgramContext(a, window, 0, r.Source.OwnerSeat, r.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], a));
+        var context = _coreCardActionsOperations.CreateCardActionProgramContext(a, window, 0, r.Source.OwnerSeat, r.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], a));
         result.Add(new(r.Source.OwnerSeat, r.Source.OwnerSeat, r.Source.SkillId, t.Id, r.GameplayHash, r.Source.SkillInstanceId, t.Priority, context));
     }
 }

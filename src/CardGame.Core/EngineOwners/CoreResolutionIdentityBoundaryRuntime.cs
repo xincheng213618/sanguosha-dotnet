@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreResolutionIdentityBoundaryRuntime
 {
-    private readonly ICoreResolutionIdentityBoundaryResolutionSchedulerOperations _resolutionSchedulerOperations;
-    internal CoreResolutionIdentityBoundaryRuntime(ICoreResolutionIdentityBoundaryResolutionSchedulerOperations resolutionSchedulerOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelResolutionSchedulerAccess _resolutionSchedulerOperations;
+    internal CoreResolutionIdentityBoundaryRuntime(global::CardGame.Core.EngineOwners.IKernelResolutionSchedulerAccess resolutionSchedulerOperations)
     {
         this._resolutionSchedulerOperations = resolutionSchedulerOperations;
     }

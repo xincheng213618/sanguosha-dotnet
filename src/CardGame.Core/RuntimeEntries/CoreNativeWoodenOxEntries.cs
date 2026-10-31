@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreNativeWoodenOxRuntime))]
 internal sealed partial class CoreNativeWoodenOxEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeWoodenOxRuntime> _resolve;

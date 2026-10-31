@@ -270,13 +270,13 @@ internal sealed partial class CoreGameEngineShortRangeSlashTargetsRuntime
     {
         if (!HasShortRangeSlashCapability || use.Action is not null || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || ShortRangeSlashWasOffered(use.Id) || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive || use.TargetSeats.Count == 0 || ShortRangeSlashTargets(use).Length == 0 || _coreActualUseTargetProgramsOperations.FreezeActualUseTarget(use, use.TargetSeats[0])is not { ActionId: null } identity)
             return;
-        foreach (var candidate in _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat], SkillProgramTriggerWindow.OtherActualUseTargeted, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat])).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.OfferShortRangeSlashTarget }]))
+        foreach (var candidate in _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat], SkillProgramTriggerWindow.OtherActualUseTargeted, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat])).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.OfferShortRangeSlashTarget }]))
             entries.Add((candidate, new(SkillProgramTriggerWindow.OtherActualUseTargeted, windowId, candidate.OwnerSeat, SourceSeat: use.SourceSeat, TargetSeat: identity.TargetSeat, OccurrenceIndex: candidate.OccurrenceIndex, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat])) { ActualUseTarget = identity }));
     }
 
     internal bool IsShortRangeLegacyCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
-        if (context.Window != SkillProgramTriggerWindow.OtherActualUseTargeted || _coreProgramLifecycleOperations.GetProgramTrigger(candidate).Effects is not [{ Op: SkillProgramEffectOp.OfferShortRangeSlashTarget }])
+        if (context.Window != SkillProgramTriggerWindow.OtherActualUseTargeted || _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is not [{ Op: SkillProgramEffectOp.OfferShortRangeSlashTarget }])
             return false;
         return ShortRangeSlashUse(candidate.OwnerSeat, context)is not null && _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } window && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && window.Candidates[window.CandidateIndex] == candidate && window.Contexts[window.CandidateIndex] == context;
     }

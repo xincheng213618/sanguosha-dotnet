@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CharacterLuSuMobileRuntime
 {
-    private readonly ICharacterLuSuMobileCoreAlternatingBenefitsOperations _coreAlternatingBenefitsOperations;
-    private readonly ICharacterLuSuMobileCoreProgramEventHistoryOperations _coreProgramEventHistoryOperations;
-    private readonly ICharacterLuSuMobileCoreRuntimeOperations _coreRuntimeOperations;
-    internal CharacterLuSuMobileRuntime(ICharacterLuSuMobileCoreAlternatingBenefitsOperations coreAlternatingBenefitsOperations, ICharacterLuSuMobileCoreProgramEventHistoryOperations coreProgramEventHistoryOperations, ICharacterLuSuMobileCoreRuntimeOperations coreRuntimeOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries _coreAlternatingBenefitsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
+    internal CharacterLuSuMobileRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations)
     {
         this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
         this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;

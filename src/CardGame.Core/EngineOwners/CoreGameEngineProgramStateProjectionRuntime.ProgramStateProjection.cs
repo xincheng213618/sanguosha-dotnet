@@ -44,7 +44,7 @@ internal sealed partial class CoreGameEngineProgramStateProjectionRuntime
             {
                 if (definition.Visibility != SkillProgramStateVisibility.Public)
                     continue;
-                var value = _coreProgramPersistentStateOperations.GetProgramBooleanState(owner.Seat, skillId, instance.SkillInstanceId, definition.Id);
+                var value = _coreProgramPersistentStateOperations.GetProgramBooleanState2(owner.Seat, skillId, instance.SkillInstanceId, definition.Id);
                 var presentation = instance.Definition.ProgramPresentation?.BooleanStates.GetValueOrDefault(definition.Id);
                 (states ??= []).Add(new(instance.SkillInstanceId, definition.Id, value, presentation is null ? $"{(definition.Id)}：{((value ? "是" : "否"))}" : value ? presentation.TrueText : presentation.FalseText));
             }

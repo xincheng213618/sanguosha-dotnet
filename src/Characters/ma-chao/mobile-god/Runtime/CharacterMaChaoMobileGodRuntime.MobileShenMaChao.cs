@@ -47,7 +47,7 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 40625)]
     internal bool MobileMaChaoTriggerEligible(ProgramTriggerLegalityContext g)
     {
-        var op = _coreProgramLifecycleOperations.GetProgramTrigger(g.Candidate).Effects[0].Op;
+        var op = _coreProgramLifecycleOperations.GetProgramTrigger2(g.Candidate).Effects[0].Op;
         if (op == SkillProgramEffectOp.ResolveMobileShenMaChaoJimie)
             return CanMobileJimie(g.OwnerSeat) && g.Owner.Markers.GetValueOrDefault(PlayerMarkerKind.MobileShenMaChaoTing) >= 8;
         if (op == SkillProgramEffectOp.ResolveMobileShenMaChaoTingwei)

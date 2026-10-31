@@ -42,14 +42,14 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
         var eligible = holders.Where(e => !issued.Any(p => p.Source.OwnerSeat == e.Source.OwnerSeat && p.ActualTurn == potential.ActualTurn && p.TurnOwner == potential.TurnOwner)).ToArray();
         if (eligible.Length == 0 || FirstBiriGain(potential.ActualTurn, potential.TurnOwner)is not { } first || first.BatchId != batch.Id)
             return[];
-        return Array.AsReadOnly(eligible.Select(e => new ProgramTriggerCandidate(e.Source.OwnerSeat, e.Source.SkillId, e.Source.BindingId, e.Source.SkillInstanceId, e.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(new ProgramTriggerCandidate(e.Source.OwnerSeat, e.Source.SkillId, e.Source.BindingId, e.Source.SkillInstanceId, e.GameplayHash, 0)).Priority)).ToArray());
+        return Array.AsReadOnly(eligible.Select(e => new ProgramTriggerCandidate(e.Source.OwnerSeat, e.Source.SkillId, e.Source.BindingId, e.Source.SkillInstanceId, e.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger2(new ProgramTriggerCandidate(e.Source.OwnerSeat, e.Source.SkillId, e.Source.BindingId, e.Source.SkillInstanceId, e.GameplayHash, 0)).Priority)).ToArray());
     }
 
     internal ProgramSkillWindowContext CreateBiriMovementContext(CardsMovedTriggerWindowFrame w, ProgramTriggerCandidate c) => new(SkillProgramTriggerWindow.CardsGained, w.Id, c.OwnerSeat, SourceSeat: w.Batch.OriginOwnerSeat, TargetSeat: c.OwnerSeat, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat]), MovementBatch: w.Batch, OccurrenceIndex: c.OccurrenceIndex);
     [ProgramIssuedTrigger(170)]
     internal bool IsIssuedBiriCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (!IsBiriTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c)) || context.Window != SkillProgramTriggerWindow.CardsGained || context.OwnerSeat != c.OwnerSeat || context.MovementBatch is not { } batch || context.ParentFrameId != batch.Id || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == batch.Id)is not CardsMovedTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex] != c || !_coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialHolderEvent>().Any(e => e.BatchId == batch.Id && e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId) && e.GameplayHash == c.GameplayHash))
+        if (!IsBiriTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) || context.Window != SkillProgramTriggerWindow.CardsGained || context.OwnerSeat != c.OwnerSeat || context.MovementBatch is not { } batch || context.ParentFrameId != batch.Id || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == batch.Id)is not CardsMovedTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex] != c || !_coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialHolderEvent>().Any(e => e.BatchId == batch.Id && e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId) && e.GameplayHash == c.GameplayHash))
             return false;
         var potential = _coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialGainEvent>().FirstOrDefault(e => e.BatchId == batch.Id);
         return potential is not null && FirstBiriGain(potential.ActualTurn, potential.TurnOwner)is { } first && first.BatchId == batch.Id && !_coreProgramEventHistoryOperations.ProgramEventHistory<BiriDrawIssuedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.ActualTurn == first.ActualTurn && e.TurnOwner == first.TurnOwner);
@@ -62,7 +62,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 1500)]
     internal ProgramSkillWindowContext? TryCreateBiriMovementContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsBiriTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsBiriTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateBiriMovementContext(frame, candidate);
         return null;
     }

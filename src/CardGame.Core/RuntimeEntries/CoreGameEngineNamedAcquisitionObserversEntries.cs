@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineNamedAcquisitionObserversRuntime))]
 internal sealed partial class CoreGameEngineNamedAcquisitionObserversEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineNamedAcquisitionObserversRuntime> _resolve;

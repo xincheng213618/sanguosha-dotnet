@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineTargetedTrickHandHpAiRuntime
 {
-    private readonly ICoreTargetedTrickHandHpAiCoreTargetedOrdinaryTrickOperations _coreTargetedOrdinaryTrickOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineTargetedOrdinaryTrickEntries _coreTargetedOrdinaryTrickOperations;
     private readonly ICoreTargetedTrickHandHpAiCorePlayerViewProjectionOperations _corePlayerViewProjectionOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess _coreAiBrainsAiBrainsAccess;
-    internal CoreGameEngineTargetedTrickHandHpAiRuntime(ICoreTargetedTrickHandHpAiCoreTargetedOrdinaryTrickOperations coreTargetedOrdinaryTrickOperations, ICoreTargetedTrickHandHpAiCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess)
+    internal CoreGameEngineTargetedTrickHandHpAiRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineTargetedOrdinaryTrickEntries coreTargetedOrdinaryTrickOperations, ICoreTargetedTrickHandHpAiCorePlayerViewProjectionOperations corePlayerViewProjectionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess coreAiBrainsAiBrainsAccess)
     {
         this._coreTargetedOrdinaryTrickOperations = coreTargetedOrdinaryTrickOperations;
         this._corePlayerViewProjectionOperations = corePlayerViewProjectionOperations;

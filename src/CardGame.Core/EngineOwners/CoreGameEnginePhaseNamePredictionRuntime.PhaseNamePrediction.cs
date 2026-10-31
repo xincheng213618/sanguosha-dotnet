@@ -124,7 +124,7 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
                 throw new InvalidOperationException("The blind reveal lost its frozen target-hand entity.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PhaseNamePrediction = r with { Stage = PhaseNamePredictionStage.Guessing, RevealedCardId = id } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(_coreCardAttackStateOperations.GetAttackCard(id)) })));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "phase-name-hand"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "phase-name-hand"))
                 return;
             PublishPredictionChoice(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
             return;

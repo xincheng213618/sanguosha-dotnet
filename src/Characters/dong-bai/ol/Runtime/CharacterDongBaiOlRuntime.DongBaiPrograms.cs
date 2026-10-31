@@ -30,7 +30,7 @@ internal sealed partial class CharacterDongBaiOlRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { LianZhu = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "lianzhu-gift-hand"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "lianzhu-gift-hand"))
             return SkillProgramStepOutcome.AwaitChild;
         ContinueLianzhuAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
         return SkillProgramStepOutcome.AwaitChild;

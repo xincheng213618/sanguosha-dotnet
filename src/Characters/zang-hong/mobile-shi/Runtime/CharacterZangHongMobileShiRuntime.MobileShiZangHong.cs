@@ -32,7 +32,7 @@ internal sealed partial class CharacterZangHongMobileShiRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal IEnumerable<(CardKind Kind, int Target)> ShiZhLiezhiOptions(int owner) => _coreVirtualBasicOffersOperations.VirtualBasicOptions(owner, anyRegisteredBasic: true).Where(option => option.Kind is CardKind.Peach or CardKind.Alcohol);
+    internal IEnumerable<(CardKind Kind, int Target)> ShiZhLiezhiOptions(int owner) => _coreVirtualBasicOffersOperations.VirtualBasicOptions2(owner, anyRegisteredBasic: true).Where(option => option.Kind is CardKind.Peach or CardKind.Alcohol);
     internal void PublishShiZhLiezhi(ProgramSkillFrame f, (CardKind Kind, int Target)[] options)
     {
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);

@@ -25,7 +25,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
 
     internal bool IsWenjiResponseForbidden(long useId, int responderSeat)
     {
-        if (_characterZhangLiaoHappyGodOperations.HappyZlCannotRespond(useId, responderSeat))
+        if (_characterZhangLiaoHappyGodOperations.HappyZlCannotRespond2(useId, responderSeat))
             return true;
         if (!_characterLiuQiOlHasIssuedLiuQiAccess._hasIssuedLiuQi || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { } use)
             return false;

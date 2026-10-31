@@ -63,7 +63,7 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
         var t = p.Triggers.Single(t => t.Effects is [var e] && e.Op == op);
         if (result.Any(c => c.OwnerSeat == r.Source.OwnerSeat && c.SkillId == p.Id && c.SkillInstanceId == r.Source.SkillInstanceId && c.TriggerId == t.Id))
             return;
-        result.Add(new(r.Source.OwnerSeat, r.Source.OwnerSeat, p.Id, t.Id, p.GameplayHash, r.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(a, window, 0, r.Source.OwnerSeat, r.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], a))));
+        result.Add(new(r.Source.OwnerSeat, r.Source.OwnerSeat, p.Id, t.Id, p.GameplayHash, r.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(a, window, 0, r.Source.OwnerSeat, r.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], a))));
     }
 
     internal bool IsIssuedKenshangCandidate(ProgramTriggerCandidate c) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(c.SkillId)?.Program?.Triggers.Any(t => t.Id == c.BindingId && t.Effects.Any(e => KenshangComposition.Handles(e.Op))) == true;
@@ -72,8 +72,8 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
         if (!IsIssuedKenshangCandidate(c) || context.CardUse is not { } card || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is not { Kenshang: { } r, Action: { } a } u || !KenshangUseProof(u) || card.CardActionId != a.ActionId || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || c.OwnerSeat != r.Source.OwnerSeat || c.SkillId != r.Source.SkillId || c.SkillInstanceId != r.Source.SkillInstanceId || c.GameplayHash != r.GameplayHash || context.OwnerSeat != c.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } w || w.ParentFrameId != u.Id || w.Action.ActionId != a.ActionId || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count)
             return false;
         var current = w.Candidates[w.CandidateIndex];
-        var t = _coreProgramLifecycleOperations.GetProgramTrigger(c);
-        return current.OwnerSeat == c.OwnerSeat && current.SkillId == c.SkillId && current.TriggerId == c.BindingId && current.SkillInstanceId == c.SkillInstanceId && current.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext(w, current) == context && (context.Window == SkillProgramTriggerWindow.CardUseCommitted && t.Effects is [{ Op: SkillProgramEffectOp.ResolveKenshangTargetRewrite }] && !r.Offered || context.Window == SkillProgramTriggerWindow.CardUseCompleted && t.Effects is [{ Op: SkillProgramEffectOp.DrawForKenshangShortDamage }] && !r.DrawIssued && KenshangDamageTotal(u) < r.MaterialCount);
+        var t = _coreProgramLifecycleOperations.GetProgramTrigger2(c);
+        return current.OwnerSeat == c.OwnerSeat && current.SkillId == c.SkillId && current.TriggerId == c.BindingId && current.SkillInstanceId == c.SkillInstanceId && current.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext2(w, current) == context && (context.Window == SkillProgramTriggerWindow.CardUseCommitted && t.Effects is [{ Op: SkillProgramEffectOp.ResolveKenshangTargetRewrite }] && !r.Offered || context.Window == SkillProgramTriggerWindow.CardUseCompleted && t.Effects is [{ Op: SkillProgramEffectOp.DrawForKenshangShortDamage }] && !r.DrawIssued && KenshangDamageTotal(u) < r.MaterialCount);
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27110)]

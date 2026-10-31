@@ -51,7 +51,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
 
     internal void CaptureMouGuquResponseUse(ResolutionFrame parent, CardActionContext action, ProgramCardContinuation continuation)
     {
-        if (!HasMouGuquCapability || action.Type != CardActionType.Response || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(action, continuation == ProgramCardContinuation.NullificationResponse ? ProgramCompletedResponseKind.Nullification : ProgramCompletedResponseKind.Dodge))
+        if (!HasMouGuquCapability || action.Type != CardActionType.Response || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, continuation == ProgramCardContinuation.NullificationResponse ? ProgramCompletedResponseKind.Nullification : ProgramCompletedResponseKind.Dodge))
             return;
         var actual = _resolutionStackOperations._resolutionStack.Single(f => f.Id == parent.Id);
         if (actual.GuquResponseAdmissions?.SingleOrDefault(a => a.ActionId == action.ActionId)is { } accepted)

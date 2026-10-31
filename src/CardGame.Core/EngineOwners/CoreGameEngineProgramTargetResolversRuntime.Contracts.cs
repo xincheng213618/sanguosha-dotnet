@@ -9,8 +9,3 @@ internal interface ICoreProgramTargetResolversCoreProgramSelectionModulesOperati
 {
     global::CardGame.Core.IProgramSelectionQueries ProgramSelectionQueries { get; }
 }
-
-internal interface ICoreProgramTargetResolversProgramTargetResolversOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    ref global::CardGame.Core.ProgramTargetResolverRegistry? _programTargetResolvers { get; }
-}

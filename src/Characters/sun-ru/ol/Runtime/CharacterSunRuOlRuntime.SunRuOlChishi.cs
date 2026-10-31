@@ -32,7 +32,7 @@ internal sealed partial class CharacterSunRuOlRuntime
     {
         if (batch.SunRuOlLastZoneLoss is not { } turn || !SunRuOlActualTurn(turn) || !_coreMatchParticipantsPlayersAccess._players[turn.OwnerSeat].IsAlive || !SunRuOlLostLastZone(batch, turn.OwnerSeat))
             return[];
-        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.CardsMoved)).Where(c => IsSunRuOlChishiTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c)) && !SunRuOlChishiUsed(c.OwnerSeat, c.SkillId, turn)).ToArray();
+        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).SelectMany(p => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.CardsMoved)).Where(c => IsSunRuOlChishiTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) && !SunRuOlChishiUsed(c.OwnerSeat, c.SkillId, turn)).ToArray();
     }
 
     internal ProgramSkillWindowContext CreateSunRuOlChishiContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate c)
@@ -66,7 +66,7 @@ internal sealed partial class CharacterSunRuOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 4000)]
     internal ProgramSkillWindowContext? TryCreateSunRuOlChishiContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         if (IsSunRuOlChishiTrigger(trigger))
             return CreateSunRuOlChishiContext(frame, candidate);
         return null;

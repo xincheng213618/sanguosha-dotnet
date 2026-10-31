@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardTopPlacementRuntime))]
 internal sealed partial class CoreGameEngineProgramDiscardTopPlacementEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardTopPlacementRuntime> _resolve;

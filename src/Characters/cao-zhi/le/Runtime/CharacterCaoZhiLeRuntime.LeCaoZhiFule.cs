@@ -46,7 +46,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
             return window;
         if (window.FuleInitialEntities is not null)
             throw new InvalidOperationException("Fule cannot recapture its original opening Hand.");
-        var owners = window.Candidates.Where(c => c.SkillId == LeCaoZhiFuleSkill && c.BindingId == FuleInitialBinding && _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.InitializeLeCaoZhiFule }]).Select(c => c.OwnerSeat).Distinct().Order();
+        var owners = window.Candidates.Where(c => c.SkillId == LeCaoZhiFuleSkill && c.BindingId == FuleInitialBinding && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.InitializeLeCaoZhiFule }]).Select(c => c.OwnerSeat).Distinct().Order();
         var entities = owners.SelectMany(owner => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Select(card =>
         {
             var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(move => move.CardId == card.Id && move.To == CardLocation.Hand(owner));

@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineNativeDamageArmorPoliciesRuntime))]
 internal sealed partial class CoreGameEngineNativeDamageArmorPoliciesEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineNativeDamageArmorPoliciesRuntime> _resolve;

@@ -40,7 +40,7 @@ internal sealed partial class CoreGameEngineBatch10MovementIntegrationRuntime
             if (!owner.IsAlive || !_characterBuZhiOlOperations.BuZhiMovementQualifies(batch, owner.Seat))
                 continue;
             foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsMoved))
-                if (_coreProgramLifecycleOperations.GetProgramTrigger(candidate).Effects.Any(e => e.Op == SkillProgramEffectOp.OfferNativeBatchHandGainOrCardLossBenefit))
+                if (_coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects.Any(e => e.Op == SkillProgramEffectOp.OfferNativeBatchHandGainOrCardLossBenefit))
                     yield return candidate;
         }
     }
@@ -52,7 +52,7 @@ internal sealed partial class CoreGameEngineBatch10MovementIntegrationRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 4100)]
     internal ProgramSkillWindowContext? TryNativeBatchBenefit(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         var features = ProgramInstructionResolver.Default.Features(trigger);
         if (features.HasOperation(SkillProgramEffectOp.OfferNativeBatchHandGainOrCardLossBenefit))
             return new(trigger.Window, frame.Id, candidate.OwnerSeat, SourceSeat: candidate.OwnerSeat, TargetSeat: candidate.OwnerSeat, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]), MovementBatch: frame.Batch);

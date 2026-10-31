@@ -9,7 +9,7 @@ internal sealed partial class CoreGameEngineUniqueHpTargetAnnouncementsRuntime
 {
     internal bool HasUniqueHpPeerPrograms => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DiscardDrawAndOfferUniqueHpPeer);
 
-    internal bool IsUniqueHpPeerCandidate(ProgramTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.DiscardDrawAndOfferUniqueHpPeer }];
+    internal bool IsUniqueHpPeerCandidate(ProgramTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.DiscardDrawAndOfferUniqueHpPeer }];
     internal ActualUseTargetIdentity? FreezeUniqueHpPeerTarget(CardUseFrame use, int target)
     {
         if (!HasUniqueHpPeerPrograms || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || target == use.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !use.TargetSeats.Contains(target))
@@ -43,7 +43,7 @@ internal sealed partial class CoreGameEngineUniqueHpTargetAnnouncementsRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new UniqueHpTargetAnnouncedEvent(windowId, identity));
             if (_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(use.Id, target))
                 continue;
-            var facts = use.Action is { } action ? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[target], action) : _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[target]);
+            var facts = use.Action is { } action ? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[target], action) : _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[target]);
             foreach (var candidate in _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[target], SkillProgramTriggerWindow.OtherActualUseTargeted, facts))
                 if (IsUniqueHpPeerCandidate(candidate))
                     entries.Add((candidate, new(SkillProgramTriggerWindow.OtherActualUseTargeted, windowId, target, SourceSeat: identity.ActorSeat, TargetSeat: target, OccurrenceIndex: candidate.OccurrenceIndex, Facts: facts) { ActualUseTarget = identity }));

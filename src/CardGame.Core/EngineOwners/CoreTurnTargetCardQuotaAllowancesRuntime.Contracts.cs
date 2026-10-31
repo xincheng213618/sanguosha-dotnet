@@ -9,8 +9,3 @@ internal interface ICoreTurnTargetCardQuotaAllowancesCoreProgramTargetRulesOpera
 {
     global::CardGame.Core.ProgramTargetRules TargetRules { get; }
 }
-
-internal interface ICoreTurnTargetCardQuotaAllowancesTurnCardUseEffectsOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    ref readonly global::CardGame.Core.TurnCardUseEffectStore _turnCardUseEffects { get; }
-}

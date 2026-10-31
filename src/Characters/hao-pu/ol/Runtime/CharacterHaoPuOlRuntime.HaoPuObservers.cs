@@ -18,7 +18,7 @@ internal sealed partial class CharacterHaoPuOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? ZhenyingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterHaoPuOlOperations.ZhenyingFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? ZhenyingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterHaoPuOlOperations.ZhenyingFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 430)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 540)]
     internal bool HasZhenyingDamageObserver(long id) => ZhenyingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

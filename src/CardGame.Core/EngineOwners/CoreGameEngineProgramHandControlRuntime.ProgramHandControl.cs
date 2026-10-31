@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEngineProgramHandControlRuntime
                 HandControlDraft = new(effect.Op, stage, maximum, [], RevealedCardIds: stage == "color" ? hand.Select(card => card.Id).ToArray() : null)
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(frame);
-            if (stage == "color" && _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(frame.Id, "hand-color-whole-hand"))
+            if (stage == "color" && _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frame.Id, "hand-color-whole-hand"))
                 return SkillProgramStepOutcome.AwaitChild;
         }
 
@@ -116,7 +116,7 @@ internal sealed partial class CoreGameEngineProgramHandControlRuntime
         if (draft.Stage == "participant-top")
         {
             var seat = draft.CardOwnerSeat!.Value;
-            var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(seat)).ToArray();
+            var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat)).ToArray();
             if (!_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || cards.Length == 0)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame with { HandControlDraft = draft with { Stage = "participant-draw", CardOwnerSeat = null, ParticipantIndex = draft.ParticipantIndex + 1 }, ReexecuteParticipantInstruction = true });

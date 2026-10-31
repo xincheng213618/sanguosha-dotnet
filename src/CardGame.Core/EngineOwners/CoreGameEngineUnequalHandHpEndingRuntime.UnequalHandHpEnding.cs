@@ -61,7 +61,7 @@ internal sealed partial class CoreGameEngineUnequalHandHpEndingRuntime
                 break;
             case UnequalHandHpStage.Gift:
                 if (r.TargetSeat != f.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive)
-                    choices.AddRange(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(f.OwnerSeat)).Where(c => !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(f.OwnerSeat, f.SkillId, f.SkillInstanceId, c)).Select(c => Choice("give-card", $"交给 {(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].Name)}【{(c.DisplayName)}】", [c.Id], [r.TargetSeat])));
+                    choices.AddRange(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(f.OwnerSeat)).Where(c => !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(f.OwnerSeat, f.SkillId, f.SkillInstanceId, c)).Select(c => Choice("give-card", $"交给 {(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].Name)}【{(c.DisplayName)}】", [c.Id], [r.TargetSeat])));
                 break;
         }
 

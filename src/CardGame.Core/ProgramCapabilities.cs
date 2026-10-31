@@ -102,8 +102,6 @@ internal sealed class ProgramCapabilityCatalog
                         $"'{byContract[contract].Implementation.FullName}' and '{type.FullName}'.");
             registrations.Add(registration);
         }
-        if (registrations.Count == 0)
-            throw new InvalidOperationException("No program capabilities were registered.");
         Registrations = Array.AsReadOnly(registrations.ToArray());
         _byContract = new ReadOnlyDictionary<Type, Registration>(byContract);
     }

@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineProgramSelectionTransformsRuntime
     bool global::CardGame.Core.ISelectionParticipantQueries.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool global::CardGame.Core.ISelectionParticipantQueries.IsAlive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     int global::CardGame.Core.ISelectionParticipantQueries.HandCount(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count;
-    int global::CardGame.Core.ISelectionParticipantQueries.EquipmentCount(int seat) => _corePhysicalOwnedCardQueriesOperations.GetEquipment(seat).Count;
+    int global::CardGame.Core.ISelectionParticipantQueries.EquipmentCount(int seat) => _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat).Count;
     int global::CardGame.Core.ISelectionParticipantQueries.Hp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Hp;
     IReadOnlyList<MatchingRecastMaterial> global::CardGame.Core.IMatchingRecastSelectionQueries.Materials(int ownerSeat) => Array.AsReadOnly(_coreMatchingRecastsOperations.MatchingRecastMaterials(ownerSeat));
     bool global::CardGame.Core.ISourceCurseSelectionQueries.HasCurse(int targetSeat) => _coreSourceCursesOperations.SourceCurseAt(targetSeat)is not null;

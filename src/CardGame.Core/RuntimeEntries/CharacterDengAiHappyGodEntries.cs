@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime))]
 internal sealed partial class CharacterDengAiHappyGodEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime> _resolve;

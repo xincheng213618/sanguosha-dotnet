@@ -50,7 +50,7 @@ internal sealed partial class CoreGameEnginePublicPileColorsRuntime
 
     internal void RecordPublicPileColorOffer(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
-        if (_coreProgramLifecycleOperations.GetProgramTrigger(candidate).Effects.Any(e => e.Op == SkillProgramEffectOp.RewardDiscardedActionColor) && ColorActionFact(context)is { } fact && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ActionColorRewardOfferedEvent>().Any(e => e.OwnerSeat == candidate.OwnerSeat && e.SkillId == candidate.SkillId && e.ActionId == fact.ActionId))
+        if (_coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects.Any(e => e.Op == SkillProgramEffectOp.RewardDiscardedActionColor) && ColorActionFact(context)is { } fact && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ActionColorRewardOfferedEvent>().Any(e => e.OwnerSeat == candidate.OwnerSeat && e.SkillId == candidate.SkillId && e.ActionId == fact.ActionId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ActionColorRewardOfferedEvent(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, context.ParentFrameId, fact.ActionId));
     }
 

@@ -5,15 +5,6 @@ using global::System.Linq;
 using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-internal interface ICoreProgramOwnCardDiscardsContentRegistryOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    ref readonly global::CardGame.Core.ContentRegistry _contentRegistry { get; }
-}
-
-internal interface ICoreProgramOwnCardDiscardsCoreNativeAiDecisionsOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    void AddThought(global::CardGame.Core.AiThoughtRecord thought);
-}
 
 internal interface ICoreProgramOwnCardDiscardsProgramPaidCardOperations : global::CardGame.Core.IProgramRuntimeOperations
 {

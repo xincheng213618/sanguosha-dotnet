@@ -70,7 +70,7 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
     {
         if (!HasXianfuRelation || change.Kind != HpChangeKind.Recovery || !_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.XianfuRelations.Any(g => g.TargetSeat == change.TargetSeat)))
             return[];
-        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.XianfuRelations.Count > 0).SelectMany(p => p.XianfuRelations).Where(g => g.TargetSeat == change.TargetSeat).SelectMany(g => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat], SkillProgramTriggerWindow.AfterHpRecovered).Where(c => c.SkillId == g.Source.SkillId && c.SkillInstanceId == g.Source.SkillInstanceId && IsXianfuEchoTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c)) && XianfuQualification(c, change.Id)is { } q && XianfuQualifiedSourceEnabled(q) && !XianfuEchoConsumed(q))).Distinct().ToArray();
+        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.XianfuRelations.Count > 0).SelectMany(p => p.XianfuRelations).Where(g => g.TargetSeat == change.TargetSeat).SelectMany(g => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat], SkillProgramTriggerWindow.AfterHpRecovered).Where(c => c.SkillId == g.Source.SkillId && c.SkillInstanceId == g.Source.SkillInstanceId && IsXianfuEchoTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) && XianfuQualification(c, change.Id)is { } q && XianfuQualifiedSourceEnabled(q) && !XianfuEchoConsumed(q))).Distinct().ToArray();
     }
 
     internal ProgramSkillWindowContext CreateXianfuHpContext(HpChangeContext change, ProgramTriggerCandidate c)

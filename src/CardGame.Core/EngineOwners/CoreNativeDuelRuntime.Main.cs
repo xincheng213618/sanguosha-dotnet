@@ -29,7 +29,7 @@ internal sealed partial class CoreNativeDuelRuntime
 
         var responder = _coreMatchParticipantsPlayersAccess._players[duel.ResponderSeat];
         var opponent = _coreMatchParticipantsPlayersAccess._players[duel.OpponentSeat];
-        if (_characterLuMengMouOperations.IsYingboUnrespondable(duel.ResolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(duel.ResolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden(duel.ResolutionId, responder.Seat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(duel.Attack.CardUserSeat, responder.Seat, CardKind.Duel, [duel.TargetSeat]))
+        if (_characterLuMengMouOperations.IsYingboUnrespondable(duel.ResolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(duel.ResolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(duel.ResolutionId, responder.Seat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(duel.Attack.CardUserSeat, responder.Seat, CardKind.Duel, [duel.TargetSeat]))
         {
             _coreNativeResponseWindowsOperations.SetResponseParentStep(duel.ResolutionId, ResolutionFrameStep.ResolvingEffect);
             _corePendingDecisionPolicyPipelineOperations._pendingDecision = null;
@@ -71,7 +71,7 @@ internal sealed partial class CoreNativeDuelRuntime
 
     internal void ResolveDuelResponse(global::CardGame.Core.NativeOwners.DuelHandle duel, CharacterState responder, Card? selectedSlash)
     {
-        if (selectedSlash is not null && _characterLiuQiOlOperations.IsWenjiResponseForbidden(duel.ResolutionId, responder.Seat))
+        if (selectedSlash is not null && _characterLiuQiOlOperations.IsWenjiResponseForbidden2(duel.ResolutionId, responder.Seat))
             throw new InvalidOperationException("Wenji forbids this exact Duel response.");
         if (selectedSlash is { } declaredSlash && _coreCardDeclarationsOperations.TryBeginCardDeclaration(responder, declaredSlash, CardKind.Slash, _coreCardDeclarationsOperations.PeekDeclarationConversion(responder, declaredSlash, CardKind.Slash, false), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Duel, responder.Seat), [duel.OpponentSeat]))
             return;

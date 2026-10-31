@@ -27,7 +27,7 @@ internal sealed partial class CharacterLuSuMouRuntime
     bool global::CardGame.Core.IMouLuSuAnniversaryFacts.InHand(int seat, int id) => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(seat);
     SkillProgram global::CardGame.Core.IMouLuSuAnniversaryFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
     IEnumerable<T> global::CardGame.Core.IMouLuSuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    bool global::CardGame.Core.IMouLuSuAnniversaryFacts.Yin(int owner, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState(owner, MouLuSuAnniversaryRuntime.Mengmou, instance, "yin");
+    bool global::CardGame.Core.IMouLuSuAnniversaryFacts.Yin(int owner, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(owner, MouLuSuAnniversaryRuntime.Mengmou, instance, "yin");
     bool global::CardGame.Core.IMouLuSuAnniversaryFacts.Parent(ProgramSkillFrame f)
     {
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
@@ -71,7 +71,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(r.Cards.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray())));
         foreach (var id in r.Cards)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuSuAnniversaryShownEvent(f.Id, id));
-        _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "mou-lu-su-mingshi-three");
+        _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "mou-lu-su-mingshi-three");
     }
 
     void global::CardGame.Core.IMouLuSuAnniversaryNative.Gift(ProgramSkillFrame f, int card)

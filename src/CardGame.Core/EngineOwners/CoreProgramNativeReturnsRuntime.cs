@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreProgramNativeReturnsRuntime
 {
-    private readonly ICoreProgramNativeReturnsNativeReturnsOperations _nativeReturnsOperations;
-    private readonly ICoreProgramNativeReturnsKernelCoreProgramRuntimeModulesOperations _kernelCoreProgramRuntimeModulesOperations;
-    internal CoreProgramNativeReturnsRuntime(ICoreProgramNativeReturnsNativeReturnsOperations nativeReturnsOperations, ICoreProgramNativeReturnsKernelCoreProgramRuntimeModulesOperations kernelCoreProgramRuntimeModulesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelNativeReturnsAccess _nativeReturnsOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations _kernelCoreProgramRuntimeModulesOperations;
+    internal CoreProgramNativeReturnsRuntime(global::CardGame.Core.EngineOwners.IKernelNativeReturnsAccess nativeReturnsOperations, global::CardGame.Core.EngineOwners.IKernelBindRuntimeHandlerOperations kernelCoreProgramRuntimeModulesOperations)
     {
         this._nativeReturnsOperations = nativeReturnsOperations;
         this._kernelCoreProgramRuntimeModulesOperations = kernelCoreProgramRuntimeModulesOperations;

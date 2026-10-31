@@ -38,7 +38,7 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal Card[] CurrentTurnHandExchangeReturnCards(ProgramSkillFrame frame) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(frame.OwnerSeat)).Where(card => !(card.IsGeneralWeapon && _cardZonesOperations._cardZones.GetLocation(card.Id).Zone == CardZoneKind.Equipment) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(frame.OwnerSeat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Transfer)).OrderBy(card => card.Id).ToArray();
+    internal Card[] CurrentTurnHandExchangeReturnCards(ProgramSkillFrame frame) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(frame.OwnerSeat)).Where(card => !(card.IsGeneralWeapon && _cardZonesOperations._cardZones.GetLocation(card.Id).Zone == CardZoneKind.Equipment) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(frame.OwnerSeat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Transfer)).OrderBy(card => card.Id).ToArray();
     internal IReadOnlyList<PromptChoice> CurrentTurnHandExchangeChoices(ProgramSkillFrame frame)
     {
         var receipt = frame.CurrentTurnHandExchange ?? throw new InvalidOperationException("The exchange choice lost its owning receipt.");

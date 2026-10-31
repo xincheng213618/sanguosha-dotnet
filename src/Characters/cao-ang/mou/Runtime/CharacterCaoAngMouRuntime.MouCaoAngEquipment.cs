@@ -16,7 +16,7 @@ internal sealed partial class CharacterCaoAngMouRuntime
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive))
             foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsMoved))
             {
-                if (!IsMouCaFengmin(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)) || MouCaoAng.Used(owner.Seat, candidate.SkillInstanceId))
+                if (!IsMouCaFengmin(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)) || MouCaoAng.Used(owner.Seat, candidate.SkillInstanceId))
                     continue;
                 foreach (var i in losses)
                     yield return candidate with
@@ -37,7 +37,7 @@ internal sealed partial class CharacterCaoAngMouRuntime
 
     internal bool CanRunMouCaEquipment(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (c.SkillId != MouCaoAngRuntime.Fengmin || !IsMouCaFengmin(_coreProgramLifecycleOperations.GetProgramTrigger(c)) || context.Window != SkillProgramTriggerWindow.CardsMoved || context.OwnerSeat != c.OwnerSeat || context.TargetSeat != c.OwnerSeat || context.OccurrenceIndex != c.OccurrenceIndex || context.MovementIndex != c.OccurrenceIndex || context.MovementBatch is not { } batch || batch.Id != context.ParentFrameId || c.OccurrenceIndex < 0 || c.OccurrenceIndex >= batch.Movements.Count || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(x => x.Id == batch.Id)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != c || !parent.Batch.Movements.SequenceEqual(batch.Movements) || MouCaoAng.Used(c.OwnerSeat, c.SkillInstanceId))
+        if (c.SkillId != MouCaoAngRuntime.Fengmin || !IsMouCaFengmin(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) || context.Window != SkillProgramTriggerWindow.CardsMoved || context.OwnerSeat != c.OwnerSeat || context.TargetSeat != c.OwnerSeat || context.OccurrenceIndex != c.OccurrenceIndex || context.MovementIndex != c.OccurrenceIndex || context.MovementBatch is not { } batch || batch.Id != context.ParentFrameId || c.OccurrenceIndex < 0 || c.OccurrenceIndex >= batch.Movements.Count || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(x => x.Id == batch.Id)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != c || !parent.Batch.Movements.SequenceEqual(batch.Movements) || MouCaoAng.Used(c.OwnerSeat, c.SkillInstanceId))
             return false;
         var m = batch.Movements[c.OccurrenceIndex];
         return m.From.Zone == CardZoneKind.Equipment && m.From.OwnerSeat == context.SourceSeat && m.From != m.To && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m);
@@ -50,7 +50,7 @@ internal sealed partial class CharacterCaoAngMouRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 1300)]
     internal ProgramSkillWindowContext? TryCreateMouCaEquipmentContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsMouCaFengmin(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsMouCaFengmin(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateMouCaEquipmentContext(frame, candidate);
         return null;
     }

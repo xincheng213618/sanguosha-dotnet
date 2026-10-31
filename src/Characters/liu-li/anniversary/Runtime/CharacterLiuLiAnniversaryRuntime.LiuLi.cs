@@ -36,7 +36,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
         if (fuli)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray())));
-            if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "anniversary-liu-li-fuli"))
+            if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "anniversary-liu-li-fuli"))
                 CompleteLiuLiReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
         }
         else

@@ -89,7 +89,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && state.CharacterStateContinuation == CharacterStateContinuation.Program);
     }
 
-    internal ProgramSkillFrame? XunXuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterXunXuAnniversaryOperations.XunXuFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations2.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? XunXuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterXunXuAnniversaryOperations.XunXuFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 46100)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 46100)]
     internal bool XunXuDamageObserver(long id) => XunXuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

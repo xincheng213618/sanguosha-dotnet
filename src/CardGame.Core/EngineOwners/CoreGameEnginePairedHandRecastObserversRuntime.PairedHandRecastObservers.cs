@@ -102,7 +102,7 @@ internal sealed partial class CoreGameEnginePairedHandRecastObserversRuntime
         return decision.ValidCardIds.SequenceEqual(expected.SelectMany(c => c.Cards).Distinct()) && decision.Choices.Count == expected.Count && decision.Choices.Zip(expected).All(pair => pair.First.Id == pair.Second.Id && pair.First.Cards.SequenceEqual(pair.Second.Cards) && pair.First.Targets.SequenceEqual(pair.Second.Targets) && pair.First.Parameters.OrderBy(x => x.Key).SequenceEqual(pair.Second.Parameters.OrderBy(x => x.Key)));
     }
 
-    internal ProgramSkillFrame? PairedHandRecastObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePairedHandRecastObserversOperations.PairedHandRecastFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? PairedHandRecastObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePairedHandRecastObserversOperations.PairedHandRecastFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 20, group: 40)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 100)]
     internal bool IsPairedHandRecastDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PairedHandRecastObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

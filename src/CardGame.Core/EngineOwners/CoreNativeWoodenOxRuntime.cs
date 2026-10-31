@@ -8,13 +8,13 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreNativeWoodenOxRuntime
 {
-    private readonly ICoreNativeWoodenOxCharacterHuCheErMouOperations _characterHuCheErMouOperations;
-    private readonly ICoreNativeWoodenOxCoreMatchLogOperations _coreMatchLogOperations;
-    private readonly ICoreNativeWoodenOxCorePhysicalMovementFacadesOperations _corePhysicalMovementFacadesOperations;
-    private readonly ICoreNativeWoodenOxCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterHuCheErMouEntries _characterHuCheErMouOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreMatchLogEntries _coreMatchLogOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CorePhysicalMovementFacadesEntries _corePhysicalMovementFacadesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCurrentTurnStatisticsWoodenOxUsedThisTurnAccess _coreCurrentTurnStatisticsWoodenOxUsedThisTurnAccess;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreNativeWoodenOxRuntime(ICoreNativeWoodenOxCharacterHuCheErMouOperations characterHuCheErMouOperations, ICoreNativeWoodenOxCoreMatchLogOperations coreMatchLogOperations, ICoreNativeWoodenOxCorePhysicalMovementFacadesOperations corePhysicalMovementFacadesOperations, ICoreNativeWoodenOxCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCurrentTurnStatisticsWoodenOxUsedThisTurnAccess coreCurrentTurnStatisticsWoodenOxUsedThisTurnAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreNativeWoodenOxRuntime(global::CardGame.Core.RuntimeEntries.CharacterHuCheErMouEntries characterHuCheErMouOperations, global::CardGame.Core.RuntimeEntries.CoreMatchLogEntries coreMatchLogOperations, global::CardGame.Core.RuntimeEntries.CorePhysicalMovementFacadesEntries corePhysicalMovementFacadesOperations, global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCurrentTurnStatisticsWoodenOxUsedThisTurnAccess coreCurrentTurnStatisticsWoodenOxUsedThisTurnAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._characterHuCheErMouOperations = characterHuCheErMouOperations;
         this._coreMatchLogOperations = coreMatchLogOperations;

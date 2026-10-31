@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineShanheYongzhanRuntime
     {
         if (!IsShanheYongzhanDyingExitIdentity(candidate, victim))
             return false;
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         return ShanheYongzhanPrograms.IsTriggerShape(candidate.SkillId, trigger.Id, trigger.Window, trigger.Subject, trigger.Optional, trigger.Condition, trigger.Effects);
     }
 

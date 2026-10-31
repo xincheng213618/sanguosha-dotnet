@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineProgramAlcoholConversionsRuntime
 {
-    private readonly ICoreProgramAlcoholConversionsCharacterGuanYuWumiaoOperations _characterGuanYuWumiaoOperations;
-    private readonly ICoreProgramAlcoholConversionsCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
-    private readonly ICoreProgramAlcoholConversionsCoreActionQueriesOperations _coreActionQueriesOperations;
-    private readonly ICoreProgramAlcoholConversionsCoreCardConversionsOperations _coreCardConversionsOperations;
-    internal CoreGameEngineProgramAlcoholConversionsRuntime(ICoreProgramAlcoholConversionsCharacterGuanYuWumiaoOperations characterGuanYuWumiaoOperations, ICoreProgramAlcoholConversionsCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations, ICoreProgramAlcoholConversionsCoreActionQueriesOperations coreActionQueriesOperations, ICoreProgramAlcoholConversionsCoreCardConversionsOperations coreCardConversionsOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterGuanYuWumiaoEntries _characterGuanYuWumiaoOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries _coreDyingCursorRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineActionQueriesEntries _coreActionQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardConversionsEntries _coreCardConversionsOperations;
+    internal CoreGameEngineProgramAlcoholConversionsRuntime(global::CardGame.Core.RuntimeEntries.CharacterGuanYuWumiaoEntries characterGuanYuWumiaoOperations, global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries coreDyingCursorRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineActionQueriesEntries coreActionQueriesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardConversionsEntries coreCardConversionsOperations)
     {
         this._characterGuanYuWumiaoOperations = characterGuanYuWumiaoOperations;
         this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;

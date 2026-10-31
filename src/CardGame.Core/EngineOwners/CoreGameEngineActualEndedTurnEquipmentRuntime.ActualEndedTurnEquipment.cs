@@ -70,7 +70,7 @@ internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
     {
         if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded, ActualEndedEquipment: not null } context || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } parent || parent.AfterTurnEnded?.CurrentChild is not { } child || child.FrameId != f.Id || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, child.Candidate))
             return false;
-        return MatchesActualEndedEquipmentContext(parent, child.Candidate, context, _coreProgramLifecycleOperations.GetProgramTrigger(child.Candidate), requireLivingTurnOwner: false);
+        return MatchesActualEndedEquipmentContext(parent, child.Candidate, context, _coreProgramLifecycleOperations.GetProgramTrigger2(child.Candidate), requireLivingTurnOwner: false);
     }
 
     internal SkillProgramStepOutcome RunActualEndedTurnEquipment(ProgramSkillFrame f)

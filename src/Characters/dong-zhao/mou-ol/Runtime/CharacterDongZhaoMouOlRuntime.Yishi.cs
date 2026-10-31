@@ -97,7 +97,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
                 throw new InvalidOperationException("Yishi retains exactly one current owned Hand entity of every frozen suit.");
             if (r.Selected.Count > 0)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(r.Selected.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray())));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "yishi-kept-hand"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "yishi-kept-hand"))
             {
                 return;
             }

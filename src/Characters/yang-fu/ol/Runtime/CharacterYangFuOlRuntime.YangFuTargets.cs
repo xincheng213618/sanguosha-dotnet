@@ -33,7 +33,7 @@ internal sealed partial class CharacterYangFuOlRuntime
     bool global::CardGame.Core.IYangFuTargetFacts.HasIssuedFuRongDistance(long useId, int actor) => _characterFuRongOlOperations.HasIssuedFuRongDistance(useId, actor);
     bool global::CardGame.Core.IYangFuTargetFacts.HasIssuedProvenanceUseDistance(long useId, int actor) => _coreProvenanceCardPoliciesOperations.HasIssuedProvenanceUseDistance(useId, actor);
     bool global::CardGame.Core.IYangFuTargetFacts.HasIssuedGrantedPhaseEntityDistance(long useId, int actor) => _coreGrantedEntityPhasesOperations.HasIssuedGrantedPhaseEntityDistance(useId, actor);
-    bool global::CardGame.Core.IYangFuTargetFacts.HasPhaseSuitAllowance(int owner, Suit? suit) => _coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance(owner, suit);
+    bool global::CardGame.Core.IYangFuTargetFacts.HasPhaseSuitAllowance(int owner, Suit? suit) => _coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance2(owner, suit);
     bool global::CardGame.Core.IYangFuTargetFacts.FirstRedAvailable(int owner, Suit? suit) => _characterGuanYuRuntimeOperations.GuanFirstRedAvailable(_coreMatchParticipantsPlayersAccess._players[owner], suit);
     bool global::CardGame.Core.IYangFuTargetFacts.BorrowedSwordTarget(int owner, int target) => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target]);
 }

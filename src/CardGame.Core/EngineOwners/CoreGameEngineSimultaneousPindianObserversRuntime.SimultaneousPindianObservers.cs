@@ -69,7 +69,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianObserversRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == r.PaymentSeat && recovery.Attempt.TargetSeat == r.PaymentSeat && recovery.Attempt.Amount == 1;
     }
 
-    internal ProgramSkillFrame? SimultaneousObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreSimultaneousPindianObserversOperations.SimultaneousFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? SimultaneousObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreSimultaneousPindianObserversOperations.SimultaneousFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 460)]
     internal bool TryAdvanceSimultaneousSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SimultaneousObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 10)]

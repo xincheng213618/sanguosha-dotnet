@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineResponseCompletionZhangbaRuntime
 {
-    private readonly ICoreResponseCompletionZhangbaCharacterZhaoYunMobileShiOperations _characterZhaoYunMobileShiOperations;
-    private readonly ICoreResponseCompletionZhangbaContentRegistryOperations _contentRegistryOperations;
-    private readonly ICoreResponseCompletionZhangbaCoreActionDiscardColorsOperations _coreActionDiscardColorsOperations;
-    private readonly ICoreResponseCompletionZhangbaCoreNativeOwnedCardQueriesOperations _coreNativeOwnedCardQueriesOperations;
-    internal CoreGameEngineResponseCompletionZhangbaRuntime(ICoreResponseCompletionZhangbaCharacterZhaoYunMobileShiOperations characterZhaoYunMobileShiOperations, ICoreResponseCompletionZhangbaContentRegistryOperations contentRegistryOperations, ICoreResponseCompletionZhangbaCoreActionDiscardColorsOperations coreActionDiscardColorsOperations, ICoreResponseCompletionZhangbaCoreNativeOwnedCardQueriesOperations coreNativeOwnedCardQueriesOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterZhaoYunMobileShiEntries _characterZhaoYunMobileShiOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineActionDiscardColorsEntries _coreActionDiscardColorsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeOwnedCardQueriesEntries _coreNativeOwnedCardQueriesOperations;
+    internal CoreGameEngineResponseCompletionZhangbaRuntime(global::CardGame.Core.RuntimeEntries.CharacterZhaoYunMobileShiEntries characterZhaoYunMobileShiOperations, global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineActionDiscardColorsEntries coreActionDiscardColorsOperations, global::CardGame.Core.RuntimeEntries.CoreNativeOwnedCardQueriesEntries coreNativeOwnedCardQueriesOperations)
     {
         this._characterZhaoYunMobileShiOperations = characterZhaoYunMobileShiOperations;
         this._contentRegistryOperations = contentRegistryOperations;

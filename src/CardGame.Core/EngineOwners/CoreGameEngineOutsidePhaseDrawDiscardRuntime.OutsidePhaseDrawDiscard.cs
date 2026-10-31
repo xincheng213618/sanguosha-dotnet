@@ -273,7 +273,7 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 4200)]
     internal ProgramSkillWindowContext? TryCreateOutsideDiscardContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         var features = ProgramInstructionResolver.Default.Features(trigger);
         if (features.HasOperation(SkillProgramEffectOp.DiscardAfterActualOutsideDiscard))
             return CreateOutsideDiscardContext(frame, candidate);

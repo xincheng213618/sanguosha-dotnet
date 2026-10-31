@@ -32,7 +32,7 @@ internal sealed partial class CharacterZhugeLiangHappyGodRuntime
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GrantHappyZhugeLiangDawu) || _coreNativeCardClassificationsOperations.GetDamageNature(attack) != DamageNature.Normal)
             return[];
-        var grant = _coreGameEngineProgramBooleanStateExpirationProgramBooleanStateLeasesAccess._programBooleanStateLeases.FirstOrDefault(lease => lease.Source.OwnerSeat == attack.TargetSeat && lease.Source.SkillId == HappyZhugeLiangComposition.Dawu && lease.Source.BindingId == "self-mist" && lease.StateId == HappyZhugeLiangComposition.MistState && lease.Expiration == SkillProgramDamageModifierExpiration.NextOwnerTurnStart && _coreProgramPersistentStateOperations.GetProgramBooleanState(lease.Source.OwnerSeat, lease.Source.SkillId, lease.Source.SkillInstanceId, lease.StateId));
+        var grant = _coreGameEngineProgramBooleanStateExpirationProgramBooleanStateLeasesAccess._programBooleanStateLeases.FirstOrDefault(lease => lease.Source.OwnerSeat == attack.TargetSeat && lease.Source.SkillId == HappyZhugeLiangComposition.Dawu && lease.Source.BindingId == "self-mist" && lease.StateId == HappyZhugeLiangComposition.MistState && lease.Expiration == SkillProgramDamageModifierExpiration.NextOwnerTurnStart && _coreProgramPersistentStateOperations.GetProgramBooleanState2(lease.Source.OwnerSeat, lease.Source.SkillId, lease.Source.SkillInstanceId, lease.StateId));
         return grant is null ? [] : [(grant.Source, -1)];
     }
 }

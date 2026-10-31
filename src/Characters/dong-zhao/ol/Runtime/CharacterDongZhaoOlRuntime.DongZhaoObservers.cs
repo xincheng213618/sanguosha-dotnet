@@ -7,7 +7,7 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhaoOlRuntime
 {
-    internal ProgramSkillFrame? DongZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterDongZhaoOlOperations.DongZhaoFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? DongZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterDongZhaoOlOperations.DongZhaoFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1560)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1670)]
     internal bool HasDongZhaoDamageObserver(long id) => DongZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

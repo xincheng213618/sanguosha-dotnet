@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineProgramTargetResolversRuntime
 {
-    private readonly ICoreProgramTargetResolversProgramTargetResolversOperations _programTargetResolversOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelProgramTargetResolversAccess _programTargetResolversOperations;
     private readonly ICoreProgramTargetResolversCoreProgramSelectionModulesOperations _coreProgramSelectionModulesOperations;
-    internal CoreGameEngineProgramTargetResolversRuntime(ICoreProgramTargetResolversProgramTargetResolversOperations programTargetResolversOperations, ICoreProgramTargetResolversCoreProgramSelectionModulesOperations coreProgramSelectionModulesOperations)
+    internal CoreGameEngineProgramTargetResolversRuntime(global::CardGame.Core.EngineOwners.IKernelProgramTargetResolversAccess programTargetResolversOperations, ICoreProgramTargetResolversCoreProgramSelectionModulesOperations coreProgramSelectionModulesOperations)
     {
         this._programTargetResolversOperations = programTargetResolversOperations;
         this._coreProgramSelectionModulesOperations = coreProgramSelectionModulesOperations;

@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineProgramRecoveryReceiptsRuntime
 {
-    private readonly ICoreProgramRecoveryReceiptsCoreTypedRecoveryDamageCursorOperations _coreTypedRecoveryDamageCursorOperations;
-    internal CoreGameEngineProgramRecoveryReceiptsRuntime(ICoreProgramRecoveryReceiptsCoreTypedRecoveryDamageCursorOperations coreTypedRecoveryDamageCursorOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries _coreTypedRecoveryDamageCursorOperations;
+    internal CoreGameEngineProgramRecoveryReceiptsRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries coreTypedRecoveryDamageCursorOperations)
     {
         this._coreTypedRecoveryDamageCursorOperations = coreTypedRecoveryDamageCursorOperations;
     }

@@ -216,7 +216,7 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
             var second = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seats[1]]).Count;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiLuSu = r with { Stage = ShiLsStage.ExchangeChildren, FirstCount = first, SecondCount = second, Lesser = first > second ? seats[0] : second > first ? seats[1] : -1, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiLsExchangeIssuedEvent(f.Id, seats[0], seats[1], first, second, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
-            if (_coreProgramHandExchangesOperations.ExchangeProgramSelectedTargetHands(f, seats) == SkillProgramStepOutcome.Continue)
+            if (_coreProgramHandExchangesOperations.ExchangeProgramSelectedTargetHands2(f, seats) == SkillProgramStepOutcome.Continue)
                 ContinueShiLs(f.Id);
             return;
         }

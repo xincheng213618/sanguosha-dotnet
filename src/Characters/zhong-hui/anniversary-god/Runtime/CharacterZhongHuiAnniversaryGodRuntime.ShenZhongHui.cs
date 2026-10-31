@@ -18,7 +18,7 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 39300, SkillProgramEffectOp.ResolveLinjieRound, SkillProgramEffectOp.ResolveLinjieDamage, SkillProgramEffectOp.ResolveDuzhang, SkillProgramEffectOp.AwakenJianghuo, SkillProgramEffectOp.ResolveLishiPhase)]
     internal bool CanTriggerShenZh(ProgramTriggerLegalityContext gate)
     {
-        var t = _coreProgramLifecycleOperations.GetProgramTrigger(gate.Candidate);
+        var t = _coreProgramLifecycleOperations.GetProgramTrigger2(gate.Candidate);
         var c = gate.WindowContext;
         return t.Effects[0].Op switch
         {

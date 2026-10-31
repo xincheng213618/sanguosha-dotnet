@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineProgramActivationLedgerRuntime
 {
-    private readonly ICoreProgramActivationLedgerSkillRuntimeStateOperations _skillRuntimeStateOperations;
-    private readonly ICoreProgramActivationLedgerCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
-    private readonly ICoreProgramActivationLedgerCoreRuntimeOperations _coreRuntimeOperations;
-    private readonly ICoreProgramActivationLedgerKernelCoreGameEngineRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
-    internal CoreGameEngineProgramActivationLedgerRuntime(ICoreProgramActivationLedgerSkillRuntimeStateOperations skillRuntimeStateOperations, ICoreProgramActivationLedgerCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreProgramActivationLedgerCoreRuntimeOperations coreRuntimeOperations, ICoreProgramActivationLedgerKernelCoreGameEngineRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelSkillRuntimeStateAccess _skillRuntimeStateOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
+    internal CoreGameEngineProgramActivationLedgerRuntime(global::CardGame.Core.EngineOwners.IKernelSkillRuntimeStateAccess skillRuntimeStateOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations)
     {
         this._skillRuntimeStateOperations = skillRuntimeStateOperations;
         this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;

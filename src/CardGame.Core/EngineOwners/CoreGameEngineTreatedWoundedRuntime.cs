@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineTreatedWoundedRuntime
 {
-    private readonly ICoreTreatedWoundedCharacterDaQiaoXiaoQiaoHappyGodOperations _characterDaQiaoXiaoQiaoHappyGodOperations;
-    private readonly ICoreTreatedWoundedCharacterSunHaoOlOperations _characterSunHaoOlOperations;
-    private readonly ICoreTreatedWoundedContentRegistryOperations _contentRegistryOperations;
-    internal CoreGameEngineTreatedWoundedRuntime(ICoreTreatedWoundedCharacterDaQiaoXiaoQiaoHappyGodOperations characterDaQiaoXiaoQiaoHappyGodOperations, ICoreTreatedWoundedCharacterSunHaoOlOperations characterSunHaoOlOperations, ICoreTreatedWoundedContentRegistryOperations contentRegistryOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries _characterDaQiaoXiaoQiaoHappyGodOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterSunHaoOlEntries _characterSunHaoOlOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    internal CoreGameEngineTreatedWoundedRuntime(global::CardGame.Core.RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries characterDaQiaoXiaoQiaoHappyGodOperations, global::CardGame.Core.RuntimeEntries.CharacterSunHaoOlEntries characterSunHaoOlOperations, global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations)
     {
         this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;
         this._characterSunHaoOlOperations = characterSunHaoOlOperations;

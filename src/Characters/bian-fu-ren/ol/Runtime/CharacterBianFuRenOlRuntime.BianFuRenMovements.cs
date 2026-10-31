@@ -294,7 +294,7 @@ internal sealed partial class CharacterBianFuRenOlRuntime
         if (batch.BianFuRenOwnedLosses is not { Count: > 0 } losses)
             yield break;
         foreach (var owner in losses.Select(loss => loss.OwnerSeat).Distinct().Where(owner => _coreMatchParticipantsPlayersAccess._players[owner].IsAlive))
-            foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[owner], SkillProgramTriggerWindow.CardsMoved).Where(candidate => IsBianFuRenWanweiTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate))))
+            foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[owner], SkillProgramTriggerWindow.CardsMoved).Where(candidate => IsBianFuRenWanweiTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate))))
                 foreach (var loss in losses.Where(loss => loss.OwnerSeat == owner))
                 {
                     var index = batch.Movements.ToList().FindIndex(move => move.Sequence == loss.CompletionMovementSequence);
@@ -309,7 +309,7 @@ internal sealed partial class CharacterBianFuRenOlRuntime
     internal bool BianFuRenMaterialAvailable(BianFuRenUsedMaterial material) => material.OriginalPayment is { } proof && BianFuRenOriginalPaymentMatches(material, proof.NativeUseId, proof.ActionId) && _cardZonesOperations._cardZones.GetLocation(material.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(move => move.CardId == material.CardId)is { } last && last.Sequence == material.CompletionMovementSequence && (material.DelayedPlacementMovementSequence == 0 ? BianFuRenNativeUseFinish(last) : BianFuRenDelayedFinish(material, last));
     internal ProgramSkillWindowContext CreateBianFuRenMovementContext(CardsMovedTriggerWindowFrame parent, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         var movement = parent.Batch.Movements[candidate.OccurrenceIndex];
         var loss = parent.Batch.BianFuRenOwnedLosses?.SingleOrDefault(receipt => receipt.OwnerSeat == candidate.OwnerSeat && receipt.CompletionMovementSequence == movement.Sequence);
         var use = parent.Batch.BianFuRenUsedDiscards?.SingleOrDefault(receipt => receipt.Action.ActorSeat != candidate.OwnerSeat && receipt.Action.EffectiveDesignatedTargetSeats.Contains(candidate.OwnerSeat) && receipt.Materials.Any(material => material.CompletionMovementSequence == movement.Sequence));
@@ -321,7 +321,7 @@ internal sealed partial class CharacterBianFuRenOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 3600)]
     internal ProgramSkillWindowContext? TryCreateBianFuRenMovementContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         var features = ProgramInstructionResolver.Default.Features(trigger);
         if (features.HasOperation(SkillProgramEffectOp.WanweiObtainMatchingLostCard) || features.HasOperation(SkillProgramEffectOp.YuejianRevealAndClaimUsedCard))
             return CreateBianFuRenMovementContext(frame, candidate);

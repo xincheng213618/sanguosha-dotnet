@@ -34,7 +34,7 @@ internal sealed partial class CharacterMiHengLeRuntime
             return window;
         if (window.JiguInitialEntities is not null)
             throw new InvalidOperationException("Jigu's actual opening Hand can only be frozen once.");
-        var owners = window.Candidates.Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.InitializeJiguInitialEntities }]).Select(c => c.OwnerSeat).Distinct().Order();
+        var owners = window.Candidates.Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.InitializeJiguInitialEntities }]).Select(c => c.OwnerSeat).Distinct().Order();
         var entities = owners.SelectMany(owner => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Select(c =>
         {
             var paid = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == c.Id && m.To == CardLocation.Hand(owner));

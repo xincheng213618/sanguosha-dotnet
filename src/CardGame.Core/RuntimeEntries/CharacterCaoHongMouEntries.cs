@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CharacterCaoHongMouRuntime))]
 internal sealed partial class CharacterCaoHongMouEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterCaoHongMouRuntime> _resolve;

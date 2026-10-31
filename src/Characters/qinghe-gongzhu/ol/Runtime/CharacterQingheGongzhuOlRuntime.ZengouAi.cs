@@ -14,7 +14,7 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
             return (new(new(0, 0, 0, 0, 0, 0, false, false), 0d, false, "没有可令其无效的真实闪。"), null);
         var candidate = _coreProgramLifecycleOperations.GetPendingProgramTriggerCandidate().Candidate;
         var hpCost = ActualDodgeZengouHpCostForAi(owner);
-        var cost = _coreWushuangZengouOperations.WushuangZengouCosts(owner.Seat, candidate.SkillId, candidate.SkillInstanceId).Length > 0 ? Math.Min(8d, hpCost) : hpCost;
+        var cost = _coreWushuangZengouOperations.WushuangZengouCosts2(owner.Seat, candidate.SkillId, candidate.SkillInstanceId).Length > 0 ? Math.Min(8d, hpCost) : hpCost;
         var view = _corePlayerViewProjectionOperations.CreateSnapshot(owner.Seat);
         var brain = _coreAiBrainsAiBrainsAccess._aiBrains.GetValueOrDefault(owner.Seat) ?? new SimpleAiBrain(owner.Seat, unchecked(_coreMatchDefinitionOptionsAccess._options.Seed * 397) ^ (owner.Seat + 1), _coreMatchDefinitionOptionsAccess._options.AiPolicyVersion);
         // Canceling this Dodge lets precisely its current attack target take the
@@ -33,7 +33,7 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
         // companion bonus. Other effects retain the ordinary conservative cost.
         if (owner.Hp <= 1)
             return double.PositiveInfinity;
-        var draws = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.AfterHpLost).Select(_coreProgramLifecycleOperations.GetProgramTrigger).Where(trigger => !trigger.Optional && trigger.Subject == SkillProgramTriggerSubject.Owner && trigger.Condition.Kind == SkillProgramTriggerConditionKind.Always && trigger.UsageLimit is null).SelectMany(trigger => trigger.Effects).Where(effect => effect is { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }).ToArray();
+        var draws = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.AfterHpLost).Select(_coreProgramLifecycleOperations.GetProgramTrigger2).Where(trigger => !trigger.Optional && trigger.Subject == SkillProgramTriggerSubject.Owner && trigger.Condition.Kind == SkillProgramTriggerConditionKind.Always && trigger.UsageLimit is null).SelectMany(trigger => trigger.Effects).Where(effect => effect is { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }).ToArray();
         var benefit = ProgramCompositionAi.Estimate(draws, _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner), owner.IsFaceDown, _coreProgramLifecycleOperations.CreateProgramAiPublicContext(owner)).Score;
         return 22d + (owner.Hp == 2 ? 8d : 0d) - benefit;
     }

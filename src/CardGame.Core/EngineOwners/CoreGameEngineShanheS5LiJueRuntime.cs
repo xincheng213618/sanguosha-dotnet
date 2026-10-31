@@ -8,13 +8,13 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
 internal sealed partial class CoreGameEngineShanheS5LiJueRuntime : global::CardGame.Core.IShanheS5LiJueProgramHost
 {
-    private readonly ICoreShanheS5LiJueCharacterLiJueOlOperations _characterLiJueOlOperations;
-    private readonly ICoreShanheS5LiJueResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreShanheS5LiJueCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
-    private readonly ICoreShanheS5LiJueCoreRuntimeOperations _coreRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterLiJueOlEntries _characterLiJueOlOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineShanheS5LiJueRuntime(ICoreShanheS5LiJueCharacterLiJueOlOperations characterLiJueOlOperations, ICoreShanheS5LiJueResolutionStackOperations resolutionStackOperations, ICoreShanheS5LiJueCoreProgramLifecycleOperations coreProgramLifecycleOperations, ICoreShanheS5LiJueCoreRuntimeOperations coreRuntimeOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineShanheS5LiJueRuntime(global::CardGame.Core.RuntimeEntries.CharacterLiJueOlEntries characterLiJueOlOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._characterLiJueOlOperations = characterLiJueOlOperations;
         this._resolutionStackOperations = resolutionStackOperations;

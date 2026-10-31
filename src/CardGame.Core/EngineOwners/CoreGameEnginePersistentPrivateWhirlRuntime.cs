@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEnginePersistentPrivateWhirlRuntime
 {
-    private readonly ICorePersistentPrivateWhirlContentRegistryOperations _contentRegistryOperations;
-    internal CoreGameEnginePersistentPrivateWhirlRuntime(ICorePersistentPrivateWhirlContentRegistryOperations contentRegistryOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
+    internal CoreGameEnginePersistentPrivateWhirlRuntime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations)
     {
         this._contentRegistryOperations = contentRegistryOperations;
     }

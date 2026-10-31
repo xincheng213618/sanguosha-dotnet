@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreDamageObserverCursorQueriesRuntime
 {
-    private readonly ICoreDamageObserverCursorQueriesResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreDamageObserverCursorQueriesCoreDamageAdjacencyServicesOperations _coreDamageAdjacencyServicesOperations;
-    private readonly ICoreDamageObserverCursorQueriesCoreDamageCursorRuntimeOperations _coreDamageCursorRuntimeOperations;
-    private readonly ICoreDamageObserverCursorQueriesCoreDyingCursorRuntimeOperations _coreDyingCursorRuntimeOperations;
-    internal CoreDamageObserverCursorQueriesRuntime(ICoreDamageObserverCursorQueriesResolutionStackOperations resolutionStackOperations, ICoreDamageObserverCursorQueriesCoreDamageAdjacencyServicesOperations coreDamageAdjacencyServicesOperations, ICoreDamageObserverCursorQueriesCoreDamageCursorRuntimeOperations coreDamageCursorRuntimeOperations, ICoreDamageObserverCursorQueriesCoreDyingCursorRuntimeOperations coreDyingCursorRuntimeOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreDamageAdjacencyServicesEntries _coreDamageAdjacencyServicesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreDamageCursorRuntimeEntries _coreDamageCursorRuntimeOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries _coreDyingCursorRuntimeOperations;
+    internal CoreDamageObserverCursorQueriesRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreDamageAdjacencyServicesEntries coreDamageAdjacencyServicesOperations, global::CardGame.Core.RuntimeEntries.CoreDamageCursorRuntimeEntries coreDamageCursorRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries coreDyingCursorRuntimeOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreDamageAdjacencyServicesOperations = coreDamageAdjacencyServicesOperations;

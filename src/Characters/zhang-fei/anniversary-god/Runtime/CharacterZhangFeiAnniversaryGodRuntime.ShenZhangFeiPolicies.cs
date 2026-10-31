@@ -30,7 +30,7 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
     internal CardActionContext? ShenZfUseAction(ProgramSkillWindowContext w)
     {
         var p = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId);
-        return p is not null && (p.Action.Type == CardActionType.Use || p.CompletedResponseReturn is { IsCommitted: true } typed && _coreResponseUseCompletionOperations.IsCompletedResponseUse(p.Action, typed.Kind)) ? p.Action : null;
+        return p is not null && (p.Action.Type == CardActionType.Use || p.CompletedResponseReturn is { IsCommitted: true } typed && _coreResponseUseCompletionOperations.IsCompletedResponseUse2(p.Action, typed.Kind)) ? p.Action : null;
     }
 
     internal bool ShenZfMaterialsColorless(CharacterState p, IReadOnlyList<int>? ids)

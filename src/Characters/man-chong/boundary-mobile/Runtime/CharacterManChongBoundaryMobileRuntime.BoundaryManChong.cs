@@ -23,7 +23,7 @@ internal sealed partial class CharacterManChongBoundaryMobileRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal Card[] BoundaryManChongDiscardable(int target) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(target)).Where(card => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(target, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard)).ToArray();
+    internal Card[] BoundaryManChongDiscardable(int target) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(target)).Where(card => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(target, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard)).ToArray();
     internal void PublishBoundaryManChongJunxing(ProgramSkillFrame frame)
     {
         var draft = frame.BoundaryManChongJunxing!;

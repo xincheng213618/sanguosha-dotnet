@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreUnconvertedCardUseQualificationRuntime
 {
-    private readonly ICoreUnconvertedCardUseQualificationResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreUnconvertedCardUseQualificationCoreResponseUseCompletionOperations _coreResponseUseCompletionOperations;
-    private readonly ICoreUnconvertedCardUseQualificationCoreNativeCardContinuationCursorsOperations _coreNativeCardContinuationCursorsOperations;
-    internal CoreUnconvertedCardUseQualificationRuntime(ICoreUnconvertedCardUseQualificationResolutionStackOperations resolutionStackOperations, ICoreUnconvertedCardUseQualificationCoreResponseUseCompletionOperations coreResponseUseCompletionOperations, ICoreUnconvertedCardUseQualificationCoreNativeCardContinuationCursorsOperations coreNativeCardContinuationCursorsOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineResponseUseCompletionEntries _coreResponseUseCompletionOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeCardContinuationCursorsEntries _coreNativeCardContinuationCursorsOperations;
+    internal CoreUnconvertedCardUseQualificationRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineResponseUseCompletionEntries coreResponseUseCompletionOperations, global::CardGame.Core.RuntimeEntries.CoreNativeCardContinuationCursorsEntries coreNativeCardContinuationCursorsOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreResponseUseCompletionOperations = coreResponseUseCompletionOperations;

@@ -63,7 +63,7 @@ internal sealed partial class CharacterXuanGongZhuOlRuntime
         return false;
     }
 
-    internal ProgramSkillFrame? XuanGongZhuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXuanGongZhuOlOperations.XuanGongZhuFirstChild(r, c), (i) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(i));
+    internal ProgramSkillFrame? XuanGongZhuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXuanGongZhuOlOperations.XuanGongZhuFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1550)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1660)]
     internal bool HasXuanGongZhuDamageObserver(long id) => XuanGongZhuObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);

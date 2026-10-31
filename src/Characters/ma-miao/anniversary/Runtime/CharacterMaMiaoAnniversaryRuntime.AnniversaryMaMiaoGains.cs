@@ -55,7 +55,7 @@ internal sealed partial class CharacterMaMiaoAnniversaryRuntime
             return;
         CaptureMaMiaoTransferProducer(batch);
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive))
-            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained).Where(c => IsAnniversaryMaMiaoCongfengTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c))))
+            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained).Where(c => IsAnniversaryMaMiaoCongfengTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c))))
                 foreach (var gain in MaMiaoForeignGains(batch, owner.Seat))
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryMaMiaoGainQualifiedEvent(batch.Id, new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash, gain.Index, gain.Recipient, gain.Holder, gain.Move.Sequence));
     }
@@ -88,7 +88,7 @@ internal sealed partial class CharacterMaMiaoAnniversaryRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 700)]
     internal ProgramSkillWindowContext? TryCreateAnniversaryMaMiaoGainContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsAnniversaryMaMiaoCongfengTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsAnniversaryMaMiaoCongfengTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateAnniversaryMaMiaoGainContext(frame, candidate);
         return null;
     }

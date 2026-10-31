@@ -77,7 +77,7 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     }
 
     bool global::CardGame.Core.IProgramPaidCardOperations.BeginMovementWindow() => _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow();
-    bool global::CardGame.Core.IProgramPaidCardOperations.BeginPublicHandReveal(long frameId, string returnKey) => _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(frameId, returnKey);
+    bool global::CardGame.Core.IProgramPaidCardOperations.BeginPublicHandReveal(long frameId, string returnKey) => _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frameId, returnKey);
     void global::CardGame.Core.IProgramPaidCardOperations.ReturnMovement(long frameId) => _coreRuntimeOperations.ReturnRuntimeProgramMovement(frameId);
     void global::CardGame.Core.IProgramPaidCardOperations.Log(string type, string message, int? actor) => _coreMatchLogOperations.AddLog(type, message, actor);
 }

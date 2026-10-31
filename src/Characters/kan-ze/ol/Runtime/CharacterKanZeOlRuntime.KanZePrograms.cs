@@ -93,7 +93,7 @@ internal sealed partial class CharacterKanZeOlRuntime
             _coreProgramLifecycleOperations.SetProgramCardSet(f.Id, XiashuShownBind, shown, SkillProgramCardSetVisibility.Public);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(shown.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray())));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { XiashuPaid = r with { Stage = XiashuStage.OwnerClaim } });
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "xiashu-selected-hand"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "xiashu-selected-hand"))
                 return;
             if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.Invoice.RecipientSeat].IsAlive)
             {

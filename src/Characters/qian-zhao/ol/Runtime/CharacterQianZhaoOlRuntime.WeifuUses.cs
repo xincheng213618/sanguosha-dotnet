@@ -79,7 +79,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
             var t = p.Triggers.Single(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.OfferWeifuCategoryTargets));
             if (result.Any(c => c.OwnerSeat == r.ActorSeat && c.SkillId == p.Id && c.SkillInstanceId == grant.Source.SkillInstanceId && c.TriggerId == t.Id))
                 continue;
-            result.Add(new(r.ActorSeat, r.ActorSeat, p.Id, t.Id, p.GameplayHash, grant.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, r.ActorSeat, r.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat], action))));
+            result.Add(new(r.ActorSeat, r.ActorSeat, p.Id, t.Id, p.GameplayHash, grant.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, r.ActorSeat, r.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat], action))));
         }
     }
 
@@ -90,7 +90,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
         if (c.SkillId != "ol:weifu" || context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } card } || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is not { WeifuUse: { } r, Action: { } a } use || !WeifuUseProof(use) || a.ActionId != card.CardActionId || r.ActorSeat != c.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != use.Id || window.Action.ActionId != a.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return false;
         var candidate = window.Candidates[window.CandidateIndex];
-        return candidate.OwnerSeat == c.OwnerSeat && candidate.SkillId == c.SkillId && candidate.TriggerId == c.BindingId && candidate.GameplayHash == c.GameplayHash && candidate.SkillInstanceId == c.SkillInstanceId && _coreCardActionsOperations.CreateCardActionProgramContext(window, candidate) == context && r.Grants.Any(g => g.Source.SkillId == c.SkillId && g.Source.SkillInstanceId == c.SkillInstanceId && g.GameplayHash == c.GameplayHash) && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program!.Triggers.Any(t => t.Id == c.BindingId && t.Effects.Any(e => e.Op == SkillProgramEffectOp.OfferWeifuCategoryTargets));
+        return candidate.OwnerSeat == c.OwnerSeat && candidate.SkillId == c.SkillId && candidate.TriggerId == c.BindingId && candidate.GameplayHash == c.GameplayHash && candidate.SkillInstanceId == c.SkillInstanceId && _coreCardActionsOperations.CreateCardActionProgramContext2(window, candidate) == context && r.Grants.Any(g => g.Source.SkillId == c.SkillId && g.Source.SkillInstanceId == c.SkillInstanceId && g.GameplayHash == c.GameplayHash) && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program!.Triggers.Any(t => t.Id == c.BindingId && t.Effects.Any(e => e.Op == SkillProgramEffectOp.OfferWeifuCategoryTargets));
     }
 
     internal CardUseFrame RequireWeifuTargetUse(ProgramSkillFrame f)

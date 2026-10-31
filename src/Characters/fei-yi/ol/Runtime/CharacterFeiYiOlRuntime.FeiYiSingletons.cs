@@ -30,7 +30,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
     internal IEnumerable<ProgramTriggerCandidate> CollectFeiYiSingletonCandidates(CardMovementBatchContext batch)
     {
         foreach (var t in (batch.FeiYiSingletons ?? []).Where(t => FeiYiSingletonIsWholeOperation(batch, t)))
-            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[t.OwnerSeat], SkillProgramTriggerWindow.CardsMoved).Where(c => IsFeiYiSingletonTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c))))
+            foreach (var c in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[t.OwnerSeat], SkillProgramTriggerWindow.CardsMoved).Where(c => IsFeiYiSingletonTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c))))
                 yield return c;
     }
 
@@ -38,7 +38,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
     internal ProgramSkillWindowContext CreateFeiYiSingletonContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate c) => new(SkillProgramTriggerWindow.CardsMoved, frame.Id, c.OwnerSeat, SourceSeat: c.OwnerSeat, TargetSeat: c.OwnerSeat, OccurrenceIndex: c.OccurrenceIndex, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat]), MovementBatch: frame.Batch);
     internal FeiYiSingletonTransition? CurrentFeiYiSingleton(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (!IsFeiYiSingletonTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(c)) || context.Window != SkillProgramTriggerWindow.CardsMoved || context.OwnerSeat != c.OwnerSeat || context.OccurrenceIndex != c.OccurrenceIndex || context.MovementBatch is not { } batch || batch.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex] != c || window.Batch.Id != batch.Id || !window.Batch.Movements.SequenceEqual(batch.Movements) || !(window.Batch.FeiYiSingletons ?? []).SequenceEqual(batch.FeiYiSingletons ?? []) || batch.FeiYiSingletons?.SingleOrDefault(t => t.OwnerSeat == c.OwnerSeat)is not { } transition || transition.Before == 1 || transition.After != 1 || !FeiYiSingletonIsWholeOperation(batch, transition) || !_cardZonesOperations._cardZones.Contains(CardLocation.Hand(c.OwnerSeat), transition.CardId) || !FeiYiDirectionAvailable(c.OwnerSeat, true) && !FeiYiDirectionAvailable(c.OwnerSeat, false))
+        if (!IsFeiYiSingletonTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) || context.Window != SkillProgramTriggerWindow.CardsMoved || context.OwnerSeat != c.OwnerSeat || context.OccurrenceIndex != c.OccurrenceIndex || context.MovementBatch is not { } batch || batch.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex] != c || window.Batch.Id != batch.Id || !window.Batch.Movements.SequenceEqual(batch.Movements) || !(window.Batch.FeiYiSingletons ?? []).SequenceEqual(batch.FeiYiSingletons ?? []) || batch.FeiYiSingletons?.SingleOrDefault(t => t.OwnerSeat == c.OwnerSeat)is not { } transition || transition.Before == 1 || transition.After != 1 || !FeiYiSingletonIsWholeOperation(batch, transition) || !_cardZonesOperations._cardZones.Contains(CardLocation.Hand(c.OwnerSeat), transition.CardId) || !FeiYiDirectionAvailable(c.OwnerSeat, true) && !FeiYiDirectionAvailable(c.OwnerSeat, false))
             return null;
         return transition;
     }
@@ -52,7 +52,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 2800)]
     internal ProgramSkillWindowContext? TryCreateFeiYiSingletonContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        if (IsFeiYiSingletonTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(candidate)))
+        if (IsFeiYiSingletonTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)))
             return CreateFeiYiSingletonContext(frame, candidate);
         return null;
     }

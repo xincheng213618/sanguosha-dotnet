@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineThirdPartyHandGainsRuntime
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive))
             foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained))
             {
-                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
                 if (!IsThirdPartyHandGainTrigger(trigger))
                     continue;
                 if (trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.KanggeGainDraw))
@@ -39,7 +39,7 @@ internal sealed partial class CoreGameEngineThirdPartyHandGainsRuntime
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive))
             foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsMoved))
             {
-                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
                 if (!IsOwnerSourceHandGainTrigger(trigger))
                     continue;
                 var indexes = batch.Movements.Select((movement, index) => (movement, index)).Where(item => item.movement.From != item.movement.To && item.movement.From.Zone == CardZoneKind.Hand && item.movement.From.OwnerSeat == candidate.OwnerSeat && item.movement.To.OwnerSeat is { } destination && _coreTableSeatQueriesOperations.IsValidPlayerSeat(destination) && destination != candidate.OwnerSeat && (trigger.MovementReasons.Count == 0 || trigger.MovementReasons.Contains(item.movement.Reason.Value)) && !trigger.ExcludedMovementReasons.Contains(item.movement.Reason.Value)).Select(item => item.index).ToArray();
@@ -62,7 +62,7 @@ internal sealed partial class CoreGameEngineThirdPartyHandGainsRuntime
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive))
             foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.CardsGained))
             {
-                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+                var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
                 if (!trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.KanggeGainDraw))
                     continue;
                 var indexes = batch.Movements.Select((movement, index) => (movement, index)).Where(item => item.movement.From != item.movement.To && item.movement.To.Zone == CardZoneKind.Hand && item.movement.To.OwnerSeat is { } gainer && _coreTableSeatQueriesOperations.IsValidPlayerSeat(gainer) && _coreMatchParticipantsPlayersAccess._players[gainer].IsAlive && gainer != owner.Seat && _characterTangJiOlOperations.IsKanggeMarkedSeat(gainer, owner.Seat) && gainer != _coreActualTurnProgressCurrentSeatAccess._currentSeat && (trigger.MovementReasons.Count == 0 || trigger.MovementReasons.Contains(item.movement.Reason.Value)) && !trigger.ExcludedMovementReasons.Contains(item.movement.Reason.Value)).Select(item => item.index).ToArray();

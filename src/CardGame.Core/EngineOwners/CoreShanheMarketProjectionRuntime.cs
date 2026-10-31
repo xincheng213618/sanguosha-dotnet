@@ -8,12 +8,12 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreShanheMarketProjectionRuntime
 {
-    private readonly ICoreShanheMarketProjectionResolutionStackOperations _resolutionStackOperations;
-    private readonly ICoreShanheMarketProjectionShanheMarketOperations _shanheMarketOperations;
-    private readonly ICoreShanheMarketProjectionKernelCoreGameEngineFaultBoundaryOperations _kernelCoreGameEngineFaultBoundaryOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelShanheMarketAccess _shanheMarketOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelEnsureSessionHealthyOperations _kernelCoreGameEngineFaultBoundaryOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreShanheMarketProjectionRuntime(ICoreShanheMarketProjectionResolutionStackOperations resolutionStackOperations, ICoreShanheMarketProjectionShanheMarketOperations shanheMarketOperations, ICoreShanheMarketProjectionKernelCoreGameEngineFaultBoundaryOperations kernelCoreGameEngineFaultBoundaryOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreShanheMarketProjectionRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.EngineOwners.IKernelShanheMarketAccess shanheMarketOperations, global::CardGame.Core.EngineOwners.IKernelEnsureSessionHealthyOperations kernelCoreGameEngineFaultBoundaryOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._shanheMarketOperations = shanheMarketOperations;

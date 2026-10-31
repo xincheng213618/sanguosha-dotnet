@@ -258,7 +258,7 @@ internal sealed partial class CharacterYangYiOlRuntime
         _coreMatchLogOperations.AddLog("CardEffect", $"狷狭：{(target.Name)} 的手牌【{(revealed.DisplayName)}】被展示（视为使用【火攻】）。", active.OwnerSeat, target.Seat);
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id)with { JuanxiaLaunch = state with { PendingKind = CardKind.FireAttack.ToString(), RevealedCardId = revealed.Id, Stage = JuanxiaStage.Fire } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(active.Id, [_coreSnapshotValueProjectionOperations.ToSnapshot(revealed)]));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(active.Id, "juanxia-fire-shown-hand"))
+        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(active.Id, "juanxia-fire-shown-hand"))
             return;
         PresentJuanxiaFirePaymentPrompt(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id), revealed);
     }

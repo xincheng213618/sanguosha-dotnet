@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreNativeCardClassificationsRuntime
 {
-    private readonly ICoreNativeCardClassificationsCharacterMaChaoMobileGodOperations _characterMaChaoMobileGodOperations;
-    private readonly ICoreNativeCardClassificationsCoreNativeDamagePoliciesOperations _coreNativeDamagePoliciesOperations;
-    internal CoreNativeCardClassificationsRuntime(ICoreNativeCardClassificationsCharacterMaChaoMobileGodOperations characterMaChaoMobileGodOperations, ICoreNativeCardClassificationsCoreNativeDamagePoliciesOperations coreNativeDamagePoliciesOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterMaChaoMobileGodEntries _characterMaChaoMobileGodOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeDamagePoliciesEntries _coreNativeDamagePoliciesOperations;
+    internal CoreNativeCardClassificationsRuntime(global::CardGame.Core.RuntimeEntries.CharacterMaChaoMobileGodEntries characterMaChaoMobileGodOperations, global::CardGame.Core.RuntimeEntries.CoreNativeDamagePoliciesEntries coreNativeDamagePoliciesOperations)
     {
         this._characterMaChaoMobileGodOperations = characterMaChaoMobileGodOperations;
         this._coreNativeDamagePoliciesOperations = coreNativeDamagePoliciesOperations;

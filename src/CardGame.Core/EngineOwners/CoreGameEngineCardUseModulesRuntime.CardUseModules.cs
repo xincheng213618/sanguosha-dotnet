@@ -65,7 +65,7 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
 
     internal void ExpireTurnCardUseEffects(int turnNumber, int turnSeat)
     {
-        _coreProgramBooleanStateExpirationOperations.ExpireProgramBooleanStateLeases(turnNumber, turnSeat);
+        _coreProgramBooleanStateExpirationOperations.ExpireProgramBooleanStateLeases2(turnNumber, turnSeat);
         _coreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess._currentTurnHeartSlashBonuses.RemoveAll(b => b.TurnNumber == turnNumber && b.TurnOwnerSeat == turnSeat);
         _coreCurrentTurnSkillSuppressionsOperations.ExpireCurrentTurnNonLockedSkillSuppressions(turnNumber, turnSeat);
         _coreAlcoholSlashSuppressionsOperations.ExpireCurrentTurnOwnSkillSuppressions(turnNumber, turnSeat);

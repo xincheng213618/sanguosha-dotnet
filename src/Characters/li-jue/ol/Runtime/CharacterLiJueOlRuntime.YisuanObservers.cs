@@ -150,7 +150,7 @@ internal sealed partial class CharacterLiJueOlRuntime
     {
         if (batch.LiJueUseDiscard is not { } invoice || !ValidLiJueUseDiscard(invoice, batch, invoice.Action.ActorSeat))
             return[];
-        return _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[invoice.Action.ActorSeat], SkillProgramTriggerWindow.CardsMoved).Where(c => ProgramInstructionResolver.Default.Features(_coreProgramLifecycleOperations.GetProgramTrigger(c)).HasOperation(SkillProgramEffectOp.PayMaxHpAndObtainActualUsedTrick)).ToArray();
+        return _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[invoice.Action.ActorSeat], SkillProgramTriggerWindow.CardsMoved).Where(c => ProgramInstructionResolver.Default.Features(_coreProgramLifecycleOperations.GetProgramTrigger2(c)).HasOperation(SkillProgramEffectOp.PayMaxHpAndObtainActualUsedTrick)).ToArray();
     }
 
     internal int[] MatchingLiJueUseDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => batch.LiJueUseDiscard is { } invoice && ValidLiJueUseDiscard(invoice, batch, candidate.OwnerSeat) ? batch.Movements.Select((m, i) => (m, i)).Where(x => invoice.FinishedMovements.Contains(x.m)).Select(x => x.i).ToArray() : [];
@@ -174,7 +174,7 @@ internal sealed partial class CharacterLiJueOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 3800)]
     internal ProgramSkillWindowContext? TryCreateLiJueMovementContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         var features = ProgramInstructionResolver.Default.Features(trigger);
         if (features.HasOperation(SkillProgramEffectOp.PayMaxHpAndObtainActualUsedTrick))
             return CreateLiJueMovementContext(frame, candidate);

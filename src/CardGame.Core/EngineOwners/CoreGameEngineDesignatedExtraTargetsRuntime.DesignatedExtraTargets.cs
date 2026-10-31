@@ -48,7 +48,7 @@ internal sealed partial class CoreGameEngineDesignatedExtraTargetsRuntime
         if (window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return false;
         var current = window.Candidates[window.CandidateIndex];
-        return current.OwnerSeat == candidate.OwnerSeat && current.SkillId == candidate.SkillId && current.TriggerId == candidate.BindingId && current.SkillInstanceId == candidate.SkillInstanceId && current.GameplayHash == candidate.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext(window, current) == context;
+        return current.OwnerSeat == candidate.OwnerSeat && current.SkillId == candidate.SkillId && current.TriggerId == candidate.BindingId && current.SkillInstanceId == candidate.SkillInstanceId && current.GameplayHash == candidate.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) == context;
     }
 
     internal bool HasDiscardedDesignatedCardName(CardKind kind) => _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Any(card => global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(card.Kind) == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind));

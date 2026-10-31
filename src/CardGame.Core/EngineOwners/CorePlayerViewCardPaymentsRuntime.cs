@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CorePlayerViewCardPaymentsRuntime
 {
-    private readonly ICorePlayerViewCardPaymentsResolutionStackOperations _resolutionStackOperations;
-    internal CorePlayerViewCardPaymentsRuntime(ICorePlayerViewCardPaymentsResolutionStackOperations resolutionStackOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    internal CorePlayerViewCardPaymentsRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
     }

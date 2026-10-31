@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineWenheActivitiesRuntime
 {
-    private readonly ICoreWenheActivitiesCoreActivityBattleRulesOperations _coreActivityBattleRulesOperations;
-    internal CoreGameEngineWenheActivitiesRuntime(ICoreWenheActivitiesCoreActivityBattleRulesOperations coreActivityBattleRulesOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineActivityBattleRulesEntries _coreActivityBattleRulesOperations;
+    internal CoreGameEngineWenheActivitiesRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineActivityBattleRulesEntries coreActivityBattleRulesOperations)
     {
         this._coreActivityBattleRulesOperations = coreActivityBattleRulesOperations;
     }

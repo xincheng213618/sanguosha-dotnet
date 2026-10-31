@@ -120,7 +120,7 @@ internal sealed partial class CharacterJiKangMobileRuntime
             case "recipient":
                 var recipient = selected.Targets.Single();
                 StepMobileJiKang(f, r with { Stage = MobileJiKangStage.GrantChildren, Subject = recipient, Paid = true });
-                _coreProgramSkillChangesOperations.GrantProgramSkills(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), recipient, ["mobile:canyun"]);
+                _coreProgramSkillChangesOperations.GrantProgramSkills2(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), recipient, ["mobile:canyun"]);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileJiKangProgressEvent(f.Id, "grant-canyun", r.Cursor, recipient, 1, 0));
                 break;
             case "club":

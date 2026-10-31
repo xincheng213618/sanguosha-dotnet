@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreTrustedResolutionDiagnosticsRuntime
 {
-    private readonly ICoreTrustedResolutionDiagnosticsResolutionStackOperations _resolutionStackOperations;
-    internal CoreTrustedResolutionDiagnosticsRuntime(ICoreTrustedResolutionDiagnosticsResolutionStackOperations resolutionStackOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    internal CoreTrustedResolutionDiagnosticsRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
     }

@@ -8,12 +8,12 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineDragonBoatBasicConversionsRuntime
 {
-    private readonly ICoreDragonBoatBasicConversionsModeRulesOperations _modeRulesOperations;
-    private readonly ICoreDragonBoatBasicConversionsCoreActionQueriesOperations _coreActionQueriesOperations;
-    private readonly ICoreDragonBoatBasicConversionsCoreCardUseModulesOperations _coreCardUseModulesOperations;
-    private readonly ICoreDragonBoatBasicConversionsCoreDragonBoatCardsOperations _coreDragonBoatCardsOperations;
-    private readonly ICoreDragonBoatBasicConversionsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
-    internal CoreGameEngineDragonBoatBasicConversionsRuntime(ICoreDragonBoatBasicConversionsModeRulesOperations modeRulesOperations, ICoreDragonBoatBasicConversionsCoreActionQueriesOperations coreActionQueriesOperations, ICoreDragonBoatBasicConversionsCoreCardUseModulesOperations coreCardUseModulesOperations, ICoreDragonBoatBasicConversionsCoreDragonBoatCardsOperations coreDragonBoatCardsOperations, ICoreDragonBoatBasicConversionsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess _modeRulesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineActionQueriesEntries _coreActionQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseModulesEntries _coreCardUseModulesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineDragonBoatCardsEntries _coreDragonBoatCardsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
+    internal CoreGameEngineDragonBoatBasicConversionsRuntime(global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess modeRulesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineActionQueriesEntries coreActionQueriesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseModulesEntries coreCardUseModulesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineDragonBoatCardsEntries coreDragonBoatCardsOperations, global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations)
     {
         this._modeRulesOperations = modeRulesOperations;
         this._coreActionQueriesOperations = coreActionQueriesOperations;

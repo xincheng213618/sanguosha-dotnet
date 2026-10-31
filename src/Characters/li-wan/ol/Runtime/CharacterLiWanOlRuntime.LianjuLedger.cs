@@ -27,7 +27,7 @@ internal sealed partial class CharacterLiWanOlRuntime
     {
         if (!HasLiWanCapability)
             return;
-        items.RemoveAll(item => item.Candidate is { } c && _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveLianjuOppositeColorReturn));
+        items.RemoveAll(item => item.Candidate is { } c && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveLianjuOppositeColorReturn));
         var due = LianjuDuePromises();
         for (var i = 0; i < due.Length; i++)
         {

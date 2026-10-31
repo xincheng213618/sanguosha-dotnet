@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreMatchPresentationRuntime
 {
-    private readonly ICoreMatchPresentationCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
-    private readonly ICoreMatchPresentationCoreNativeDamageHandlesOperations _coreNativeDamageHandlesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreMatchSetupDefinitionsEntries _coreMatchSetupDefinitionsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeDamageHandlesEntries _coreNativeDamageHandlesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionAccess _coreMatchDefinitionModeDefinitionAccess;
-    internal CoreMatchPresentationRuntime(ICoreMatchPresentationCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, ICoreMatchPresentationCoreNativeDamageHandlesOperations coreNativeDamageHandlesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionAccess coreMatchDefinitionModeDefinitionAccess)
+    internal CoreMatchPresentationRuntime(global::CardGame.Core.RuntimeEntries.CoreMatchSetupDefinitionsEntries coreMatchSetupDefinitionsOperations, global::CardGame.Core.RuntimeEntries.CoreNativeDamageHandlesEntries coreNativeDamageHandlesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionAccess coreMatchDefinitionModeDefinitionAccess)
     {
         this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;
         this._coreNativeDamageHandlesOperations = coreNativeDamageHandlesOperations;

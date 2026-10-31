@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreTurnTargetCardQuotaAllowancesRuntime
 {
-    private readonly ICoreTurnTargetCardQuotaAllowancesTurnCardUseEffectsOperations _turnCardUseEffectsOperations;
+    private readonly global::CardGame.Core.EngineOwners.IKernelTurnCardUseEffectsAccess _turnCardUseEffectsOperations;
     private readonly ICoreTurnTargetCardQuotaAllowancesCoreProgramTargetRulesOperations _coreProgramTargetRulesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
-    internal CoreTurnTargetCardQuotaAllowancesRuntime(ICoreTurnTargetCardQuotaAllowancesTurnCardUseEffectsOperations turnCardUseEffectsOperations, ICoreTurnTargetCardQuotaAllowancesCoreProgramTargetRulesOperations coreProgramTargetRulesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess)
+    internal CoreTurnTargetCardQuotaAllowancesRuntime(global::CardGame.Core.EngineOwners.IKernelTurnCardUseEffectsAccess turnCardUseEffectsOperations, ICoreTurnTargetCardQuotaAllowancesCoreProgramTargetRulesOperations coreProgramTargetRulesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess)
     {
         this._turnCardUseEffectsOperations = turnCardUseEffectsOperations;
         this._coreProgramTargetRulesOperations = coreProgramTargetRulesOperations;

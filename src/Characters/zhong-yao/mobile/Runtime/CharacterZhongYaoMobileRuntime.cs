@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
 internal sealed partial class CharacterZhongYaoMobileRuntime : global::CardGame.Core.IMobileZhongYaoSelectionQueries
 {
-    private readonly ICharacterZhongYaoMobileResolutionStackOperations _resolutionStackOperations;
-    private readonly ICharacterZhongYaoMobileCoreCardActionsOperations _coreCardActionsOperations;
-    private readonly ICharacterZhongYaoMobileCorePlayCardHistoryOperations _corePlayCardHistoryOperations;
-    private readonly ICharacterZhongYaoMobileCoreProgramLifecycleOperations _coreProgramLifecycleOperations;
-    internal CharacterZhongYaoMobileRuntime(ICharacterZhongYaoMobileResolutionStackOperations resolutionStackOperations, ICharacterZhongYaoMobileCoreCardActionsOperations coreCardActionsOperations, ICharacterZhongYaoMobileCorePlayCardHistoryOperations corePlayCardHistoryOperations, ICharacterZhongYaoMobileCoreProgramLifecycleOperations coreProgramLifecycleOperations)
+    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardActionsEntries _coreCardActionsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEnginePlayCardHistoryEntries _corePlayCardHistoryOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
+    internal CharacterZhongYaoMobileRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardActionsEntries coreCardActionsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEnginePlayCardHistoryEntries corePlayCardHistoryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreCardActionsOperations = coreCardActionsOperations;

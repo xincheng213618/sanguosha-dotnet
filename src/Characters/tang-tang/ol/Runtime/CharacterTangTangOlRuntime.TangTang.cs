@@ -10,7 +10,7 @@ internal sealed partial class CharacterTangTangOlRuntime
 {
     internal const string ZexingTakeReason = "skill-program.tang-tang.zexing.take", ZexingGiftReason = "skill-program.tang-tang.zexing.gift", ZhiyiDrawReason = "skill-program.tang-tang.zhiyi.draw";
     internal static CardConversionSource TangTangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_tang_tang_ol_TangTang.TangTangSource(f);
-    internal IReadOnlyList<Card> TangTangTransferCards(int chooser, int holder) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(holder)).Where(c => !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Transfer)).ToArray();
+    internal IReadOnlyList<Card> TangTangTransferCards(int chooser, int holder) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(holder)).Where(c => !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Transfer)).ToArray();
     internal TangTangEntity TangTangEntityAt(int holder, int id)
     {
         var c = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
@@ -159,7 +159,7 @@ internal sealed partial class CharacterTangTangOlRuntime
             else
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { TangTang = r with { Peer = peer, Stage = TangTangStage.ShowChildren, Selected = [], Candidates = [], Viewed = [] } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZexingPeerChosenEvent(f.Id, f.OwnerSeat, r.ActualTurn, r.TurnOwner, peer, _coreProgramEventHistoryOperations.ProgramEventHistory<ZexingPeerChosenEvent>().Count(e => e.FrameId == f.Id)));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(f.Id, "zexing-shown-card"))
+            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "zexing-shown-card"))
                 return;
             ContinueTangTang(f.Id);
             return;

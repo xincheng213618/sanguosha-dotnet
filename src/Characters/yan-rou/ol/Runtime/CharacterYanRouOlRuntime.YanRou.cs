@@ -36,7 +36,7 @@ internal sealed partial class CharacterYanRouOlRuntime
         var card = context.CardUse!;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(u => u.Id == card.ParentCardUseFrameId);
         var payer = use.SourceSeat;
-        return _coreMatchParticipantsPlayersAccess._players[payer].IsAlive && (t.OwnerRelation == SkillProgramCardActionOwnerRelation.Actor ? c.OwnerSeat == payer : context.TargetSeat == c.OwnerSeat && use.Action!.EffectiveDesignatedTargetSeats.Contains(c.OwnerSeat)) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[payer]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(payer)).Any(ca => YanRouCanDiscard(c.OwnerSeat, payer, ca, _cardZonesOperations._cardZones.GetLocation(ca.Id)));
+        return _coreMatchParticipantsPlayersAccess._players[payer].IsAlive && (t.OwnerRelation == SkillProgramCardActionOwnerRelation.Actor ? c.OwnerSeat == payer : context.TargetSeat == c.OwnerSeat && use.Action!.EffectiveDesignatedTargetSeats.Contains(c.OwnerSeat)) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[payer]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(payer)).Any(ca => YanRouCanDiscard(c.OwnerSeat, payer, ca, _cardZonesOperations._cardZones.GetLocation(ca.Id)));
     }
 
     internal SkillProgramStepOutcome BeginYanRou(ProgramSkillFrame supplied, SkillProgramEffectOp op)

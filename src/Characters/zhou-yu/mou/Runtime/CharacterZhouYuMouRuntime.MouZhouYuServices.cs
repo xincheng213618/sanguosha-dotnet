@@ -25,7 +25,7 @@ internal sealed partial class CharacterZhouYuMouRuntime
     SkillProgram? global::CardGame.Core.IMouZhouYuFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
     IEnumerable<T> global::CardGame.Core.IMouZhouYuFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
     string global::CardGame.Core.IMouZhouYuFacts.Instance(int s, string skill) => _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[s], skill);
-    bool global::CardGame.Core.IMouZhouYuFacts.Yin(int s, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState(s, MouZhouYuRuntime.Yingmou, instance, "yin");
+    bool global::CardGame.Core.IMouZhouYuFacts.Yin(int s, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(s, MouZhouYuRuntime.Yingmou, instance, "yin");
     IReadOnlyList<CardConversionSource> global::CardGame.Core.IMouZhouYuFacts.FireSources() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreSkillProgramsOperations.EnabledSkillPrograms(p).Any(x => x.Id == MouZhouYuRuntime.Ronghuo)).Select(p => new CardConversionSource(MouZhouYuRuntime.Ronghuo, "next-fire-use", p.Seat, ((global::CardGame.Core.IMouZhouYuFacts)this).Instance(p.Seat, MouZhouYuRuntime.Ronghuo))).ToArray());
     long? global::CardGame.Core.IMouZhouYuFacts.FireDamage(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
     {

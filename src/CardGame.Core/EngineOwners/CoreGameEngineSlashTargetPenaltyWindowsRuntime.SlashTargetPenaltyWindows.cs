@@ -30,8 +30,8 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyWindowsRuntime
         if (!HasSlashTargetPenaltyPrograms || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.IsSourceLess || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat) || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive)
             return false;
         var owner = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat];
-        var facts = use.Action is { } action ? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(owner, action) : _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(owner);
-        var candidates = _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(owner, SkillProgramTriggerWindow.ActualSlashTargetPenalty, facts).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.RequireTargetDiscardOrEquipmentRecast }]).ToArray();
+        var facts = use.Action is { } action ? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(owner, action) : _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(owner);
+        var candidates = _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(owner, SkillProgramTriggerWindow.ActualSlashTargetPenalty, facts).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.RequireTargetDiscardOrEquipmentRecast }]).ToArray();
         if (candidates.Length == 0)
             return false;
         var visited = (use.SlashTargetPenaltyVisits ?? []).ToList();

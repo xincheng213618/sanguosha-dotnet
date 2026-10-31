@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CharacterLuShiOlRuntime))]
 internal sealed partial class CharacterLuShiOlEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterLuShiOlRuntime> _resolve;

@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineOrderedPrintedSkillLossRuntime))]
 internal sealed partial class CoreGameEngineOrderedPrintedSkillLossEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineOrderedPrintedSkillLossRuntime> _resolve;

@@ -87,14 +87,14 @@ internal sealed partial class CoreNativeDyingRuntime
             return;
         }
 
-        if (programCandidates.FirstOrDefault(item => _coreProgramLifecycleOperations.GetProgramTrigger(item).Window == SkillProgramTriggerWindow.SelfDyingResponse)is { } programCandidate)
+        if (programCandidates.FirstOrDefault(item => _coreProgramLifecycleOperations.GetProgramTrigger2(item).Window == SkillProgramTriggerWindow.SelfDyingResponse)is { } programCandidate)
         {
             _coreProgramLifecycleOperations.BeginDyingProgramBinding(programCandidate, dying);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
             return;
         }
 
-        foreach (var rescueCandidate in programCandidates.Where(item => _coreProgramLifecycleOperations.GetProgramTrigger(item).Window == SkillProgramTriggerWindow.DyingResponse))
+        foreach (var rescueCandidate in programCandidates.Where(item => _coreProgramLifecycleOperations.GetProgramTrigger2(item).Window == SkillProgramTriggerWindow.DyingResponse))
         {
             var(useRescue, rescueThought) = _coreAiBrainsAiBrainsAccess._aiBrains[responder.Seat].ChooseProgramDyingRescue(_corePlayerViewProjectionOperations.CreateSnapshot(responder.Seat), dying.VictimSeat, _contentRegistryOperations._contentRegistry!.GetSkill(rescueCandidate.SkillId).Name, ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
             _coreNativeAiDecisionsOperations.AddThought(rescueThought);
@@ -219,7 +219,7 @@ internal sealed partial class CoreNativeDyingRuntime
         foreach (var candidate in programCandidates)
         {
             var skill = _contentRegistryOperations._contentRegistry!.GetSkill(candidate.SkillId);
-            choices.Add(new PromptChoice(new ChoiceId($"dying.program.{(candidate.SkillId)}.{(candidate.BindingId)}.{(candidate.SkillInstanceId)}"), _coreProgramLifecycleOperations.GetProgramTrigger(candidate).Window == SkillProgramTriggerWindow.DyingResponse ? $"发动【{(skill.Name)}】救援 {(victim.Name)}。" : $"发动【{(skill.Name)}】：{(skill.Description)}", [], [], new Dictionary<string, string> { ["response"] = "program-trigger", ["skill-id"] = candidate.SkillId, ["binding-id"] = candidate.BindingId, ["skill-instance-id"] = candidate.SkillInstanceId, ["target-seat"] = victim.Seat.ToString(System.Globalization.CultureInfo.InvariantCulture), }));
+            choices.Add(new PromptChoice(new ChoiceId($"dying.program.{(candidate.SkillId)}.{(candidate.BindingId)}.{(candidate.SkillInstanceId)}"), _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Window == SkillProgramTriggerWindow.DyingResponse ? $"发动【{(skill.Name)}】救援 {(victim.Name)}。" : $"发动【{(skill.Name)}】：{(skill.Description)}", [], [], new Dictionary<string, string> { ["response"] = "program-trigger", ["skill-id"] = candidate.SkillId, ["binding-id"] = candidate.BindingId, ["skill-instance-id"] = candidate.SkillInstanceId, ["target-seat"] = victim.Seat.ToString(System.Globalization.CultureInfo.InvariantCulture), }));
         }
 
         var rescueCardIds = peaches.Select(card => card.Id).Concat(alcohols.Select(card => card.Id)).ToArray();
@@ -272,7 +272,7 @@ internal sealed partial class CoreNativeDyingRuntime
                 throw new InvalidOperationException("The requested Peach conversion is no longer legal.");
             usedPeachCardId = peach.Id;
             usedPeachPhysicalCardKind = peachConversionSource is null ? null : peach.Kind;
-            _coreNativeRecoveryCardsOperations.ResolvePeach(responder, victim, peach, allowDying: true, peachConversionSource, new DyingResponseEvent(dying.FrameId, responder.Seat, true, peach.Id, false, null) { UsedPeachPhysicalCardKind = usedPeachPhysicalCardKind });
+            _coreNativeRecoveryCardsOperations.ResolvePeach2(responder, victim, peach, allowDying: true, peachConversionSource, new DyingResponseEvent(dying.FrameId, responder.Seat, true, peach.Id, false, null) { UsedPeachPhysicalCardKind = usedPeachPhysicalCardKind });
             return;
         }
 

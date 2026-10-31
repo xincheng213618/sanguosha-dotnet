@@ -50,7 +50,7 @@ internal sealed partial class CoreGameEngineAlcoholIdentityPoliciesRuntime
         // Keep historical producer state unchanged when this new policy is absent.
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.ForeignTurnAlcoholUseProhibition))
             return null;
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         if (!HasDyingAlcoholProducer(trigger))
             return null;
         if (!CanRunProgramDyingAlcoholPolicy(trigger, context, candidate.OwnerSeat) || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying)

@@ -16,7 +16,7 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
         SkillProgramEffectOp.PrepareBoundaryYanYanJuzhan => PrepareBoundaryYanYan(f),
         SkillProgramEffectOp.FinishBoundaryYanYanJuzhan => FinishBoundaryYanYan(f),
         _ => ClaimBoundaryYanYan(f)};
-    internal bool HasBoundaryYanYanHe(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(seat).Count > 0;
+    internal bool HasBoundaryYanYanHe(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat).Count > 0;
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 54300)]
     internal void ObserveBoundaryYanYan(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> candidates)
     {
@@ -28,7 +28,7 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
                 return;
             foreach (var claim in claims.Where(c => !c.Settled && _coreMatchParticipantsPlayersAccess._players[c.Source.OwnerSeat].IsAlive).DistinctBy(c => (c.Source.OwnerSeat, c.Source.SkillInstanceId)))
                 if (!candidates.Any(c => c.OwnerSeat == claim.Source.OwnerSeat && c.SkillId == claim.Source.SkillId && c.SkillInstanceId == claim.Source.SkillInstanceId && c.TriggerId == "chengshi-completed-use"))
-                    candidates.Add(new(claim.Source.OwnerSeat, -1, claim.Source.SkillId, "chengshi-completed-use", claim.GameplayHash, claim.Source.SkillInstanceId, 0, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, claim.Source.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[claim.Source.OwnerSeat], action))));
+                    candidates.Add(new(claim.Source.OwnerSeat, -1, claim.Source.SkillId, "chengshi-completed-use", claim.GameplayHash, claim.Source.SkillInstanceId, 0, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, claim.Source.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[claim.Source.OwnerSeat], action))));
             return;
         }
 
@@ -132,7 +132,7 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
         if (c.SkillId != BoundaryYanYanComposition.Skill || c.BindingId != "chengshi-completed-use" || w.Window != SkillProgramTriggerWindow.CardUseCompleted || w.OwnerSeat != c.OwnerSeat || w.CardUse is not { } info || _coreCardUseLifecycleOperations.LifecycleCardUse(info.ParentCardUseFrameId)is not { Step: ResolutionFrameStep.Completed, Action: { } a, BoundaryYanYanClaims: { } claims } u || a.ActionId != info.CardActionId || !claims.Any(p => p.Source.OwnerSeat == c.OwnerSeat && p.Source.SkillInstanceId == c.SkillInstanceId && p.GameplayHash == c.GameplayHash && (settled || !p.Settled) && BoundaryYanYanIssuedClaimMatches(u, p)) || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(x => x.Id == w.ParentFrameId)is not { } window || window.ParentFrameId != u.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return null;
         var actual = window.Candidates[window.CandidateIndex];
-        return actual.OwnerSeat == c.OwnerSeat && actual.SkillId == c.SkillId && actual.TriggerId == c.BindingId && actual.SkillInstanceId == c.SkillInstanceId && actual.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext(window, actual) == w && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) == 1 ? u : null;
+        return actual.OwnerSeat == c.OwnerSeat && actual.SkillId == c.SkillId && actual.TriggerId == c.BindingId && actual.SkillInstanceId == c.SkillInstanceId && actual.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext2(window, actual) == w && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) == 1 ? u : null;
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 54300)]

@@ -409,7 +409,7 @@ internal sealed partial class CoreRecoveryReplacementRuntime
                 _coreRuntimeOperations.AdvanceRuntimeProgram(continuation.ResumeFrameId!.Value);
                 break;
             case PostEventContinuation.SkillInvocation:
-                if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not SkillInvocationFrame invocation || !_characterHuaTuoAnniversaryGodOperations.IsSkillInvocationHealthChild(invocation, completed))
+                if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not SkillInvocationFrame invocation || !_characterHuaTuoAnniversaryGodOperations.IsSkillInvocationHealthChild2(invocation, completed))
                     throw new InvalidOperationException("A skill invocation lost its exact recovery producer return.");
                 _coreRuntimeOperations.AdvanceRuntimeFrame(invocation.Id);
                 break;

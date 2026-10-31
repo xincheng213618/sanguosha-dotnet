@@ -58,7 +58,7 @@ internal sealed partial class CharacterMengDaOlRuntime
     {
         if (context.Window != SkillProgramTriggerWindow.AfterTurnEnded || context.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } parent || !_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent) || _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(parent) != candidate || context.SourceSeat != parent.OwnerSeat || context.TargetSeat != parent.OwnerSeat || context.Facts != parent.AfterTurnEnded!.Items[parent.AfterTurnEnded.ItemIndex].Facts || context.OccurrenceIndex != candidate.OccurrenceIndex)
             return false;
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         return trigger.Effects is [{ Op: SkillProgramEffectOp.ResolveGoudeActualTurnEnd }] && trigger.TurnOwnerScope == (candidate.OwnerSeat == parent.OwnerSeat ? SkillProgramTurnOwnerScope.Own : SkillProgramTurnOwnerScope.OtherLiving);
     }
 

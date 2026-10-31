@@ -9,7 +9,7 @@ internal sealed partial class CoreNativeGroupResponsesRuntime
 {
     internal void ResolveGroupResponse(global::CardGame.Core.NativeOwners.GroupCardHandle group, CharacterState responder, Card? selectedResponse)
     {
-        if (selectedResponse is not null && _characterLiuQiOlOperations.IsWenjiResponseForbidden(group.ResolutionId, responder.Seat))
+        if (selectedResponse is not null && _characterLiuQiOlOperations.IsWenjiResponseForbidden2(group.ResolutionId, responder.Seat))
             throw new InvalidOperationException("Wenji forbids this exact group response.");
         if (selectedResponse is { } declaredResponse && _coreCardDeclarationsOperations.TryBeginCardDeclaration(responder, declaredResponse, group.RequiredCardKind!.Value, _coreCardDeclarationsOperations.PeekDeclarationConversion(responder, declaredResponse, group.RequiredCardKind.Value, false), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Group, responder.Seat), [group.SourceSeat]))
             return;

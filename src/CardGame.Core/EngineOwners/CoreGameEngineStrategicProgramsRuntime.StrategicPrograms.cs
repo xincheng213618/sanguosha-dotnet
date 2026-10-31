@@ -26,7 +26,7 @@ internal sealed partial class CoreGameEngineStrategicProgramsRuntime
             if (program is null)
                 continue;
             foreach (var definition in program.BooleanStates.Where(state => state.Visibility == SkillProgramStateVisibility.Public))
-                values[definition.Id] = _coreProgramPersistentStateOperations.GetProgramBooleanState(player.Seat, grant.SkillId, grant.SkillInstanceId, definition.Id);
+                values[definition.Id] = _coreProgramPersistentStateOperations.GetProgramBooleanState2(player.Seat, grant.SkillId, grant.SkillInstanceId, definition.Id);
         }
 
         return values.Count > 0 ? values : null;
@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEngineStrategicProgramsRuntime
     {
         foreach (var key in _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates.Keys.Where(key => key.OwnerSeat == ownerSeat).ToArray())
         {
-            var definition = _coreProgramPersistentStateOperations.GetProgramBooleanStateDefinition(key.SkillId, key.StateId);
+            var definition = _coreProgramPersistentStateOperations.GetProgramBooleanStateDefinition2(key.SkillId, key.StateId);
             if (definition.ResetScope == SkillProgramStateResetScope.PlayPhase)
                 _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates[key] = definition.InitialValue;
         }
@@ -153,9 +153,9 @@ internal sealed partial class CoreGameEngineStrategicProgramsRuntime
                 _coreGameEngineStrategicProgramsProgramSuppressionsStrategicEndPlayTurnStrategicHandLimitPenaltyTurnsAccess._strategicEndPlayTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber;
                 return SkillProgramStepOutcome.Continue;
             case SkillProgramEffectOp.DiscardTargetEquipment:
-                var equipmentDiscard = _coreNativeLogicalDiscardsOperations.CaptureNativeLogicalDiscardInvocation(frame.OwnerSeat, frame.OwnerSeat, frame.SelectedTargetSeats.SelectMany(seat => _corePhysicalOwnedCardQueriesOperations.GetEquipment(seat).Where(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(frame.OwnerSeat, card, CardLocation.Equipment(seat), OwnedCardMoveIntent.Discard)).Select(card => card.Id)).ToArray(), reason, frame.Id);
+                var equipmentDiscard = _coreNativeLogicalDiscardsOperations.CaptureNativeLogicalDiscardInvocation(frame.OwnerSeat, frame.OwnerSeat, frame.SelectedTargetSeats.SelectMany(seat => _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat).Where(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(frame.OwnerSeat, card, CardLocation.Equipment(seat), OwnedCardMoveIntent.Discard)).Select(card => card.Id)).ToArray(), reason, frame.Id);
                 foreach (var seat in frame.SelectedTargetSeats)
-                    _corePhysicalMovementFacadesOperations.MoveCards(_corePhysicalOwnedCardQueriesOperations.GetEquipment(seat).Where(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(frame.OwnerSeat, card, CardLocation.Equipment(seat), OwnedCardMoveIntent.Discard)).ToArray(), CardLocation.Equipment(seat), CardLocation.DiscardPile, reason, movement => _characterBianFuRenOlOperations.RecordBianFuRenForeignDiscardProducer(movement, frame.OwnerSeat, frame.Id));
+                    _corePhysicalMovementFacadesOperations.MoveCards(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat).Where(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(frame.OwnerSeat, card, CardLocation.Equipment(seat), OwnedCardMoveIntent.Discard)).ToArray(), CardLocation.Equipment(seat), CardLocation.DiscardPile, reason, movement => _characterBianFuRenOlOperations.RecordBianFuRenForeignDiscardProducer(movement, frame.OwnerSeat, frame.Id));
                 _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(equipmentDiscard);
                 return SkillProgramStepOutcome.Continue;
             case SkillProgramEffectOp.DamageOtherLiving:

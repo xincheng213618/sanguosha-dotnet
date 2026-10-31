@@ -88,7 +88,7 @@ internal sealed partial class CoreGameEngineZhaoguMirrorRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ZhaoguMirror = frame.ZhaoguMirror!with { Template = _coreSnapshotValueProjectionOperations.ToSnapshot(card), Stage = ZhaoguMirrorStage.RevealChildren } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, frame.TriggerId!, frame.OwnerSeat, ZhaoguRevealKey, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
-        if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(frame.Id, ZhaoguRevealKey))
+        if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frame.Id, ZhaoguRevealKey))
             ContinueZhaoguAfterReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));
     }
 
@@ -145,7 +145,7 @@ internal sealed partial class CoreGameEngineZhaoguMirrorRuntime
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(id, card, frame.OwnerSeat, use.TargetSeats, option.ActionKind, option.TargetCardId, option.RequiredCardKind, kind);
     }
 
-    internal IEnumerable<(CardKind Kind, int Target)> ZhaoguVirtualBasicOptions(ProgramSkillFrame frame) => frame.ZhaoguMirror?.Template is { } template && CardUseCategoryCatalog.Get(template.Kind) == CardUseCategories.Basic ? _coreVirtualBasicOffersOperations.VirtualBasicOptions(frame.OwnerSeat, true).Where(option => option.Kind == template.Kind) : [];
+    internal IEnumerable<(CardKind Kind, int Target)> ZhaoguVirtualBasicOptions(ProgramSkillFrame frame) => frame.ZhaoguMirror?.Template is { } template && CardUseCategoryCatalog.Get(template.Kind) == CardUseCategories.Basic ? _coreVirtualBasicOffersOperations.VirtualBasicOptions2(frame.OwnerSeat, true).Where(option => option.Kind == template.Kind) : [];
     internal bool IsZhaoguVirtualBasicDraft(ProgramSkillFrame frame, ProgramVirtualBasicDraft draft) => ValidZhaoguHeader(frame) && frame.ZhaoguMirror is { Stage: ZhaoguMirrorStage.BasicChild, Template: not null } && draft.InstructionIndex == frame.InstructionIndex;
     internal ProgramSkillFrame CompleteZhaoguVirtualBasicReceipt(ProgramSkillFrame frame, long childId)
     {

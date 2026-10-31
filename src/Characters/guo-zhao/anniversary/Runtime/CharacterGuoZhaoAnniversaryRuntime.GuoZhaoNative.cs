@@ -42,7 +42,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
         var r = f.AnniversaryGuoZhao!;
         if (!ValidGuoZhao(f) || !r.Paid || r.Option != "equipment" || r.Stage is not (AnniversaryGuoZhaoStage.EquipmentNext or AnniversaryGuoZhaoStage.EquipmentChildren))
             throw new InvalidOperationException("Zunwei equipment needs its original paid option and returned whole equipment Use.");
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive || _corePhysicalOwnedCardQueriesOperations.GetEquipment(f.OwnerSeat).Count >= _corePhysicalOwnedCardQueriesOperations.GetEquipment(r.Target).Count || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive || _corePhysicalOwnedCardQueriesOperations.GetEquipment2(f.OwnerSeat).Count >= _corePhysicalOwnedCardQueriesOperations.GetEquipment2(r.Target).Count || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
         {
             FinishGuoZhao(f);
             return;

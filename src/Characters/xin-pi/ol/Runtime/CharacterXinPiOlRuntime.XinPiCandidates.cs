@@ -14,7 +14,7 @@ internal sealed partial class CharacterXinPiOlRuntime
         if (context.Window != SkillProgramTriggerWindow.BeforeDamageApplied || CurrentYinju(c.OwnerSeat)is not { } r || r.Source.SkillId != c.SkillId || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash || context.SourceSeat != c.OwnerSeat || context.TargetSeat != r.TargetSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not BeforeDamageProgramWindowFrame w || w.Prevented || w.SourceSeat != c.OwnerSeat || w.TargetSeat != r.TargetSeat || w.Amount <= 0 || context.Amount != w.Amount || _coreDamagePreventionProgramsOperations.BeforeDamageHasNoSource(w) || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count)
             return false;
         var current = w.Candidates[w.CandidateIndex];
-        if (current.Candidate != c || _coreDamagePreventionProgramsOperations.CreateBeforeDamageProgramContext(w, current) != context || _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is not [{ Op: SkillProgramEffectOp.PreventYinjuDamageAndRecover }])
+        if (current.Candidate != c || _coreDamagePreventionProgramsOperations.CreateBeforeDamageProgramContext(w, current) != context || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.PreventYinjuDamageAndRecover }])
             return false;
         relation = r;
         window = w;
@@ -25,7 +25,7 @@ internal sealed partial class CharacterXinPiOlRuntime
     {
         relation = null !;
         use = null !;
-        if (CurrentYinju(c.OwnerSeat)is not { } r || r.Source.SkillId != c.SkillId || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash || ExactXinPiNativeWindow(context, false)is not { Action: { } a } u || a.ActorSeat != c.OwnerSeat || !XinPiMainTargets(u).Contains(r.TargetSeat) || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(c, context, window) || _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is not [{ Op: SkillProgramEffectOp.DrawBothAfterYinjuActualTargetUse }] || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<YinjuUseDrawStartedEvent>().Any(e => e.Relation.ActivationFrameId == r.ActivationFrameId && e.UseId == u.Id))
+        if (CurrentYinju(c.OwnerSeat)is not { } r || r.Source.SkillId != c.SkillId || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash || ExactXinPiNativeWindow(context, false)is not { Action: { } a } u || a.ActorSeat != c.OwnerSeat || !XinPiMainTargets(u).Contains(r.TargetSeat) || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(c, context, window) || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.DrawBothAfterYinjuActualTargetUse }] || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<YinjuUseDrawStartedEvent>().Any(e => e.Relation.ActivationFrameId == r.ActivationFrameId && e.UseId == u.Id))
             return false;
         relation = r;
         use = u;
@@ -57,7 +57,7 @@ internal sealed partial class CharacterXinPiOlRuntime
             result.RemoveAll(c => c.OwnerSeat == action.ActorSeat && c.SkillId == r.Source.SkillId && c.TriggerId == t.Id && c.SkillInstanceId != r.Source.SkillInstanceId);
             if (result.Any(c => c.OwnerSeat == action.ActorSeat && c.SkillId == r.Source.SkillId && c.TriggerId == t.Id && c.SkillInstanceId == r.Source.SkillInstanceId))
                 continue;
-            result.Add(new(action.ActorSeat, r.TargetSeat, r.Source.SkillId, t.Id, r.GameplayHash, r.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, action.ActorSeat, r.TargetSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action))));
+            result.Add(new(action.ActorSeat, r.TargetSeat, r.Source.SkillId, t.Id, r.GameplayHash, r.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, action.ActorSeat, r.TargetSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action))));
         }
     }
 }

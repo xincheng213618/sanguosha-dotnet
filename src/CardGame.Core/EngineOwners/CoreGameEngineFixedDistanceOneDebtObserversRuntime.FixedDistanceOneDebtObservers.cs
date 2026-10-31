@@ -25,7 +25,7 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtObserversRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == root.OwnerSeat && recovery.Attempt.TargetSeat == root.OwnerSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.MoveReason?.Value == "program.fixed-distance-one.ending-discard";
     }
 
-    internal ProgramSkillFrame? FixedDistanceDebtObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreFixedDistanceOneDebtObserversOperations.FixedDistanceDebtFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasHandGainDebtObserverSuffix(index));
+    internal ProgramSkillFrame? FixedDistanceDebtObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreFixedDistanceOneDebtObserversOperations.FixedDistanceDebtFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 40, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 170)]
     internal bool IsFixedDistanceDebtProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && FixedDistanceDebtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

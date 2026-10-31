@@ -8,8 +8,8 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CorePhysicalDrawFacadesRuntime
 {
-    private readonly ICorePhysicalDrawFacadesCorePhysicalCardDrawOperations _corePhysicalCardDrawOperations;
-    internal CorePhysicalDrawFacadesRuntime(ICorePhysicalDrawFacadesCorePhysicalCardDrawOperations corePhysicalCardDrawOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEnginePhysicalCardDrawEntries _corePhysicalCardDrawOperations;
+    internal CorePhysicalDrawFacadesRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEnginePhysicalCardDrawEntries corePhysicalCardDrawOperations)
     {
         this._corePhysicalCardDrawOperations = corePhysicalCardDrawOperations;
     }

@@ -83,7 +83,7 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
         var instance = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat]).ProgramInstances.SingleOrDefault(i => i.SkillId == ShiWyZhongao);
         if (instance is null)
             return;
-        _coreProgramSkillChangesOperations.SetProgramBooleanState(source, ShiWyZhongao, instance.SkillInstanceId, success ? "succeeded" : "failed", true);
+        _coreProgramSkillChangesOperations.SetProgramBooleanState2(source, ShiWyZhongao, instance.SkillInstanceId, success ? "succeeded" : "failed", true);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiWeiYanMissionEvent(source.Id, source.OwnerSeat, success));
         _coreProgramSkillChangesOperations.ReplaceProgramSkills(source, success ? [ShiWyKuanggu] : [ShiWyZhuangshi], success ? [ShiWyKuanggu2] : [ShiWyKunfen], ProgramSkillSourceRemoval.Enabled, acquireFirst: true);
     }

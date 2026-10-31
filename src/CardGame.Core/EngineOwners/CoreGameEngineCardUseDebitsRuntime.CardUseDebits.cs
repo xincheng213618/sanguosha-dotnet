@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEngineCardUseDebitsRuntime
             suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[actorSeat], card);
         }
 
-        if (_coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance(actorSeat, suit) || _coreBoundDiscardSlashBenefitsOperations.HasTurnSlashSuitAllowance(actorSeat, suit))
+        if (_coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance2(actorSeat, suit) || _coreBoundDiscardSlashBenefitsOperations.HasTurnSlashSuitAllowance(actorSeat, suit))
             return;
         if (suit is { } usedSuit && _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[actorSeat], SkillProgramCardPolicyKind.BypassSlashLimitBySuit, action.EffectiveKind).Any(item => item.Policy.InputSuit == usedSuit))
             return;

@@ -71,7 +71,7 @@ internal sealed partial class CoreNativeTrickUseRuntime
     {
         var frame = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(cardUse => cardUse.Id == resolutionId);
         var processing = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing);
-        return (frame.PhysicalCardIds ?? [frame.CardId]).Select(cardId => (_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(resolutionId, cardId) || _characterSunYuanOlOperations.IsSayingRemovedMaterial(resolutionId, cardId) || (_coreHellSoulCardsOperations.IsHellDestroyedSoulMaterial(resolutionId, cardId) || (_characterHuBanOlOperations.IsHuiyunOutsideGeneralWeaponMaterial(resolutionId, cardId) || _characterMiHengLeOperations.IsSiruiOutsideGeneralWeaponMaterial(resolutionId, cardId)) || (_coreGuanduEquipmentOperations.IsGuanduDestroyedChariotMaterial(resolutionId, cardId) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(resolutionId, cardId)))) ? _coreResponseEntityExchangeOperations.EntityAtCurrentLocation(cardId) : processing.Single(card => card.Id == cardId)).ToArray();
+        return (frame.PhysicalCardIds ?? [frame.CardId]).Select(cardId => (_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(resolutionId, cardId) || _characterSunYuanOlOperations.IsSayingRemovedMaterial(resolutionId, cardId) || (_coreHellSoulCardsOperations.IsHellDestroyedSoulMaterial(resolutionId, cardId) || (_characterHuBanOlOperations.IsHuiyunOutsideGeneralWeaponMaterial(resolutionId, cardId) || _characterMiHengLeOperations.IsSiruiOutsideGeneralWeaponMaterial(resolutionId, cardId)) || (_coreGuanduEquipmentOperations.IsGuanduDestroyedChariotMaterial(resolutionId, cardId) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial3(resolutionId, cardId)))) ? _coreResponseEntityExchangeOperations.EntityAtCurrentLocation(cardId) : processing.Single(card => card.Id == cardId)).ToArray();
     }
 
     internal void ResolvePeachGarden(CharacterState source, Card peachGarden)
@@ -143,7 +143,7 @@ internal sealed partial class CoreNativeTrickUseRuntime
             return;
         if (_characterCuiLieAnniversaryOperations.TrySkipAnniversaryCuiLieDelayedTarget(pending))
             return;
-        if (_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(pending.ParentFrameId, pending.EffectCardId) || _cardZonesOperations._cardZones.GetLocation(pending.EffectCardId) == CardLocation.OutsideGame && _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(pending.ParentFrameId, pending.EffectCardId))
+        if (_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(pending.ParentFrameId, pending.EffectCardId) || _cardZonesOperations._cardZones.GetLocation(pending.EffectCardId) == CardLocation.OutsideGame && _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial3(pending.ParentFrameId, pending.EffectCardId))
         {
             _coreNativeCardUseCompletionOperations.FinishCardUse(pending.ParentFrameId, _coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending), pending.EffectCardKind);
             _coreMatchLogOperations.AddLog("CardEffect", "延时锦囊的原实体已离开处理区，不能置入判定区。", pending.SourceSeat);

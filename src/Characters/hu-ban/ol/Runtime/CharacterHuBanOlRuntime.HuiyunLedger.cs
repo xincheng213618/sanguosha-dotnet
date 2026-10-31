@@ -89,7 +89,7 @@ internal sealed partial class CharacterHuBanOlRuntime
         if (!IsIssuedHuiyunCandidate(c) || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.OwnerSeat != c.OwnerSeat || context.CardUse is not { } card || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is not { Step: ResolutionFrameStep.Completed, HuiyunOrigin: { } r, Action: { } a } u || !HuiyunUseProof(u) || r.Source.OwnerSeat != c.OwnerSeat || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash || card.CardActionId != a.ActionId || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != u.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return null;
         var current = window.Candidates[window.CandidateIndex];
-        return current.OwnerSeat == c.OwnerSeat && current.SkillId == c.SkillId && current.TriggerId == c.BindingId && current.SkillInstanceId == c.SkillInstanceId && current.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext(window, current) == context && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) == 1 ? u : null;
+        return current.OwnerSeat == c.OwnerSeat && current.SkillId == c.SkillId && current.TriggerId == c.BindingId && current.SkillInstanceId == c.SkillInstanceId && current.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) == context && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) == 1 ? u : null;
     }
 
     internal bool CanRunIssuedHuiyunCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => HuiyunCandidateUse(c, context)is { } u && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && HasHuiyunOption(c.OwnerSeat, u.HuiyunOrigin!.RoundNumber) && HuiyunOpportunities(u).Count > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<HuiyunStartedEvent>().Any(e => e.Origin.UseId == u.Id);
@@ -101,7 +101,7 @@ internal sealed partial class CharacterHuBanOlRuntime
         var t = _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program!.Triggers.Single();
         if (result.Any(c => c.SkillId == r.Source.SkillId && c.SkillInstanceId == r.Source.SkillInstanceId && c.OwnerSeat == r.Source.OwnerSeat))
             return;
-        result.Add(new(r.Source.OwnerSeat, r.Source.OwnerSeat, r.Source.SkillId, t.Id, r.GameplayHash, r.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, r.Source.OwnerSeat, r.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], action))));
+        result.Add(new(r.Source.OwnerSeat, r.Source.OwnerSeat, r.Source.SkillId, t.Id, r.GameplayHash, r.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, r.Source.OwnerSeat, r.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], action))));
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27380)]

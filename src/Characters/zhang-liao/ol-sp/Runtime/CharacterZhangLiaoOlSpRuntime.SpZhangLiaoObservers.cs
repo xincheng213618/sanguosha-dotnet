@@ -35,7 +35,7 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
         SpZhangLiaoStage.CleanupChildren => "skill-program.ol:mubing.reveal-cleanup",
         _ => ""
     };
-    internal ProgramSkillFrame? SpZhangLiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterZhangLiaoOlSpOperations.SpZhangLiaoFirstChild(root, child), (child) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(child));
+    internal ProgramSkillFrame? SpZhangLiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterZhangLiaoOlSpOperations.SpZhangLiaoFirstChild(root, child), (child) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(child));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 330)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 440)]
     internal bool HasSpZhangLiaoDamageObserver(long id) => SpZhangLiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && (id == root.WindowContext?.ParentFrameId || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));

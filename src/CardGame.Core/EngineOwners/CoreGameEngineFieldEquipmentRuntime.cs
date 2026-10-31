@@ -8,10 +8,10 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineFieldEquipmentRuntime
 {
-    private readonly ICoreFieldEquipmentCharacterWeiYanHappyGodOperations _characterWeiYanHappyGodOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CharacterWeiYanHappyGodEntries _characterWeiYanHappyGodOperations;
     private readonly ICoreFieldEquipmentCoreEquipmentContentOperations _coreEquipmentContentOperations;
-    private readonly ICoreFieldEquipmentCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
-    internal CoreGameEngineFieldEquipmentRuntime(ICoreFieldEquipmentCharacterWeiYanHappyGodOperations characterWeiYanHappyGodOperations, ICoreFieldEquipmentCoreEquipmentContentOperations coreEquipmentContentOperations, ICoreFieldEquipmentCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations)
+    private readonly global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
+    internal CoreGameEngineFieldEquipmentRuntime(global::CardGame.Core.RuntimeEntries.CharacterWeiYanHappyGodEntries characterWeiYanHappyGodOperations, ICoreFieldEquipmentCoreEquipmentContentOperations coreEquipmentContentOperations, global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations)
     {
         this._characterWeiYanHappyGodOperations = characterWeiYanHappyGodOperations;
         this._coreEquipmentContentOperations = coreEquipmentContentOperations;

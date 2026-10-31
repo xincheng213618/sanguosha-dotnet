@@ -53,7 +53,7 @@ internal sealed partial class CharacterZhouYuMobileRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { PendingMovementContinuation = null, RandomOwnedTransfer = receipt = receipt with { Stage = RandomOwnedTransferStage.RevealChildren, RevealedSuit = suit }, PublicHandRevealSelection = new(RandomRecipientRevealReturn, frame.InstructionIndex, 0, card.Id, card.Kind, location, location, receipt.RecipientSeat, receipt.RecipientSeat, receipt.ResultBind, suit) });
         _coreProgramLifecycleOperations.SetProgramCardSet(id, receipt.ResultBind, [card.Id], SkillProgramCardSetVisibility.Public, [location], suit);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), receipt.RecipientSeat, receipt.ResultBind, Array.AsReadOnly(new[] { _closedHandCardViewQueriesSource.Get().Project(_coreMatchParticipantsPlayersAccess._players[receipt.RecipientSeat], card)with { Suit = suit } })));
-        if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(id, RandomRecipientRevealReturn))
+        if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(id, RandomRecipientRevealReturn))
             ReturnRecipientRandomTransferReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(id));
     }
 

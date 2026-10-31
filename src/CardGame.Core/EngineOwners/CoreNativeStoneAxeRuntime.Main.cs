@@ -89,7 +89,7 @@ internal sealed partial class CoreNativeStoneAxeRuntime
 
             foreach (var card in selectedCards)
             {
-                if ((card.IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, originalLocations[card.Id], CardLocation.OutsideGame) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(card.Id, originalLocations[card.Id], CardLocation.OutsideGame)) && originalLocations[card.Id] == CardLocation.Equipment(source.Seat) && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.OutsideGame)
+                if ((card.IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, originalLocations[card.Id], CardLocation.OutsideGame) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial2(card.Id, originalLocations[card.Id], CardLocation.OutsideGame)) && originalLocations[card.Id] == CardLocation.Equipment(source.Seat) && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.OutsideGame)
                     continue;
                 _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.StoneAxeDiscard);
             }

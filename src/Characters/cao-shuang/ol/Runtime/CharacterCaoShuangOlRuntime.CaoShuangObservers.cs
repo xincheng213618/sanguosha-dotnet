@@ -48,7 +48,7 @@ internal sealed partial class CharacterCaoShuangOlRuntime
         return child is RecoveryReplacementFrame recovery && recovery.ParentFrameId == root.Id && recovery.Return == new RecoveryReplacementReturn(PostEventContinuation.Program, root.Id) && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason == new CardMoveReason(CaoShuangPlacementReason) && recovery.Attempt.SourceSeat == r.TargetSeat && recovery.Attempt.TargetSeat == r.TargetSeat && recovery.Attempt.Amount == 1;
     }
 
-    internal ProgramSkillFrame? CaoShuangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterCaoShuangOlOperations.CaoShuangFirstChild(root, child), (child) => _coreObserverSubtreesOperations2.HasMovementObserverSuffix(child));
+    internal ProgramSkillFrame? CaoShuangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterCaoShuangOlOperations.CaoShuangFirstChild(root, child), (child) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(child));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 320)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 430)]
     internal bool HasCaoShuangDamageObserver(long id) => CaoShuangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.Any(f => f.Id == root.Id);

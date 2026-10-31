@@ -1,5 +1,6 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
+[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineLiYiNativeQueriesRuntime))]
 internal sealed partial class CoreGameEngineLiYiNativeQueriesEntries
 {
     private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineLiYiNativeQueriesRuntime> _resolve;

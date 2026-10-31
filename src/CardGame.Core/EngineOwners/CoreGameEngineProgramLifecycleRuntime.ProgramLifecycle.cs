@@ -567,7 +567,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         return context with
         {
             EventMovedCardCount = movementFacts?.MovedCardCount,
-            BooleanState = stateId => facts is null ? _coreProgramPersistentStateOperations.GetProgramBooleanState(owner.Seat, skillId, skillInstanceId, stateId) : facts.GetBooleanState(skillId, skillInstanceId, stateId)
+            BooleanState = stateId => facts is null ? _coreProgramPersistentStateOperations.GetProgramBooleanState2(owner.Seat, skillId, skillInstanceId, stateId) : facts.GetBooleanState(skillId, skillInstanceId, stateId)
         };
     }
 
@@ -662,7 +662,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         var targets = decision.Choices.SelectMany(choice => choice.Targets).Distinct().ToArray();
         var publicContext = CreateProgramAiPublicContext(owner)with
         {
-            BooleanState = stateId => _coreProgramPersistentStateOperations.GetProgramBooleanState(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, stateId),
+            BooleanState = stateId => _coreProgramPersistentStateOperations.GetProgramBooleanState2(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, stateId),
             PindianWon = bind => frame.PindianResultBindings.SingleOrDefault(item => item.Name == bind)?.SourceWon ?? false,
             PindianOutcome = bind => frame.PindianResultBindings.SingleOrDefault(item => item.Name == bind)?.SourceWon,
             ChoiceResult = bind => frame.ChoiceBindings.SingleOrDefault(item => item.Name == bind)?.OptionId

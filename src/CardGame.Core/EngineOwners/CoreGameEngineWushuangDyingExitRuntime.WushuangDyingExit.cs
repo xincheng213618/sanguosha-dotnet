@@ -7,7 +7,7 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangDyingExitRuntime
 {
-    internal bool IsWushuangDyingExitCandidate(ProgramTriggerCandidate c, int victim) => _coreWushuangModeProjectionOperations.IsWushuangMode && c.OwnerSeat == victim && _coreProgramLifecycleOperations.GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.ResolveWushuangCombatTactic, Amount: 2174 or 2175 } e] && c.SkillId == $"wushuang:tactic-{(e.Amount)}";
+    internal bool IsWushuangDyingExitCandidate(ProgramTriggerCandidate c, int victim) => _coreWushuangModeProjectionOperations.IsWushuangMode && c.OwnerSeat == victim && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ResolveWushuangCombatTactic, Amount: 2174 or 2175 } e] && c.SkillId == $"wushuang:tactic-{(e.Amount)}";
     [ProgramTriggerProof(ProgramTriggerProofPhase.NativeWindow, 100, SkillProgramTriggerWindow.DyingExited)]
     internal bool IsWushuangDyingExitContext(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {

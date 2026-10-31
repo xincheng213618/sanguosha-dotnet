@@ -9,9 +9,9 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePublicFactionCountsRuntime
 {
     private readonly ICorePublicFactionCountsCoreModeAllegianceOperations _coreModeAllegianceOperations;
-    private readonly ICorePublicFactionCountsCoreMatchSetupDefinitionsOperations _coreMatchSetupDefinitionsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreMatchSetupDefinitionsEntries _coreMatchSetupDefinitionsOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEnginePublicFactionCountsRuntime(ICorePublicFactionCountsCoreModeAllegianceOperations coreModeAllegianceOperations, ICorePublicFactionCountsCoreMatchSetupDefinitionsOperations coreMatchSetupDefinitionsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEnginePublicFactionCountsRuntime(ICorePublicFactionCountsCoreModeAllegianceOperations coreModeAllegianceOperations, global::CardGame.Core.RuntimeEntries.CoreMatchSetupDefinitionsEntries coreMatchSetupDefinitionsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreModeAllegianceOperations = coreModeAllegianceOperations;
         this._coreMatchSetupDefinitionsOperations = coreMatchSetupDefinitionsOperations;

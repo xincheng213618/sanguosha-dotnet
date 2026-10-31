@@ -25,7 +25,7 @@ internal sealed partial class CharacterXuRongOlRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 430)]
     internal bool CanOfferXuRongLifecycle(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
-        var t = _coreProgramLifecycleOperations.GetProgramTrigger(candidate);
+        var t = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         if (t.Effects.Count != 1)
             return true;
         return t.Effects[0].Op switch

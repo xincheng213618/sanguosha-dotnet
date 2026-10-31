@@ -129,6 +129,6 @@ internal sealed partial class CharacterWenChouMouOlRuntime
         var target = use.TargetSeats.FirstOrDefault(-1);
         if (target < 0)
             return;
-        result.Add(new(o.Source.OwnerSeat, target, o.Source.SkillId, "reward", o.GameplayHash, o.Source.SkillInstanceId, trigger.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, o.Source.OwnerSeat, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[o.Source.OwnerSeat], action))));
+        result.Add(new(o.Source.OwnerSeat, target, o.Source.SkillId, "reward", o.GameplayHash, o.Source.SkillInstanceId, trigger.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, o.Source.OwnerSeat, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[o.Source.OwnerSeat], action))));
     }
 }

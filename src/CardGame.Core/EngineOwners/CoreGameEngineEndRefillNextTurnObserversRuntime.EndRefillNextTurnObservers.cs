@@ -17,7 +17,7 @@ internal sealed partial class CoreGameEngineEndRefillNextTurnObserversRuntime
         return child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex <= skills.Candidates.Count;
     }
 
-    internal ProgramSkillFrame? EndRefillObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreEndRefillNextTurnObserversOperations.EndRefillFirstChild(root, child), (index) => _coreObserverSubtreesOperations2.HasHandGainDebtObserverSuffix(index));
+    internal ProgramSkillFrame? EndRefillObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreEndRefillNextTurnObserversOperations.EndRefillFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 120, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 230)]
     internal bool IsEndRefillDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && EndRefillObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

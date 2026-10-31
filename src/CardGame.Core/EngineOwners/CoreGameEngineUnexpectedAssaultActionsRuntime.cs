@@ -8,11 +8,11 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineUnexpectedAssaultActionsRuntime
 {
-    private readonly ICoreUnexpectedAssaultActionsCoreActionQueriesOperations _coreActionQueriesOperations;
-    private readonly ICoreUnexpectedAssaultActionsCoreCardConversionsOperations _coreCardConversionsOperations;
-    private readonly ICoreUnexpectedAssaultActionsCorePhysicalOwnedCardQueriesOperations _corePhysicalOwnedCardQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineActionQueriesEntries _coreActionQueriesOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardConversionsEntries _coreCardConversionsOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreGameEngineUnexpectedAssaultActionsRuntime(ICoreUnexpectedAssaultActionsCoreActionQueriesOperations coreActionQueriesOperations, ICoreUnexpectedAssaultActionsCoreCardConversionsOperations coreCardConversionsOperations, ICoreUnexpectedAssaultActionsCorePhysicalOwnedCardQueriesOperations corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    internal CoreGameEngineUnexpectedAssaultActionsRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineActionQueriesEntries coreActionQueriesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardConversionsEntries coreCardConversionsOperations, global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreActionQueriesOperations = coreActionQueriesOperations;
         this._coreCardConversionsOperations = coreCardConversionsOperations;

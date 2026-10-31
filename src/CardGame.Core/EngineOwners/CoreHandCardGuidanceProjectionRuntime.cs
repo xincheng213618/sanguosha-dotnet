@@ -8,9 +8,9 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreHandCardGuidanceProjectionRuntime
 {
-    private readonly ICoreHandCardGuidanceProjectionCoreHandGuidanceOperations _coreHandGuidanceOperations;
+    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineHandGuidanceEntries _coreHandGuidanceOperations;
     private readonly ICoreHandCardGuidanceProjectionCoreNativeLegalActionsOperations _coreNativeLegalActionsOperations;
-    internal CoreHandCardGuidanceProjectionRuntime(ICoreHandCardGuidanceProjectionCoreHandGuidanceOperations coreHandGuidanceOperations, ICoreHandCardGuidanceProjectionCoreNativeLegalActionsOperations coreNativeLegalActionsOperations)
+    internal CoreHandCardGuidanceProjectionRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineHandGuidanceEntries coreHandGuidanceOperations, ICoreHandCardGuidanceProjectionCoreNativeLegalActionsOperations coreNativeLegalActionsOperations)
     {
         this._coreHandGuidanceOperations = coreHandGuidanceOperations;
         this._coreNativeLegalActionsOperations = coreNativeLegalActionsOperations;

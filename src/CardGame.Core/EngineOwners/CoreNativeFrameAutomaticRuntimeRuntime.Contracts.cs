@@ -12,18 +12,3 @@ internal interface ICoreNativeFrameAutomaticRuntimeCoreModeNativeFrameRuntimeOpe
     bool Matches(global::CardGame.Core.NativeFrameAutomaticPhase phase, int index, global::CardGame.Core.ResolutionFrame frame);
     bool TryAdvance(global::CardGame.Core.ResolutionFrame frame);
 }
-
-internal interface ICoreNativeFrameAutomaticRuntimeKernelCoreGameEngineRuleProgressionOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    void AdvanceRulesAndPublishState();
-}
-
-internal interface ICoreNativeFrameAutomaticRuntimeNativeSystemFuncCardGameCoreGameEngineCardGameCoreResolutionFrameBoolOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    bool Matches(global::CardGame.Core.NativeFrameAutomaticPhase phase, int index, global::CardGame.Core.ResolutionFrame frame);
-}
-
-internal interface ICoreNativeFrameAutomaticRuntimeCorePendingDecisionPolicyPipelineOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    global::CardGame.Core.PendingDecision? _pendingDecision { get; set; }
-}
